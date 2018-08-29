@@ -79,7 +79,6 @@ module.exports = {
     'no-tabs': 'error',
     'no-unneeded-ternary': 'error',
     'no-whitespace-before-property': 'error',
-    quotes: ['error', 'single'],
     semi: 'error',
     'space-before-blocks': 'error',
     'space-before-function-paren': ['error', 'never'],
