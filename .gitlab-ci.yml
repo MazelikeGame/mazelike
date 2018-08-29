@@ -1,10 +1,6 @@
-before_script:
-    - wget https://nodejs.org/dist/v8.11.4/node-v8.11.4-linux-x64.tar.xz
-    - tar xf node-v8.11.4-linux-x64.tar.xz
-    - PATH="$PATH:$(pwd)/node-v8.11.4-linux-x64/bin"
-    - npm install -g eslint
-
 eslint:
+    image: node:8.11
     stage: test
     script:
-        - eslint .
+        - npm i eslint
+        - node_modules/.bin/eslint .
