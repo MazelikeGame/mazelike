@@ -2,5 +2,5 @@ eslint:
     image: node:8.11
     stage: test
     script:
-        - npm i eslint
-        - node_modules/.bin/eslint .
+        - npm ci
+        - npm run eslint .
