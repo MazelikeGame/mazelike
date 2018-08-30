@@ -1,1 +1,0 @@
-btoa("bad things");
