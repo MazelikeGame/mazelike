@@ -1,1 +1,1 @@
-console.log('bad things')
+btoa("bad things");
