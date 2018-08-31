@@ -1,0 +1,24 @@
+version: "3.2"
+services:
+    backend:
+        image: mazelike/backend
+        build:
+            context: Backend
+        env_file: .env
+        ports: 
+            - 3000:3000
+
+    mysql:
+        image: mysql
+        env_file: .env
+        restart: always
+        expose:
+            - 3306
+        volumes:
+            - type: volume
+              source: mysql-data
+              target: /var/lib/mysql
+
+volumes:
+    mysql-data:
+
