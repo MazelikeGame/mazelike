@@ -16,7 +16,6 @@ module.exports = {
     'no-label-var': 'error',
     'no-shadow': 'error',
     'no-shadow-restricted-names': 'error',
-    'no-use-before-define': 'error',
     'arrow-body-style': ['error', 'always'],
     'arrow-parens': 'error',
     'arrow-spacing': 'error',
