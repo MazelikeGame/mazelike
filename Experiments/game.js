@@ -29,7 +29,7 @@ function setup() {
     dogTexture.frame = new PIXI.Rectangle(0, 0, 16, 16);
 
     for(let y = 0; y < innerHeight; y += GRASS_HEIGHT) {
-        for(let x = 0; x < innerHeight; x += GRASS_WIDTH) {
+        for(let x = 0; x < innerWidth; x += GRASS_WIDTH) {
             let floor = new PIXI.Sprite(grassTexture);
 
             floor.x = x;
