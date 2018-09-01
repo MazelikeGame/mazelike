@@ -1,6 +1,8 @@
 extends layout
 
 block content
+  .image-block
+    img(src="https://cdn.shopify.com/s/files/1/1061/1924/files/Sad_Face_Emoji.png?9898922749706957214" alt="sad emoji" width="160" height="160")
   h1= message
   h2= error.status
   pre #{error.stack}

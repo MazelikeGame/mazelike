@@ -1,5 +1,12 @@
 extends layout
 
+block variables
+    - var title = "Home"
+
 block content
-  h1= title
-  p Welcome to #{title}
+    h2.text-center Welcome to MazeLike
+
+    .row
+        .offset-sm-2.col-sm-8
+            .jumbotron.text-center.
+                Get yo maze on!
