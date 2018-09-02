@@ -1,15 +1,16 @@
-var createError = require('http-errors');
 var express = require('express');
+var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var session = require('express-session');
+var createError = require('http-errors');
 var path = require('path');
-var logger = require('morgan');
+var morgan = require('morgan');
+var User = require('./models/user.js');
 
 const dashboardRouter = require('./routes/dashboard');
 const publicRouter = require('./routes/public');
 
 var app = express();
-
-// view engine setup
 
 /* 8 is the length of string '/backend' */
 var projectDir = __dirname.substring(0, __dirname.length - 8);
@@ -17,14 +18,43 @@ var frontendDir = projectDir.concat('/Frontend');
 app.set('views', path.join(frontendDir, 'views'));
 app.set('view engine', 'pug');
 
-app.use(logger('dev'));
+app.use(morgan('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(frontendDir, 'public')));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(express.static(path.join(frontendDir, 'public')));
 
 app.use('/', publicRouter);
-app.use('/dashboard', dashboardRouter);
+app.use('/dashboard', sessionChecker, dashboardRouter);
+
+app.use(session({
+    key: 'user_sid',
+    secret: 'somerandomstuffs',
+    resave: false,
+    saveUnitialized: false,
+    cookie: {
+        expires: 600000
+    }
+}));
+
+// This middleware will check if user's cookie is still saved in browser and user is not set,
+// then automatically log the user out. This usually happens when you stop your express server after login,
+// your cookie still remains saved in the browser.
+app.use((req, res, next) => {
+    if (req.cookies.user_sid && !req.session.user) {
+        res.clearCookie('user_sid');
+    }
+    next();
+});
+
+// middleware function to check for logged-in users
+var sessionChecker = (req, res, next) => {
+    if (req.session.user && req.cookies.user_sid) {
+        res.redirect('/dashboard');
+    } else {
+        next();
+    }
+};
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
