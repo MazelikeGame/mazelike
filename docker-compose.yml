@@ -13,9 +13,8 @@ services:
             - backend
 
     mysql:
-        image: mysql:5
+        image: mysql:5.7
         env_file: .env
-        restart: always
         volumes:
             - type: volume
               source: mysql-data
