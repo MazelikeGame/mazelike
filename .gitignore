@@ -1,2 +1,5 @@
 node_modules
-.env
+
+# At somepoint we will want to ignore this file but for prototyping purposes
+# I'll leave it in
+#.env

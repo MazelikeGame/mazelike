@@ -3,8 +3,7 @@ FROM node:8.11
 COPY package*.json ./
 RUN npm install --production
 
-COPY Backend .
-COPY Frontend static
+COPY . .
 
 EXPOSE 3000
 
