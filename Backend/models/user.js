@@ -1,7 +1,8 @@
 var Sequelize = require('sequelize');
 var bcrypt = require('bcrypt');
 
-var sequelize = new Sequelize('mysql://root@mysql:3306/auth-system');
+var mysqlAddress = process.env.MYSQL_ADDRESS || "mysql@localhost:5432";
+var sequelize = new Sequelize(`mysql://${mysqlAddress}/auth-system`);
 
 var User = sequelize.define('users', {
     username: {

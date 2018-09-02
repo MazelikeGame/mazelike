@@ -4,7 +4,9 @@ services:
         image: mazelike/backend
         build:
             context: .
-        env_file: .env
+        environment:
+            - MYSQL_ALLOW_EMPTY_PASSWORD=true
+            - MYSQL_DATABASE=auth-system
         ports:
             - 3000:3000
         depends_on:
@@ -14,7 +16,8 @@ services:
 
     mysql:
         image: mysql:5.7
-        env_file: .env
+        environment:
+            - MYSQL_ADDRESS=root@mysql:3306
         volumes:
             - type: volume
               source: mysql-data
