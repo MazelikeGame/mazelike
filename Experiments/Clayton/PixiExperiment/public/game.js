@@ -1,4 +1,5 @@
 import { Player } from './player.js';
+import { Keyboard } from './keyboard.js';
 
 //Pixi.JS Setup
 const app = new PIXI.Application(800, 600, {backgroundColor: 0x1099bb});
@@ -14,6 +15,8 @@ var usernameText = new PIXI.Text(player.username);
  */
 function init()
 {
+    var input = new Keyboard(player);
+
     var helloText = new PIXI.Text('Hello World');
     helloText.x = 10;
     helloText.y = 10;
