@@ -4,7 +4,7 @@ export class Keyboard
     {
         var speed = 5;
 
-        document.addEventListener('keydown', function(event)
+        document.addEventListener('keydown', (event) =>
         {
             switch(event.keyCode)
             {
@@ -21,6 +21,8 @@ export class Keyboard
                     player.setX = player.x - 1 * speed;
                     break;
             }
+
+            event.preventDefault();
         });
        
     }

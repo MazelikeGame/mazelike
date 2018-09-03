@@ -1,35 +1,38 @@
 import { Player } from './player.js';
 import { Keyboard } from './keyboard.js';
 
+//https://github.com/kittykatattack/learningPixi
+
 //Pixi.JS Setup
-const app = new PIXI.Application(800, 600, {backgroundColor: 0x1099bb});
+const app = new PIXI.Application(500, 500, {backgroundColor: 0xFFFFFF});
 document.body.appendChild(app.view);
 
 // Switch to this: http://pixijs.download/dev/docs/PIXI.Spritesheet.html
 
-var player = new Player("Clay", 5, 5, new PIXI.Sprite.fromImage('./images/player.png'));
-var usernameText = new PIXI.Text(player.username);
+var objects = [];
 
 /**
  * Setup
  */
 function init()
 {
-    var input = new Keyboard(player);
 
-    var helloText = new PIXI.Text('Hello World');
-    helloText.x = 10;
-    helloText.y = 10;
-    app.stage.addChild(helloText);
+    let style = new PIXI.TextStyle({
+        fontFamily: "Arial",
+        fontSize: 11
+    });
+    var nameText = new PIXI.Text('Hello World', style);
+    nameText.x = 10;
+    nameText.y = 20;
+    app.stage.addChild(nameText);
 
+    objects.push(nameText);
+
+    var player = new Player("Clay", 5, 5, new PIXI.Sprite.fromImage('./images/player.png'));
     app.stage.addChild(player.sprite);
-    console.log(player.username);
-
+    objects.push(player);
     
-    usernameText.x = player.x;
-    usernameText.y = player.y + 10;
-    app.stage.addChild(usernameText);
-    
+    var input = new Keyboard(player);
     app.ticker.add(delta => loop(delta));
 }
 
@@ -39,8 +42,8 @@ function init()
  */
 function loop(deltaTime)
 {
-    usernameText.x = player.x;
-    usernameText.y = player.y;
+    objects[0].y = objects[1].y + 15;
+    objects[0].x = objects[1].x;
     //console.log("deltaTime: " + deltaTime);
 }
 
