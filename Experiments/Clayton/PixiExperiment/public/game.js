@@ -1,4 +1,4 @@
-import Player from './player.js';
+import { Player } from './player.js';
 
 //Pixi.JS Setup
 const app = new PIXI.Application(800, 600, {backgroundColor: 0x1099bb});
@@ -6,9 +6,8 @@ document.body.appendChild(app.view);
 
 // Switch to this: http://pixijs.download/dev/docs/PIXI.Spritesheet.html
 
-var sprite = new PIXI.Sprite.fromImage('./images/player.png');
-
-var player = new Player("Clay", 5, 5, sprite);
+var player = new Player("Clay", 5, 5, new PIXI.Sprite.fromImage('./images/player.png'));
+var usernameText = new PIXI.Text(player.username);
 
 /**
  * Setup
@@ -19,11 +18,16 @@ function init()
     helloText.x = 10;
     helloText.y = 10;
     app.stage.addChild(helloText);
-    app.stage.addChild(sprite);
 
-
-    app.ticker.add(delta => loop(delta));
+    app.stage.addChild(player.sprite);
     console.log(player.username);
+
+    
+    usernameText.x = player.x;
+    usernameText.y = player.y + 10;
+    app.stage.addChild(usernameText);
+    
+    app.ticker.add(delta => loop(delta));
 }
 
 /**
@@ -32,8 +36,9 @@ function init()
  */
 function loop(deltaTime)
 {
-    player.sprite.x += 1;
+    usernameText.x = player.x;
+    usernameText.y = player.y;
     //console.log("deltaTime: " + deltaTime);
 }
 
-init();
+PIXI.loader.load(init);
