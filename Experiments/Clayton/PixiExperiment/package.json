@@ -1,16 +1,16 @@
 {
   "name": "pixiexperiment",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "cookie-parser": "~1.4.3",
-    "debug": "~2.6.9",
-    "express": "~4.16.0",
-    "http-errors": "~1.6.2",
-    "morgan": "~1.9.0",
-    "pug": "2.0.0-beta11"
+    "express": "^4.16.3",
+    "pixi.js": "^4.8.1"
   }
 }
