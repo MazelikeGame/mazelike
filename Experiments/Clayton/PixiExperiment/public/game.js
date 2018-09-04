@@ -10,8 +10,6 @@ const app = new PIXI.Application(500, 500, {
 
 document.body.appendChild(app.view);
 
-// Switch to this: http://pixijs.download/dev/docs/PIXI.Spritesheet.html
-
 var objects = []; //I don't need this. Pixi keeps an array of children.
 
 //Can split this into map.js
@@ -81,12 +79,12 @@ function init()
 
 
     //Player #2
-    var player2 = new Player("Clay2", 20, 25, new PIXI.Sprite(texture));
+    var player2 = new Player("Clay2", 250, 250, new PIXI.Sprite(texture));
     app.stage.addChild(player2.sprite);
 
     objects.push(player2);
     
-    var input = new Keyboard(player); //Input
+    var input = new Keyboard(player); //Input for now... need to redo this.
 
     app.ticker.add(delta => loop(delta)); //Game loop
     
@@ -120,7 +118,6 @@ function moveNPC()
  */
 function loop(deltaTime)
 {
-    //console.log(objects);
     objects[1].y = objects[0].y + 15;
     objects[1].x = objects[0].x - objects[1].text.length;
 }
