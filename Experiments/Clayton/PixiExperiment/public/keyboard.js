@@ -3,7 +3,7 @@ export class Keyboard
     constructor(player)
     {
         var speed = 5;
-
+ 
         document.addEventListener('keydown', (event) =>
         {
             switch(event.keyCode)
@@ -24,6 +24,5 @@ export class Keyboard
 
             event.preventDefault();
         });
-       
     }
 }

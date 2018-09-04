@@ -11,12 +11,7 @@ export class Player
         this.sprite.x = this.x;
         this.sprite.y = this.y;
     }
-
-    Test()
-    {
-        console.log(this.username);
-    }
-
+    
     set setX(x)
     {
         this.x = x;
