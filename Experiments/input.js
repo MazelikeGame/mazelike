@@ -20,8 +20,8 @@ export class KeyHandler {
     }
 
     _keyEvent(type, e) {
-        if(this._keyCodes.has(e.which) && typeof this["on" + type] == "function" && this._type != type) {
-            this["on" + type](e.which);
+        if(this._keyCodes.has(e.which) && typeof this[`on${type}`] === "function" && this._type !== type) {
+            this[`on${type}`](e.which);
             this._type = type;
         }
     }

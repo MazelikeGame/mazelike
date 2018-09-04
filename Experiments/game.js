@@ -1,3 +1,4 @@
+/* global PIXI */
 import {KeyHandler, KEY_CODES} from "./input.js";
 
 let app = new PIXI.Application({
@@ -10,13 +11,37 @@ document.body.appendChild(app.view);
 app.renderer.view.style.position = "absolute";
 app.renderer.view.style.display = "block";
 app.renderer.autoResize = true;
-(onresize = () => app.renderer.resize(innerWidth, innerHeight))();
 
-// load the textures
-PIXI.loader
-    .add("floor", "DawnLike/Objects/Floor.png")
-    .add("dog", "DawnLike/Characters/Dog0.png")
-    .load(setup);
+let onresize = () => {
+    app.renderer.resize(innerWidth, innerHeight);
+};
+
+onresize();
+
+
+/**
+ * VelocityMod takes an object, a direction, an up and a down key.
+ * VelocityMod sets object.direction to 1 when up keys is pressed and to -1
+ * when the down key is pressed.
+ */
+class VelocityMod extends KeyHandler {
+    constructor(object, direction, upKey, downKey) {
+        super(upKey, downKey);
+        this.obj = object;
+        this.dir = direction;
+        this.upKey = upKey;
+
+        this.obj[this.dir] = 0;
+    }
+
+    onDown(key) {
+        this.obj[this.dir] = key === this.upKey ? 1 : -1;
+    }
+
+    onUp() {
+        this.obj[this.dir] = 0;
+    }
+}
 
 // the width and height of the grass square
 const GRASS_WIDTH = 45;
@@ -61,26 +86,8 @@ function setup() {
     });
 }
 
-/**
- * VelocityMod takes an object, a direction, an up and a down key.
- * VelocityMod sets object.direction to 1 when up keys is pressed and to -1
- * when the down key is pressed.
- */
-class VelocityMod extends KeyHandler {
-    constructor(object, direction, upKey, downKey) {
-        super(upKey, downKey);
-        this.obj = object;
-        this.dir = direction;
-        this.upKey = upKey;
-
-        this.obj[this.dir] = 0;
-    }
-
-    onDown(key) {
-        this.obj[this.dir] = key == this.upKey ? 1 : -1;
-    }
-
-    onUp() {
-        this.obj[this.dir] = 0;
-    }
-}
+// load the textures
+PIXI.loader
+    .add("floor", "DawnLike/Objects/Floor.png")
+    .add("dog", "DawnLike/Characters/Dog0.png")
+    .load(setup);
