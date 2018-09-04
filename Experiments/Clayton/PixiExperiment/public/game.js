@@ -57,18 +57,6 @@ function init()
 {
     generateMap();
 
-    var nameText = new PIXI.Text('Hello World',
-    {
-        fontFamily: "Arial",
-        fontSize: 11
-    });
-    
-    nameText.x = 0;
-    nameText.y = 20;
-    app.stage.addChild(nameText);
-
-    objects.push(nameText);
-
     //Player Sprite
     let texture = PIXI.TextureCache["./images/Player0.png"];
     let rectangle = new PIXI.Rectangle(0, 0, 16, 16);
@@ -79,13 +67,51 @@ function init()
     app.stage.addChild(player.sprite);
     objects.push(player);
 
+    var nameText = new PIXI.Text(player.username,
+    {
+        fontFamily: "Arial",
+        fontSize: 11
+    });
+
+    nameText.x = 0;
+    nameText.y = 20;
+    app.stage.addChild(nameText);
+
+    objects.push(nameText);
+
+
     //Player #2
     var player2 = new Player("Clay2", 20, 25, new PIXI.Sprite(texture));
     app.stage.addChild(player2.sprite);
+
+    objects.push(player2);
     
     var input = new Keyboard(player); //Input
-    
+
     app.ticker.add(delta => loop(delta)); //Game loop
+    
+    setInterval(moveNPC, 500);
+}
+
+function moveNPC()
+{
+    let random = Math.floor((Math.random() * 4) + 1);
+
+    switch(random)
+    {
+        case 1:
+            objects[2].setY = objects[2].y + 1 * 2;
+            break;
+        case 2:
+            objects[2].setY = objects[2].y - 1 * 2;
+            break;
+        case 3:
+            objects[2].setX = objects[2].x + 1 * 2;
+            break;
+        case 4:
+            objects[2].setX = objects[2].x - 1 * 2;
+            break;
+    }
 }
 
 /**
@@ -94,8 +120,9 @@ function init()
  */
 function loop(deltaTime)
 {
-    objects[0].y = objects[1].y + 15;
-    objects[0].x = objects[1].x - objects[0].text.length;
+    //console.log(objects);
+    objects[1].y = objects[0].y + 15;
+    objects[1].x = objects[0].x - objects[1].text.length;
 }
 
 PIXI.loader.add("./images/Player0.png").add("./images/Floor.png").load(init);
