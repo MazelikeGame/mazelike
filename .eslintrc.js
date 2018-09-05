@@ -30,7 +30,7 @@ module.exports = {
     'template-curly-spacing': 'error',
     'yield-star-spacing': 'error',
     'array-callback-return': 'error',
-    complexity: ['error', { max: 6 }],
+    complexity: ['error', { max: 5 }],
     'consistent-return': 'error',
     curly: 'error',
     'dot-notation': 'error',
