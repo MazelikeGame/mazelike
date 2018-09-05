@@ -1,5 +1,7 @@
-/* global PIXI */
+/* global PIXI io */
 import {KeyHandler, KEY_CODES} from "./input.js";
+
+let sock = io(location.host);
 
 let app = new PIXI.Application({
     antialias: true
@@ -17,7 +19,6 @@ let onresize = () => {
 };
 
 onresize();
-
 
 /**
  * VelocityMod takes an object, a direction, an up and a down key.
@@ -70,7 +71,9 @@ function setup() {
     let dog = new PIXI.Sprite(dogTexture);
 
     // position the dog
-    dog.position.set(app.stage.width / 2, app.stage.height / 2);
+    dog.x = Math.floor(Math.random() * app.stage.width / 2);
+    dog.y = Math.floor(Math.random() * app.stage.height / 2);
+
     dog.scale.set(2, 2);
 
     // bind the dogs velocity values (vx and vy) to the arrow keys
@@ -79,10 +82,64 @@ function setup() {
 
     app.stage.addChild(dog);
 
+    let id;
+    let players = new Map();
+
     // move the dog based on its velocity every 60th of a second
     app.ticker.add(() => {
         dog.x += dog.vx;
         dog.y += dog.vy;
+
+        for(let [_, player] of players) { // eslint-disable-line no-unused-vars
+            if(!player.sprite) {
+                player.sprite = new PIXI.Sprite(dogTexture);
+                player.sprite.scale.set(2, 2);
+                app.stage.addChild(player.sprite);
+            }
+
+            player.sprite.position.set(player.x, player.y);
+        }
+
+        if(id && (dog.vx !== 0 || dog.vy !== 0)) {
+            sock.emit("position", {
+                id,
+                x: dog.x,
+                y: dog.y
+            });
+        }
+    });
+
+    sock.on("id", (_id) => {
+        id = _id;
+
+        sock.emit("position", {
+            id,
+            x: dog.x,
+            y: dog.y
+        });
+    });
+
+    sock.emit("ready");
+
+    sock.on("set", (pos) => {
+        if(pos.id === id) {
+            return;
+        }
+
+        if(players.has(pos.id)) {
+            Object.assign(players.get(pos.id), pos);
+        } else {
+            players.set(pos.id, pos);
+        }
+    });
+
+    sock.on("remove", (_id) => {
+        let player = players.get(_id);
+        if(player) {
+            app.stage.removeChild(player.sprite);
+        }
+
+        players.delete(_id);
     });
 }
 
