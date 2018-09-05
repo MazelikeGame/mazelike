@@ -54,7 +54,7 @@ function sessionChecker(req, res, next) {
     } else {
         next();
     }
-};
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

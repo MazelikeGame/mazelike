@@ -35,10 +35,10 @@ var User = sequelize.define('users', {
 
 sequelize.sync()
     .then(() => {
-        console.log('users table has been successfully created, if one doesn\'t exist')
+        console.log('users table has been successfully created, if one doesn\'t exist');
     })
     .catch((error) => {
-        console.log('This error occured', error)
+        console.log('This error occured', error);
     });
 
 module.exports = User;
