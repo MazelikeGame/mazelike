@@ -5,8 +5,7 @@ services:
     build:
       context: .
     environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
-      - MYSQL_DATABASE=auth-system
+      - MYSQL_ADDRESS=root@mysql:3306
     ports:
       - 3000:3000
     depends_on:
@@ -17,7 +16,8 @@ services:
   mysql:
     image: mysql:5.7
     environment:
-      - MYSQL_ADDRESS=root@mysql:3306
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_DATABASE=auth-system
     volumes:
       - type: volume
         source: mysql-data
