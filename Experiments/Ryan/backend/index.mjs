@@ -7,7 +7,7 @@ let app = express();
 let server = http.Server(app);
 let io = socketio(server);
 
-app.use(express.static("."));
+app.use(express.static("../frontend"));
 
 let nextId = 0;
 
