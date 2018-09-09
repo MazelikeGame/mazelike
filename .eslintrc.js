@@ -66,7 +66,7 @@ module.exports = {
     'comma-spacing': 'error',
     'computed-property-spacing': 'error',
     'func-call-spacing': 'error',
-    indent: ['error', 4],
+    indent: ['error', 2],
     'key-spacing': 'error',
     'max-len': ['error', { code: 120, ignoreUrls: true, ignoreTemplateLiterals: true, ignoreRegExpLiterals: true }],
     'new-cap': ['error', { properties: false }],
