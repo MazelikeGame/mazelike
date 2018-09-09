@@ -4,7 +4,7 @@ import { Keyboard } from './keyboard.js';
 //https://github.com/kittykatattack/learningPixi
 
 //Pixi.JS Setup
-const app = new PIXI.Application(500, 500, {
+const app = new PIXI.Application(800, 800, {
     backgroundColor: 0xFFFFFF,
 });
 
@@ -26,9 +26,9 @@ function generateMap()
     const grassRectangle = new PIXI.Rectangle(128, 110, 16, 16);
     const grassTexture = new PIXI.Texture(tiles, grassRectangle);
 
-    for(var x = 0; x < 500; x++)
+    for(var x = 0; x < app.renderer.width; x++)
     {
-        for(var y = 0; y < 500; y++)
+        for(var y = 0; y < app.renderer.width; y++)
         {
             if(((x % 16) == 0) && ((y % 16) == 0))
             {
