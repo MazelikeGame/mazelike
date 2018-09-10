@@ -6,6 +6,7 @@ import { Keyboard } from './keyboard.js';
 //Pixi.JS Setup
 const app = new PIXI.Application(800, 800, {
     backgroundColor: 0xFFFFFF,
+    antialias: true
 });
 
 document.body.appendChild(app.view);

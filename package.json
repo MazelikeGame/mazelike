@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "pixi.js": "^4.8.1"
+  },
   "devDependencies": {
     "eslint": "^5.4.0"
   },
