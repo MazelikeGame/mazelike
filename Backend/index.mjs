@@ -6,7 +6,7 @@ let app = express();
 let server = http.Server(app);
 let io = socketio(server);
 
-app.use(express.static("frontend"));
+app.use(express.static("Frontend"));
 
 let nextId = 0;
 
@@ -26,4 +26,4 @@ io.on("connection", (client) => {
   });
 });
 
-server.listen(3000, "localhost");
+server.listen(3000);
