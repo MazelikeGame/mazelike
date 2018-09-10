@@ -2,13 +2,17 @@
   "name": "mazelike",
   "version": "1.0.0",
   "scripts": {
-    "test": "echo My not test test",
-    "start": "node --experimental-modules Backend/index.mjs"
+    "test": "jasmine",
+    "start": "node --experimental-modules Backend/index.mjs",
+    "docker-test": "scripts/docker-test"
   },
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.3",
     "socket.io": "^2.1.1"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "jasmine": "^3.2.0"
+  }
 }

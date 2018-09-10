@@ -1,0 +1,14 @@
+#!/bin/bash
+
+root="$(git rev-parse --show-toplevel)"
+
+docker-compose up -d mysql
+
+# Rebuild both images if not in fast mode
+if [ "$1" != "-fast" ]; then
+  docker-compose build
+  docker build -t mazelike/test $root -f scripts/test.Dockerfile
+fi
+
+# Run the tests in docker
+docker run --rm -t --network pp_3_backend -v "$root/spec:/app/spec" mazelike/test
