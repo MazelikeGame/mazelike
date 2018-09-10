@@ -120,8 +120,8 @@ function gameLoop(delta, sprite) {
 
 function play(delta) {
   if(hitTestRectangle(dog, wall)) {
-    console.log('hit!');
-    wall.x += dog.vx;
+    wall.x = dog.x + (50 * dog.vx);
+    wall.y = dog.y + (50 * dog.vy);
   }
   dog.y += dog.vy;
   dog.x += dog.vx;
