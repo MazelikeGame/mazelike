@@ -19,18 +19,36 @@ onresize();
 app.renderer.resize(window.innerWidth, window.innerHeight);
 app.renderer.backgroundColor = 0x6dcff6;
 
+let dog;
+let boot;
 function setup() {
-  // Courtesy of Ryan
+  app.ticker.add(delta => gameLoop(delta));
+  let bootTexture = PIXI.loader.resources.boot.texture;
+  bootTexture.frame = new PIXI.Rectangle(0, 0, 16, 16);
+  boot = new PIXI.Sprite(bootTexture);
   let dogTexture = PIXI.loader.resources.dog.texture;
   dogTexture.frame = new PIXI.Rectangle(0, 0, 16, 16);
-  let dog = new PIXI.Sprite(dogTexture);
-  dog.x = 10;
-  dog.y = 10;
-  // Courtesy of Ryan
+  dog = new PIXI.Sprite(dogTexture);
+  dog.x = 150;
+  dog.y = 150;
+
+  document.addEventListener('keydown', (event) => {
+    if(event.keyCode === 32) {
+      boot.x = dog.x;
+      boot.y = dog.y;
+      app.stage.addChild(boot);
+    }
+  });
   app.stage.addChild(dog);
+}
+
+function gameLoop(delta) {
+  //Move the dog 1 pixel
+  boot.x += 1;
 }
 
 // Add textures
 PIXI.loader
   .add("dog", "images/Dog0.png")
+  .add("boot", "images/Boot.png")
   .load(setup);
