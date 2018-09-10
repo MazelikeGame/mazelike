@@ -1,0 +1,7 @@
+- MUST RUN 'npm install mysql' for any sql related commands
+- note that these ARE NOT tested, as idk our database info yet
+  (and my one for cs363 is being weird)
+
+- also realized part way through the course that its teaching more so teaching sql,
+  and that basically any SQL is used with the generic node code that deals with databases
+  (see select_ex.js)

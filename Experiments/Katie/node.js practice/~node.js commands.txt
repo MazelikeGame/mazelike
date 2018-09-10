@@ -1,0 +1,6 @@
+- node file.js will start it
+- to use one of node.js's built in modules, we create a variable with
+  the following formatting: var module_name = require('module_name');
+	- if we wanted to use the https module, we would include:
+		var http = require('http');
+- 
