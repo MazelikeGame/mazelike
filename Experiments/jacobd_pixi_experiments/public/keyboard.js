@@ -6,9 +6,11 @@ export function keyboard(keyCode) {
   key.press = undefined;
   key.release = undefined;
   //The `downHandler`
-  key.downHandler = event => {
+  key.downHandler = (event) => {
     if (event.keyCode === key.code) {
-      if (key.isUp && key.press) key.press();
+      if (key.isUp && key.press) {
+        key.press();
+      }
       key.isDown = true;
       key.isUp = false;
     }
@@ -16,9 +18,11 @@ export function keyboard(keyCode) {
   };
 
   //The `upHandler`
-  key.upHandler = event => {
+  key.upHandler = (event) => {
     if (event.keyCode === key.code) {
-      if (key.isDown && key.release) key.release();
+      if (key.isDown && key.release) {
+        key.release();
+      }
       key.isDown = false;
       key.isUp = true;
     }
