@@ -19,12 +19,8 @@ html(lang="en")
         a(href="/", title="Expresso") MazeLike
       nav.my-2.my-md-0.mr-md-3
         a.p-2.text-dark(href="/", title="Home") Home
-
-        if user == undefined
-          a.p-2.text-dark(href="/login") Log In / Register
-        else
-          a.p-2.text-dark(href="/dashboard") Dashboard
-          a.p-2.text-dark(href="/users/logout") Logout
+        a.p-2.text-dark(href="/login") Log In / Register
+        a.p-2.text-dark(href="/dashboard") Dashboard
     .container
         block content
 
