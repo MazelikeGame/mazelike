@@ -1,5 +1,5 @@
 eslint:
-  image: node:8.11
+  image: mazelike/backend
   stage: test
   script:
     - npm install
