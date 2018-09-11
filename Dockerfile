@@ -1,5 +1,6 @@
 FROM node:8.11
 
+HEALTHCHECK CMD curl -f http://localhost:3000/ || exit 1
 WORKDIR /app
 
 COPY package*.json ./
