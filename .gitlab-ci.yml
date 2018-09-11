@@ -4,3 +4,4 @@ eslint:
   script:
     - npm install -dd
     - npm run eslint .
+    - npm test
