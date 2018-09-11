@@ -2,5 +2,5 @@ eslint:
   image: node:8.11
   stage: test
   script:
-    - npm install
+    - npm install -dd
     - npm run eslint .
