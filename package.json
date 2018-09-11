@@ -5,7 +5,7 @@
     "test": "jasmine",
     "start": "node --experimental-modules Backend/index.mjs",
     "docker-test": "scripts/docker-test",
-    "doc": "jsdoc -r Frontend Backend -d Documents/jsdoc"
+    "doc": "jsdoc -r Frontend Backend -d Documents"
   },
   "license": "ISC",
   "dependencies": {
