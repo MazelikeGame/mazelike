@@ -5,7 +5,8 @@
     "test": "jasmine",
     "start": "node --experimental-modules Backend/index.mjs",
     "docker-test": "scripts/docker-test",
-    "doc": "jsdoc -r Frontend Backend -d Documents"
+    "doc": "jsdoc -r Frontend Backend -d Documents",
+    "eslint": "eslint Backend/"
   },
   "license": "ISC",
   "dependencies": {
@@ -17,8 +18,5 @@
   "devDependencies": {
     "jasmine": "^3.2.0",
     "jsdoc": "^3.5.5"
-  }
-  "scripts":{
-    “eslint:”: “eslint Backend/"
   }
 }
