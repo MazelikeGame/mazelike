@@ -1,20 +1,20 @@
 {
   "name": "mazelike",
-  "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
-  "dependencies": {},
-  "devDependencies": {
-    "eslint": "^5.4.0"
-  },
+  "version": "1.0.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "eslint": "eslint ."
+    "test": "jasmine",
+    "start": "node --experimental-modules Backend/index.mjs",
+    "docker-test": "scripts/docker-test",
+    "doc": "jsdoc -r Frontend Backend -d Documents"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://git.linux.iastate.edu/cs309/Fall2018/PP_3.git"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3",
+    "socket.io": "^2.1.1"
   },
-  "author": "",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "jasmine": "^3.2.0",
+    "jsdoc": "^3.5.5"
+  }
 }

@@ -1,0 +1,34 @@
+version: "3.2"
+services:
+  backend:
+    image: mazelike/backend
+    build:
+      context: .
+    environment:
+      - MYSQL_ADDRESS=root@mysql:3306
+    ports:
+      - 3000:3000
+    depends_on:
+      - mysql
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_DATABASE=auth-system
+    volumes:
+      - type: volume
+        source: mysql-data
+        target: /var/lib/mysql
+    networks:
+      - backend
+    expose:
+      - 3306
+
+volumes:
+  mysql-data:
+
+networks:
+  backend:
