@@ -16,3 +16,5 @@ MazeLike_Deploy:
       - docker kill mazelike || echo "Server not running"
       - docker container rm mazelike || echo "Container not found"
       - docker run --name mazelike -d -p 80:3000 -e NODE_ENV=production "mazelike/backend:$VERSION"
+  only:
+    - master
