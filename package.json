@@ -6,7 +6,7 @@
     "start": "node --experimental-modules Backend/index.mjs",
     "docker-test": "scripts/docker-test",
     "doc": "jsdoc -r Frontend Backend -d Documents",
-    "eslint": "eslint Backend/"
+    "eslint": "eslint Frontend Backend --ext .js,.mjs"
   },
   "license": "ISC",
   "dependencies": {
