@@ -5,10 +5,12 @@
     "test": "jasmine",
     "start": "node --experimental-modules Backend/index.mjs",
     "docker-test": "scripts/docker-test",
-    "doc": "jsdoc -r Frontend Backend -d Documents"
+    "doc": "jsdoc -r Frontend Backend -d Documents",
+    "eslint": "eslint Frontend Backend --ext .js,.mjs"
   },
   "license": "ISC",
   "dependencies": {
+    "eslint": "^5.5.0",
     "express": "^4.16.3",
     "socket.io": "^2.1.1"
   },
