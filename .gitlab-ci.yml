@@ -11,3 +11,6 @@ MazeLike_Deploy:
   stage: deploy
   script:
       - docker build -t mazelike/backend .
+      - docker kill mazelike
+      - docker container rm mazelike
+      - docker run --name mazelike -d -p 80:3000 -e NODE_ENV=production mazelike/backend
