@@ -2,11 +2,13 @@ import express from "express";
 import http from "http";
 import socketio from "socket.io";
 import versionRouter from "./routes/version";
+import logger from "morgan";
 
 let app = express();
 let server = http.Server(app);
 let io = socketio(server);
 
+app.use(logger("dev"));
 app.use(express.static("Frontend"));
 
 /**
