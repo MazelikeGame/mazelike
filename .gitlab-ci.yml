@@ -10,8 +10,8 @@ MazeLike_Deploy:
   image: docker:stable
   stage: deploy
   script:
-    # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-      - VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' \ | sed 's/[",]//g')
+      # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
+      - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g')"
       - docker build -t mazelike/backend:$VERSION .
       - docker kill mazelike || echo "Server not running"
       - docker container rm mazelike || echo "Container not found"
