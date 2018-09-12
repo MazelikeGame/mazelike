@@ -1,7 +1,13 @@
-eslint:
+MazeLike_Testing:
   image: node:8.11
   stage: test
   script:
     - npm install -dd
     - npm run eslint
     - npm test
+
+MazeLike_Deploy:
+    stage: deploy
+    script:
+        - docker-pull hello-world
+        - echo $uid
