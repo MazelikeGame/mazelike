@@ -3,5 +3,5 @@ eslint:
   stage: test
   script:
     - npm install -dd
-    - npm run eslint .
+    - npm run eslint
     - npm test
