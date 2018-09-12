@@ -8,7 +8,7 @@ let app = express();
 let server = http.Server(app);
 let io = socketio(server);
 
-app.use(logger("dev"));
+app.use(logger(process.env.NODE_ENV === "production" ? "common" : "tiny"));
 app.use(express.static("Frontend"));
 
 /**
