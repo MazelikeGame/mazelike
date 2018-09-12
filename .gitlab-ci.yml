@@ -7,7 +7,7 @@ MazeLike_Testing:
     - npm test
 
 MazeLike_Deploy:
-    stage: deploy
-    script:
-        - docker-pull hello-world
-        - echo $uid
+  image: docker:stable
+  stage: deploy
+  script:
+      - docker build -t mazelike/backend .
