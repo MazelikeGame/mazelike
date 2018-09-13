@@ -19,3 +19,15 @@ Also run `docker-compose stop` after you are done because the docker tests start
 ## Generate documentation
 
 Run `npm run doc`
+
+## Manual deploy/rollback
+
+1. Ssh into the server
+2. Run `deploy` to get the list of available versions
+3. Run `deploy VERSION_YOU_WANT_TO_ROLL_BACK_TO_HERE`
+
+If you get a docker error double check the version you entered and consult Ryan.
+
+NOTE: Any changes to master will deploy the latest version.
+
+Also to you can run `deploy latest` to redeploy the latest version of the server.
