@@ -6,12 +6,12 @@ accountRouter.get('/', function(req, res) {
   res.send('Hello');
 });
 
-accountRouter.get('/register', function(req, res) {
-  res.send('Register');
+accountRouter.get('/create', function(req, res) {
+  res.send('Create an account');
 });
 
 accountRouter.get('/login', function(req, res) {
-  res.send('Login');
+  res.send('login.html');
 });
 
 export default accountRouter;

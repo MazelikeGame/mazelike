@@ -6,10 +6,11 @@ import accountRouter from "./routes/accounts.mjs";
 let app = express();
 let server = http.Server(app);
 let io = socketio(server);
-
 app.use(express.static("Frontend"));
 
-app.use('/accounts', accountRouter);
+app.set('view engine', 'pug');
+
+app.use('/account', accountRouter);
 
 let nextId = 0;
 
