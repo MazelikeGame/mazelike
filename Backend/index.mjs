@@ -8,7 +8,7 @@ let server = http.Server(app);
 let io = socketio(server);
 app.use(express.static("Frontend"));
 
-app.set('view engine', 'pug');
+app.set('view engine', 'handlebars'); //Need to install handlebars
 
 app.use('/account', accountRouter);
 
@@ -22,7 +22,7 @@ io.on("connection", (client) => {
   });
 
   client.on("position", (pos) => {
-    io.emit("set", pos);
+    io.emit("setR", pos);
   });
 
   client.on("disconnect", () => {
