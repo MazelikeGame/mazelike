@@ -1,12 +1,15 @@
 import express from "express";
 import http from "http";
 import socketio from "socket.io";
+import accountRouter from "./routes/accounts.mjs";
 
 let app = express();
 let server = http.Server(app);
 let io = socketio(server);
 
 app.use(express.static("Frontend"));
+
+app.use('/accounts', accountRouter);
 
 let nextId = 0;
 
