@@ -11,7 +11,7 @@ accountRouter.get('/create', function(req, res) {
 });
 
 accountRouter.get('/login', function(req, res) {
-  res.render('login.html', { root: "Frontend"});
+  res.render('login');
 });
 
 export default accountRouter;
