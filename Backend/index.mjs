@@ -5,6 +5,7 @@ import accountRouter from "./routes/accounts.mjs";
 import exphbs from "express-handlebars";
 import sequelize from 'sequelize';
 import dotenv from 'dotenv';
+import bodyParser from 'body-parser';
 
 let app = express();
 let server = http.Server(app);
@@ -12,6 +13,8 @@ let io = socketio(server);
 
 dotenv.config();
 app.use(express.static("Frontend"));
+app.use(bodyParser.urlencoded());
+app.use(bodyParser.json());
 
 //Handlebars
 app.engine('handlebars', exphbs());
