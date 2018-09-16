@@ -3,20 +3,35 @@ import http from "http";
 import socketio from "socket.io";
 import accountRouter from "./routes/accounts.mjs";
 import exphbs from "express-handlebars";
+import sequelize from 'sequelize';
+import dotenv from 'dotenv';
 
 let app = express();
 let server = http.Server(app);
 let io = socketio(server);
 
+dotenv.config();
 app.use(express.static("Frontend"));
 
+//Handlebars
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 app.set('views', 'Frontend/views');
 
+//Routes
 app.use('/account', accountRouter);
 
-app.get('/testing', (req, res) => {
+
+/*
+sql.authenticate().then(() => {
+  console.log('Connection has been established successfully.');
+}).catch(err => {
+  console.error('Unable to connect to the database:', err);
+});*/
+
+
+
+app.get('/testing2', (req, res) => {
   res.render('login');
 });
 
