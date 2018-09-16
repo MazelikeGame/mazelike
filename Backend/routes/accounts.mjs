@@ -15,10 +15,10 @@ accountRouter.get('/create', function(req, res) {
 });*/
 
 accountRouter.get('/create', function(req, res) {
+  res.render('create_acct');
   var username = req.param('user');
   var email = req.param('email');
   var password = req.param('password');  
-  res.send(username);
 });
 
 accountRouter.get('/login', function(req, res) {
