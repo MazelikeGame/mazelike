@@ -27,7 +27,7 @@ const User = sql.define('user', {
 });
 
 accountRouter.get('/', function(req, res) {
-  res.redirect('/');   //In the future check for auth here.
+  res.redirect('/'); //In the future check for auth here.
 });
 
 accountRouter.get('/create', function(req, res) {

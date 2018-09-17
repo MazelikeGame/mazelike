@@ -3,7 +3,6 @@ import http from "http";
 import socketio from "socket.io";
 import accountRouter from "./routes/accounts.mjs";
 import exphbs from "express-handlebars";
-import sequelize from 'sequelize';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 
@@ -24,15 +23,12 @@ app.set('views', 'Frontend/views');
 //Routes
 app.use('/account', accountRouter);
 
-
 /*
 sql.authenticate().then(() => {
   console.log('Connection has been established successfully.');
 }).catch(err => {
   console.error('Unable to connect to the database:', err);
 });*/
-
-
 
 app.get('/testing2', (req, res) => {
   res.render('login');

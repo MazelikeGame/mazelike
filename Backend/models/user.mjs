@@ -1,6 +1,3 @@
 export class User {
-  constructor()
-  {
-    
-  }
+
 }
