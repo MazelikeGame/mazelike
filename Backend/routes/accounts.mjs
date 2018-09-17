@@ -45,7 +45,8 @@ accountRouter.post('/create', function(req, res) {
       if(user) {
         res.send("Username or email already exists!");
       } else {
-        //The req.body needs sanitized 
+        //The req.body needs sanitized and checked for valid inputs in the future.
+        //Shouldn't be assinging bcrypt.hashSync here.
         userModel.create({
           username: req.body.username,
           email: req.body.email,
