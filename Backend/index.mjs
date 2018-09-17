@@ -12,7 +12,7 @@ let io = socketio(server);
 
 dotenv.config();
 app.use(express.static("Frontend"));
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 //Handlebars

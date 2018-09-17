@@ -1,11 +1,11 @@
 import express from "express";
-import sequelize from 'sequelize';
+import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
 
 export const accountRouter = express.Router();
 
-const Sql = new sequelize({
+const Sql = new Sequelize({
   database: process.env.DB_DATABASE,
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
@@ -16,13 +16,13 @@ const Sql = new sequelize({
 
 const User = Sql.define('user', {
   username: {
-    type: sequelize.STRING
+    type: Sequelize.STRING
   },
   email: {
-    type: sequelize.STRING
+    type: Sequelize.STRING
   },
   password: {
-    type: sequelize.STRING
+    type: Sequelize.STRING
   }
 });
 
@@ -36,7 +36,7 @@ accountRouter.get('/create', function(req, res) {
 
 accountRouter.post('/create', function(req, res) {
   res.send('Account Created!');
-  user.sync().then(() => {
+  User.sync().then(() => {
     return User.create({
       username: req.body.username,
       email: req.body.email,
