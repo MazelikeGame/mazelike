@@ -2,6 +2,8 @@ import express from "express";
 import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
 import { User } from '../models/user.mjs';
+import bcrypt from 'bcrypt';
+
 dotenv.config();
 
 export const accountRouter = express.Router();
@@ -16,8 +18,6 @@ const sql = new Sequelize({
   operatorsAliases: false
 });
 
-const userModel = new User(sql);
-
 accountRouter.get('/', function(req, res) {
   res.redirect('/'); //In the future check for auth here.
 });
@@ -27,12 +27,30 @@ accountRouter.get('/create', function(req, res) {
 });
 
 accountRouter.post('/create', function(req, res) {
-  res.send('Account Created!');
+  var userModel = new User(sql); //make username, email, password properties in the user model.
+
+  userModel.beforeCreate(() => {
+    bcrypt.hashSync(req.body.password, 10);
+  });
+
   userModel.sync().then(() => {
-    return userModel.create({
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password
+    const Op = Sequelize.Op;
+    userModel.findOne({
+      where: {
+        [Op.or]: [{username: req.body.username}, {email: req.body.email}]
+      }
+    }).then(function(user) {
+      if(user) {
+        res.send("Username or email already exists!");
+      } else {
+        //The req.body needs sanitized 
+        userModel.create({
+          username: req.body.username,
+          email: req.body.email,
+          password: bcrypt.hashSync(req.body.password, 10)
+        });
+        res.send('Account Created!');
+      }
     });
   });
 });
