@@ -30,10 +30,6 @@ sql.authenticate().then(() => {
   console.error('Unable to connect to the database:', err);
 });*/
 
-app.get('/testing2', (req, res) => {
-  res.render('login');
-});
-
 let nextId = 0;
 
 io.on("connection", (client) => {
