@@ -28,10 +28,12 @@ accountRouter.get('/create', function(req, res) {
 
 accountRouter.post('/create', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
-
+  
+  /*
+  //When cleaning up, switch to this, instead of directly assigning password.
   userModel.beforeCreate(() => {
     bcrypt.hashSync(req.body.password, 10);
-  });
+  });*/
 
   userModel.sync().then(() => {
     const Op = Sequelize.Op;
