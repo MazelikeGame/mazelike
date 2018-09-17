@@ -5,7 +5,7 @@ dotenv.config();
 
 export const accountRouter = express.Router();
 
-const sql = new sequelize({
+const Sql = new sequelize({
   database: process.env.DB_DATABASE,
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
@@ -14,7 +14,7 @@ const sql = new sequelize({
   dialect: 'mysql'
 });
 
-const User = sql.define('user', {
+const User = Sql.define('user', {
   username: {
     type: sequelize.STRING
   },
@@ -36,7 +36,7 @@ accountRouter.get('/create', function(req, res) {
 
 accountRouter.post('/create', function(req, res) {
   res.send('Account Created!');
-  User.sync().then(() => {
+  user.sync().then(() => {
     return User.create({
       username: req.body.username,
       email: req.body.email,
