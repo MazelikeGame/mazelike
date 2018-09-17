@@ -1,12 +1,12 @@
 import express from "express";
 import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
-import { User } from '../models/user.mjs';
+import User from '../models/user.mjs';
 import bcrypt from 'bcrypt';
 
 dotenv.config();
 
-export const accountRouter = express.Router();
+const accountRouter = express.Router();
 
 const sql = new Sequelize({
   database: process.env.DB_DATABASE,
