@@ -1,9 +1,14 @@
-MazeLike_Testing:
+MazeLike_Eslint:
   image: node:8.11
   stage: test
   script:
     - npm install -dd
     - npm run eslint
+
+MazeLike_Tests:
+  image: node-docker:8.11
+  stage: test
+  script:
     - npm test
 
 MazeLike_Deploy:
