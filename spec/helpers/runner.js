@@ -181,13 +181,10 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10 * 60 * 1000; // 10 minutes
 // Start the server and wait for it to start listening
 beforeAll(async function(done) {
   try {
-    // Build the image
     await composeBuild();
 
-    // Start the server
     let {stdio} = await startServer();
 
-    // save these for later
     this.__stdio__ = stdio;
 
     jasmine.DEFAULT_TIMEOUT_INTERVAL = TEST_TIMEOUT;

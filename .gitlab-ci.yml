@@ -2,6 +2,8 @@ MazeLike_Tests:
   image: ryan3r/mazelike-testing:8.11
   stage: test
   script:
+    - docker version
+    - docker info
     - npm install
     - npm run eslint
     - npm test
