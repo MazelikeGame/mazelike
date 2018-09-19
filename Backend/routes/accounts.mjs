@@ -26,9 +26,16 @@ accountRouter.get('/create', function(req, res) {
   res.render('create_acct');
 });
 
+accountRouter.get('/update', function(req, res) {
+  res.render('edit_acct');
+});
+
+// accountRouter.put('/update', function(req, res) {
+// });
+
 accountRouter.post('/create', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
-  
+
   /*
   //When cleaning up, switch to this, instead of directly assigning password.
   userModel.beforeCreate(() => {
