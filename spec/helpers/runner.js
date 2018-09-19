@@ -160,13 +160,13 @@ async function startServer() {
   return {stdout, stderr};
 }
 
+// Don't time out if this takes a while
+let orig = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10 * 60 * 1000; // 10 minutes
+
 // Start the server and wait for it to start listening
 beforeAll(async function(done) {
   try {
-    // Don't time out if this takes a while
-    let orig = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = Infinity;
-
     // Build the image
     await composeBuild();
 
