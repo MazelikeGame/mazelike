@@ -139,7 +139,7 @@ function dockerDown() {
  * @returns Promise
  */
 async function startServer() {
-  let child = child_process.spawn("docker-compose", ["up"], {
+  let child = child_process.spawn("docker-compose", ["up", "--force-recreate"], {
     stdio: ["ignore", "pipe", "pipe"]
   });
 
