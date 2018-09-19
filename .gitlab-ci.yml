@@ -2,6 +2,7 @@ MazeLike_Tests:
   stage: test
   script:
     - docker volume rm -f pp_3_mysql-data
+    - yes | docker system prune
     - rm -fr node_modules
     - npm ci
     - npm run eslint
