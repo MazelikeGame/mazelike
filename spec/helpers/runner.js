@@ -2,26 +2,38 @@
 const child_process = require("child_process");
 const {Buffer} = require("buffer");
 
+const TEST_TIMEOUT = 15 * 1000; // 15 seconds
+
 /**
  * Create a single buffer from a stream
  * 
- * @param {Stream} stream
+ * @param {Stream[]} streams
  * @return Promise<Buffer>
  */
-function collect(stream) {
-  return new Promise((resolve, reject) => {
-    let buffer = Buffer.alloc(0);
+function collect(streams) {
+  let promises = [];
+  let buffer = Buffer.alloc(0);
 
-    stream.on("error", reject);
+  for(let stream of streams) {
+    promises.push(
+      new Promise((resolve, reject) => {
+        stream.on("error", reject);
 
-    stream.on("data", (data) => {
-      buffer = Buffer.concat([buffer, data], buffer.length + data.length);
+        stream.on("data", (data) => {
+          buffer = Buffer.concat([buffer, data], buffer.length + data.length);
+        });
+
+        stream.on("end", () => {
+          resolve();
+        });
+      })
+    );
+  }
+
+  return Promise.all(promises)
+    .then(() => {
+      return buffer;
     });
-
-    stream.on("end", () => {
-      resolve(buffer);
-    });
-  });
 }
 
 /**
@@ -32,17 +44,17 @@ function collect(stream) {
 async function composeBuild() {
   return new Promise((resolve, reject) => {
     let child = child_process.spawn("docker-compose", ["build"], {
-      stdio: ["ignore", "ignore", "pipe"]
+      stdio: ["ignore", "pipe", "pipe"]
     });
 
     // collect and errors printed by docker-compose
-    let stderr = collect(child.stderr);
+    let stdio = collect([child.stdout, child.stderr]);
 
     // wait for docker-compose to exit
     child.on("close", async(code) => {
       if(code !== 0) {
         // Something went wrong
-        reject(new Error(`docker-compose build: ${(await stderr).toString()}`));
+        reject(new Error(`docker-compose build: ${(await stdio).toString()}`));
       } else {
         resolve();
       }
@@ -66,7 +78,7 @@ function waitForReady(stdout) {
     let backendReady = false;
     let mysqlReady = false;
 
-    stdout.on("data", (bufData) => {
+    let dataHandler = (bufData) => {
       let data = bufData.toString();
 
       // check for ready messages
@@ -75,21 +87,24 @@ function waitForReady(stdout) {
 
       // check if both are ready
       if(mysqlReady && backendReady) {
-        stdout.removeAllListeners("data");
-        stdout.removeAllListeners("end");
+        stdout.removeListener("data", dataHandler);
+        stdout.removeListener("end", endHandler);
 
         resolve();
       }
-    });
+    };
 
-    stdout.on("end", () => {
+    let endHandler = () => {
       // if the stream ends and either one is not ready throw an error
       if(!mysqlReady || !backendReady) {
         let service = !backendReady ? "The backend" : "MySQL";
 
         reject(new Error(`${service} was not ready in time`));
       }
-    });
+    };
+
+    stdout.on("data", dataHandler);
+    stdout.on("end", endHandler);
   });
 }
 
@@ -128,7 +143,7 @@ async function startServer() {
     stdio: ["ignore", "pipe", "pipe"]
   });
 
-  let stderr = collect(child.stdout);
+  let stdio = collect([child.stdout, child.stderr]);
 
   await Promise.race([
     // Wait for an error from starting the child or ...
@@ -143,7 +158,7 @@ async function startServer() {
         // make sure docker stops
         setTimeout(dockerDown, 500);
 
-        throw new Error(`Data written to stderr: ${(await stderr).toString()}`);
+        throw new Error(`Data written to stderr: ${(await stdio).toString()}`);
       }),
 
     // Wait for all services to be ready
@@ -151,17 +166,16 @@ async function startServer() {
 
       // Add stderr to the error message from waitForReady
       .catch(async(err) => {
-        throw new Error(`${err.message} stderr: ${(await stderr).toString()}`);
+        throw new Error(`${err.message} stderr: ${(await stdio).toString()}`);
       })
   ]);
 
-  let stdout = collect(child.stdout);
-
-  return {stdout, stderr};
+  // This must be passed in an object otherwise
+  // the function will wait for it to resolve
+  return {stdio};
 }
 
 // Don't time out if this takes a while
-let orig = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
 // Start the server and wait for it to start listening
@@ -171,13 +185,12 @@ beforeAll(async function(done) {
     await composeBuild();
 
     // Start the server
-    let {stdout, stderr} = await startServer();
+    let {stdio} = await startServer();
 
     // save these for later
-    this.__stdout__ = stdout;
-    this.__stderr__ = stderr;
+    this.__stdio__ = stdio;
 
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = orig;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = TEST_TIMEOUT;
 
     done();
   } catch(err) {
@@ -185,7 +198,11 @@ beforeAll(async function(done) {
   }
 });
 
-// Stop the server after all tests have been run
-afterAll(function(done) {
+// Stop the server before we exit
+process.on("exit", () => {
+  dockerDown();
+});
+
+afterAll((done) => {
   dockerDown().then(done);
 });
