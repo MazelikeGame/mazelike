@@ -8,6 +8,7 @@ dotenv.config();
 
 const accountRouter = express.Router();
 
+console.log(process.env.DB_PASS);
 const sql = new Sequelize({
   database: process.env.DB_DATABASE,
   username: process.env.DB_USER,
@@ -30,8 +31,28 @@ accountRouter.get('/update', function(req, res) {
   res.render('edit_acct');
 });
 
-// accountRouter.put('/update', function(req, res) {
-// });
+accountRouter.post('/update/:accountId', function(req, res) {
+  var userModel = new User(sql);
+  userModel.sync().then(() => {
+    const Op = Sequelize.Op;
+    userModel.findOne({
+      where: {
+        [Op.or]: [{username: req.body.username}, {email: req.body.email}]
+      }
+    }).then(function(user) {
+      if(user) {
+        res.send("Username or email already exists!");
+      } else {
+        userModel.update({
+          username: req.body.username,
+          email: req.body.email,
+          password: bcrypt.hashSync(req.body.password, 10)
+        });
+        res.send('Account updated!');
+      }
+    });
+  });
+});
 
 accountRouter.post('/create', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
