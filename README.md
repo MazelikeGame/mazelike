@@ -12,9 +12,11 @@ NOTE: You can run `docker-compose ps` to see if any containers are running and `
 
 ## Testing
 
-The best option is running the tests in docker to do that run `scripts/docker-test`.  This will rebuild the testing and backend containers and run `npm test`.  If you are just modifying the specs you can run `scripts/docker-test -fast` which will skip the builds and just run the tests.  If you have any issues with changes to your code not showing up the first thing you should do is run it without the `-fast` flag.  
+Run `npm install` then run `npm test`
 
-Also run `docker-compose stop` after you are done because the docker tests start mysql but they do not stop it.
+## MySQL auth errors
+
+There may be data left over from a previous mysql instance run `docker-compose down` and `docker volume rm pp_3_mysql-data` to delete the old data. The try `docker-compose up --build` again.
 
 ## Generate documentation
 
