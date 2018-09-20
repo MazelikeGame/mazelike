@@ -130,6 +130,8 @@ function dockerDown() {
   child_process.execSync("docker-compose stop");
 }
 
+let exitDump = Promise.resolve();
+
 /**
  * Run docker-compose up and wait for MySQL and the backend to be ready.
  * Returns a promise to the stderr and stdout of docker-compose up.
@@ -141,6 +143,8 @@ async function startServer() {
     stdio: ["ignore", "pipe", "pipe"]
   });
 
+  let stdio = collect([child.stdout, child.stderr]);
+
   await Promise.race([
     // Wait for an error from starting the child or ...
     once(child, "error")
@@ -151,6 +155,7 @@ async function startServer() {
     // Throw an error if data is written to stderr or ...
     once(child.stderr, "data")
       .then(async() => {
+        exitDump = stdio;
         throw new Error(`Data written to stderr (run 'docker logs pp_3_backend_1' to see the logs)`);
       }),
 
@@ -185,8 +190,16 @@ beforeAll(async function(done) {
 // Stop the server before we exit
 process.on("exit", () => {
   dockerDown();
+
+  exitDump.then((logs) => {
+    console.log(logs);
+  });
 });
 
 process.on("SIGINT", () => {
   dockerDown();
+
+  exitDump.then((logs) => {
+    console.log(logs);
+  });
 });
