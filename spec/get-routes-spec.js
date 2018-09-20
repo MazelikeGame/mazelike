@@ -14,16 +14,26 @@ describe("Basic route testing", () => {
   */
 });
 
+// create a function that checks a http response
+const makeResponseChecker = (expectedStatus, done) => {
+  return (res) => {
+    let isOk = expectedStatus !== undefined ?
+      res.statusCode === expectedStatus :
+      200 <= res.statusCode && res.statusCode < 400;
+
+    if(isOk) {
+      done();
+    } else {
+      done(new Error(`Bad status code ${res.statusCode}`));
+    }
+  };
+};
+
 // Define a basic GET test
-function checkRouteGet(url) {
+function checkRouteGet(url, expectedStatus) {
   it(`Get ${url} responds ok`, (done) => {
-    let req = http.get(`http://localhost:3000${url}`, (res) => {
-      if(res.statusCode !== 200 && res.statusCode !== 304) {
-        done(new Error(`Bad status code ${res.statusCode}`));
-      } else {
-        done();
-      }
-    });
+    let req = http.get(`http://localhost:3000${url}`, 
+      makeResponseChecker(expectedStatus, done));
     
     req.on("error", done);
   });
@@ -31,7 +41,7 @@ function checkRouteGet(url) {
 
 /*
 // Define a basic POST test
-function checkRoutePost(url, body) {
+function checkRoutePost(url, body, expectedStatus) {
   it(`Post ${url} responds ok`, (done) => {
     let req = http.request({
       method: "post",
@@ -41,13 +51,7 @@ function checkRoutePost(url, body) {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       }
-    }, (res) => {
-      if(res.statusCode !== 200 && res.statusCode !== 304) {
-        done(new Error(`Bad status code ${res.statusCode}`));
-      } else {
-        done();
-      }
-    });
+    }, makeResponseChecker(expectedStatus, done));
     
     req.on("error", done);
     req.end(querystring.stringify(body));
