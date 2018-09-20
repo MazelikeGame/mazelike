@@ -152,17 +152,17 @@ async function startServer() {
         return Promise.reject(err);
       }),
 
-    // Throw an error if data is written to stderr or ...
-    once(child.stderr, "data")
-      .then(async() => {
-        // Tell collect to stop collecting
-        child.stderr.emit("end");
-        child.stdout.emit("end");
+    // // Throw an error if data is written to stderr or ...
+    // once(child.stderr, "data")
+    //   .then(async() => {
+    //     // Tell collect to stop collecting
+    //     child.stderr.emit("end");
+    //     child.stdout.emit("end");
 
-        exitDump = (await stdio).toString();
+    //     exitDump = (await stdio).toString();
 
-        throw new Error(`Data written to stderr (run 'docker logs pp_3_backend_1' to see the logs)`);
-      }),
+    //     throw new Error(`Data written to stderr (run 'docker logs pp_3_backend_1' to see the logs)`);
+    //   }),
 
     // Wait for all services to be ready
     waitForReady(child.stdout)
@@ -180,7 +180,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10 * 60 * 1000; // 10 minutes
 // Start the server and wait for it to start listening
 beforeAll(async function(done) {
   try {
-    // await composeBuild();
+    await composeBuild();
 
     await startServer();
 
