@@ -54,7 +54,7 @@ async function composeBuild() {
     child.on("close", async(code) => {
       if(code !== 0) {
         // Something went wrong
-        reject(new Error(`docker-compose build: ${(await stdio).toString()}`));
+        reject(new Error(`docker-compose build error: \n${(await stdio).toString()}`));
       } else {
         resolve();
       }
@@ -127,11 +127,7 @@ function once(emitter, eventName) {
  * @return Promise
  */
 function dockerDown() {
-  try {
-    child_process.execSync("docker-compose stop");
-  } catch(err) {
-    // do nothing docker will output the error
-  }
+  child_process.execSync("docker-compose stop");
 }
 
 /**
@@ -142,11 +138,8 @@ function dockerDown() {
  */
 async function startServer() {
   let child = child_process.spawn("docker-compose", ["up"], {
-    stdio: ["ignore", "pipe", "pipe"]
+    stdio: ["ignore", "ignore", "pipe"]
   });
-
-  let stdio = collect([child.stdout, child.stderr]);
-  let timeoutHandle;
 
   await Promise.race([
     // Wait for an error from starting the child or ...
@@ -158,10 +151,7 @@ async function startServer() {
     // Throw an error if data is written to stderr or ...
     once(child.stderr, "data")
       .then(async() => {
-        // make sure docker stops (15 second timeout)
-        // timeoutHandle = setTimeout(dockerDown, 15000);
-
-        throw new Error(`Data written to stderr: ${(await stdio).toString()}`);
+        throw new Error(`Data written to stderr (run 'docker logs pp_3_backend_1' to see the logs)`);
       }),
 
     // Wait for all services to be ready
@@ -169,15 +159,9 @@ async function startServer() {
 
       // Add stderr to the error message from waitForReady
       .catch(async(err) => {
-        throw new Error(`${err.message} stderr: ${(await stdio).toString()}`);
+        throw new Error(`${err.message} (run 'docker logs pp_3_backend_1' to see the logs)`);
       })
   ]);
-
-  clearTimeout(timeoutHandle);
-
-  // This must be passed in an object otherwise
-  // the function will wait for it to resolve
-  return {stdio};
 }
 
 // Don't time out if this takes a while
@@ -188,9 +172,7 @@ beforeAll(async function(done) {
   try {
     await composeBuild();
 
-    let {stdio} = await startServer();
-
-    this.__stdio__ = stdio;
+    await startServer();
 
     jasmine.DEFAULT_TIMEOUT_INTERVAL = TEST_TIMEOUT;
 
@@ -202,11 +184,9 @@ beforeAll(async function(done) {
 
 // Stop the server before we exit
 process.on("exit", () => {
-  console.log("B");
   dockerDown();
 });
 
 process.on("SIGINT", () => {
-  console.log("A");
   dockerDown();
 });
