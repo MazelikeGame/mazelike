@@ -159,8 +159,8 @@ async function startServer() {
         child.stderr.emit("end");
         child.stdout.emit("end");
 
-        exitDump = await stdio;
-        
+        exitDump = (await stdio).toString();
+
         throw new Error(`Data written to stderr (run 'docker logs pp_3_backend_1' to see the logs)`);
       }),
 
