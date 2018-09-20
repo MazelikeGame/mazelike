@@ -1,4 +1,4 @@
-/* global beforeAll afterAll jasmine */
+/* global beforeAll jasmine */
 const child_process = require("child_process");
 const {Buffer} = require("buffer");
 
@@ -127,9 +127,7 @@ function once(emitter, eventName) {
  * @return Promise
  */
 function dockerDown() {
-  return new Promise((resolve) => {
-    child_process.exec("docker-compose down", resolve);
-  });
+  child_process.execSync("docker-compose down");
 }
 
 /**
@@ -144,6 +142,7 @@ async function startServer() {
   });
 
   let stdio = collect([child.stdout, child.stderr]);
+  let timeoutHandle;
 
   await Promise.race([
     // Wait for an error from starting the child or ...
@@ -155,8 +154,8 @@ async function startServer() {
     // Throw an error if data is written to stderr or ...
     once(child.stderr, "data")
       .then(async() => {
-        // make sure docker stops
-        setTimeout(dockerDown, 500);
+        // make sure docker stops (5 second timeout)
+        timeoutHandle = setTimeout(dockerDown, 5000);
 
         throw new Error(`Data written to stderr: ${(await stdio).toString()}`);
       }),
@@ -169,6 +168,8 @@ async function startServer() {
         throw new Error(`${err.message} stderr: ${(await stdio).toString()}`);
       })
   ]);
+
+  clearTimeout(timeoutHandle);
 
   // This must be passed in an object otherwise
   // the function will wait for it to resolve
@@ -200,6 +201,6 @@ process.on("exit", () => {
   dockerDown();
 });
 
-afterAll((done) => {
-  dockerDown().then(done);
+process.on("SIGINT", () => {
+  dockerDown();
 });
