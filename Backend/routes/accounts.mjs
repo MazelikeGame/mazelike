@@ -8,7 +8,6 @@ dotenv.config();
 
 const accountRouter = express.Router();
 
-console.log(process.env.DB_PASS);
 const sql = new Sequelize({
   database: process.env.DB_DATABASE,
   username: process.env.DB_USER,
