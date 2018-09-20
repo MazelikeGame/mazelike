@@ -159,7 +159,7 @@ async function startServer() {
     once(child.stderr, "data")
       .then(async() => {
         // make sure docker stops (15 second timeout)
-        timeoutHandle = setTimeout(dockerDown, 15000);
+        // timeoutHandle = setTimeout(dockerDown, 15000);
 
         throw new Error(`Data written to stderr: ${(await stdio).toString()}`);
       }),
