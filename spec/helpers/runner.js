@@ -127,7 +127,11 @@ function once(emitter, eventName) {
  * @return Promise
  */
 function dockerDown() {
-  child_process.execSync("docker-compose down");
+  try {
+    child_process.execSync("docker-compose down");
+  } catch(err) {
+    // do nothing docker will output the error
+  }
 }
 
 /**
