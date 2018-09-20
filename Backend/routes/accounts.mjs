@@ -26,11 +26,13 @@ accountRouter.get('/create', function(req, res) {
   res.render('create_acct');
 });
 
-accountRouter.get('/update', function(req, res) {
+// TODO: Would like to require being logged in
+accountRouter.get('/edit/:accountId', function(req, res) {
   res.render('edit_acct');
 });
 
-accountRouter.post('/update/:accountId', function(req, res) {
+// TODO: Would like to require being logged in
+accountRouter.post('/edit/:accountId', function(req, res) {
   var userModel = new User(sql);
   userModel.sync().then(() => {
     const Op = Sequelize.Op;
@@ -40,7 +42,7 @@ accountRouter.post('/update/:accountId', function(req, res) {
       }
     }).then(function(user) {
       if(user) {
-        res.send("Username or email already exists!");
+        res.send("Username or email is taken. Please use an email and username that is not taken");
       } else {
         userModel.update({
           username: req.body.username,
