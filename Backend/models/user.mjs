@@ -10,6 +10,5 @@ export default function User(sequelize) {
 
   // add methods here as user.method = function() {}
   // do not use an => if you want to use this in the function
-
   return user;
 }

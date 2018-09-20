@@ -23,13 +23,6 @@ app.set('views', 'Frontend/views');
 //Routes
 app.use('/account', accountRouter);
 
-/*
-sql.authenticate().then(() => {
-  console.log('Connection has been established successfully.');
-}).catch(err => {
-  console.error('Unable to connect to the database:', err);
-});*/
-
 let nextId = 0;
 
 io.on("connection", (client) => {

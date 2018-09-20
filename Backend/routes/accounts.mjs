@@ -19,7 +19,7 @@ const sql = new Sequelize({
 });
 
 accountRouter.get('/', function(req, res) {
-  res.redirect('/'); //In the future check for auth here.
+  res.redirect('/');
 });
 
 accountRouter.get('/create', function(req, res) {
@@ -28,7 +28,8 @@ accountRouter.get('/create', function(req, res) {
 
 accountRouter.post('/create', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
-  
+  userModel.password = "hi";
+  console.log(userModel.password);
   /*
   //When cleaning up, switch to this, instead of directly assigning password.
   userModel.beforeCreate(() => {
@@ -36,10 +37,9 @@ accountRouter.post('/create', function(req, res) {
   });*/
 
   userModel.sync().then(() => {
-    const Op = Sequelize.Op;
     userModel.findOne({
       where: {
-        [Op.or]: [{username: req.body.username}, {email: req.body.email}]
+        [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
       }
     }).then(function(user) {
       if(user) {
