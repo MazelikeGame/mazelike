@@ -128,7 +128,7 @@ function once(emitter, eventName) {
  */
 function dockerDown() {
   try {
-    child_process.execSync("docker-compose down");
+    child_process.execSync("docker-compose stop");
   } catch(err) {
     // do nothing docker will output the error
   }
