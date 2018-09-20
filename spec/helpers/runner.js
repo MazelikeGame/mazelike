@@ -202,9 +202,11 @@ beforeAll(async function(done) {
 
 // Stop the server before we exit
 process.on("exit", () => {
+  console.log("B");
   dockerDown();
 });
 
 process.on("SIGINT", () => {
+  console.log("A");
   dockerDown();
 });
