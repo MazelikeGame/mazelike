@@ -48,4 +48,6 @@ io.on("connection", (client) => {
   });
 });
 
-server.listen(3000);
+server.listen(3000, () => {
+  process.stdout.write("Server started on port 3000\n");
+});
