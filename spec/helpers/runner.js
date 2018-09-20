@@ -138,7 +138,7 @@ function dockerDown() {
  */
 async function startServer() {
   let child = child_process.spawn("docker-compose", ["up"], {
-    stdio: ["ignore", "ignore", "pipe"]
+    stdio: ["ignore", "pipe", "pipe"]
   });
 
   await Promise.race([
