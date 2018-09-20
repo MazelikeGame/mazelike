@@ -130,7 +130,7 @@ function dockerDown() {
   child_process.execSync("docker-compose stop");
 }
 
-let exitDump = Promise.resolve();
+let exitDump;
 
 /**
  * Run docker-compose up and wait for MySQL and the backend to be ready.
@@ -155,7 +155,12 @@ async function startServer() {
     // Throw an error if data is written to stderr or ...
     once(child.stderr, "data")
       .then(async() => {
-        exitDump = stdio;
+        // Tell collect to stop collecting
+        child.stderr.emit("end");
+        child.stdout.emit("end");
+
+        exitDump = await stdio;
+        
         throw new Error(`Data written to stderr (run 'docker logs pp_3_backend_1' to see the logs)`);
       }),
 
@@ -175,7 +180,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10 * 60 * 1000; // 10 minutes
 // Start the server and wait for it to start listening
 beforeAll(async function(done) {
   try {
-    await composeBuild();
+    // await composeBuild();
 
     await startServer();
 
@@ -191,15 +196,15 @@ beforeAll(async function(done) {
 process.on("exit", () => {
   dockerDown();
 
-  exitDump.then((logs) => {
-    console.log(logs);
-  });
+  if(exitDump) {
+    console.log(exitDump);
+  }
 });
 
 process.on("SIGINT", () => {
   dockerDown();
 
-  exitDump.then((logs) => {
-    console.log(logs);
-  });
+  if(exitDump) {
+    console.log(exitDump);
+  }
 });
