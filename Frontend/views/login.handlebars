@@ -15,12 +15,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <!--webfonts-->
 <link href='http://fonts.googleapis.com/css?family=Oxygen:400,300,700|Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
 <!--//webfonts-->
-<script>
-	function myFunction()
-		{
-			alert("Thanks for login");
-		}
-</script>
 </head>
  
 <body>
@@ -31,18 +25,18 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 		<div class="login">
 			<div class="inset">
 				<!-----start-main---->
-				<form>
+				<form action="../account/login" method="POST">
 			         <div>
 						<span><label>Username</label></span>
-						<span><input type="text" class="textbox" id="active"></span>
+						<span><input type="text" name="username" class="textbox" id="active"></span>
 					 </div>
 					 <div>
 						<span><label>Password</label></span>
-					    <span><input type="password" class="password"></span>
+					    <span><input type="password" name="password" class="password"></span>
 					 </div>
 					<div class="sign">
 						<div class="submit">
-						  <input type="submit" onclick="myFunction()" value="LOGIN" >
+						  <input type="submit" value="LOGIN" >
 						</div>
 						<span class="forget-pass">
 							<a href="#">Forgot Password?</a>

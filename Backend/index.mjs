@@ -5,6 +5,7 @@ import accountRouter from "./routes/accounts.mjs";
 import exphbs from "express-handlebars";
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
+import session from 'express-session';
 
 let app = express();
 let server = http.Server(app);
@@ -14,6 +15,16 @@ dotenv.config();
 app.use(express.static("Frontend"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+
+//Note if we add https: cookie: { secure: true }
+app.use(session({
+  secret: 'mazelike',
+  resave: true,
+  saveUninitialized: false,
+  cookie: {
+    expires: 600000 //Switch this if we want to stay logged in forever.
+  }
+}));
 
 //Handlebars
 app.engine('handlebars', exphbs());

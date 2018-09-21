@@ -18,6 +18,21 @@ const sql = new Sequelize({
   operatorsAliases: false
 });
 
+/**
+ * Checks to make sure the user is authenticated.
+ * @param req 
+ * @param res 
+ * @param next 
+ */
+function isAuthenticated(req, res, next) {
+  if(!req.session || !req.session.authenticated) {
+    res.redirect('/account/login');
+  }
+
+  req.session.cookie.expires = 600000;
+  next();
+}
+
 accountRouter.get('/', function(req, res) {
   res.redirect('/');
 });
@@ -29,7 +44,6 @@ accountRouter.get('/create', function(req, res) {
 accountRouter.post('/create', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
   userModel.password = "hi";
-  console.log(userModel.password);
   /*
   //When cleaning up, switch to this, instead of directly assigning password.
   userModel.beforeCreate(() => {
@@ -58,8 +72,30 @@ accountRouter.post('/create', function(req, res) {
   });
 });
 
+accountRouter.get('/logout', isAuthenticated, function(req, res) {
+  req.session.destroy();
+  res.redirect('/account/login');
+});
+
 accountRouter.get('/login', function(req, res) {
-  res.render('login');
+  res.render('login'); //Add isAuth to make sure you can't login again.
+});
+
+accountRouter.get('/edit', isAuthenticated, function(req, res) {
+  res.send(req.session.username);
+});
+
+accountRouter.post('/login', function(req, res) {
+  if (req.body.username && req.body.username === 'test'  
+  && req.body.password && req.body.password === 'password') { //Put SQL check here...
+    
+    //Login works
+    req.session.authenticated = true;
+    req.session.username = 'test';
+    res.redirect('/');
+  } else {
+    res.redirect('/account/login'); //Fail login
+  }
 });
 
 export default accountRouter;
