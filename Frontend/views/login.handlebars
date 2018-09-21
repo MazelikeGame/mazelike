@@ -26,7 +26,10 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 			<div class="inset">
 				<!-----start-main---->
 				<form action="../account/login" method="POST">
-			         <div>
+			    <div>
+						{{#if wrongLogin}}
+							<b>Wrong login</b>
+						{{/if}}
 						<span><label>Username</label></span>
 						<span><input type="text" name="username" class="textbox" id="active"></span>
 					 </div>

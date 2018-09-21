@@ -61,10 +61,11 @@ accountRouter.post('/create', function(req, res) {
       } else {
         //The req.body needs sanitized and checked for valid inputs in the future.
         //Shouldn't be assinging bcrypt.hashSync here.
+
         userModel.create({
           username: req.body.username,
           email: req.body.email,
-          password: bcrypt.hashSync(req.body.password, 10)
+          password: req.body.password
         });
         res.send('Account Created!');
       }
@@ -86,6 +87,23 @@ accountRouter.get('/edit', isAuthenticated, function(req, res) {
 });
 
 accountRouter.post('/login', function(req, res) {
+
+  var userModel = new User(sql); //make username, email, password properties in the user model.
+  userModel.findOne({
+    where: {
+      username: req.body.username, 
+      password: req.body.password
+    }
+  }).then(function(user) {
+    if(user) {
+      req.session.authenticated = true;
+      req.session.username = user.username;
+      res.redirect('/');
+    } else {
+      res.redirect('/account/login'); //Fail login
+    }
+  });
+  /*
   if (req.body.username && req.body.username === 'test'  
   && req.body.password && req.body.password === 'password') { //Put SQL check here...
     
@@ -95,7 +113,7 @@ accountRouter.post('/login', function(req, res) {
     res.redirect('/');
   } else {
     res.redirect('/account/login'); //Fail login
-  }
+  }*/
 });
 
 export default accountRouter;
