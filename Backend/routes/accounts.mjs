@@ -2,7 +2,6 @@ import express from "express";
 import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
 import User from '../models/user.mjs';
-import bcrypt from 'bcrypt';
 
 dotenv.config();
 
@@ -15,7 +14,8 @@ const sql = new Sequelize({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   dialect: 'mysql',
-  operatorsAliases: false
+  operatorsAliases: false,
+  logging: true
 });
 
 /**
@@ -67,7 +67,7 @@ accountRouter.post('/create', function(req, res) {
           email: req.body.email,
           password: req.body.password
         });
-        res.send('Account Created!');
+        res.redirect('/');
       }
     });
   });
@@ -103,6 +103,7 @@ accountRouter.post('/login', function(req, res) {
       res.redirect('/account/login'); //Fail login
     }
   });
+
   /*
   if (req.body.username && req.body.username === 'test'  
   && req.body.password && req.body.password === 'password') { //Put SQL check here...
