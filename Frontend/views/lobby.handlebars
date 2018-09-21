@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Lobby {{id}}</title>
+    <meta name="viewport" content="width=device-width"/>
+  </head>
+  <body>
+    {{#if isHost}}
+    {{else}}
+      <p>
+        <a href="/game/lobby/join?id={{id}}">Join this lobby</a>
+      </p>
+    {{/if}}
+    <ul>
+      {{#each players}}
+        <li>
+          {{name}}
+          {{#if isHost}}
+            [Host]
+          {{else}}
+            {{#if ../isHost}}
+              [<a href="drop/{{id}}">Drop</a>]
+            {{/if}}
+          {{/if}}
+        </li>
+      {{/each}}
+    </ul>
+  </body>
+</html>

@@ -1,12 +1,25 @@
 import express from "express";
 import http from "http";
 import socketio from "socket.io";
+import gameRouter from "./routes/game.mjs";
+import exphbs from "express-handlebars";
+import bodyParser from 'body-parser';
 
 let app = express();
 let server = http.Server(app);
 let io = socketio(server);
 
 app.use(express.static("Frontend"));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+
+//Handlebars
+app.engine('handlebars', exphbs());
+app.set('view engine', 'handlebars');
+app.set('views', 'Frontend/views');
+
+//Routes
+app.use("/game", gameRouter);
 
 let nextId = 0;
 
@@ -18,7 +31,7 @@ io.on("connection", (client) => {
   });
 
   client.on("position", (pos) => {
-    io.emit("set", pos);
+    io.emit("setR", pos);
   });
 
   client.on("disconnect", () => {
@@ -26,6 +39,4 @@ io.on("connection", (client) => {
   });
 });
 
-server.listen(3000, () => {
-  process.stdout.write("Server started on port 3000\n");
-});
+server.listen(3000);
