@@ -14,9 +14,8 @@ const sql = new Sequelize({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   dialect: 'mysql',
-  operatorsAliases: false,
-  logging: true
-});
+  operatorsAliases: false
+}); //logging: false - to turn logging off.
 
 /**
  * Checks to make sure the user is authenticated.
@@ -29,7 +28,7 @@ function isAuthenticated(req, res, next) {
     res.redirect('/account/login');
   }
 
-  req.session.cookie.expires = 600000;
+  req.session.cookie.expires = 600000; //Resets the cookie time.
   next();
 }
 
@@ -57,7 +56,7 @@ accountRouter.post('/create', function(req, res) {
       }
     }).then(function(user) {
       if(user) {
-        res.send("Username or email already exists!");
+        res.render('create_acct', { duplicateUser: true });
       } else {
         //The req.body needs sanitized and checked for valid inputs in the future.
         //Shouldn't be assinging bcrypt.hashSync here.
@@ -100,7 +99,7 @@ accountRouter.post('/login', function(req, res) {
       req.session.username = user.username;
       res.redirect('/');
     } else {
-      res.redirect('/account/login'); //Fail login
+      res.render('login', { wrongInformation: true }); //Failed login
     }
   });
 

@@ -170,6 +170,7 @@ input[type="text"]:hover,input[type="Password"]:hover,#active{
 .copy-right p a:hover {
 	color:#fff;
 }
+
 /*----start-responsive design-----*/
 @media (max-width:1440px){
 	.main {
