@@ -32,9 +32,17 @@ function isAuthenticated(req, res, next) {
   next();
 }
 
+/**
+ * DEFAULT
+ */
+
 accountRouter.get('/', function(req, res) {
-  res.redirect('/');
+  res.redirect('/'); //Redirects to the homepage.
 });
+
+/**
+ * CREATE ACCOUNT GET/POST
+ */
 
 accountRouter.get('/create', function(req, res) {
   res.render('create_acct');
@@ -72,21 +80,28 @@ accountRouter.post('/create', function(req, res) {
   });
 });
 
+/**
+ * LOGOUT
+ */
+
 accountRouter.get('/logout', isAuthenticated, function(req, res) {
   req.session.destroy();
   res.redirect('/account/login');
-});
-
-accountRouter.get('/login', function(req, res) {
-  res.render('login'); //Add isAuth to make sure you can't login again.
 });
 
 accountRouter.get('/edit', isAuthenticated, function(req, res) {
   res.send(req.session.username);
 });
 
-accountRouter.post('/login', function(req, res) {
+/**
+ * LOGIN GET/POST
+ */
 
+accountRouter.get('/login', function(req, res) {
+  res.render('login'); //Add isAuth to make sure you can't login again.
+});
+
+accountRouter.post('/login', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
   userModel.findOne({
     where: {
@@ -102,18 +117,6 @@ accountRouter.post('/login', function(req, res) {
       res.render('login', { wrongInformation: true }); //Failed login
     }
   });
-
-  /*
-  if (req.body.username && req.body.username === 'test'  
-  && req.body.password && req.body.password === 'password') { //Put SQL check here...
-    
-    //Login works
-    req.session.authenticated = true;
-    req.session.username = 'test';
-    res.redirect('/');
-  } else {
-    res.redirect('/account/login'); //Fail login
-  }*/
 });
 
 export default accountRouter;

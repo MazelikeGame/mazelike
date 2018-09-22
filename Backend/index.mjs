@@ -34,6 +34,10 @@ app.set('views', 'Frontend/views');
 //Routes
 app.use('/account', accountRouter);
 
+app.get('/', function(req, res) {
+  res.render('index');
+});
+
 let nextId = 0;
 
 io.on("connection", (client) => {
