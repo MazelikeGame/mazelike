@@ -1,17 +1,18 @@
+/* global io */
 import express from "express";
 import http from "http";
 import socketio from "socket.io";
 import {gameRouter, joinRoute} from "./routes/game.mjs";
 import exphbs from "express-handlebars";
-// import bodyParser from 'body-parser';
+import bodyParser from 'body-parser';
 
 let app = express();
 let server = http.Server(app);
-let io = socketio(server);
+global.io = socketio(server);
 
 app.use(express.static("Frontend"));
-// app.use(bodyParser.urlencoded({extended: true}));
-// app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 //Handlebars
 app.engine('handlebars', exphbs());

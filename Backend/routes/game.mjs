@@ -1,3 +1,4 @@
+/* global io */
 import express from "express";
 import crypto from "crypto";
 
@@ -41,6 +42,8 @@ export const joinRoute = (req, res) => {
     name: req.query.user
   });
 
+  io.emit("lobby-add", lobby.players[lobby.players.length - 1]);
+
   res.redirect(`/game/lobby/${req.params.id}`);
 };
 
@@ -79,6 +82,7 @@ gameRouter.get("/lobby/:id/delete", (req, res) => {
   if(lobby) {
     if(lobby.host === req.query.user) {
       lobbies.delete(req.params.id);
+      io.emit("lobby-delete");
     } else {
       res.end("Only the host can delete this lobby.");
       return;
@@ -102,6 +106,7 @@ gameRouter.get("/lobby/:id/drop/:player", (req, res) => {
     });
 
     if(idx !== -1) {
+      io.emit("lobby-drop", lobby.players[idx].id);
       lobby.players.splice(idx, 1);
     }
 
