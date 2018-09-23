@@ -26,9 +26,15 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 		<div class="login">
 			<div class="inset">
 				<!--ERRORS-->
-				{{#if wrongInformation}}
+				{{#if wrongUsername}}
 					<div class="error">
-						Wrong username or password!
+						The username you entered does not exist!
+					</div>
+				{{/if}}
+
+				{{#if wrongPassword}}
+					<div class="error">
+						Wrong password!
 					</div>
 				{{/if}}
 				<!--END ERRORS-->

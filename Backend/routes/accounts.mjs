@@ -2,6 +2,7 @@ import express from "express";
 import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
 import User from '../models/user.mjs';
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 
@@ -49,13 +50,7 @@ accountRouter.get('/create', function(req, res) {
 });
 
 accountRouter.post('/create', function(req, res) {
-  var userModel = new User(sql); //make username, email, password properties in the user model.
-  userModel.password = "hi";
-  /*
-  //When cleaning up, switch to this, instead of directly assigning password.
-  userModel.beforeCreate(() => {
-    bcrypt.hashSync(req.body.password, 10);
-  });*/
+  var userModel = new User(sql);
 
   userModel.sync().then(() => {
     userModel.findOne({
@@ -64,17 +59,16 @@ accountRouter.post('/create', function(req, res) {
       }
     }).then(function(user) {
       if(user) {
-        res.render('create_acct', { duplicateUser: true });
+        res.render('create_acct', { isAuthenticated: true });
       } else {
-        //The req.body needs sanitized and checked for valid inputs in the future.
-        //Shouldn't be assinging bcrypt.hashSync here.
-
-        userModel.create({
-          username: req.body.username,
-          email: req.body.email,
-          password: req.body.password
+        bcrypt.hash(req.body.password, 10, function(err, hash) {
+          userModel.create({
+            username: req.body.username,
+            email: req.body.email,
+            password: hash
+          });
+          res.redirect('/');
         });
-        res.redirect('/');
       }
     });
   });
@@ -105,16 +99,21 @@ accountRouter.post('/login', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
   userModel.findOne({
     where: {
-      username: req.body.username, 
-      password: req.body.password
+      username: req.body.username
     }
   }).then(function(user) {
     if(user) {
-      req.session.authenticated = true;
-      req.session.username = user.username;
-      res.redirect('/');
+      bcrypt.compare(req.body.password, user.password, function(err, result) {
+        if(result) {
+          req.session.authenticated = true;
+          req.session.username = user.username;
+          res.redirect('/');
+        } else {
+          res.render('login', { wrongPassword: true }); //Failed login by password.
+        }
+      });
     } else {
-      res.render('login', { wrongInformation: true }); //Failed login
+      res.render('login', { wrongUsername: true }); //Failed login by username.
     }
   });
 });
