@@ -57,31 +57,18 @@
         <aside>
             <div id="sidebar" class="nav-collapse ">
                 <!-- sidebar menu start-->
-                <ul class="sidebar-menu" id="nav-accordion">
-                    
+                <ul class="sidebar-menu" id="nav-accordion">                    
                     <p class="centered"><a href="view_acct.html"><img src="img/profilepic.jpg" class="img-circle" width="60"></a></p>
-                    <h5 class="centered">  
-                        <p id="user"></p>        
-                        <script>
-                            window.onload = function () {
-                                var mysql = require('mysql');
-                                var con = mysql.createConnection({
-                                    host: "localhost",
-                                    user: "root",
-                                    password: "5757",
-                                    database: "test"
-                                });
-                                con.connect(function (err) {
-                                    if (err) throw err;
-                                    con.query("SELECT username FROM Account", function (err, result, fields) {
-                                        if (err) throw err;
-                                        console.log(result[0].username);
-                                    });
-                                });
-                                document.getElementById('user').innerHTML = "meh";
-                            };
-                        </script>
+                    <script src="js/test.js" type="text/javascript"></script>
+                    <h5 class="centered">
+                        <p id="username"></p>
                     </h5>
+                    <script>
+                        window.onload = function () {
+                            var username = getUsername();
+                            document.getElementById('username').innerHTML = username;
+                        };
+                    </script>
                     <li class="mt">
                         <a class="active" href="dashboard.html">
                             <i class="fa fa-dashboard"></i>

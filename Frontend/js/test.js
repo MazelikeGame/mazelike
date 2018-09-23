@@ -1,4 +1,5 @@
-var mysql = require('mysql');
+//var mysql = require('mysql');
+import mysql from "mysql";
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -7,10 +8,14 @@ var con = mysql.createConnection({
   database: "test"
 });
 
-con.connect(function(err) {
+function getUsername(){
+return "lol";
+}
+
+con.connect(function (err) {
+  if (err) throw err;
+  con.query("SELECT username FROM Account", function (err, result, fields) {
     if (err) throw err;
-    con.query("SELECT username FROM Account", function (err, result, fields) {
-      if (err) throw err;
-      console.log(result[0].username);
-    });
+    console.log(result[0].username);
+  });
 });
