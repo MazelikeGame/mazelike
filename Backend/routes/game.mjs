@@ -2,14 +2,20 @@
 import express from "express";
 import crypto from "crypto";
 import util from "util";
+import Lobby from "../models/lobby";
 
 export let gameRouter = express.Router();
 
-let lobbies = new Map();
-
 // View a lobby
-gameRouter.get("/lobby/:id", (req, res) => {
-  if(!lobbies.has(req.params.id)) {
+gameRouter.get("/lobby/:id", async(req, res) => {
+  let lobbyResults = await Lobby.findAll({
+    where: {
+      lobbyId: req.params.id
+    }
+  });
+
+  // Check if the lobby exists
+  if(lobbyResults.length === 0) {
     res.render("lobby", {
       invalid: true,
       user: req.query.user
@@ -18,52 +24,67 @@ gameRouter.get("/lobby/:id", (req, res) => {
     return;
   }
 
-  let lobby = lobbies.get(req.params.id);
+  // Convert the mysql rows into useful a useful format
+  let host = lobbyResults.find((row) => {
+    return row.isHost;
+  });
+
+  let isHost = host.playerId === req.query.user;
+
+  let players = lobbyResults.map((row) => {
+    return {
+      id: row.playerId,
+      name: row.playerId,
+      isHost: row.isHost
+    };
+  });
 
   res.render("lobby", {
     id: req.params.id,
-    isHost: req.query.user === lobby.host,
+    isHost,
     user: req.query.user,
-    players: lobby.players,
-    host: lobby.host,
+    players,
+    host: host.playerId, // Update to name
     origin: `http://${req.headers.host}`,
-    secret: lobby.secret
+    secret: lobbyResults[0].secret
   });
 });
 
 // Join a lobby
 // /j/:id (from the root)
-export const joinRoute = (req, res) => {
+export const joinRoute = async(req, res) => {
   if(!req.query.user) {
     res.redirect("/login");
     return;
   }
 
-  // Find the lobby
-  let lobby, id;
-  for(const [_id, _lobby] of lobbies) {
-    if(_lobby.secret === req.params.id) {
-      lobby = _lobby;
-      id = _id;
+  let lobby = await Lobby.find({
+    where: {
+      secret: req.params.id
     }
-  }
+  });
 
+  // check if the lobby exists
   if(!lobby) {
     res.end("Join code is invalid");
     return;
   }
 
-  lobby.players.push({
-    id: req.query.user,
-    name: req.query.user
+  await Lobby.create({
+    lobbyId: lobby.lobbyId,
+    secret: lobby.secret,
+    playerId: req.query.user
   });
 
   io.emit("lobby-add", {
-    id,
-    player: lobby.players[lobby.players.length - 1]
+    id: lobby.lobbyId,
+    player: {
+      name: req.query.user,
+      id: req.query.user
+    }
   });
 
-  res.redirect(`/game/lobby/${id}`);
+  res.redirect(`/game/lobby/${lobby.lobbyId}`);
 };
 
 const randomBytes = util.promisify(crypto.randomBytes);
@@ -89,86 +110,105 @@ gameRouter.get("/new", async(req, res) => {
   let id = await genId(ID_LENGTH);
   let secret = await genId(SECRET_LENGTH);
 
-  lobbies.set(id, {
-    host: req.query.user,
+  await Lobby.create({
     secret,
-    players: [{
-      id: req.query.user,
-      name: req.query.user,
-      isHost: true
-    }]
+    lobbyId: id,
+    playerId: req.query.user,
+    isHost: true
   });
 
   res.redirect(`/game/lobby/${id}`);
 });
 
 // Delete a lobby
-gameRouter.get("/lobby/:id/delete", (req, res) => {
+gameRouter.get("/lobby/:id/delete", async(req, res) => {
   if(!req.query.user) {
     res.redirect("/login");
     return;
   }
 
-  let lobby = lobbies.get(req.params.id);
+  let lobby = await Lobby.find({
+    where: {
+      lobbyId: req.params.id,
+      playerId: req.query.user
+    }
+  });
 
   if(lobby) {
-    if(lobby.host === req.query.user) {
-      lobbies.delete(req.params.id);
+    if(lobby.isHost) {
+      await Lobby.destroy({
+        where: {
+          lobbyId: req.params.id
+        }
+      });
+
       io.emit("lobby-delete");
+      res.end("Lobby deleted");
     } else {
       res.end("Only the host can delete this lobby.");
-      return;
     }
+    return;
   }
 
-  res.end("Lobby deleted");
+  res.end("No such lobby or you are not in it");
 });
 
 // Drop a player from the lobby
-gameRouter.get("/lobby/:id/drop/:player", (req, res) => {
+gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
   if(!req.query.user) {
     res.redirect("/login");
     return;
   }
 
-  let lobby = lobbies.get(req.params.id);
+  let lobby = await Lobby.find({
+    where: {
+      lobbyId: req.params.id,
+      playerId: req.params.player
+    }
+  });
 
   if(lobby) {
-    let idx = lobby.players.findIndex((player) => {
-      return player.id === req.params.player;
+    await lobby.destroy();
+
+    io.emit("lobby-drop", {
+      id: req.params.id,
+      player: req.params.player
     });
-
-    if(idx !== -1) {
-      io.emit("lobby-drop", {
-        id: req.params.id,
-        player: lobby.players[idx].id
-      });
-
-      lobby.players.splice(idx, 1);
-    }
 
     res.end("Player removed");
   }
 
-  res.end("No such lobby");
+  res.end("No such lobby or player");
 });
 
 // Start the game for this lobby
-gameRouter.get("/lobby/:id/start", (req, res) => {
+gameRouter.get("/lobby/:id/start", async(req, res) => {
   if(!req.query.user) {
     res.redirect("/login");
     return;
   }
 
-  let lobby = lobbies.get(req.params.id);
+  let lobby = await Lobby.find({
+    where: {
+      lobbyId: req.params.id,
+      playerId: req.query.user
+    }
+  });
 
-  if(lobby) {
-    lobbies.delete(req.params.id);
+  if(lobby && lobby.isHost) {
+    await Lobby.destroy({
+      where: {
+        lobbyId: req.params.id
+      }
+    });
+
+    // Create game here (TODO)
+
     io.emit("lobby-start", req.params.id);
 
     res.end("Game started");
     return;
   }
 
-  res.end("No such lobby");
+  res.end("No such lobby or you are not the host");
 });
