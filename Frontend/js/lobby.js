@@ -21,8 +21,12 @@ if(input) {
 let sock = io(location.origin);
 
 // Handle a player being dropped
-sock.on("lobby-drop", (id) => {
-  let item = document.querySelector(`[data-player-id="${id}"]`);
+sock.on("lobby-drop", ({id, player}) => {
+  if(id !== hydrate.id) {
+    return;
+  }
+
+  let item = document.querySelector(`[data-player-id="${player}"]`);
 
   if(item) {
     item.remove();
@@ -32,7 +36,11 @@ sock.on("lobby-drop", (id) => {
 let group = document.querySelector(".list-group");
 
 // Handle adding a new player
-sock.on("lobby-add", (player) => {
+sock.on("lobby-add", ({id, player}) => {
+  if(id !== hydrate.id) {
+    return;
+  }
+
   // Create the div for the player item
   let playerItem = document.createElement("div");
   playerItem.setAttribute("class", "list-group-item d-flex justify-content-between align-items-center");
@@ -59,11 +67,65 @@ Array.from(document.querySelectorAll("a.drop-link"))
 
 function linkHandler(e) {
   e.preventDefault();
-  fetch(this.href);
-  // TODO: Do something with the response
+  fetchAndNotify(this.href);
 }
 
 // Reload the page if this lobby is deleted
-sock.on("lobby-delete", () => {
-  location.reload();
+sock.on("lobby-delete", (id) => {
+  if(id === hydrate.id) {
+    location.reload();
+  }
 });
+
+// Go to the game page
+sock.on("lobby-start", (id) => {
+  if(id === hydrate.id) {
+    location.href = `/game/${id}`;
+  }
+});
+
+// Start the game
+let startBtn = document.querySelector("#start");
+
+if(startBtn) {
+  startBtn.addEventListener("click", () => {
+    fetchAndNotify(`/game/lobby/${hydrate.id}/start?user=${hydrate.user}`);
+  });
+}
+
+let container = document.querySelector(".container");
+let notifyTimeout;
+
+// Show a notification
+function notify(msg, type = "primary") {
+  let alert = document.querySelector(".alert");
+  if(alert) {
+    alert.remove();
+  }
+
+  clearTimeout(notifyTimeout);
+  notifyTimeout = setTimeout(() => {
+    let alert = document.querySelector(".alert");
+    if(alert) {
+      alert.remove();
+    }
+  }, 3000);
+
+  let alertDiv = document.createElement("div");
+  alertDiv.setAttribute("class", `alert alert-${type}`);
+  alertDiv.setAttribute("role", "alert");
+  alertDiv.innerText = msg;
+
+  container.insertBefore(alertDiv, container.firstChild);
+}
+
+// Fetch a url and show the response as a notification
+function fetchAndNotify(url) {
+  return fetch(url)
+    .then((res) => {
+      return res.text()
+        .then((text) => {
+          notify(text, res.ok ? "primary" : "danger");
+        });
+    });
+}

@@ -6,6 +6,7 @@ export let gameRouter = express.Router();
 
 let lobbies = new Map();
 
+// View a lobby
 gameRouter.get("/lobby/:id", (req, res) => {
   if(!lobbies.has(req.params.id)) {
     res.render("lobby", {
@@ -28,6 +29,7 @@ gameRouter.get("/lobby/:id", (req, res) => {
   });
 });
 
+// Join a lobby
 // /j/:id (from the root)
 export const joinRoute = (req, res) => {
   if(!req.query.user) {
@@ -42,11 +44,15 @@ export const joinRoute = (req, res) => {
     name: req.query.user
   });
 
-  io.emit("lobby-add", lobby.players[lobby.players.length - 1]);
+  io.emit("lobby-add", {
+    id: req.params.id,
+    player: lobby.players[lobby.players.length - 1]
+  });
 
   res.redirect(`/game/lobby/${req.params.id}`);
 };
 
+// Create a new lobby
 gameRouter.get("/new", (req, res) => {
   if(!req.query.user) {
     res.redirect("/login");
@@ -71,6 +77,7 @@ gameRouter.get("/new", (req, res) => {
   });
 });
 
+// Delete a lobby
 gameRouter.get("/lobby/:id/delete", (req, res) => {
   if(!req.query.user) {
     res.redirect("/login");
@@ -92,6 +99,7 @@ gameRouter.get("/lobby/:id/delete", (req, res) => {
   res.end("Lobby deleted");
 });
 
+// Drop a player from the lobby
 gameRouter.get("/lobby/:id/drop/:player", (req, res) => {
   if(!req.query.user) {
     res.redirect("/login");
@@ -106,11 +114,35 @@ gameRouter.get("/lobby/:id/drop/:player", (req, res) => {
     });
 
     if(idx !== -1) {
-      io.emit("lobby-drop", lobby.players[idx].id);
+      io.emit("lobby-drop", {
+        id: req.params.id,
+        player: lobby.players[idx].id
+      });
+
       lobby.players.splice(idx, 1);
     }
 
     res.end("Player removed");
+  }
+
+  res.end("No such lobby");
+});
+
+// Start the game for this lobby
+gameRouter.get("/lobby/:id/start", (req, res) => {
+  if(!req.query.user) {
+    res.redirect("/login");
+    return;
+  }
+
+  let lobby = lobbies.get(req.params.id);
+
+  if(lobby) {
+    lobby.started = true;
+    io.emit("lobby-start", req.params.id);
+
+    res.end("Game started");
+    return;
   }
 
   res.end("No such lobby");
