@@ -3,16 +3,31 @@ import express from "express";
 import http from "http";
 import socketio from "socket.io";
 import {gameRouter, joinRoute} from "./routes/game.mjs";
+import accountRouter from "./routes/accounts.mjs";
 import exphbs from "express-handlebars";
+import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
+import session from 'express-session';
+import sequelize from "./sequelize";
 
 let app = express();
 let server = http.Server(app);
 global.io = socketio(server);
 
+dotenv.config();
 app.use(express.static("Frontend"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+
+//Note if we add https: cookie: { secure: true }
+app.use(session({
+  secret: 'mazelike',
+  resave: true,
+  saveUninitialized: false,
+  cookie: {
+    expires: 600000 //Switch this if we want to stay logged in forever.
+  }
+}));
 
 //Handlebars
 app.engine('handlebars', exphbs());
@@ -22,6 +37,11 @@ app.set('views', 'Frontend/views');
 //Routes
 app.use("/game", gameRouter);
 app.get("/j/:id", joinRoute);
+app.use('/account', accountRouter);
+
+app.get('/', function(req, res) {
+  res.render('index');
+});
 
 let nextId = 0;
 
@@ -41,4 +61,8 @@ io.on("connection", (client) => {
   });
 });
 
-server.listen(3000);
+sequelize.sync().then(() => {
+  server.listen(3000, () => {
+    process.stdout.write("Server started on port 3000\n");
+  });
+});
