@@ -20,15 +20,14 @@ const sql = new Sequelize({
 
 /**
  * Checks to make sure the user is authenticated.
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
 function isAuthenticated(req, res, next) {
   if(!req.session || !req.session.authenticated) {
     res.redirect('/account/login');
   }
-
   req.session.cookie.expires = 600000;
   next();
 }
@@ -44,8 +43,8 @@ accountRouter.get('/create', function(req, res) {
 accountRouter.post('/create', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
   userModel.password = "hi";
-  /*
-  //When cleaning up, switch to this, instead of directly assigning password.
+
+  /*When cleaning up, switch to this, instead of directly assigning password.
   userModel.beforeCreate(() => {
     bcrypt.hashSync(req.body.password, 10);
   });*/
@@ -57,7 +56,8 @@ accountRouter.post('/create', function(req, res) {
       }
     }).then(function(user) {
       if(user) {
-        res.send("Username or email already exists!");
+        // res.send("Username or email already exists!");
+        res.redirect('/create');
       } else {
         //The req.body needs sanitized and checked for valid inputs in the future.
         //Shouldn't be assinging bcrypt.hashSync here.
@@ -91,7 +91,7 @@ accountRouter.post('/login', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
   userModel.findOne({
     where: {
-      username: req.body.username, 
+      username: req.body.username,
       password: req.body.password
     }
   }).then(function(user) {
@@ -105,9 +105,9 @@ accountRouter.post('/login', function(req, res) {
   });
 
   /*
-  if (req.body.username && req.body.username === 'test'  
+  if (req.body.username && req.body.username === 'test'
   && req.body.password && req.body.password === 'password') { //Put SQL check here...
-    
+
     //Login works
     req.session.authenticated = true;
     req.session.username = 'test';
