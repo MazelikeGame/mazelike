@@ -6,6 +6,7 @@ import exphbs from "express-handlebars";
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import session from 'express-session';
+import sequelize from "./sequelize";
 
 let app = express();
 let server = http.Server(app);
@@ -56,6 +57,8 @@ io.on("connection", (client) => {
   });
 });
 
-server.listen(3000, () => {
-  process.stdout.write("Server started on port 3000\n");
+sequelize.sync().then(() => {
+  server.listen(3000, () => {
+    process.stdout.write("Server started on port 3000\n");
+  });
 });

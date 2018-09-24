@@ -8,16 +8,6 @@ dotenv.config();
 
 const accountRouter = express.Router();
 
-const sql = new Sequelize({
-  database: process.env.DB_DATABASE,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  dialect: 'mysql',
-  operatorsAliases: false
-}); //logging: false - to turn logging off.
-
 /**
  * Checks to make sure the user is authenticated.
  * @param req
@@ -50,27 +40,23 @@ accountRouter.get('/create', function(req, res) {
 });
 
 accountRouter.post('/create', function(req, res) {
-  var userModel = new User(sql);
+  User.username = req.body.username;
+  User.email = req.body.email;
 
-  userModel.username = req.body.username;
-  userModel.email = req.body.email;
-
-  userModel.sync().then(() => {
-    userModel.findOne({
-      where: {
-        [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
-      }
-    }).then(function(user) {
-      if(user) {
-        res.render('create_acct', { isAuthenticated: true });
-      } else {
-        bcrypt.hash(req.body.password, 10, function(err, hash) {
-          userModel.password = hash;
-          userModel.create(userModel);
-          res.redirect('/');
-        });
-      }
-    });
+  User.findOne({
+    where: {
+      [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
+    }
+  }).then(function(user) {
+    if(user) {
+      res.render('create_acct', { isAuthenticated: true });
+    } else {
+      bcrypt.hash(req.body.password, 10, function(err, hash) {
+        User.password = hash;
+        User.create(User);
+        res.redirect('/');
+      });
+    }
   });
 });
 
@@ -96,8 +82,8 @@ accountRouter.get('/login', function(req, res) {
 });
 
 accountRouter.post('/login', function(req, res) {
-  var userModel = new User(sql); //make username, email, password properties in the user model.
-  userModel.findOne({
+  //make username, email, password properties in the user model.
+  User.findOne({
     where: {
       username: req.body.username
     }
