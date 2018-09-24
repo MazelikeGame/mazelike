@@ -16,22 +16,43 @@ const sql = new Sequelize({
   port: process.env.DB_PORT,
   dialect: 'mysql',
   operatorsAliases: false
-});
+}); //logging: false - to turn logging off.
+
+/**
+ * Checks to make sure the user is authenticated.
+ * @param req
+ * @param res
+ * @param next
+ */
+function isAuthenticated(req, res, next) {
+  if(!req.session || !req.session.authenticated) {
+    res.redirect('/account/login');
+  }
+
+  req.session.cookie.expires = 600000; //Resets the cookie time.
+  next();
+}
+
+/**
+ * DEFAULT
+ */
 
 accountRouter.get('/', function(req, res) {
-  res.redirect('/'); //In the future check for auth here.
+  res.redirect('/'); //Redirects to the homepage.
 });
+
+/**
+ * CREATE ACCOUNT GET/POST
+ */
 
 accountRouter.get('/create', function(req, res) {
   res.render('create_acct');
 });
 
-// TODO: Would like to require being logged in
 accountRouter.get('/edit/:accountId', function(req, res) {
   res.render('edit_acct');
 });
 
-// TODO: Would like to require being logged in
 accountRouter.post('/edit/:accountId', function(req, res) {
   var userModel = new User(sql);
   userModel.sync().then(() => {
@@ -56,39 +77,72 @@ accountRouter.post('/edit/:accountId', function(req, res) {
 });
 
 accountRouter.post('/create', function(req, res) {
-  var userModel = new User(sql); //make username, email, password properties in the user model.
+  var userModel = new User(sql);
 
-  /*
-  //When cleaning up, switch to this, instead of directly assigning password.
-  userModel.beforeCreate(() => {
-    bcrypt.hashSync(req.body.password, 10);
-  });*/
+  userModel.username = req.body.username;
+  userModel.email = req.body.email;
 
   userModel.sync().then(() => {
-    const Op = Sequelize.Op;
     userModel.findOne({
       where: {
-        [Op.or]: [{username: req.body.username}, {email: req.body.email}]
+        [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
       }
     }).then(function(user) {
       if(user) {
-        res.send("Username or email already exists!");
+        res.render('create_acct', { isAuthenticated: true });
       } else {
-        //The req.body needs sanitized and checked for valid inputs in the future.
-        //Shouldn't be assinging bcrypt.hashSync here.
-        userModel.create({
-          username: req.body.username,
-          email: req.body.email,
-          password: bcrypt.hashSync(req.body.password, 10)
+        bcrypt.hash(req.body.password, 10, function(err, hash) {
+          userModel.password = hash;
+          userModel.create(userModel);
+          res.redirect('/');
         });
-        res.send('Account Created!');
       }
     });
   });
 });
 
+/**
+ * LOGOUT
+ */
+
+accountRouter.get('/logout', isAuthenticated, function(req, res) {
+  req.session.destroy();
+  res.redirect('/account/login');
+});
+
+accountRouter.get('/edit', isAuthenticated, function(req, res) {
+  res.send(req.session.username);
+});
+
+/**
+ * LOGIN GET/POST
+ */
+
 accountRouter.get('/login', function(req, res) {
-  res.render('login');
+  res.render('login'); //Add isAuth to make sure you can't login again.
+});
+
+accountRouter.post('/login', function(req, res) {
+  var userModel = new User(sql); //make username, email, password properties in the user model.
+  userModel.findOne({
+    where: {
+      username: req.body.username
+    }
+  }).then(function(user) {
+    if(user) {
+      bcrypt.compare(req.body.password, user.password, function(err, result) {
+        if(result) {
+          req.session.authenticated = true;
+          req.session.username = user.username;
+          res.redirect('/');
+        } else {
+          res.render('login', { wrongPassword: true }); //Failed login by password.
+        }
+      });
+    } else {
+      res.render('login', { wrongUsername: true }); //Failed login by username.
+    }
+  });
 });
 
 export default accountRouter;

@@ -1,28 +1,75 @@
 /* global describe it */
 var request = require('request');
+var chai = require('chai');
+var assert = chai.assert;
+var expect = chai.expect;
+
 var base_url = 'http://localhost:3000/';
-var update_url = 'http://localhost:3000/account/update';
+var login_url = 'http://localhost:3000/account/login';
 var create_url = 'http://localhost:3000/account/create';
 
 
-describe("General site tests", () => {
-  it("/ returns 200", () => {
-    request.get(base_url, function(err, response, body) {
-      expect(response.statusCode).toBe(200);
+describe('Create route tests', () => {
+  it('Can visit /create', (done) => {
+    request.get(create_url, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 200);
+      } catch(e) {
+        done(e);
+      }
+      done();
+    });
+  });
+
+  it('Can create an account', (done) => {
+    request.post({
+      url: create_url,
+      form: { username: 'test', password: 'test', email: 'test@test.com' }
+    }, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 302);
+      } catch(e) {
+        done(e);
+      }
+      done();
     });
   });
 });
 
-describe('Auth tests', () => {
-  it('/create returns 200', () => {
-    request.get(create_url, function(err, response, body) {
-      expect(response.statusCode).toBe(200);
+
+describe('Login route tests', () => {
+  it('Can visit login', (done) => {
+    request.get(login_url, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 200);
+      } catch(e) {
+        done(e);
+      }
+      done();
     });
   });
 
-  it('/update returns 200', () => {
-    request.get(update_url, function(err, response, body) {
-      expect(response.statusCode).toBe(200);
+  it('Can login ', (done) => {
+    request.post({
+      url: create_url,
+      form: { username: 'test', password: 'test', email: 'test@test.com' }
+    }, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 200);
+      } catch(e) {
+        done(e);
+      }
+    });
+    request.post({
+      url: login_url,
+      form: { username: 'test', password: 'password' }
+    }, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 200);
+      } catch(e) {
+        done(e);
+      }
+      done();
     });
   });
 });
