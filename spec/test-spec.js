@@ -1,48 +1,75 @@
 /* global describe it */
 var request = require('request');
+var chai = require('chai');
+var assert = chai.assert;
+var expect = chai.expect;
+
 var base_url = 'http://localhost:3000/';
 var login_url = 'http://localhost:3000/account/login';
 var create_url = 'http://localhost:3000/account/create';
 
 
-describe("An example test", () => {
-  it("Passes", () => {
-    // throw new Error("Fail");
-  });
-});
-
 describe('Create route tests', () => {
-  it('Can visit /create', () => {
+  it('Can visit /create', (done) => {
     request.get(create_url, function(err, response, body) {
-      expect(response.statusCode.toBe(200));
-      expect(response.url.toBe(create_url));
+      try {
+        assert.equal(response.statusCode, 200);
+      } catch(e) {
+        done(e);
+      }
+      done();
     });
   });
 
-  it('Can create an account', () => {
+  it('Can create an account', (done) => {
     request.post({
       url: create_url,
       form: { username: 'test', password: 'test', email: 'test@test.com' }
     }, function(err, response, body) {
-      expect(response.url).toBe(login_url);
+      try {
+        assert.equal(response.statusCode, 302);
+      } catch(e) {
+        done(e);
+      }
+      done();
     });
   });
 });
 
+
 describe('Login route tests', () => {
-  it('Can visit login', () => {
+  it('Can visit login', (done) => {
     request.get(login_url, function(err, response, body) {
-      expect(response.statusCode).toBe(200);
-      expect(response.url.toBe(login_url));
+      try {
+        assert.equal(response.statusCode, 200);
+      } catch(e) {
+        done(e);
+      }
+      done();
     });
   });
 
-  it('Can login with default credentials', () => {
+  it('Can login ', (done) => {
+    request.post({
+      url: create_url,
+      form: { username: 'test', password: 'test', email: 'test@test.com' }
+    }, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 200);
+      } catch(e) {
+        done(e);
+      }
+    });
     request.post({
       url: login_url,
       form: { username: 'test', password: 'password' }
     }, function(err, response, body) {
-      expect(response.url).toBe(base_url);
+      try {
+        assert.equal(response.statusCode, 302);
+      } catch(e) {
+        done(e);
+      }
+      done();
     });
   });
 });

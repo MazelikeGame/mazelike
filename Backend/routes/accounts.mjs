@@ -20,9 +20,9 @@ const sql = new Sequelize({
 
 /**
  * Checks to make sure the user is authenticated.
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
 function isAuthenticated(req, res, next) {
   if(!req.session || !req.session.authenticated) {
