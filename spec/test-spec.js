@@ -2,7 +2,7 @@
 var request = require('request');
 var base_url = 'http://localhost:3000/';
 var login_url = 'http://localhost:3000/account/login';
-var create_url = 'http://localhost:3000/account/create'
+var create_url = 'http://localhost:3000/account/create';
 
 
 describe("An example test", () => {

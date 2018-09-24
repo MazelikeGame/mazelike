@@ -52,6 +52,9 @@ accountRouter.get('/create', function(req, res) {
 accountRouter.post('/create', function(req, res) {
   var userModel = new User(sql);
 
+  userModel.username = req.body.username;
+  userModel.email = req.body.email;
+
   userModel.sync().then(() => {
     userModel.findOne({
       where: {
@@ -62,11 +65,8 @@ accountRouter.post('/create', function(req, res) {
         res.render('create_acct', { isAuthenticated: true });
       } else {
         bcrypt.hash(req.body.password, 10, function(err, hash) {
-          userModel.create({
-            username: req.body.username,
-            email: req.body.email,
-            password: hash
-          });
+          userModel.password = hash;
+          userModel.create(userModel);
           res.redirect('/');
         });
       }
