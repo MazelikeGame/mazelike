@@ -1,5 +1,6 @@
-//var mysql = require('mysql');
-import mysql from "mysql";
+var mysql = require('mysql')
+
+//import mysql from "mysql";
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -8,14 +9,19 @@ var con = mysql.createConnection({
   database: "test"
 });
 
-function getUsername(){
-return "lol";
-}
+var usr = "";
 
 con.connect(function (err) {
   if (err) throw err;
   con.query("SELECT username FROM Account", function (err, result, fields) {
     if (err) throw err;
-    console.log(result[0].username);
+    usr = result[0].username;
+    console.log(usr)
   });
 });
+
+console.log(usr)
+var myInfo = "{{username}}";
+var template = Handlebars.compile(myInfo);
+var data = template({username: user});
+document.getElementById('username').innerHTML = data;
