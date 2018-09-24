@@ -27,7 +27,7 @@ describe('Create route tests', () => {
       form: { username: 'test', password: 'test', email: 'test@test.com' }
     }, function(err, response, body) {
       try {
-        assert.equal(response.statusCode, 200);
+        assert.equal(response.statusCode, 302);
       } catch(e) {
         done(e);
       }
