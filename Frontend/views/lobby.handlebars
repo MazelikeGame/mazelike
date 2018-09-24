@@ -30,11 +30,11 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="/game/new?user={{user}}">New lobby</a>
+            <a class="nav-link" href="/game/new">New lobby</a>
           </li>
           {{#if isHost}}
             <li class="nav-item">
-            <a class="nav-link" href="/game/lobby/{{id}}/delete?user={{user}}">Delete lobby</a>
+            <a class="nav-link" href="/game/lobby/{{id}}/delete">Delete lobby</a>
           </li>
           {{/if}}
         </ul>
@@ -54,11 +54,11 @@
         <div class="list-group">
           {{#each players}}
             <div class="list-group-item d-flex justify-content-between align-items-center" data-player-id="{{id}}">
-              {{name}}
+              {{id}}
               {{#if isHost}}
               {{else}}
                 {{#if ../isHost}}
-                  <a class="drop-link" href="/game/lobby/{{../id}}/drop/{{id}}?user={{../user}}">Drop</a>
+                  <a class="drop-link" href="/game/lobby/{{../id}}/drop/{{id}}">Drop</a>
                 {{/if}}
               {{/if}}
             </div>
@@ -80,6 +80,6 @@
         {{/if}}
       {{/if}}
     </div>
-    <script src="/js/lobby.js" data-ishost="{{isHost}}" data-id="{{id}}" data-user="{{user}}"></script>
+    <script src="/js/lobby.js" data-ishost="{{isHost}}" data-id="{{id}}"></script>
   </body>
 </html>

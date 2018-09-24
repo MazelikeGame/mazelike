@@ -36,7 +36,7 @@ sock.on("lobby-drop", ({id, player}) => {
 let group = document.querySelector(".list-group");
 
 // Handle adding a new player
-sock.on("lobby-add", ({id, player}) => {
+sock.on("lobby-add", ({id, playerId}) => {
   if(id !== hydrate.id) {
     return;
   }
@@ -44,14 +44,14 @@ sock.on("lobby-add", ({id, player}) => {
   // Create the div for the player item
   let playerItem = document.createElement("div");
   playerItem.setAttribute("class", "list-group-item d-flex justify-content-between align-items-center");
-  playerItem.setAttribute("data-player-id", player.id);
-  playerItem.innerText = player.name;
+  playerItem.setAttribute("data-player-id", playerId);
+  playerItem.innerText = playerId;
   group.appendChild(playerItem);
 
   // Create the drop link if we are the host
   if(hydrate.ishost === "true") {
     let link = document.createElement("a");
-    link.href = `/game/lobby/${hydrate.id}/drop/${player.id}?user=${hydrate.user}`;
+    link.href = `/game/lobby/${hydrate.id}/drop/${playerId}`;
     link.innerText = "Drop";
     playerItem.appendChild(link);
 
@@ -89,7 +89,7 @@ let startBtn = document.querySelector("#start");
 
 if(startBtn) {
   startBtn.addEventListener("click", () => {
-    fetchAndNotify(`/game/lobby/${hydrate.id}/start?user=${hydrate.user}`);
+    fetchAndNotify(`/game/lobby/${hydrate.id}/start`);
   });
 }
 

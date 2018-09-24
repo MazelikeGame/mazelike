@@ -8,6 +8,9 @@ export let gameRouter = express.Router();
 
 // View a lobby
 gameRouter.get("/lobby/:id", async(req, res) => {
+  // make sure req.user is an object
+  req.user || (req.user = {}); // eslint-disable-line
+
   let lobbyResults = await Lobby.findAll({
     where: {
       lobbyId: req.params.id
@@ -18,33 +21,32 @@ gameRouter.get("/lobby/:id", async(req, res) => {
   if(lobbyResults.length === 0) {
     res.render("lobby", {
       invalid: true,
-      user: req.query.user
+      user: req.user.username
     });
 
     return;
   }
 
   // Convert the mysql rows into useful a useful format
-  let host = lobbyResults.find((row) => {
+  let host = await lobbyResults.find((row) => {
     return row.isHost;
   });
-
-  let isHost = host.playerId === req.query.user;
 
   let players = lobbyResults.map((row) => {
     return {
       id: row.playerId,
-      name: row.playerId,
       isHost: row.isHost
     };
   });
 
+  let isHost = host.playerId === req.user.username;
+
   res.render("lobby", {
     id: req.params.id,
     isHost,
-    user: req.query.user,
+    user: req.user.username,
     players,
-    host: host.playerId, // Update to name
+    host: host.playerId,
     origin: `http://${req.headers.host}`,
     secret: lobbyResults[0].secret
   });
@@ -53,8 +55,8 @@ gameRouter.get("/lobby/:id", async(req, res) => {
 // Join a lobby
 // /j/:id (from the root)
 export const joinRoute = async(req, res) => {
-  if(!req.query.user) {
-    res.redirect("/login");
+  if(!req.user) {
+    res.redirect("/account/login");
     return;
   }
 
@@ -73,15 +75,12 @@ export const joinRoute = async(req, res) => {
   await Lobby.create({
     lobbyId: lobby.lobbyId,
     secret: lobby.secret,
-    playerId: req.query.user
+    playerId: req.user.username
   });
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
-    player: {
-      name: req.query.user,
-      id: req.query.user
-    }
+    playerId: req.user.username
   });
 
   res.redirect(`/game/lobby/${lobby.lobbyId}`);
@@ -102,8 +101,8 @@ const SECRET_LENGTH = 3;
 
 // Create a new lobby
 gameRouter.get("/new", async(req, res) => {
-  if(!req.query.user) {
-    res.redirect("/login");
+  if(!req.user) {
+    res.redirect("/account/login");
     return;
   }
 
@@ -113,7 +112,7 @@ gameRouter.get("/new", async(req, res) => {
   await Lobby.create({
     secret,
     lobbyId: id,
-    playerId: req.query.user,
+    playerId: req.user.username,
     isHost: true
   });
 
@@ -122,15 +121,15 @@ gameRouter.get("/new", async(req, res) => {
 
 // Delete a lobby
 gameRouter.get("/lobby/:id/delete", async(req, res) => {
-  if(!req.query.user) {
-    res.redirect("/login");
+  if(!req.user) {
+    res.redirect("/account/login");
     return;
   }
 
   let lobby = await Lobby.find({
     where: {
       lobbyId: req.params.id,
-      playerId: req.query.user
+      playerId: req.user.username
     }
   });
 
@@ -142,7 +141,7 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
         }
       });
 
-      io.emit("lobby-delete");
+      io.emit("lobby-delete", req.params.id);
       res.end("Lobby deleted");
     } else {
       res.end("Only the host can delete this lobby.");
@@ -155,8 +154,20 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
 
 // Drop a player from the lobby
 gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
-  if(!req.query.user) {
-    res.redirect("/login");
+  if(!req.user) {
+    res.redirect("/account/login");
+    return;
+  }
+
+  let host = await Lobby.find({
+    where: {
+      lobbyId: req.params.id,
+      playerId: req.user.username
+    }
+  });
+
+  if(!host.isHost) {
+    res.end("Only the host can drop a player");
     return;
   }
 
@@ -183,15 +194,15 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
 
 // Start the game for this lobby
 gameRouter.get("/lobby/:id/start", async(req, res) => {
-  if(!req.query.user) {
-    res.redirect("/login");
+  if(!req.user) {
+    res.redirect("/account/login");
     return;
   }
 
   let lobby = await Lobby.find({
     where: {
       lobbyId: req.params.id,
-      playerId: req.query.user
+      playerId: req.user.username
     }
   });
 

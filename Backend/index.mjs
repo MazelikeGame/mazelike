@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import sequelize from "./sequelize";
+import userMiddleware from "./middleware/accounts";
 
 let app = express();
 let server = http.Server(app);
@@ -33,6 +34,9 @@ app.use(session({
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 app.set('views', 'Frontend/views');
+
+// Middleware
+app.use(userMiddleware);
 
 //Routes
 app.use("/game", gameRouter);
