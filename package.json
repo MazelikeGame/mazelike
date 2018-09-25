@@ -2,7 +2,7 @@
   "name": "mazelike",
   "version": "1.10.0",
   "scripts": {
-    "test": "jasmine",
+    "test": "node test-runner",
     "start": "node --experimental-modules Backend/index.mjs",
     "docker-test": "scripts/docker-test",
     "doc": "jsdoc -r Frontend Backend -d Documents",
