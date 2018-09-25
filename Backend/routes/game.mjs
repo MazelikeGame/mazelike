@@ -3,8 +3,64 @@ import express from "express";
 import crypto from "crypto";
 import util from "util";
 import Lobby from "../models/lobby";
+import sql from "../sequelize";
 
 export let gameRouter = express.Router();
+
+// List all lobbies
+gameRouter.get("/all", async(req, res) => {
+  if(!req.user) {
+    res.redirect("/account/login");
+    return;
+  }
+
+  // Get the hosts of all of the lobbies this user is a part of
+  let lobbies = await sql.query(`
+    SELECT l1.playerId, l1.lobbyId FROM lobbies l1
+      WHERE l1.lobbyId IN (SELECT l.lobbyId FROM lobbies l WHERE l.playerId = :userId)
+      && l1.isHost = 1
+      ORDER BY l1.lobbyId;`, {
+    replacements: {
+      userId: req.user.username
+    },
+    type: sql.QueryTypes.SELECT
+  });
+
+  let counts = await sql.query(`
+    SELECT lobbyId, COUNT(playerId) AS count FROM lobbies l1
+      WHERE l1.lobbyId IN (SELECT l2.lobbyId FROM lobbies l2 WHERE l2.playerId = :userId)
+      GROUP BY l1.lobbyId
+      ORDER BY l1.lobbyId`, {
+    replacements: {
+      userId: req.user.username
+    },
+    type: sql.QueryTypes.SELECT
+  });
+
+  if(counts.length !== lobbies.length) {
+    process.stderr.write("Lobbies and counts results were different from /game/all\n");
+    res.writeHead(500);
+    res.end("Internal server error (see server logs)");
+    return;
+  }
+
+  // Merge counts and lobbies
+  for(let i = 0; i < lobbies.length; ++i) {
+    if(lobbies[i].lobbyId !== counts[i].lobbyId) {
+      process.stderr.write("Lobbies and counts lobbyIds were different from /game/all\n");
+      res.writeHead(500);
+      res.end("Internal server error (see server logs)");
+      return;
+    }
+
+    lobbies[i].count = counts[i].count;
+  }
+
+  res.render("game-list", {
+    user: req.user.username,
+    lobbies
+  });
+});
 
 // View a lobby
 gameRouter.get("/lobby/:id", async(req, res) => {

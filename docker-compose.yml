@@ -25,6 +25,8 @@ services:
       - backend
     expose:
       - 3306
+    ports:
+      - 3306:3306
 
 volumes:
   mysql-data:
