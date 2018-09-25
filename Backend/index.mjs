@@ -72,7 +72,7 @@ const start = async() => {
     } catch(err) {
       await sleep(5000);
 
-      if(i === 30) {
+      if(i === 5) {
         process.stderr.write(err.stack);
         process.exit(1);
       }
