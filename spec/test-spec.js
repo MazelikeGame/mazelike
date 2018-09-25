@@ -4,9 +4,9 @@ var chai = require('chai');
 var assert = chai.assert;
 var expect = chai.expect;
 
-var base_url = 'http://localhost:3000/';
-var login_url = 'http://localhost:3000/account/login';
-var create_url = 'http://localhost:3000/account/create';
+var base_url = 'http://backend:3000/';
+var login_url = 'http://backend:3000/account/login';
+var create_url = 'http://backend:3000/account/create';
 
 
 describe('Create route tests', () => {

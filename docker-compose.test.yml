@@ -1,0 +1,36 @@
+version: "3.2"
+services:
+  tests:
+    image: mazelike/tests
+    build:
+      context: .
+      dockerfile: test.Dockerfile
+    depends_on:
+      - backend
+    networks:
+      - backend
+  
+  backend:
+    image: mazelike/backend:devel
+    build:
+      context: .
+    env_file: .env
+    expose:
+      - 3000
+    depends_on:
+      - mysql
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: mazelike
+      MYSQL_ROOT_PASSWORD: password
+    networks:
+      - backend
+    expose:
+      - 3306
+
+networks:
+  backend:
