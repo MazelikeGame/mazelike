@@ -1,5 +1,7 @@
 const child_process = require("child_process");
 
+const EXIT_STATUS = /pp_3_tests_1 exited with code (\d+)/;
+
 // Wait for the tests container to exit
 function awaitTestExit() {
   let tests = child_process.spawn("docker-compose",
@@ -7,8 +9,15 @@ function awaitTestExit() {
       stdio: ["ignore", "pipe", "pipe"]
     });
   
+  tests.stdout.setEncoding("utf8");
+  
   return new Promise((resolve) => {
-    tests.on("exit", resolve);
+    tests.stdout.on("data", (line) => {
+      let match = line.match(EXIT_STATUS);
+      if(match) {
+        resolve(+match[1]);
+      }
+    });
   });
 }
 
@@ -71,6 +80,8 @@ const sleep = (ms) => {
 };
 
 async function run() {
+  dockerComposeDown();
+  
   await Promise.all([
     dockerComposeBuild(),
     mysqlUp()
