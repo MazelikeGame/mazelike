@@ -65,11 +65,13 @@ function dockerComposeBuild() {
   });
 }
 
-function dockerComposeDown() {
+function dockerComposeDown(count) {
   try {
     child_process.execSync("docker-compose -f docker-compose.test.yml down");
   } catch(err) {
-    // do nothing
+    if(count) {
+      dockerComposeDown(count - 1);
+    }
   }
 }
 
@@ -80,7 +82,7 @@ const sleep = (ms) => {
 };
 
 async function run() {
-  dockerComposeDown();
+  dockerComposeDown(3);
   
   await Promise.all([
     dockerComposeBuild(),
@@ -88,10 +90,10 @@ async function run() {
   ]);
 
   dockerComposeUp();
-  await sleep(3000);
+  await sleep(7000);
   let status = await awaitTestExit();
 
-  dockerComposeDown();
+  dockerComposeDown(3);
   process.exit(status);
 }
 
