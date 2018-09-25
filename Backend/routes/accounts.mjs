@@ -36,7 +36,6 @@ function isAuthenticated(req, res, next) {
 /**
  * DEFAULT
  */
-
 accountRouter.get('/', function(req, res) {
   res.redirect('/'); //Redirects to the homepage.
 });
@@ -44,36 +43,8 @@ accountRouter.get('/', function(req, res) {
 /**
  * CREATE ACCOUNT GET/POST
  */
-
 accountRouter.get('/create', function(req, res) {
   res.render('create_acct');
-});
-
-accountRouter.get('/edit/:accountId', function(req, res) {
-  res.render('edit_acct');
-});
-
-accountRouter.post('/edit/:accountId', function(req, res) {
-  var userModel = new User(sql);
-  userModel.sync().then(() => {
-    const Op = Sequelize.Op;
-    userModel.findOne({
-      where: {
-        [Op.or]: [{username: req.body.username}, {email: req.body.email}]
-      }
-    }).then(function(user) {
-      if(user) {
-        res.send("Username or email is taken. Please use an email and username that is not taken");
-      } else {
-        userModel.update({
-          username: req.body.username,
-          email: req.body.email,
-          password: bcrypt.hashSync(req.body.password, 10)
-        });
-        res.send('Account updated!');
-      }
-    });
-  });
 });
 
 accountRouter.post('/create', function(req, res) {
@@ -101,23 +72,45 @@ accountRouter.post('/create', function(req, res) {
   });
 });
 
+accountRouter.get('/edit', isAuthenticated, function(req, res) {
+  res.render('edit_acct');
+});
+
+accountRouter.post('/edit', function(req, res) {
+  var userModel = new User(sql);
+  userModel.sync().then(() => {
+    const Op = Sequelize.Op;
+    userModel.findOne({
+      where: {
+        [Op.or]: [{username: req.body.username}, {email: req.body.email}]
+      }
+    }).then(function(user) {
+      if(user) {
+        res.send("Username or email is taken. Please use an email and username that is not taken");
+      } else {
+        userModel.update({
+          username: req.body.username,
+          email: req.body.email,
+          password: bcrypt.hashSync(req.body.password, 10)
+        });
+        res.send('Account updated!');
+      }
+    });
+  });
+});
+
+
 /**
  * LOGOUT
  */
-
 accountRouter.get('/logout', isAuthenticated, function(req, res) {
   req.session.destroy();
   res.redirect('/account/login');
 });
 
-accountRouter.get('/edit', isAuthenticated, function(req, res) {
-  res.send(req.session.username);
-});
-
 /**
  * LOGIN GET/POST
  */
-
 accountRouter.get('/login', function(req, res) {
   res.render('login'); //Add isAuth to make sure you can't login again.
 });
