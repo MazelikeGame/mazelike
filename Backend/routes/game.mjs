@@ -72,6 +72,19 @@ export const joinRoute = async(req, res) => {
     return;
   }
 
+  // Check if the user is in the lobby
+  let userExists = await Lobby.find({
+    where: {
+      secret: req.params.id,
+      playerId: req.user.username
+    }
+  });
+
+  if(userExists) {
+    res.redirect(`/game/lobby/${lobby.lobbyId}`);
+    return;
+  }
+
   await Lobby.create({
     lobbyId: lobby.lobbyId,
     secret: lobby.secret,
