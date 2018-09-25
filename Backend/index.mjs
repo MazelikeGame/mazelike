@@ -75,19 +75,22 @@ const start = async() => {
   // make several attempts to connect to mysql
   for(let i = 0;; ++i) {
     try {
-      await sequelize.sync();
+      await sequelize.authenticate();
       break;
     } catch(err) {
-      // pause between each failed attempt to give mysql time to start
       await sleep(5000);
 
-      // stop trying after 5
-      if(i === 5) {
+      if(i === 10) {
         process.stderr.write(err.stack);
         process.exit(1);
       }
     }
   }
+
+  process.stdout.write("------------------ Ignore previous mysql connection erors ------------------\n");
+
+  await sequelize.sync();
+
   server.listen(3000, () => {
     process.stdout.write("Server started on port 3000\n");
   });
