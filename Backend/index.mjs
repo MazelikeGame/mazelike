@@ -65,8 +65,32 @@ io.on("connection", (client) => {
   });
 });
 
-sequelize.sync().then(() => {
+const sleep = (ms) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+};
+
+const start = async() => {
+  // make several attempts to connect to mysql
+  for(let i = 0;; ++i) {
+    try {
+      await sequelize.sync();
+      break;
+    } catch(err) {
+      // pause between each failed attempt to give mysql time to start
+      await sleep(5000);
+
+      // stop trying after 5
+      if(i === 5) {
+        process.stderr.write(err.stack);
+        process.exit(1);
+      }
+    }
+  }
   server.listen(3000, () => {
     process.stdout.write("Server started on port 3000\n");
   });
-});
+};
+
+start();

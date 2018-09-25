@@ -18,15 +18,14 @@
     "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
-    "mysql": "^2.16.0",
     "mysql2": "^1.6.1",
-    "request": "^2.88.0",
     "sequelize": "^4.38.1",
     "socket.io": "^2.1.1"
   },
   "private": true,
   "devDependencies": {
     "jasmine": "^3.2.0",
-    "jsdoc": "^3.5.5"
+    "jsdoc": "^3.5.5",
+    "request": "^2.88.0"
   }
 }

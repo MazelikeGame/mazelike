@@ -1,0 +1,26 @@
+version: "3.2"
+services:
+  backend:
+    image: mazelike/backend:devel
+    build:
+      context: .
+    env_file: .env
+    ports:
+      - 3001:3000
+    depends_on:
+      - mysql
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: mazelike
+      MYSQL_ROOT_PASSWORD: password
+    networks:
+      - backend
+    expose:
+      - 3306
+
+networks:
+  backend:

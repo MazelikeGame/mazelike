@@ -1,4 +1,4 @@
-/* global beforeAll jasmine */
+/* global beforeAll jasmine it */
 const child_process = require("child_process");
 const {Buffer} = require("buffer");
 
@@ -43,7 +43,7 @@ function collect(streams) {
  */
 async function composeBuild() {
   return new Promise((resolve, reject) => {
-    let child = child_process.spawn("docker-compose", ["build"], {
+    let child = child_process.spawn("docker-compose", ["-f", "docker-compose.test.yml", "build"], {
       stdio: ["ignore", "pipe", "pipe"]
     });
 
@@ -127,7 +127,8 @@ function once(emitter, eventName) {
  * @return Promise
  */
 function dockerDown() {
-  child_process.execSync("docker-compose stop");
+  child_process.execSync("docker-compose -f docker-compose.test.yml logs backend");
+  child_process.execSync("docker-compose -f docker-compose.test.yml down");
 }
 
 /**
@@ -137,7 +138,7 @@ function dockerDown() {
  * @returns Promise
  */
 async function startServer() {
-  let child = child_process.spawn("docker-compose", ["up"], {
+  let child = child_process.spawn("docker-compose", ["-f", "docker-compose.test.yml", "up"], {
     stdio: ["ignore", "pipe", "pipe"]
   });
 
@@ -184,3 +185,12 @@ process.on("exit", () => {
 process.on("SIGINT", () => {
   dockerDown();
 });
+
+global.itAsync = (desc, fn) => {
+  it(desc, (done) => {
+    Promise.resolve(fn())
+      .then(() => {
+        done();
+      }, done);
+  });
+};
