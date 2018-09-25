@@ -6,6 +6,7 @@ import exphbs from "express-handlebars";
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import session from 'express-session';
+import sequelize from "./sequelize";
 
 let app = express();
 let server = http.Server(app);
@@ -56,6 +57,35 @@ io.on("connection", (client) => {
   });
 });
 
-server.listen(3000, () => {
-  process.stdout.write("Server started on port 3000\n");
-});
+const sleep = (ms) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+};
+
+const start = async() => {
+  // make several attempts to connect to mysql
+  for(let i = 0;; ++i) {
+    try {
+      await sequelize.authenticate();
+      break;
+    } catch(err) {
+      await sleep(5000);
+
+      if(i === 30) {
+        process.stderr.write(err.stack);
+        process.exit(1);
+      }
+    }
+  }
+
+  process.stdout.write("------------------ Ignore previous mysql connection erors ------------------\n");
+
+  await sequelize.sync();
+
+  server.listen(3000, () => {
+    process.stdout.write("Server started on port 3000\n");
+  });
+};
+
+start();
