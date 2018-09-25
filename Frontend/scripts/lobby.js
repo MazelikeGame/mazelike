@@ -1,3 +1,4 @@
+/* global io */
 // Get the data passed in from the template
 let hydrate = document.currentScript.dataset;
 
@@ -105,9 +106,9 @@ function notify(msg, type = "primary") {
 
   clearTimeout(notifyTimeout);
   notifyTimeout = setTimeout(() => {
-    let alert = document.querySelector(".alert");
-    if(alert) {
-      alert.remove();
+    let _alert = document.querySelector(".alert");
+    if(_alert) {
+      _alert.remove();
     }
   }, 3000);
 
