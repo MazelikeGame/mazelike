@@ -11,15 +11,15 @@
     <title>MazeLike</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="../css/bootstrap.css" rel="stylesheet">
     <!--external css-->
-    <link href="font-awesome/css/font-awesome.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="js/bootstrap-datepicker/css/datepicker.css" />
-    <link rel="stylesheet" type="text/css" href="js/bootstrap-daterangepicker/daterangepicker.css" />
+    <link href="../font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../js/bootstrap-datepicker/css/datepicker.css" />
+    <link rel="stylesheet" type="text/css" href="../js/bootstrap-daterangepicker/daterangepicker.css" />
 
     <!-- Custom styles for this template -->
-    <link href="css/loggedinstyle.css" rel="stylesheet">
-    <link href="css/style-responsive.css" rel="stylesheet">
+    <link href="../css/loggedinstyle.css" rel="stylesheet">
+    <link href="../css/style-responsive.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -40,11 +40,11 @@
                 <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
             </div>
             <!--logo start-->
-            <a href="dashboard.html" class="logo"><b>M A Z E L I K E</b></a>
+            <a href="/account/dashboard" class="logo"><b>M A Z E L I K E</b></a>
             <!--logo end-->
             <div class="top-menu">
                 <ul class="nav pull-right top-menu">
-                    <a href="index.html"><button class="blue-btn">Log Out</button></a>
+                    <a href="../.."><button class="blue-btn">Log Out</button></a>
                 </ul>
             </div>
         </header>
@@ -58,20 +58,18 @@
             <div id="sidebar" class="nav-collapse ">
                 <!-- sidebar menu start-->
                 <ul class="sidebar-menu" id="nav-accordion">                    
-                    <p class="centered"><a href="view_acct.html"><img src="img/profilepic.jpg" class="img-circle" width="60"></a></p>
-                    <script src="handlebars-v4.0.12.js"></script>
+                    <p class="centered"><a href="/account/view"><img src="../img/profilepic.jpg" class="img-circle" width="60"></a></p>
                     <h5 class="centered">
-                        <p id="username"></p>
+                        {{username}}
                     </h5>
-                    <script src="dashboard.js" type="text/javascript"></script>
                     <li class="mt">
-                        <a class="active" href="dashboard.html">
+                        <a class="active" href="/account/dashboard">
                             <i class="fa fa-dashboard"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li class="mt">
-                        <a href="view_acct.html">
+                        <a href="/account/view">
                             <i class="fa fa-tasks"></i>
                             <span>View Account</span>
                         </a>
@@ -91,29 +89,13 @@
                 <div class="row mt">
                     <!-- SERVER STATUS PANELS -->
                     <div class="col-md-4 col-sm-4 mb">
-                        <div class="white-panel pn donut-chart">
+                        <div class="white-panel pn">
                             <div class="white-header">
-                                <h5>SERVER LOAD</h5>
+                                <h5>Games</h5>
                             </div>
                             <div class="row">
-                                <div class="col-sm-6 col-xs-6 goleft">
-                                    <p><i class="fa fa-database"></i> 70%</p>
-                                </div>
-                            </div>
-                            <canvas id="serverstatus01" height="120" width="120"></canvas>
-                            <script>
-                                var doughnutData = [
-                                    {
-                                        value: 70,
-                                        color: "#68dff0"
-                                    },
-                                    {
-                                        value: 30,
-                                        color: "#fdfdfd"
-                                    }
-                                ];
-                                var myDoughnut = new Chart(document.getElementById("serverstatus01").getContext("2d")).Doughnut(doughnutData);
-                            </script>
+                                <h5>Games Here</h5>
+                            </div>   
                         </div>
                     </div><!-- /col-md-4-->
 
@@ -121,103 +103,28 @@
                     <div class="col-md-4 col-sm-4 mb">
                         <div class="white-panel pn">
                             <div class="white-header">
-                                <h5>TOP PRODUCT</h5>
+                                <h5>Game Stats</h5>
                             </div>
                             <div class="row">
-                                <div class="col-sm-6 col-xs-6 goleft">
-                                    <p><i class="fa fa-heart"></i> 122</p>
-                                </div>
-                                <div class="col-sm-6 col-xs-6"></div>
-                            </div>
-                            <div class="centered">
-                                <img src="img/product.png" width="120">
-                            </div>
+                                <h5>Games Stats Here</h5>
+                            </div> 
                         </div>
                     </div><!-- /col-md-4 -->
 
-                    <div class="col-md-4 mb">
-                        <!-- WHITE PANEL - TOP USER -->
+                    <div class="col-md-3 col-sm-3 mb">
                         <div class="white-panel pn">
                             <div class="white-header">
-                                <h5>TOP USER</h5>
+                                <h5>Options</h5>
                             </div>
-                            <p><img src="img/ui-zac.jpg" class="img-circle" width="80"></p>
-                            <p><b>Zac Snider</b></p>
                             <div class="row">
-                                <div class="col-md-6">
-                                    <p class="small mt">MEMBER SINCE</p>
-                                    <p>2012</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p class="small mt">TOTAL SPEND</p>
-                                    <p>$ 47,60</p>
-                                </div>
+                                <button class="blue-btn" type="button"> Create New Game </button>
                             </div>
-                        </div>
-                    </div><!-- /col-md-4 -->
-
-
-                </div><!-- /row -->
-
-
-                <div class="row">
-                    <!-- TWITTER PANEL -->
-                    <div class="col-md-4 mb">
-                        <div class="darkblue-panel pn">
-                            <div class="darkblue-header">
-                                <h5>DROPBOX STATICS</h5>
+                            <div class="row">
+                                <button class="blue-btn" type="button"> Continue Game </button>
                             </div>
-                            <canvas id="serverstatus02" height="120" width="120"></canvas>
-                            <script>
-                                var doughnutData = [
-                                    {
-                                        value: 60,
-                                        color: "#68dff0"
-                                    },
-                                    {
-                                        value: 40,
-                                        color: "#444c57"
-                                    }
-                                ];
-                                var myDoughnut = new Chart(document.getElementById("serverstatus02").getContext("2d")).Doughnut(doughnutData);
-                            </script>
-                            <p>April 17, 2014</p>
-                            <footer>
-                                <div class="pull-left">
-                                    <h5><i class="fa fa-hdd-o"></i> 17 GB</h5>
-                                </div>
-                                <div class="pull-right">
-                                    <h5>60% Used</h5>
-                                </div>
-                            </footer>
-                        </div>
-                        <! -- /darkblue panel -->
-                    </div><!-- /col-md-4 -->
-
-
-                    <div class="col-md-4 mb">
-                        <!-- INSTAGRAM PANEL -->
-                        <div class="instagram-panel pn">
-                            <i class="fa fa-instagram fa-4x"></i>
-                            <p>@THISISYOU<br /> 5 min. ago
-                            </p>
-                            <p><i class="fa fa-comment"></i> 18 | <i class="fa fa-heart"></i> 49</p>
-                        </div>
-                    </div><!-- /col-md-4 -->
-
-                    <div class="col-md-4 col-sm-4 mb">
-                        <!-- REVENUE PANEL -->
-                        <div class="darkblue-panel pn">
-                            <div class="darkblue-header">
-                                <h5>REVENUE</h5>
+                            <div class="row">
+                                <button class="blue-btn" type="button"> Delete Game </button>
                             </div>
-                            <div class="chart mt">
-                                <div class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%"
-                                    data-line-width="1" data-line-color="#fff" data-spot-color="#fff" data-fill-color=""
-                                    data-highlight-line-color="#fff" data-spot-radius="4" data-data="[200,135,667,333,526,996,564,123,890,464,655]"></div>
-                            </div>
-                            <p class="mt"><b>$ 17,980</b><br />Month Income
-                            </p>
                         </div>
                     </div><!-- /col-md-4 -->
 
@@ -229,24 +136,24 @@
             </section>
 
             <!-- js placed at the end of the document so the pages load faster -->
-            <script src="js/jquery.js"></script>
-            <script src="js/jquery-1.8.3.min.js"></script>
-            <script src="js/bootstrap.min.js"></script>
-            <script class="include" type="text/javascript" src="js/jquery.dcjqaccordion.2.7.js"></script>
-            <script src="js/jquery.scrollTo.min.js"></script>
-            <script src="js/jquery.nicescroll.js" type="text/javascript"></script>
-            <script src="js/jquery.sparkline.js"></script>
+            <script src="../js/jquery.js"></script>
+            <script src="../js/jquery-1.8.3.min.js"></script>
+            <script src="../js/bootstrap.min.js"></script>
+            <script class="include" type="text/javascript" src="../js/jquery.dcjqaccordion.2.7.js"></script>
+            <script src="../js/jquery.scrollTo.min.js"></script>
+            <script src="../js/jquery.nicescroll.js" type="text/javascript"></script>
+            <script src="../js/jquery.sparkline.js"></script>
 
 
             <!--common script for all pages-->
-            <script src="js/common-scripts.js"></script>
+            <script src="../js/common-scripts.js"></script>
 
-            <script type="text/javascript" src="js/gritter/js/jquery.gritter.js"></script>
-            <script type="text/javascript" src="js/gritter-conf.js"></script>
+            <script type="text/javascript" src="../js/gritter/js/jquery.gritter.js"></script>
+            <script type="text/javascript" src="../js/gritter-conf.js"></script>
 
             <!--script for this page-->
-            <script src="js/sparkline-chart.js"></script>
-            <script src="js/zabuto_calendar.js"></script>
+            <script src="../js/sparkline-chart.js"></script>
+            <script src="../js/zabuto_calendar.js"></script>
 
             <script type="application/javascript">
                 $(document).ready(function () {

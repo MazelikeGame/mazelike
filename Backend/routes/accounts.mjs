@@ -119,11 +119,16 @@ accountRouter.post('/login', function(req, res) {
 });
 
 accountRouter.get('/view', function(req, res) {
-  res.render('view_acct');
+  res.render('view_acct', {
+    username: "username",
+    email: "email@example.com",
+  });
 });
 
 accountRouter.get('/dashboard', function(req, res) {
-  res.render('dashboard');
+  res.render('dashboard', {
+    username: "username"
+  });
 });
 
 export default accountRouter;
