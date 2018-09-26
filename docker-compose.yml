@@ -23,8 +23,8 @@ services:
         target: /var/lib/mysql
     networks:
       - backend
-    expose:
-      - 3306
+    ports:
+      - 5506:3306
 
 volumes:
   mysql-data:
