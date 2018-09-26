@@ -62,8 +62,14 @@ function dockerComposeBuild() {
       stdio: ["ignore", "inherit", "inherit"]
     });
   
-  return new Promise((resolve) => {
-    build.on("exit", resolve);
+  return new Promise((resolve, reject) => {
+    build.on("exit", (code) => {
+      if(code === 0) {
+        resolve();
+      } else {
+        reject(new Error("Build failed"));
+      }
+    });
   });
 }
 
@@ -87,14 +93,21 @@ async function run() {
   let startTime = Date.now();
   dockerComposeDown(1);
 
-  await Promise.all([
-    dockerComposeBuild(),
-    mysqlUp()
-  ]);
+  let status;
 
-  dockerComposeUp();
-  await sleep(7000);
-  let status = await awaitTestExit();
+  try {
+    await Promise.all([
+      dockerComposeBuild(),
+      mysqlUp()
+    ]);
+
+    dockerComposeUp();
+    await sleep(7000);
+    status = await awaitTestExit();
+  } catch(err) {
+    status = 1;
+    process.stderr.write(err.message);
+  }
 
   dockerComposeDown(2);
   /* eslint-disable no-console */
