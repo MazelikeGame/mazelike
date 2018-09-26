@@ -8,7 +8,7 @@ services:
     depends_on:
       - backend
     networks:
-      - backend
+      - testing
   
   backend:
     image: mazelike/backend:devel
@@ -20,7 +20,7 @@ services:
     depends_on:
       - mysql
     networks:
-      - backend
+      - testing
 
   mysql:
     image: mysql:5.7
@@ -28,9 +28,9 @@ services:
       MYSQL_DATABASE: mazelike
       MYSQL_ROOT_PASSWORD: password
     networks:
-      - backend
+      - testing
     expose:
       - 3306
 
 networks:
-  backend:
+  testing:
