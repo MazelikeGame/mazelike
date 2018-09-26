@@ -1,6 +1,6 @@
 const child_process = require("child_process");
 
-const EXIT_STATUS = /pp_3_tests_1 exited with code (\d+)/;
+const EXIT_STATUS = /tests_\d+ exited with code (\d+)/;
 
 // Wait for the tests container to exit
 function awaitTestExit() {
@@ -27,13 +27,15 @@ const MYSQL_UP_MSG = "socket: '/var/run/mysqld/mysqld.sock'  port: 3306";
 function mysqlUp() {
   let mysql = child_process.spawn("docker-compose",
     ["-f", "docker-compose.test.yml", "up", "mysql"], {
-      stdio: ["ignore", "pipe", "pipe"]
+      stdio: ["ignore", "pipe", "inherit"]
     });
   
   mysql.stdout.setEncoding("utf8");
 
   return new Promise((resolve, reject) => {
     mysql.stdout.on("data", (data) => {
+      process.stdout.write(data);
+
       if(data.indexOf(MYSQL_UP_MSG) !== -1) {
         mysql.stdout.removeAllListeners("data");
 
@@ -82,8 +84,9 @@ const sleep = (ms) => {
 };
 
 async function run() {
-  dockerComposeDown(3);
-  
+  let startTime = Date.now();
+  dockerComposeDown(1);
+
   await Promise.all([
     dockerComposeBuild(),
     mysqlUp()
@@ -93,7 +96,10 @@ async function run() {
   await sleep(7000);
   let status = await awaitTestExit();
 
-  dockerComposeDown(3);
+  dockerComposeDown(2);
+  /* eslint-disable no-console */
+  console.log(`Runtime ${(Date.now() - startTime) / 1000}s`);
+  /* eslint-enable no-console */
   process.exit(status);
 }
 
