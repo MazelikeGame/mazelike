@@ -15,8 +15,8 @@ export default function User(sequelize) {
     });
   };
 
-  user.comparePassword = async function(password, realPassword, callback) {
-    bcrypt.compare(password, realPassword, 10, function(err, result) {
+  user.comparePassword = function(password, realPassword, callback) {
+    bcrypt.compare(password, realPassword, function(err, result) {
       callback(err, result);
     });
   };

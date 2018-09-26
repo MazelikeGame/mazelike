@@ -74,9 +74,7 @@ accountRouter.post('/create', function(req, res) {
 
 accountRouter.get('/logout', isAuthenticated, function(req, res) {
   req.session.destroy(function(err) {
-    if(err) {
-      //
-    } else {
+    if(!err) {
       res.redirect('login');
     }
   });
@@ -96,13 +94,14 @@ accountRouter.get('/login', function(req, res) {
 
 accountRouter.post('/login', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
+
   userModel.findOne({
     where: {
       username: req.body.username
     }
   }).then(function(user) {
     if(user) {
-      bcrypt.compare(req.body.password, user.password, function(err, result) {
+      userModel.comparePassword(req.body.password, user.password, (err, result) => {
         if(result) {
           req.session.authenticated = true;
           req.session.username = user.username;
