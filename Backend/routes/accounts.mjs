@@ -25,12 +25,13 @@ const sql = new Sequelize({
  * @param next
  */
 function isAuthenticated(req, res, next) {
-  if(!req.session || !req.session.authenticated) {
-    res.redirect('/account/login');
+  if(req.session || req.session.authenticated) {
+    next();
   }
 
-  req.session.cookie.expires = 600000; //Resets the cookie time.
-  next();
+  // req.session.cookie.expires = 600000; //Resets the cookie time.
+  // next();
+  return res.redirect('/account/login');
 }
 
 /**
@@ -72,31 +73,24 @@ accountRouter.post('/create', function(req, res) {
   });
 });
 
-accountRouter.get('/edit', isAuthenticated, function(req, res) {
+accountRouter.get('/edit', function(req, res) {
   res.render('edit_acct');
 });
 
 accountRouter.post('/edit', function(req, res) {
   var userModel = new User(sql);
-  userModel.sync().then(() => {
-    const Op = Sequelize.Op;
-    userModel.findOne({
-      where: {
-        [Op.or]: [{username: req.body.username}, {email: req.body.email}]
-      }
-    }).then(function(user) {
-      if(user) {
-        res.send("Username or email is taken. Please use an email and username that is not taken");
+  var selector = {
+    where: { username: req.session.username }
+  };
+  if (req.body.email || req.body.password) {
+    userModel.update(req.body, selector).then(function(result) {
+      if(result) {
+        res.redirect('/?message=success');
       } else {
-        userModel.update({
-          username: req.body.username,
-          email: req.body.email,
-          password: bcrypt.hashSync(req.body.password, 10)
-        });
-        res.send('Account updated!');
+        res.render('edit_acct', { message: 'Unsuccessful' });
       }
     });
-  });
+  }
 });
 
 
@@ -127,6 +121,7 @@ accountRouter.post('/login', function(req, res) {
         if(result) {
           req.session.authenticated = true;
           req.session.username = user.username;
+          req.session.userId = user.id;
           res.redirect('/');
         } else {
           res.render('login', { wrongPassword: true }); //Failed login by password.
