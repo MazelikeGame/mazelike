@@ -1,11 +1,6 @@
 MazeLike_Tests:
   stage: test
   script:
-    - docker-compose down
-    - docker volume rm -f pp_3_mysql-data
-    - rm -fr node_modules
-    - npm ci
-    - npm run eslint
     - npm test
 
 MazeLike_Deploy:
