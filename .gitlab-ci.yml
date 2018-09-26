@@ -1,9 +1,6 @@
 MazeLike_Tests:
   stage: test
   script:
-    - rm -fr node_modules
-    - npm ci
-    - npm run eslint
     - npm test
 
 MazeLike_Deploy:
