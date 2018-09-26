@@ -41,3 +41,13 @@ Also to you can run `deploy latest` to redeploy the latest version of the server
 Connect to `localhost:5506` and login as root with the password password.
 
 If mysql is not running run `docker-compose up -d mysql` to start it and `docker-compose down` to stop it.
+
+## Default .env
+
+```
+DB_HOST=mysql
+DB_PORT=3306
+DB_USER=root
+DB_PASS=password
+DB_DATABASE=mazelike
+```

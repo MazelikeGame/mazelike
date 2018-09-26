@@ -7,7 +7,6 @@ RUN npm install
 
 COPY .eslintignore .eslintignore
 COPY .eslintrc.js .eslintrc.js
-COPY .env .env
 COPY Frontend Frontend
 COPY Backend Backend
 COPY spec spec
