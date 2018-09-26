@@ -2,10 +2,11 @@
 var request = require('request');
 var chai = require('chai');
 var assert = chai.assert;
+var expect = chai.expect;
 
-var login_url = 'http://localhost:3000/account/login';
-var create_url = 'http://localhost:3000/account/create';
-var edit_url = 'http://localhost:3000/account/edit';
+var base_url = 'http://backend:3000/';
+var login_url = 'http://backend:3000/account/login';
+var create_url = 'http://backend:3000/account/create';
 
 
 describe('Create route tests', () => {
@@ -69,19 +70,6 @@ describe('Login route tests', () => {
         done(e);
       }
       done();
-    });
-  });
-});
-
-describe('Edit route tests', () => {
-  it('Can visit /edit', (done) => {
-    request.get(edit_url, function(err, response, body) {
-      try {
-        assert.equal(response.statusCode, 200);
-        done();
-      } catch(e) {
-        done(e);
-      }
     });
   });
 });

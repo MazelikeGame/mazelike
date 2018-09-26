@@ -3,20 +3,11 @@ import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
 import User from '../models/user.mjs';
 import bcrypt from 'bcrypt';
+import sql from "../sequelize";
 
 dotenv.config();
 
 const accountRouter = express.Router();
-
-const sql = new Sequelize({
-  database: process.env.DB_DATABASE,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  dialect: 'mysql',
-  operatorsAliases: false
-}); //logging: false - to turn logging off.
 
 /**
  * Checks to make sure the user is authenticated.
