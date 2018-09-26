@@ -119,16 +119,19 @@ accountRouter.post('/login', function(req, res) {
 });
 
 accountRouter.get('/view', function(req, res) {
+
   res.render('view_acct', {
-    username: "username",
-    email: "email@example.com",
+    username: req.session.username,
+    //if user is undefined
+    email: "email@example.com", //req.user.email
+    //else something DO THIS OUTSIDE THE RENDER else redirect to login page @Katie-finish
   });
 });
 
 accountRouter.get('/dashboard', function(req, res) {
   res.render('dashboard', {
-    username: "username"
-  });
+    username: req.session.username
+  }); //redirect to login
 });
 
 export default accountRouter;
