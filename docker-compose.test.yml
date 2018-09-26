@@ -1,15 +1,5 @@
 version: "3.2"
 services:
-  tests:
-    image: mazelike/tests
-    build:
-      context: .
-      dockerfile: test.Dockerfile
-    depends_on:
-      - backend
-    networks:
-      - testing
-  
   backend:
     image: mazelike/backend:devel
     build:
@@ -31,6 +21,16 @@ services:
       - testing
     expose:
       - 3306
+  
+  tests:
+    image: mazelike/tests
+    build:
+      context: .
+      dockerfile: test.Dockerfile
+    depends_on:
+      - backend
+    networks:
+      - testing
 
 networks:
   testing:

@@ -1,4 +1,4 @@
-FROM node:8.11
+FROM mazelike/backend:devel
 
 WORKDIR /app
 
