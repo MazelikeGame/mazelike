@@ -36,7 +36,7 @@ app.set('views', 'Frontend/views');
 app.use('/account', accountRouter);
 
 app.get('/', function(req, res) {
-  res.render('index');
+  res.render('index', { version: process.env.npm_package_version });
 });
 
 let nextId = 0;
