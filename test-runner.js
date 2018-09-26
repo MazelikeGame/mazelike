@@ -26,7 +26,7 @@ const MYSQL_UP_MSG = "socket: '/var/run/mysqld/mysqld.sock'  port: 3306";
 // Start mysql
 function mysqlUp() {
   let mysql = child_process.spawn("docker-compose",
-    ["-f", "docker-compose.test.yml", "up"], {
+    ["-f", "docker-compose.test.yml", "up", "mysql"], {
       stdio: ["ignore", "pipe", "pipe"]
     });
   
