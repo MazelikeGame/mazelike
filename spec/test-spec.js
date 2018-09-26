@@ -8,6 +8,8 @@ var base_url = 'http://localhost:3000/';
 var login_url = 'http://localhost:3000/account/login';
 var create_url = 'http://localhost:3000/account/create';
 
+var view_url = 'http://localhost:3000/account/view';
+var dashboard_url = 'http://localhost:3000/account/dashboard';
 
 describe('Create route tests', () => {
   it('Can visit /create', (done) => {
@@ -70,6 +72,19 @@ describe('Login route tests', () => {
         done(e);
       }
       done();
+    });
+  });
+});
+
+describe('Visit route test', () => {
+  it('Can visit the view route', (done) => {
+    request.get(view_url, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 200);
+        done();
+      } catch(e) {
+        done(e);
+      }
     });
   });
 });

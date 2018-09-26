@@ -118,4 +118,12 @@ accountRouter.post('/login', function(req, res) {
   });
 });
 
+accountRouter.get('/view', function(req, res) {
+  res.render('view_acct');
+});
+
+accountRouter.get('/dashboard', function(req, res) {
+  res.render('dashboard');
+});
+
 export default accountRouter;
