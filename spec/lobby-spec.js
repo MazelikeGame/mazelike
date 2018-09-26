@@ -15,7 +15,7 @@ const requestAsync = (...opts) => {
 describe("Lobby", function() {
   itAsync("redirects non-users to login", async() => {
     let res = await requestAsync({
-      url: "http://localhost:3001/game/new",
+      url: "http://backend:3000/game/new",
       followRedirect: false
     });
 
