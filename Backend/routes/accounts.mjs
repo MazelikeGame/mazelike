@@ -17,11 +17,11 @@ const accountRouter = express.Router();
  */
 function isAuthenticated(req, res, next) {
   if(!req.session || !req.session.authenticated) {
-    res.redirect('/account/login');
+    return res.redirect('/account/login');
   }
 
   req.session.cookie.expires = 600000; //Resets the cookie time.
-  next();
+  return next();
 }
 
 /**
@@ -55,9 +55,12 @@ accountRouter.post('/create', function(req, res) {
       if(user) {
         res.render('create_acct', { isAuthenticated: true });
       } else {
-        bcrypt.hash(req.body.password, 10, function(err, hash) {
-          userModel.password = hash;
-          userModel.create(userModel);
+        userModel.encryptPassword(req.body.password, (err, hash) => {
+          userModel.create({
+            username: userModel.username,
+            email: userModel.email,
+            password: hash
+          });
           res.redirect('/');
         });
       }
@@ -70,8 +73,13 @@ accountRouter.post('/create', function(req, res) {
  */
 
 accountRouter.get('/logout', isAuthenticated, function(req, res) {
-  req.session.destroy();
-  res.redirect('/account/login');
+  req.session.destroy(function(err) {
+    if(err) {
+      //
+    } else {
+      res.redirect('login');
+    }
+  });
 });
 
 accountRouter.get('/edit', isAuthenticated, function(req, res) {
