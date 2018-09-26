@@ -82,7 +82,7 @@ accountRouter.post('/edit', function(req, res) {
   var selector = {
     where: { username: req.session.username }
   };
-  if (req.body.email || req.body.password) {
+  if ((req.body.email || req.body.password) && req.session.username !== undefined) {
     userModel.update(req.body, selector).then(function(result) {
       if(result) {
         res.redirect('/?message=success');
@@ -91,6 +91,7 @@ accountRouter.post('/edit', function(req, res) {
       }
     });
   }
+  res.redirect('/account/login');
 });
 
 
