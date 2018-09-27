@@ -4,9 +4,9 @@ MazeLike_Tests:
     - cp /etc/mazelike/testing.env .env
     - npm ci
     - npm start &
-    - npm test
+    - npm test; STATUS=$? || echo "Failed"
     - kill $!
-    - rm -f server.log
+    - exit $STATUS
 
 MazeLike_Deploy:
   stage: deploy
