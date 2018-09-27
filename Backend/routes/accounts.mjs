@@ -3,7 +3,6 @@ import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
 import User from '../models/user.mjs';
 import bcrypt from 'bcrypt';
-import sql from "../sequelize";
 
 dotenv.config();
 
