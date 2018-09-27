@@ -1,6 +1,6 @@
 {
   "name": "mazelike",
-  "version": "1.10.0",
+  "version": "1.2.0",
   "scripts": {
     "test": "node test-runner",
     "start": "node --experimental-modules Backend/index.mjs",
@@ -27,6 +27,7 @@
   "private": true,
   "devDependencies": {
     "jasmine": "^3.2.0",
-    "jsdoc": "^3.5.5"
+    "jsdoc": "^3.5.5",
+    "request": "^2.88.0"
   }
 }

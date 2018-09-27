@@ -26,7 +26,6 @@ function isAuthenticated(req, res, next) {
 /**
  * DEFAULT
  */
-
 accountRouter.get('/', function(req, res) {
   res.redirect('/'); //Redirects to the homepage.
 });
@@ -34,7 +33,6 @@ accountRouter.get('/', function(req, res) {
 /**
  * CREATE ACCOUNT GET/POST
  */
-
 accountRouter.get('/create', function(req, res) {
   res.render('create_acct');
 });
@@ -67,10 +65,31 @@ accountRouter.post('/create', function(req, res) {
   });
 });
 
+accountRouter.get('/edit', function(req, res) {
+  res.render('edit_acct');
+});
+
+accountRouter.post('/edit', function(req, res) {
+  var userModel = new User(sql);
+  var selector = {
+    where: { username: req.session.username }
+  };
+  if ((req.body.email || req.body.password) && req.session.username !== undefined) {
+    userModel.update(req.body, selector).then(function(result) {
+      if(result) {
+        res.redirect('/?message=success');
+      } else {
+        res.render('edit_acct', { message: 'Unsuccessful' });
+      }
+    });
+  }
+  res.redirect('/account/login');
+});
+
+
 /**
  * LOGOUT
  */
-
 accountRouter.get('/logout', isAuthenticated, function(req, res) {
   req.session.destroy(function(err) {
     if(!err) {
@@ -79,14 +98,9 @@ accountRouter.get('/logout', isAuthenticated, function(req, res) {
   });
 });
 
-accountRouter.get('/edit', isAuthenticated, function(req, res) {
-  res.send(req.session.username);
-});
-
 /**
  * LOGIN GET/POST
  */
-
 accountRouter.get('/login', function(req, res) {
   res.render('login'); //Add isAuth to make sure you can't login again.
 });
@@ -104,6 +118,7 @@ accountRouter.post('/login', function(req, res) {
         if(result) {
           req.session.authenticated = true;
           req.session.username = user.username;
+          req.session.userId = user.id;
           res.redirect('/');
         } else {
           res.render('login', { wrongPassword: true }); //Failed login by password.

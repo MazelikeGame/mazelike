@@ -4,7 +4,12 @@ services:
     image: mazelike/backend:devel
     build:
       context: .
-    env_file: .env
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: password
+      DB_DATABASE: mazelike
     expose:
       - 3000
     depends_on:
