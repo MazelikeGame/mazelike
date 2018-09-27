@@ -133,7 +133,7 @@ accountRouter.get('/view', function(req, res) {
   }else{
     res.render('view_acct', {
       username: req.session.username,
-      email: "email@example.com", //req.user.email
+      email: req.user.email
     });
   }
   
