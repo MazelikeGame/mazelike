@@ -125,6 +125,7 @@ export const joinRoute = async(req, res) => {
 
   // check if the lobby exists
   if(!lobby) {
+    res.status(404);
     res.end("Join code is invalid");
     return;
   }
@@ -214,11 +215,13 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
       io.emit("lobby-delete", req.params.id);
       res.end("Lobby deleted");
     } else {
+      res.status(401);
       res.end("Only the host can delete this lobby.");
     }
     return;
   }
 
+  res.status(404);
   res.end("No such lobby or you are not in it");
 });
 
@@ -237,6 +240,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
   });
 
   if(!host.isHost) {
+    res.status(401);
     res.end("Only the host can drop a player");
     return;
   }
@@ -259,6 +263,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
     res.end("Player removed");
   }
 
+  res.status(404);
   res.end("No such lobby or player");
 });
 
