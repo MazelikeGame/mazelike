@@ -16,18 +16,18 @@ const accountRouter = express.Router();
  * @param next
  */
 function isAuthenticated(req, res, next) {
-  if(!req.session || !req.session.authenticated) {
-    res.redirect('/account/login');
+  if(req.session || req.session.authenticated) {
+    next();
   }
 
-  req.session.cookie.expires = 600000; //Resets the cookie time.
-  next();
+  // req.session.cookie.expires = 600000; //Resets the cookie time.
+  // next();
+  return res.redirect('/account/login');
 }
 
 /**
  * DEFAULT
  */
-
 accountRouter.get('/', function(req, res) {
   res.redirect('/'); //Redirects to the homepage.
 });
@@ -35,7 +35,6 @@ accountRouter.get('/', function(req, res) {
 /**
  * CREATE ACCOUNT GET/POST
  */
-
 accountRouter.get('/create', function(req, res) {
   res.render('create_acct');
 });
@@ -65,23 +64,39 @@ accountRouter.post('/create', function(req, res) {
   });
 });
 
+accountRouter.get('/edit', function(req, res) {
+  res.render('edit_acct');
+});
+
+accountRouter.post('/edit', function(req, res) {
+  var userModel = new User(sql);
+  var selector = {
+    where: { username: req.session.username }
+  };
+  if ((req.body.email || req.body.password) && req.session.username !== undefined) {
+    userModel.update(req.body, selector).then(function(result) {
+      if(result) {
+        res.redirect('/?message=success');
+      } else {
+        res.render('edit_acct', { message: 'Unsuccessful' });
+      }
+    });
+  }
+  res.redirect('/account/login');
+});
+
+
 /**
  * LOGOUT
  */
-
 accountRouter.get('/logout', isAuthenticated, function(req, res) {
   req.session.destroy();
   res.redirect('/account/login');
 });
 
-accountRouter.get('/edit', isAuthenticated, function(req, res) {
-  res.send(req.session.username);
-});
-
 /**
  * LOGIN GET/POST
  */
-
 accountRouter.get('/login', function(req, res) {
   res.render('login'); //Add isAuth to make sure you can't login again.
 });
@@ -98,6 +113,7 @@ accountRouter.post('/login', function(req, res) {
         if(result) {
           req.session.authenticated = true;
           req.session.username = user.username;
+          req.session.userId = user.id;
           res.redirect('/');
         } else {
           res.render('login', { wrongPassword: true }); //Failed login by password.
