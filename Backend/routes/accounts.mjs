@@ -68,24 +68,24 @@ accountRouter.get('/edit', function(req, res) {
 
 accountRouter.post('/edit', function(req, res) {
   var userModel = new User(sql);
-  var selector = {
-    where: { username: req.session.username }
-  };
   if ((req.body.email || req.body.password) && req.session.username !== undefined) {
-    if(req.body.password) {
-      userModel.encryptPassword(req.body.password, (err, hash) => {
-        req.body.password = hash;
+    userModel.encryptPassword(req.body.password, (err, hash) => {
+      let values = {
+        email: req.body.email,
+        password: hash
+      };
+      let selector = {
+        where: { username: req.session.username }
+      };
+      userModel.update(values, selector).then(function(result) {
+        if(result) {
+          res.redirect('/?message=success');
+        } else {
+          res.redirect('edit_acct');
+        }
       });
-    }
-    userModel.update(req.body, selector).then(function(result) {
-      if(result) {
-        res.redirect('/?message=success');
-      } else {
-        res.render('edit_acct', { message: 'Unsuccessful' });
-      }
     });
   }
-  res.redirect('/account/login');
 });
 
 
