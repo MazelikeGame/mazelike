@@ -20,6 +20,4 @@ let Lobby = sql.define("lobbies", {
   }
 });
 
-Lobby.sync();
-
 export default Lobby;

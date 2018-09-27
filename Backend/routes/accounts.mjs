@@ -2,7 +2,7 @@ import express from "express";
 import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
 import User from '../models/user.mjs';
-import bcrypt from 'bcrypt';
+import sql from "../sequelize";
 
 dotenv.config();
 
@@ -16,17 +16,16 @@ const accountRouter = express.Router();
  */
 function isAuthenticated(req, res, next) {
   if(!req.session || !req.session.authenticated) {
-    res.redirect('/account/login');
+    return res.redirect('/account/login');
   }
 
   req.session.cookie.expires = 600000; //Resets the cookie time.
-  next();
+  return next();
 }
 
 /**
  * DEFAULT
  */
-
 accountRouter.get('/', function(req, res) {
   res.redirect('/'); //Redirects to the homepage.
 });
@@ -34,65 +33,92 @@ accountRouter.get('/', function(req, res) {
 /**
  * CREATE ACCOUNT GET/POST
  */
-
 accountRouter.get('/create', function(req, res) {
   res.render('create_acct');
 });
 
 accountRouter.post('/create', function(req, res) {
-  User.username = req.body.username;
-  User.email = req.body.email;
+  var userModel = new User(sql);
 
-  User.findOne({
-    where: {
-      [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
-    }
-  }).then(function(user) {
-    if(user) {
-      res.render('create_acct', { isAuthenticated: true });
-    } else {
-      bcrypt.hash(req.body.password, 10, function(err, hash) {
-        User.password = hash;
-        User.create(User);
-        res.redirect('/');
-      });
+  userModel.username = req.body.username;
+  userModel.email = req.body.email;
+
+  userModel.sync().then(() => {
+    userModel.findOne({
+      where: {
+        [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
+      }
+    }).then(function(user) {
+      if(user) {
+        res.render('create_acct', { isAuthenticated: true });
+      } else {
+        userModel.encryptPassword(req.body.password, (err, hash) => {
+          userModel.create({
+            username: userModel.username,
+            email: userModel.email,
+            password: hash
+          });
+          res.redirect('/');
+        });
+      }
+    });
+  });
+});
+
+accountRouter.get('/edit', function(req, res) {
+  res.render('edit_acct');
+});
+
+accountRouter.post('/edit', function(req, res) {
+  var userModel = new User(sql);
+  var selector = {
+    where: { username: req.session.username }
+  };
+  if ((req.body.email || req.body.password) && req.session.username !== undefined) {
+    userModel.update(req.body, selector).then(function(result) {
+      if(result) {
+        res.redirect('/?message=success');
+      } else {
+        res.render('edit_acct', { message: 'Unsuccessful' });
+      }
+    });
+  }
+  res.redirect('/account/login');
+});
+
+
+/**
+ * LOGOUT
+ */
+accountRouter.get('/logout', isAuthenticated, function(req, res) {
+  req.session.destroy(function(err) {
+    if(!err) {
+      res.redirect('login');
     }
   });
 });
 
 /**
- * LOGOUT
- */
-
-accountRouter.get('/logout', isAuthenticated, function(req, res) {
-  req.session.destroy();
-  res.redirect('/account/login');
-});
-
-accountRouter.get('/edit', isAuthenticated, function(req, res) {
-  res.send(req.session.username);
-});
-
-/**
  * LOGIN GET/POST
  */
-
 accountRouter.get('/login', function(req, res) {
   res.render('login'); //Add isAuth to make sure you can't login again.
 });
 
 accountRouter.post('/login', function(req, res) {
-  //make username, email, password properties in the user model.
-  User.findOne({
+  var userModel = new User(sql); //make username, email, password properties in the user model.
+
+  userModel.findOne({
     where: {
       username: req.body.username
     }
   }).then(function(user) {
     if(user) {
-      bcrypt.compare(req.body.password, user.password, function(err, result) {
+      userModel.comparePassword(req.body.password, user.password, (err, result) => {
         if(result) {
           req.session.authenticated = true;
           req.session.username = user.username;
+          req.session.userId = user.id;
           res.redirect('/');
         } else {
           res.render('login', { wrongPassword: true }); //Failed login by password.
