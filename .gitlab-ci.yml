@@ -1,6 +1,7 @@
 MazeLike_Tests:
   stage: test
   script:
+    - cp /etc/mazelike/testing.env .env
     - npm ci
     - npm start &
     - npm test
