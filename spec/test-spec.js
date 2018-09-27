@@ -1,12 +1,12 @@
-/* global describe it */
+/* global describe it SERVER_URL */
 var request = require('request');
 var chai = require('chai');
 var assert = chai.assert;
 var expect = chai.expect;
 
-var login_url = 'http://backend:3000/account/login';
-var create_url = 'http://backend:3000/account/create';
-var edit_url = 'http://backend:3000/account/edit';
+var login_url = `http://localhost:3000/account/login`;
+var create_url = `http://localhost:3000/account/create`;
+var edit_url = `http://localhost:3000/account/edit`;
 
 
 describe('Create route tests', () => {
