@@ -1,17 +1,19 @@
+/* global io */
+import sequelize from "./sequelize";
 import express from "express";
 import http from "http";
 import socketio from "socket.io";
+import {gameRouter, joinRoute} from "./routes/game.mjs";
 import accountRouter from "./routes/accounts.mjs";
 import exphbs from "express-handlebars";
-import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import session from 'express-session';
+import userMiddleware from "./middleware/accounts";
 
 let app = express();
 let server = http.Server(app);
-let io = socketio(server);
+global.io = socketio(server);
 
-dotenv.config();
 app.use(express.static("Frontend"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -31,7 +33,12 @@ app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 app.set('views', 'Frontend/views');
 
+// Middleware
+app.use(userMiddleware);
+
 //Routes
+app.use("/game", gameRouter);
+app.get("/j/:id", joinRoute);
 app.use('/account', accountRouter);
 
 app.get('/', function(req, res) {
@@ -56,6 +63,36 @@ io.on("connection", (client) => {
   });
 });
 
-server.listen(3000, () => {
-  process.stdout.write("Server started on port 3000\n");
-});
+const sleep = (ms) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+};
+
+const start = async() => {
+  // make several attempts to connect to mysql
+  for(let i = 0;; ++i) {
+    try {
+      await sequelize.authenticate();
+      break;
+    } catch(err) {
+      process.stderr.write(`MySql connection failed ${err.message} (retrying in 5s)\n`);
+      await sleep(5000);
+
+      if(i === 30) {
+        process.stderr.write(err.stack);
+        process.exit(1);
+      }
+    }
+  }
+
+  process.stdout.write("------------------ Ignore previous mysql connection erors ------------------\n");
+
+  await sequelize.sync();
+
+  server.listen(3000, () => {
+    process.stdout.write("Server started on port 3000\n");
+  });
+};
+
+start();
