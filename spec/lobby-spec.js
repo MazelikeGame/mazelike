@@ -159,4 +159,20 @@ describe("Lobby", function() {
     chai.should().equal(res2.statusCode, 200);
     chai.assert(body.indexOf("bar") !== -1, "bar not found in lobby");
   });
+
+  itAsync("can delete a lobby", async() => {
+    await requestAsync({
+      url: `http://backend:3000/game/lobby/${lobbyId}/delete`,
+      followRedirect: false,
+      jar: true
+    });
+
+    let {res} = await requestAsync({
+      url: `http://backend:3000/game/lobby/${lobbyId}`,
+      followRedirect: false,
+      jar: true
+    });
+
+    chai.should().equal(res.statusCode, 404);    
+  });
 });

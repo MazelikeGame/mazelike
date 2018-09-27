@@ -75,6 +75,7 @@ gameRouter.get("/lobby/:id", async(req, res) => {
 
   // Check if the lobby exists
   if(lobbyResults.length === 0) {
+    res.status(404);
     res.render("lobby", {
       invalid: true,
       user: req.user.username
