@@ -6,7 +6,7 @@ MazeLike_Tests:
     - npm start &
     - npm test
   after_script:
-    - kill $(ps -aux | fgrep npm | fgrep gitlab | awk '{print $2}')
+    - kill $(ps -aux | fgrep npm | fgrep gitlab | head -1 | awk '{print $2}')
 
 MazeLike_Deploy:
   stage: deploy
