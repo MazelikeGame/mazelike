@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      {{#if invalid}}
+        Not found
+      {{else}}
+        {{host}}'s Lobby
+      {{/if}}
+    </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.dev.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width"/>
+    <style>
+      h2, .alert {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <a class="navbar-brand" href="/">Mazelike</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/game/new">New lobby</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/game/all">My games</a>
+          </li>
+          {{#if isHost}}
+            <li class="nav-item">
+            <a class="nav-link" href="/game/lobby/{{id}}/delete">Delete lobby</a>
+          </li>
+          {{/if}}
+        </ul>
+        <span class="navbar-text">
+          {{#if user}}
+            {{user}}
+          {{else}}
+            <a href="/account/login">Login</a>
+          {{/if}}
+        </span>
+      </div>
+    </nav>
+    <div class="container">
+      {{#if invalid}}
+        <h2>Lobby not found</h2>
+        <p>
+          Either get a join link from your friend or <a href="/game/new">create your own lobby.</a>
+        </p>
+      {{else}}
+        <h2>Player list</h2>
+        <div class="list-group">
+          {{#each players}}
+            <div class="list-group-item d-flex justify-content-between align-items-center" data-player-id="{{id}}">
+              {{id}}
+              {{#if isHost}}
+              {{else}}
+                {{#if ../isHost}}
+                  <a class="drop-link" href="/game/lobby/{{../id}}/drop/{{id}}">Drop</a>
+                {{/if}}
+              {{/if}}
+            </div>
+          {{/each}}
+        </div>
+        {{#if isHost}}
+          <h2>Add players</h2>
+          <p>
+            Share this link with other people to add them to this lobby.
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="join-link">Join link</span>
+              </div>
+              <input type="text" class="form-control" value="{{origin}}/j/{{secret}}"
+                aria-describedby="join-link" id="join-link-copy">
+            </div>
+          </p>
+          <button class="btn btn-primary" style="float: right;" id="start">Start game</button>
+        {{/if}}
+      {{/if}}
+    </div>
+    <script src="/scripts/lobby.js" data-ishost="{{isHost}}" data-id="{{id}}"></script>
+  </body>
+</html>
