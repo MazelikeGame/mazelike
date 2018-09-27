@@ -2,7 +2,6 @@ import express from "express";
 import Sequelize from 'sequelize';
 import dotenv from 'dotenv';
 import User from '../models/user.mjs';
-import bcrypt from 'bcrypt';
 import sql from "../sequelize";
 
 dotenv.config();
@@ -16,13 +15,12 @@ const accountRouter = express.Router();
  * @param next
  */
 function isAuthenticated(req, res, next) {
-  if(req.session || req.session.authenticated) {
-    next();
+  if(!req.session || !req.session.authenticated) {
+    return res.redirect('/account/login');
   }
 
-  // req.session.cookie.expires = 600000; //Resets the cookie time.
-  // next();
-  return res.redirect('/account/login');
+  req.session.cookie.expires = 600000; //Resets the cookie time.
+  return next();
 }
 
 /**
@@ -54,9 +52,12 @@ accountRouter.post('/create', function(req, res) {
       if(user) {
         res.render('create_acct', { isAuthenticated: true });
       } else {
-        bcrypt.hash(req.body.password, 10, function(err, hash) {
-          userModel.password = hash;
-          userModel.create(userModel);
+        userModel.encryptPassword(req.body.password, (err, hash) => {
+          userModel.create({
+            username: userModel.username,
+            email: userModel.email,
+            password: hash
+          });
           res.redirect('/');
         });
       }
@@ -90,8 +91,11 @@ accountRouter.post('/edit', function(req, res) {
  * LOGOUT
  */
 accountRouter.get('/logout', isAuthenticated, function(req, res) {
-  req.session.destroy();
-  res.redirect('/account/login');
+  req.session.destroy(function(err) {
+    if(!err) {
+      res.redirect('login');
+    }
+  });
 });
 
 /**
@@ -103,13 +107,14 @@ accountRouter.get('/login', function(req, res) {
 
 accountRouter.post('/login', function(req, res) {
   var userModel = new User(sql); //make username, email, password properties in the user model.
+
   userModel.findOne({
     where: {
       username: req.body.username
     }
   }).then(function(user) {
     if(user) {
-      bcrypt.compare(req.body.password, user.password, function(err, result) {
+      userModel.comparePassword(req.body.password, user.password, (err, result) => {
         if(result) {
           req.session.authenticated = true;
           req.session.username = user.username;
