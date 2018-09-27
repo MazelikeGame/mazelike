@@ -116,7 +116,7 @@ accountRouter.post('/login', function(req, res) {
           req.session.authenticated = true;
           req.session.username = user.username;
           req.session.userId = user.id;
-          res.redirect('/');
+          res.redirect('/account/dashboard');
         } else {
           res.render('login', { wrongPassword: true }); //Failed login by password.
         }

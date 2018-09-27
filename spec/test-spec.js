@@ -139,3 +139,29 @@ describe('Edit route tests', () => {
     });
   });
 });
+
+describe('Visit route test', () => {
+  it('Can visit the view route', (done) => {
+    request.get(view_url, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 200);
+        done();
+      } catch(e) {
+        done(e);
+      }
+    });
+  });
+});
+
+describe('Dashboard route test', () => {
+  it('Can visit the dashboard route', (done) => {
+    request.get(dashboard_url, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 200);
+        done();
+      } catch(e) {
+        done(e);
+      }
+    });
+  });
+});
