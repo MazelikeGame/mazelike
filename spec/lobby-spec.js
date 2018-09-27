@@ -1,4 +1,4 @@
-/* global describe itAsync SERVER_URL */
+/* global describe itAsync */
 const request = require("request");
 const chai = require("chai");
 

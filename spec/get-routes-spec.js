@@ -1,4 +1,4 @@
-/* global describe it SERVER_URL */
+/* global describe it */
 const http = require("http");
 // const querystring = require("querystring");
 
