@@ -19,7 +19,7 @@ let lobbyId, joinUrl;
 describe("Lobby", function() {
   itAsync("redirects non-users to login", async() => {
     let {res} = await requestAsync({
-      url: "http://backend:3000/game/new",
+      url: `http://localhost:3000/game/new`,
       followRedirect: false
     });
 
@@ -30,7 +30,7 @@ describe("Lobby", function() {
   itAsync("can create a new game", async() => {
     await requestAsync({
       method: "post",
-      url: "http://backend:3000/account/create",
+      url: `http://localhost:3000/account/create`,
       followRedirect: false,
       form: {
         username: "foo",
@@ -41,7 +41,7 @@ describe("Lobby", function() {
 
     await requestAsync({
       method: "post",
-      url: "http://backend:3000/account/login",
+      url: `http://localhost:3000/account/login`,
       followRedirect: false,
       jar: true,
       form: {
@@ -51,7 +51,7 @@ describe("Lobby", function() {
     });
 
     let {res} = await requestAsync({
-      url: "http://backend:3000/game/new",
+      url: `http://localhost:3000/game/new`,
       followRedirect: false,
       jar: true
     });
@@ -65,7 +65,7 @@ describe("Lobby", function() {
 
   itAsync("can view a lobby", async() => {
     let {res} = await requestAsync({
-      url: `http://backend:3000/game/lobby/${lobbyId}`,
+      url: `http://localhost:3000/game/lobby/${lobbyId}`,
       followRedirect: false
     });
 
@@ -74,20 +74,20 @@ describe("Lobby", function() {
 
   itAsync("can view a lobby as user", async() => {
     let {res, body} = await requestAsync({
-      url: `http://backend:3000/game/lobby/${lobbyId}`,
+      url: `http://localhost:3000/game/lobby/${lobbyId}`,
       followRedirect: false,
       jar: true
     });
 
     chai.should().equal(res.statusCode, 200);
-    joinUrl = body.match(/http:\/\/backend:3000\/j\/([A-Za-z0-9]+)/);
+    joinUrl = body.match(/\/j\/([A-Za-z0-9]+)/);
     chai.assert(joinUrl, "Join url not found");
   });
 
   itAsync("can join a lobby", async() => {
     await requestAsync({
       method: "post",
-      url: "http://backend:3000/account/create",
+      url: `http://localhost:3000/account/create`,
       followRedirect: false,
       form: {
         username: "bar",
@@ -98,7 +98,7 @@ describe("Lobby", function() {
 
     await requestAsync({
       method: "post",
-      url: "http://backend:3000/account/login",
+      url: `http://localhost:3000/account/login`,
       followRedirect: false,
       jar: true,
       form: {
@@ -112,7 +112,7 @@ describe("Lobby", function() {
     }
 
     let {res} = await requestAsync({
-      url: joinUrl[0],
+      url: `http://localhost:3000${joinUrl[0]}`,
       followRedirect: false,
       jar: true
     });
@@ -121,7 +121,7 @@ describe("Lobby", function() {
     chai.should().equal(res.headers.location, `/game/lobby/${lobbyId}`);
 
     let {res: res2, body} = await requestAsync({
-      url: `http://backend:3000/game/lobby/${lobbyId}`,
+      url: `http://localhost:3000/game/lobby/${lobbyId}`,
       followRedirect: false,
       jar: true
     });
@@ -133,7 +133,7 @@ describe("Lobby", function() {
   itAsync("can drop a player", async() => {
     await requestAsync({
       method: "post",
-      url: "http://backend:3000/account/login",
+      url: `http://localhost:3000/account/login`,
       followRedirect: false,
       jar: true,
       form: {
@@ -143,7 +143,7 @@ describe("Lobby", function() {
     });
 
     let {res} = await requestAsync({
-      url: `http://backend:3000/game/lobby/${lobbyId}/drop/bar`,
+      url: `http://localhost:3000/game/lobby/${lobbyId}/drop/bar`,
       followRedirect: false,
       jar: true
     });
@@ -151,7 +151,7 @@ describe("Lobby", function() {
     chai.should().equal(res.statusCode, 200);
     
     let {res: res2, body} = await requestAsync({
-      url: `http://backend:3000/game/lobby/${lobbyId}`,
+      url: `http://localhost:3000/game/lobby/${lobbyId}`,
       followRedirect: false,
       jar: true
     });
@@ -162,13 +162,13 @@ describe("Lobby", function() {
 
   itAsync("can delete a lobby", async() => {
     await requestAsync({
-      url: `http://backend:3000/game/lobby/${lobbyId}/delete`,
+      url: `http://localhost:3000/game/lobby/${lobbyId}/delete`,
       followRedirect: false,
       jar: true
     });
 
     let {res} = await requestAsync({
-      url: `http://backend:3000/game/lobby/${lobbyId}`,
+      url: `http://localhost:3000/game/lobby/${lobbyId}`,
       followRedirect: false,
       jar: true
     });
@@ -178,7 +178,7 @@ describe("Lobby", function() {
 
   itAsync("can start a game", async() => {
     let {res} = await requestAsync({
-      url: "http://backend:3000/game/new",
+      url: `http://localhost:3000/game/new`,
       followRedirect: false,
       jar: true
     });
@@ -189,13 +189,13 @@ describe("Lobby", function() {
     lobbyId = match[1];
 
     await requestAsync({
-      url: `http://backend:3000/game/lobby/${lobbyId}/start`,
+      url: `http://localhost:3000/game/lobby/${lobbyId}/start`,
       followRedirect: false,
       jar: true
     });
 
     let {res: res2} = await requestAsync({
-      url: `http://backend:3000/game/lobby/${lobbyId}`,
+      url: `http://localhost:3000/game/lobby/${lobbyId}`,
       followRedirect: false,
       jar: true
     });

@@ -1,4 +1,7 @@
 import Sequelize from "sequelize";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const sql = new Sequelize({
   database: process.env.DB_DATABASE,

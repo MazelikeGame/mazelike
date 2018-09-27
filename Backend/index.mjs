@@ -1,21 +1,19 @@
 /* global io */
+import sequelize from "./sequelize";
 import express from "express";
 import http from "http";
 import socketio from "socket.io";
 import {gameRouter, joinRoute} from "./routes/game.mjs";
 import accountRouter from "./routes/accounts.mjs";
 import exphbs from "express-handlebars";
-import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import session from 'express-session';
-import sequelize from "./sequelize";
 import userMiddleware from "./middleware/accounts";
 
 let app = express();
 let server = http.Server(app);
 global.io = socketio(server);
 
-dotenv.config();
 app.use(express.static("Frontend"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -78,6 +76,7 @@ const start = async() => {
       await sequelize.authenticate();
       break;
     } catch(err) {
+      process.stderr.write(`MySql connection failed ${err.message} (retrying in 5s)\n`);
       await sleep(5000);
 
       if(i === 30) {
