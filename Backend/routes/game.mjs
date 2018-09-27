@@ -4,6 +4,7 @@ import crypto from "crypto";
 import util from "util";
 import Lobby from "../models/lobby";
 import sql from "../sequelize";
+import path from "path";
 
 export let gameRouter = express.Router();
 
@@ -297,4 +298,9 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
   }
 
   res.end("No such lobby or you are not the host");
+});
+
+// Serve /game/:id as /game/
+gameRouter.get(/[A-Za-z0-9]{12}/, (req, res) => {
+  res.sendFile(path.resolve("Frontend/game/index.html"));
 });
