@@ -75,6 +75,11 @@ accountRouter.post('/edit', function(req, res) {
     where: { username: req.session.username }
   };
   if ((req.body.email || req.body.password) && req.session.username !== undefined) {
+    if(req.body.password) {
+      userModel.encryptPassword(req.body.password, (err, hash) => {
+        req.body.password = hash;
+      });
+    }
     userModel.update(req.body, selector).then(function(result) {
       if(result) {
         res.redirect('/?message=success');
