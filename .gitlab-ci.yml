@@ -2,10 +2,9 @@ MazeLike_Tests:
   stage: test
   script:
     - npm ci
-    - npm start > server.log 2>&1 &
+    - npm start &
     - npm test
     - kill $!
-    - cat server.log
     - rm -f server.log
 
 MazeLike_Deploy:

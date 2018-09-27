@@ -21,7 +21,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10 * 60 * 1000; // 10 minutes
 // Start the server and wait for it to start listening
 beforeAll(async function(done) {
   while(!await pingServer()) {
-    process.stderr.write("Connection failed");
+    process.stderr.write("Connection failed\n");
     await sleep(3000);
   }
 
