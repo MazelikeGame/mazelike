@@ -3,7 +3,6 @@ MazeLike_Tests:
   script:
     - npm ci
     - npm start > server.log 2>&1 &
-    - sleep 3
     - npm test
     - kill $!
     - cat server.log
