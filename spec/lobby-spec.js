@@ -175,4 +175,31 @@ describe("Lobby", function() {
 
     chai.should().equal(res.statusCode, 404);    
   });
+
+  itAsync("can start a game", async() => {
+    let {res} = await requestAsync({
+      url: "http://backend:3000/game/new",
+      followRedirect: false,
+      jar: true
+    });
+
+    let match = res.headers.location.match(/^\/game\/lobby\/(.+)$/);
+    chai.assert(match, `New got ${res.headers.location}`);
+
+    lobbyId = match[1];
+
+    await requestAsync({
+      url: `http://backend:3000/game/lobby/${lobbyId}/start`,
+      followRedirect: false,
+      jar: true
+    });
+
+    let {res: res2} = await requestAsync({
+      url: `http://backend:3000/game/lobby/${lobbyId}`,
+      followRedirect: false,
+      jar: true
+    });
+
+    chai.should().equal(res2.statusCode, 404);
+  });
 });
