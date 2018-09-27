@@ -4,9 +4,9 @@ MazeLike_Tests:
     - cp /etc/mazelike/testing.env .env
     - npm ci
     - npm start &
-    - npm test; STATUS=$?
-    - kill $!
-    - exit $STATUS
+    - npm test
+  after_script:
+    - ps -aux | fgrep npm | fgrep gitlab | awk '{print $2}'
 
 MazeLike_Deploy:
   stage: deploy
