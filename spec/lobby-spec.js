@@ -17,10 +17,6 @@ const requestAsync = (...opts) => {
 let lobbyId, joinUrl;
 
 describe("Lobby", function() {
-  it("Fails", () => {
-    throw new Error("foo");
-  });
-  
   itAsync("redirects non-users to login", async() => {
     let {res} = await requestAsync({
       url: `http://localhost:3000/game/new`,
