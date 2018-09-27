@@ -1,7 +1,6 @@
-MazeLike_Tests:
-  stage: test
-  script:
-    - npm test
+# MazeLike_Tests:
+#   stage: test
+#   script:
 
 MazeLike_Deploy:
   stage: deploy
