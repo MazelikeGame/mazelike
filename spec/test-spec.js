@@ -128,7 +128,7 @@ describe('Edit route tests', () => {
       form: { username: `test-account-${random}`, password: 'password_edited' }
     }, function(err, response, body) {
       try {
-        assert.equal(response.statusCode, 302);
+        assert.equal(response.statusCode, 30);
       } catch (e) {
         done(e);
       }
