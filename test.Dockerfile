@@ -6,4 +6,5 @@ RUN npm install
 
 COPY . .
 
-CMD npm run eslint && ./node_modules/.bin/jasmine
+RUN chmod +x test-inner.sh
+CMD ["/bin/bash", "/app/test-inner.sh"]
