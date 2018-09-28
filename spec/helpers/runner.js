@@ -4,14 +4,15 @@ const http = require("http");
 global.SERVER_URL = process.env.IS_RUNNING_IN_DOCKER ?
   "http://backend:3000" : "http://localhost:3000";
 
-let i = 0;
+let retries = 0;
+const MAX_RETRIES = 50;
 
 // Try to connect to the server
 function pingServer() {
   return new Promise((resolve) => {
     http.get(SERVER_URL, resolve.bind(undefined, true))
       .on("error", function(err) {
-        process.stderr.write(`[${i+1}/30] Could not GET ${SERVER_URL}/: ${err.message}\n`);
+        process.stderr.write(`[${retries + 1}/${MAX_RETRIES}] Could not GET ${SERVER_URL}/: ${err.message}\n`);
         resolve(false);
       });
   });
@@ -28,9 +29,9 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
 // Start the server and wait for it to start listening
 beforeAll(async function(done) {
-  while(!await pingServer() && i < 30) {
+  while(!await pingServer() && retries < MAX_RETRIES) {
     await sleep(3000);
-    ++i;
+    ++retries;
   }
 
   done();
