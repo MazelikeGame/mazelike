@@ -63,7 +63,11 @@ accountRouter.post('/create', function(req, res) {
 });
 
 accountRouter.get('/edit', function(req, res) {
-  res.render('edit_acct');
+  if(req.session.username === undefined) {
+    res.redirect('login');
+  } else {
+    res.render('edit_acct');
+  }
 });
 
 accountRouter.post('/edit', function(req, res) {
