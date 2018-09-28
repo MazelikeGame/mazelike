@@ -10,7 +10,13 @@ function dockerComposeDown() {
 }
 
 // Display the logs
-child_process.spawn("docker-compose", ["-f", "docker-compose.test.yml", "logs", "-f"], {
+let logArgs = ["-f", "docker-compose.test.yml", "logs", "-f"];
+
+if(process.argv.length > 2) {
+  logArgs.push(process.argv[2]);
+}
+
+child_process.spawn("docker-compose", logArgs, {
   stdio: ["ignore", "inherit", "inherit"]
 });
 
