@@ -128,6 +128,9 @@ input[type="text"]:hover,input[type="Password"]:hover, input[type="email"]:hover
 .submit input[type="submit"]:hover{
 	background:#62A0C4;
 }
+.create-account {
+  float: right;
+}
 .forget{
 	float:right;
 }
@@ -259,7 +262,7 @@ input[type="text"]:hover,input[type="Password"]:hover, input[type="email"]:hover
 	.inset:before {
 	left: 67%;
 	top: -4.4%;
-	}	
+	}
 	.user {
 	margin-right: 4.2em;
 	}
@@ -283,5 +286,5 @@ input[type="text"]:hover,input[type="Password"]:hover, input[type="email"]:hover
 	padding: 6px;
 	margin: 9px 0px;
 	}
-	
+
 }
