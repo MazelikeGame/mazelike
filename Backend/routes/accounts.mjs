@@ -63,24 +63,33 @@ accountRouter.post('/create', function(req, res) {
 });
 
 accountRouter.get('/edit', function(req, res) {
-  res.render('edit_acct');
+  if(req.session.username === undefined) {
+    res.redirect('login');
+  } else {
+    res.render('edit_acct');
+  }
 });
 
 accountRouter.post('/edit', function(req, res) {
   var userModel = new User(sql);
-  var selector = {
-    where: { username: req.session.username }
-  };
   if ((req.body.email || req.body.password) && req.session.username !== undefined) {
-    userModel.update(req.body, selector).then(function(result) {
-      if(result) {
-        res.redirect('/?message=success');
-      } else {
-        res.render('edit_acct', { message: 'Unsuccessful' });
-      }
+    userModel.encryptPassword(req.body.password, (err, hash) => {
+      let values = {
+        email: req.body.email,
+        password: hash
+      };
+      let selector = {
+        where: { username: req.session.username }
+      };
+      userModel.update(values, selector).then(function(result) {
+        if(result) {
+          res.redirect('/?message=success');
+        } else {
+          res.redirect('edit_acct');
+        }
+      });
     });
   }
-  res.redirect('/account/login');
 });
 
 
