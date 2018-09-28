@@ -31,7 +31,11 @@ accountRouter.get('/', function(req, res) {
  * CREATE ACCOUNT GET/POST
  */
 accountRouter.get('/create', function(req, res) {
-  res.render('create_acct');
+  if(req.session.authenticated) {
+    res.redirect('dashboard');
+  } else {
+    res.render('create_acct');
+  }
 });
 
 accountRouter.post('/create', function(req, res) {
