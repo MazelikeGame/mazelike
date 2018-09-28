@@ -8,6 +8,9 @@ var login_url = `http://localhost:3000/account/login`;
 var create_url = `http://localhost:3000/account/create`;
 var edit_url = `http://localhost:3000/account/edit`;
 
+var view_url = 'http://localhost:3000/account/view';
+var dashboard_url = 'http://localhost:3000/account/dashboard';
+
 const random = Math.floor(Math.random() * 10000000);
 
 describe('Create route tests', () => {
@@ -84,6 +87,32 @@ describe('Edit route tests', () => {
         done(e);
       }
       done();
+    });
+  });
+});
+
+describe('Visit route test', () => {
+  it('Can visit the view route', (done) => {
+    request.get(view_url, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 200);
+        done();
+      } catch(e) {
+        done(e);
+      }
+    });
+  });
+});
+
+describe('Dashboard route test', () => {
+  it('Can visit the dashboard route', (done) => {
+    request.get(dashboard_url, function(err, response, body) {
+      try {
+        assert.equal(response.statusCode, 200);
+        done();
+      } catch(e) {
+        done(e);
+      }
     });
   });
 });

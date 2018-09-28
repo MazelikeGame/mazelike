@@ -125,7 +125,7 @@ accountRouter.post('/login', function(req, res) {
           req.session.authenticated = true;
           req.session.username = user.username;
           req.session.userId = user.id;
-          res.redirect('/');
+          res.redirect('/account/dashboard');
         } else {
           res.render('login', { wrongPassword: true }); //Failed login by password.
         }
@@ -134,6 +134,28 @@ accountRouter.post('/login', function(req, res) {
       res.render('login', { wrongUsername: true }); //Failed login by username.
     }
   });
+});
+
+accountRouter.get('/view', function(req, res) {
+  if(req.session.username === undefined) {
+    res.redirect('/account/login');
+  }else{
+    res.render('view_acct', {
+      username: req.session.username,
+      email: req.user.email
+    });
+  }
+  
+});
+
+accountRouter.get('/dashboard', function(req, res) {
+  if(req.session.username === undefined) {
+    res.redirect('/account/login');
+  }else{
+    res.render('dashboard', {
+      username: req.session.username,
+    });
+  }
 });
 
 export default accountRouter;
