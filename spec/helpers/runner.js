@@ -30,7 +30,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10 * 60 * 1000; // 10 minutes
 // Start the server and wait for it to start listening
 beforeAll(async function(done) {
   while(!await pingServer() && retries < MAX_RETRIES) {
-    await sleep(3000);
+    await sleep(5000);
     ++retries;
   }
 
