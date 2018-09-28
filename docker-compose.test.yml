@@ -36,6 +36,8 @@ services:
       - backend
     networks:
       - testing
+    environment:
+      IS_RUNNING_IN_DOCKER: ok
 
 networks:
   testing:
