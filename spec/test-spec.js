@@ -4,12 +4,12 @@ var chai = require('chai');
 var assert = chai.assert;
 var expect = chai.expect;
 
-var login_url = `http://localhost:3000/account/login`;
-var create_url = `http://localhost:3000/account/create`;
-var edit_url = `http://localhost:3000/account/edit`;
+var login_url = `${SERVER_URL}/account/login`;
+var create_url = `${SERVER_URL}/account/create`;
+var edit_url = `${SERVER_URL}/account/edit`;
 
-var view_url = 'http://localhost:3000/account/view';
-var dashboard_url = 'http://localhost:3000/account/dashboard';
+var view_url = `${SERVER_URL}/account/view`;
+var dashboard_url = `${SERVER_URL}/account/dashboard`;
 
 const random = Math.floor(Math.random() * 10000000);
 

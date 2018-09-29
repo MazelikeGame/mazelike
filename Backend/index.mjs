@@ -69,6 +69,7 @@ const sleep = (ms) => {
   });
 };
 
+const MAX_RETRIES = 50;
 const start = async() => {
   // make several attempts to connect to mysql
   for(let i = 0;; ++i) {
@@ -76,10 +77,10 @@ const start = async() => {
       await sequelize.authenticate();
       break;
     } catch(err) {
-      process.stderr.write(`MySql connection failed ${err.message} (retrying in 5s)\n`);
+      process.stderr.write(`[${i + 1}/${MAX_RETRIES}] MySql connection failed ${err.message} (retrying in 5s)\n`);
       await sleep(5000);
 
-      if(i === 30) {
+      if(i === MAX_RETRIES) {
         process.stderr.write(err.stack);
         process.exit(1);
       }
