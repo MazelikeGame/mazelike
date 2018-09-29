@@ -36,6 +36,12 @@ services:
       - backend
     networks:
       - testing
+    environment:
+      IS_RUNNING_IN_DOCKER: ok
+    volumes:
+      - type: bind
+        source: ./runner-result
+        target: /app/runner-result
 
 networks:
   testing:

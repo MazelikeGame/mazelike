@@ -2,3 +2,4 @@ node_modules
 .vscode/tasks.json
 .DS_Store
 .env
+runner-result
