@@ -49,17 +49,21 @@ let nextId = 0;
 
 io.on("connection", (client) => {
   const id = ++nextId;
+  let gameId;
 
-  client.once("ready", () => {
+  client.once("ready", (_gameId) => {
+    gameId = _gameId;
     client.emit("id", id);
   });
 
   client.on("position", (pos) => {
-    io.emit("setR", pos);
+    io.emit("set", pos);
   });
 
   client.on("disconnect", () => {
-    io.emit("remove", id);
+    if(gameId) {
+      io.emit("remove", {id, gameId});
+    }
   });
 });
 
