@@ -24,7 +24,7 @@ const makeResponseChecker = (expectedStatus, done) => {
 // Define a basic GET test
 function checkRouteGet(url, expectedStatus) {
   it(`Get ${url} responds ok`, (done) => {
-    let req = http.get(`http://localhost:3000${url}`, 
+    let req = http.get(`${SERVER_URL}${url}`, 
       makeResponseChecker(expectedStatus, done));
     
     req.on("error", done);

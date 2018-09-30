@@ -74,16 +74,15 @@ accountRouter.post('/edit', function(req, res) {
   var userModel = new User(sql);
   if ((req.body.email || req.body.password) && req.session.username !== undefined) {
     userModel.encryptPassword(req.body.password, (err, hash) => {
-      let values = {
-        email: req.body.email,
-        password: hash
-      };
+      let values = {};
+      req.body.email && (values.email = req.body.email); // eslint-disable-line
+      req.body.password && (values.password = hash); // eslint-disable-line
       let selector = {
         where: { username: req.session.username }
       };
       userModel.update(values, selector).then(function(result) {
         if(result) {
-          res.redirect('/?message=success');
+          res.redirect('dashboard');
         } else {
           res.redirect('edit_acct');
         }
@@ -108,7 +107,11 @@ accountRouter.get('/logout', isAuthenticated, function(req, res) {
  * LOGIN GET/POST
  */
 accountRouter.get('/login', function(req, res) {
-  res.render('login'); //Add isAuth to make sure you can't login again.
+  if(req.session.authenticated) {
+    res.redirect('dashboard');
+  } else {
+    res.render('login');
+  }
 });
 
 accountRouter.post('/login', function(req, res) {
@@ -145,7 +148,7 @@ accountRouter.get('/view', function(req, res) {
       email: req.user.email
     });
   }
-  
+
 });
 
 accountRouter.get('/dashboard', function(req, res) {
