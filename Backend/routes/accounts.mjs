@@ -31,7 +31,11 @@ accountRouter.get('/', function(req, res) {
  * CREATE ACCOUNT GET/POST
  */
 accountRouter.get('/create', function(req, res) {
-  res.render('create_acct');
+  if(req.session.authenticated) {
+    res.redirect('dashboard');
+  } else {
+    res.render('create_acct');
+  }
 });
 
 accountRouter.post('/create', function(req, res) {
@@ -55,7 +59,7 @@ accountRouter.post('/create', function(req, res) {
             email: userModel.email,
             password: hash
           });
-          res.redirect('/');
+          res.redirect('login');
         });
       }
     });
@@ -66,7 +70,9 @@ accountRouter.get('/edit', function(req, res) {
   if(req.session.username === undefined) {
     res.redirect('login');
   } else {
-    res.render('edit_acct');
+    res.render('edit_acct', {
+      username: req.session.username
+    });
   }
 });
 
@@ -128,7 +134,7 @@ accountRouter.post('/login', function(req, res) {
           req.session.authenticated = true;
           req.session.username = user.username;
           req.session.userId = user.id;
-          res.redirect('/account/dashboard');
+          res.redirect('dashboard');
         } else {
           res.render('login', { wrongPassword: true }); //Failed login by password.
         }
@@ -141,8 +147,8 @@ accountRouter.post('/login', function(req, res) {
 
 accountRouter.get('/view', function(req, res) {
   if(req.session.username === undefined) {
-    res.redirect('/account/login');
-  }else{
+    res.redirect('login');
+  } else{
     res.render('view_acct', {
       username: req.session.username,
       email: req.user.email
@@ -153,8 +159,8 @@ accountRouter.get('/view', function(req, res) {
 
 accountRouter.get('/dashboard', function(req, res) {
   if(req.session.username === undefined) {
-    res.redirect('/account/login');
-  }else{
+    res.redirect('login');
+  } else{
     res.render('dashboard', {
       username: req.session.username,
     });
