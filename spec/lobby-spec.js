@@ -1,18 +1,5 @@
-/* global describe itAsync SERVER_URL */
-const request = require("request");
+/* global describe itAsync SERVER_URL requestAsync */
 const chai = require("chai");
-
-const requestAsync = (...opts) => {
-  return new Promise((resolve, reject) => {
-    request(...opts, (err, res, body) => {
-      if(err) {
-        reject(err);
-      } else {
-        resolve({res, body});
-      }
-    });
-  });
-};
 
 let lobbyId, joinUrl;
 
@@ -41,7 +28,7 @@ describe("Lobby", function() {
 
     await requestAsync({
       method: "post",
-      url: `${SERVER_URL}/account/login`,
+      url: `${SERVER_URL}/account/login?returnUrl=%2Fgame%2Fnew`,
       followRedirect: false,
       jar: true,
       form: {
