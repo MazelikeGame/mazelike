@@ -4,6 +4,7 @@ import User from '../models/user.mjs';
 import sql from "../sequelize";
 import multer from 'multer';
 import fs from 'fs';
+import qs from "querystring";
 
 
 var storage = multer.diskStorage({
@@ -46,7 +47,11 @@ accountRouter.get('/create', function(req, res) {
   if(req.session.authenticated) {
     res.redirect('dashboard');
   } else {
-    res.render('create_acct');
+    res.render('create_acct', {
+      returnUrl: req.query.returnUrl ?
+        `?returnUrl=${qs.escape(req.query.returnUrl || "")}` :
+        ""
+    });
   }
 });
 
@@ -68,7 +73,12 @@ accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), f
       }
     }).then(function(user) {
       if(user) {
-        res.render('create_acct', { isAuthenticated: true });
+        res.render('create_acct', {
+          isAuthenticated: true,
+          returnUrl: req.query.returnUrl ?
+            `?returnUrl=${qs.escape(req.query.returnUrl || "")}` :
+            ""
+        });
       } else {
         userModel.encryptPassword(req.body.password, (err, hash) => {
           userModel.create({
@@ -77,7 +87,7 @@ accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), f
             password: hash,
             image_name: userModel.image_name
           });
-          res.redirect('login');
+          res.loginRedirect(req.query.returnUrl || "");
         });
       }
     });
@@ -150,9 +160,17 @@ accountRouter.get('/logout', isAuthenticated, function(req, res) {
  */
 accountRouter.get('/login', function(req, res) {
   if(req.session.authenticated) {
-    res.redirect('dashboard');
+    if(req.query.returnUrl) {
+      res.redirect(req.query.returnUrl);
+    } else {
+      res.redirect('dashboard');
+    }
   } else {
-    res.render('login');
+    res.render('login', {
+      returnUrl: req.query.returnUrl ?
+        `?returnUrl=${qs.escape(req.query.returnUrl || "")}` :
+        ""
+    });
   }
 });
 
@@ -170,20 +188,34 @@ accountRouter.post('/login', function(req, res) {
           req.session.authenticated = true;
           req.session.username = user.username;
           req.session.userId = user.id;
-          res.redirect('dashboard');
+          if(req.query.returnUrl) {
+            res.redirect(req.query.returnUrl);
+          } else {
+            res.redirect('dashboard');
+          }
         } else {
-          res.render('login', { wrongPassword: true }); //Failed login by password.
+          res.render('login', {
+            wrongPassword: true,
+            returnUrl: req.query.returnUrl ?
+              `?returnUrl=${qs.escape(req.query.returnUrl || "")}` :
+              ""
+          }); //Failed login by password.
         }
       });
     } else {
-      res.render('login', { wrongUsername: true }); //Failed login by username.
+      res.render('login', {
+        wrongUsername: true,
+        returnUrl: req.query.returnUrl ?
+          `?returnUrl=${qs.escape(req.query.returnUrl || "")}` :
+          ""
+      }); //Failed login by username.
     }
   });
 });
 
 accountRouter.get('/view', function(req, res) {
   if(req.session.username === undefined) {
-    res.redirect('login');
+    res.loginRedirect();
   } else{
     res.render('view_acct', {
       username: req.session.username,
