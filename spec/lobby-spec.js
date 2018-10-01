@@ -24,7 +24,7 @@ describe("Lobby", function() {
     });
 
     chai.should().equal(res.statusCode, 302);
-    chai.should().equal(res.headers.location, "/account/login");
+    chai.should().equal(res.headers.location, "/account/login?returnUrl=%2Fgame%2Fnew");
   });
 
   itAsync("can create a new game", async() => {
