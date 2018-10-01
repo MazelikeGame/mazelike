@@ -7,7 +7,7 @@ import multer from 'multer';
 var storage = multer.diskStorage({
   destination: 'Frontend/public/images',
   filename: function(req, file, cb) {
-    cb(null, file.originalname);
+    cb(null, file.originalname.concat('-' + Date.now()));
   }
 });
 var upload = multer({ storage: storage });
@@ -52,8 +52,7 @@ accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), f
 
   userModel.username = req.body.username;
   userModel.email = req.body.email;
-  userModel.image_name = req.body.username;
-
+  userModel.image_name = req.files.avatar[0].filename;
 
   userModel.sync().then(() => {
     userModel.findOne({
@@ -95,7 +94,7 @@ accountRouter.post('/edit', function(req, res) {
       let values = {};
       req.body.email && (values.email = req.body.email); // eslint-disable-line
       req.body.password && (values.password = hash); // eslint-disable-line
-      req.body.image && (values.image = req.body.image); // eslint-disable-line
+      // req.body.image && (values.image = req.body.image); // eslint-disable-line
       let selector = {
         where: { username: req.session.username }
       };
