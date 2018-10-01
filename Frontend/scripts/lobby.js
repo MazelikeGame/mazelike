@@ -122,7 +122,9 @@ function notify(msg, type = "primary") {
 
 // Fetch a url and show the response as a notification
 function fetchAndNotify(url) {
-  return fetch(url)
+  return fetch(url, {
+    credentials: "same-origin"
+  })
     .then((res) => {
       return res.text()
         .then((text) => {

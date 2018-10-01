@@ -3,6 +3,8 @@ import {KeyHandler, KEY_CODES} from "./input.js";
 
 let sock = io(location.host);
 
+let gameId = location.pathname.match(/\/game\/(.+)/)[1];
+
 let app = new PIXI.Application({
   antialias: true
 });
@@ -107,6 +109,7 @@ function setup() {
     if(id && (dog.vx !== 0 || dog.vy !== 0)) {
       sock.emit("position", {
         id,
+        gameId,
         x: dog.x,
         y: dog.y
       });
@@ -118,15 +121,16 @@ function setup() {
 
     sock.emit("position", {
       id,
+      gameId,
       x: dog.x,
       y: dog.y
     });
   });
 
-  sock.emit("ready");
+  sock.emit("ready", gameId);
 
   sock.on("set", (pos) => {
-    if(pos.id === id) {
+    if(pos.id === id || pos.gameId !== gameId) {
       return;
     }
 
@@ -137,7 +141,11 @@ function setup() {
     }
   });
 
-  sock.on("remove", (_id) => {
+  sock.on("remove", ({gameId: _gameId, id: _id}) => {
+    if(_gameId !== gameId) {
+      return;
+    }
+
     let player = players.get(_id);
     if(player) {
       app.stage.removeChild(player.sprite);
