@@ -55,7 +55,11 @@ accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), f
 
   userModel.username = req.body.username;
   userModel.email = req.body.email;
-  userModel.image_name = req.files.avatar[0].filename;
+  try {
+    userModel.image_name = req.files.avatar[0].filename;
+  } catch(e) {
+    userModel.image_name = null;
+  }
 
   userModel.sync().then(() => {
     userModel.findOne({
@@ -91,7 +95,7 @@ accountRouter.get('/edit', function(req, res) {
   }
 });
 
-accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), function(req, res) {
+accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), function(req, res) { // eslint-disable-line
   var userModel = new User(sql);
 
   var argument, file_name;
