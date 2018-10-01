@@ -7,7 +7,9 @@ import multer from 'multer';
 var storage = multer.diskStorage({
   destination: 'Frontend/public/images',
   filename: function(req, file, cb) {
-    cb(null, file.originalname.concat('-' + Date.now()));
+    let new_name = Date.now().toString().concat('-');
+    // cb(null, file.originalname.concat('-' + Date.now()));
+    cb(null, new_name.concat(file.originalname));
   }
 });
 var upload = multer({ storage: storage });
