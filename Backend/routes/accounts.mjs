@@ -90,7 +90,7 @@ accountRouter.get('/edit', function(req, res) {
   } else {
     res.render('edit_acct', {
       username: req.session.username,
-      image: req.user.image_name
+      image: req.user.image_name || "../../img/profilepic.jpg"
     });
   }
 });
@@ -117,7 +117,7 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
       if(changing_avatar === true) {
         values.image_name = file_name;
         let file_to_delete = 'Frontend/public/images/'.concat(req.user.image_name);
-        fs.unlinkSync(file_to_delete, () => {});
+        fs.unlink(file_to_delete, () => {});
       }
       let selector = {
         where: { username: req.session.username }
@@ -188,7 +188,7 @@ accountRouter.get('/view', function(req, res) {
     res.render('view_acct', {
       username: req.session.username,
       email: req.user.email,
-      image: req.user.image_name
+      image: req.user.image_name || "../../img/profilepic.jpg"
     });
   }
 
@@ -200,7 +200,7 @@ accountRouter.get('/dashboard', function(req, res) {
   } else{
     res.render('dashboard', {
       username: req.session.username,
-      image: req.user.image_name
+      image: req.user.image_name || "../../img/profilepic.jpg"
     });
   }
 });
