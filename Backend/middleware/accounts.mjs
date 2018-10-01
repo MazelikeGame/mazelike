@@ -14,6 +14,10 @@ export default async function userMiddleware(req, res, next) {
     });
   }
 
+  /**
+   * Redirect the user to /account/login if they are not logged in
+   * @param url Optional url to use other than the current url
+   */
   res.loginRedirect = (url) => {
     if(!req.user) {
       let returnUrl = "";
