@@ -7,9 +7,8 @@ import multer from 'multer';
 var storage = multer.diskStorage({
   destination: 'Frontend/public/images',
   filename: function(req, file, cb) {
-    let new_name = Date.now().toString().concat('-');
-    // cb(null, file.originalname.concat('-' + Date.now()));
-    cb(null, new_name.concat(file.originalname));
+    let date_posted = Date.now().toString().concat('-');
+    cb(null, date_posted.concat(file.originalname));
   }
 });
 var upload = multer({ storage: storage });
@@ -84,7 +83,8 @@ accountRouter.get('/edit', function(req, res) {
     res.redirect('login');
   } else {
     res.render('edit_acct', {
-      username: req.session.username
+      username: req.session.username,
+      image: req.user.image_name
     });
   }
 });
@@ -166,7 +166,7 @@ accountRouter.get('/view', function(req, res) {
     res.render('view_acct', {
       username: req.session.username,
       email: req.user.email,
-      image: req.user.image
+      image: req.user.image_name
     });
   }
 
@@ -178,6 +178,7 @@ accountRouter.get('/dashboard', function(req, res) {
   } else{
     res.render('dashboard', {
       username: req.session.username,
+      image: req.user.image_name
     });
   }
 });
