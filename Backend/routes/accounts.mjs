@@ -89,14 +89,15 @@ accountRouter.get('/edit', function(req, res) {
   }
 });
 
-accountRouter.post('/edit', function(req, res) {
+accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), function(req, res) {
   var userModel = new User(sql);
-  if ((req.body.email || req.body.password) && req.session.username !== undefined) {
+
+  if ((req.body.email || req.body.password || req.files.avatar[0].filename) && req.session.username !== undefined) {
     userModel.encryptPassword(req.body.password, (err, hash) => {
       let values = {};
       req.body.email && (values.email = req.body.email); // eslint-disable-line
       req.body.password && (values.password = hash); // eslint-disable-line
-      // req.body.image && (values.image = req.body.image); // eslint-disable-line
+      req.files.avatar[0].filename && (values.image_name = req.files.avatar[0].filename); // eslint-disable-line
       let selector = {
         where: { username: req.session.username }
       };
