@@ -17,6 +17,7 @@
     "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
+    "multer": "^1.4.0",
     "mysql2": "^1.6.1",
     "sequelize": "^4.38.1",
     "socket.io": "^2.1.1"
