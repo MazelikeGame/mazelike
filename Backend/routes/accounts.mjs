@@ -2,6 +2,18 @@ import express from "express";
 import Sequelize from 'sequelize';
 import User from '../models/user.mjs';
 import sql from "../sequelize";
+import multer from 'multer';
+import fs from 'fs';
+
+
+var storage = multer.diskStorage({
+  destination: 'Frontend/public/images',
+  filename: function(req, file, cb) {
+    let date_posted = Date.now().toString().concat('-');
+    cb(null, date_posted.concat(file.originalname));
+  }
+});
+var upload = multer({ storage: storage });
 
 const accountRouter = express.Router();
 
@@ -38,11 +50,16 @@ accountRouter.get('/create', function(req, res) {
   }
 });
 
-accountRouter.post('/create', function(req, res) {
+accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), function(req, res) {
   var userModel = new User(sql);
 
   userModel.username = req.body.username;
   userModel.email = req.body.email;
+  try {
+    userModel.image_name = req.files.avatar[0].filename;
+  } catch(e) {
+    userModel.image_name = null;
+  }
 
   userModel.sync().then(() => {
     userModel.findOne({
@@ -57,7 +74,8 @@ accountRouter.post('/create', function(req, res) {
           userModel.create({
             username: userModel.username,
             email: userModel.email,
-            password: hash
+            password: hash,
+            image_name: userModel.image_name
           });
           res.redirect('login');
         });
@@ -71,18 +89,36 @@ accountRouter.get('/edit', function(req, res) {
     res.redirect('login');
   } else {
     res.render('edit_acct', {
-      username: req.session.username
+      username: req.session.username,
+      image: req.user.image_name
     });
   }
 });
 
-accountRouter.post('/edit', function(req, res) {
+// I will refactor this in the future
+accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), function(req, res) { // eslint-disable-line
   var userModel = new User(sql);
-  if ((req.body.email || req.body.password) && req.session.username !== undefined) {
+
+  var argument, file_name;
+  var changing_avatar = false;
+  try {
+    file_name = req.files.avatar[0].filename;
+    argument = req.body.email || req.body.password || req.files.avatar[0].filename;
+    changing_avatar = true;
+  } catch (e) {
+    argument = req.body.email || req.body.password;
+  }
+
+  if (argument && req.session.username !== undefined) {
     userModel.encryptPassword(req.body.password, (err, hash) => {
       let values = {};
       req.body.email && (values.email = req.body.email); // eslint-disable-line
       req.body.password && (values.password = hash); // eslint-disable-line
+      if(changing_avatar === true) {
+        values.image_name = file_name;
+        let file_to_delete = 'Frontend/public/images/'.concat(req.user.image_name);
+        fs.unlinkSync(file_to_delete, () => {});
+      }
       let selector = {
         where: { username: req.session.username }
       };
@@ -151,7 +187,8 @@ accountRouter.get('/view', function(req, res) {
   } else{
     res.render('view_acct', {
       username: req.session.username,
-      email: req.user.email
+      email: req.user.email,
+      image: req.user.image_name
     });
   }
 
@@ -163,6 +200,7 @@ accountRouter.get('/dashboard', function(req, res) {
   } else{
     res.render('dashboard', {
       username: req.session.username,
+      image: req.user.image_name
     });
   }
 });
