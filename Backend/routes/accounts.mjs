@@ -116,7 +116,7 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
       req.body.password && (values.password = hash); // eslint-disable-line
       if(changing_avatar === true) {
         values.image_name = file_name;
-        let file_to_delete = '../../Frontend/public/images/'.concat(req.user.image_name);
+        let file_to_delete = 'Frontend/public/images/'.concat(req.user.image_name);
         fs.unlinkSync(file_to_delete, () => {});
       }
       let selector = {
