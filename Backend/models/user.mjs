@@ -6,7 +6,8 @@ export default function User(sequelize) {
   let user = sequelize.define('users', {
     username: Sequelize.STRING,
     email: Sequelize.STRING,
-    password: Sequelize.STRING
+    password: Sequelize.STRING,
+    image_name: Sequelize.STRING
   });
 
   user.encryptPassword = function(password, callback) {

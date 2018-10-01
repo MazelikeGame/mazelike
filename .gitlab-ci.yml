@@ -14,7 +14,7 @@ MazeLike_Deploy:
       - docker tag "mazelike/backend:$VERSION" mazelike/backend:latest
       - docker kill mazelike || echo "Server not running"
       - docker container rm mazelike || echo "Container not found"
-      - docker run --name mazelike -d -p 80:3000 --env-file /etc/mazelike/.env "mazelike/backend:$VERSION"
+      - docker run --name mazelike -d -p 80:3000 --env-file /etc/mazelike/.env -v /etc/mazelike/images:/app/Frontend/public/images "mazelike/backend:$VERSION"
   only:
     - master
 
@@ -25,6 +25,6 @@ MazeLike_Staging:
       - docker build -t "mazelike/backend:staging" .
       - docker kill mazelike_staging || echo "Server not running"
       - docker container rm mazelike_staging || echo "Container not found"
-      - docker run --name mazelike_staging -d -p 8080:3000 --env-file /etc/mazelike/staging.env "mazelike/backend:staging"
+      - docker run --name mazelike_staging -d -p 8080:3000 --env-file /etc/mazelike/staging.env -v /etc/mazelike/images_staging:/app/Frontend/public/images "mazelike/backend:staging"
   only:
     - staging

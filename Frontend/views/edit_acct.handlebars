@@ -24,7 +24,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
       <div class="edit">
         <div class="inset">
           <!-----start-main---->
-          <form action="../../account/edit" method="POST">
+          <form action="../../account/edit" method="POST" enctype="multipart/form-data">
             <div class="username">
               Username: {{username}}<br><br>
             </div>
@@ -35,6 +35,11 @@ License URL: http://creativecommons.org/licenses/by/3.0/
              <div>
               <span><label>New Password</label></span>
                 <span><input type="password" name="password" class="textbox" id="active"></span>
+             </div>
+             <img src="../public/images/{{image}}" class="img-circle" width="60">
+             <div>
+              <span><label>New Avatar</label></span>
+                <span><input type="file" name="avatar" id="active"></span>
              </div>
             <div class="sign">
               <div class="submit">
