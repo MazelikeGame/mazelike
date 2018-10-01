@@ -4,7 +4,12 @@ import User from '../models/user.mjs';
 import sql from "../sequelize";
 import multer from 'multer';
 
-var upload = multer({ dest: 'Frontend/public/images' });
+var upload = multer({
+  dest: 'Frontend/public/images',
+  filename: function(req, file, cb) {
+    cb(null, req.body.username);
+  }
+});
 const accountRouter = express.Router();
 
 /**
@@ -40,10 +45,9 @@ accountRouter.get('/create', function(req, res) {
   }
 });
 
-accountRouter.post('/create', function(req, res) {
+accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), function(req, res) {
   var userModel = new User(sql);
 
-  upload.fields([{ name: req.body.username, maxCount: 1}]);
   userModel.username = req.body.username;
   userModel.email = req.body.email;
   userModel.image_name = req.body.username;
