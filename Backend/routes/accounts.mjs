@@ -3,6 +3,8 @@ import Sequelize from 'sequelize';
 import User from '../models/user.mjs';
 import sql from "../sequelize";
 import multer from 'multer';
+import fs from 'fs';
+
 
 var storage = multer.diskStorage({
   destination: 'Frontend/public/images',
@@ -92,12 +94,27 @@ accountRouter.get('/edit', function(req, res) {
 accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), function(req, res) {
   var userModel = new User(sql);
 
-  if ((req.body.email || req.body.password || req.files.avatar[0].filename) && req.session.username !== undefined) {
+  var argument, file_name;
+  var changing_avatar = false;
+  try {
+    file_name = req.files.avatar[0].filename;
+    argument = req.body.email || req.body.password || req.files.avatar[0].filename;
+    changing_avatar = true;
+  } catch (e) {
+    argument = req.body.email || req.body.password;
+  }
+
+  if (argument && req.session.username !== undefined) {
     userModel.encryptPassword(req.body.password, (err, hash) => {
       let values = {};
       req.body.email && (values.email = req.body.email); // eslint-disable-line
       req.body.password && (values.password = hash); // eslint-disable-line
-      req.files.avatar[0].filename && (values.image_name = req.files.avatar[0].filename); // eslint-disable-line
+      if(changing_avatar === true) {
+        values.image_name = file_name;
+        // let file_to_delete = '../../Frontend/public/images/'.concat(req.user.image_name);
+        // console.log(file_to_delete);
+        // fs.unlink(file_to_delete);
+      }
       let selector = {
         where: { username: req.session.username }
       };
