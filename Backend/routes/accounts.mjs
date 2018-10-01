@@ -2,7 +2,9 @@ import express from "express";
 import Sequelize from 'sequelize';
 import User from '../models/user.mjs';
 import sql from "../sequelize";
+import multer from 'multer';
 
+var upload = multer({ dest: 'Frontend/public/images' });
 const accountRouter = express.Router();
 
 /**
@@ -41,8 +43,11 @@ accountRouter.get('/create', function(req, res) {
 accountRouter.post('/create', function(req, res) {
   var userModel = new User(sql);
 
+  upload.fields([{ name: req.body.username, maxCount: 1}]);
   userModel.username = req.body.username;
   userModel.email = req.body.email;
+  userModel.image_name = req.body.username;
+
 
   userModel.sync().then(() => {
     userModel.findOne({
@@ -50,6 +55,17 @@ accountRouter.post('/create', function(req, res) {
         [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
       }
     }).then(function(user) {
+      // if(req.body.image) {
+      //   const image_dir = 'Frontend/public/images/';
+      //   let image_name = req.body.username.toString().concat('.jpeg');
+      //   fs.writeFile(image_dir.concat(image_name), req.body.image, function(err) {
+      //     if(err) {
+      //       throw err;
+      //     }
+      //     console.log('File saved.');
+      //   });
+      //   console.log(req.body);
+      // }
       if(user) {
         res.render('create_acct', { isAuthenticated: true });
       } else {
@@ -57,7 +73,8 @@ accountRouter.post('/create', function(req, res) {
           userModel.create({
             username: userModel.username,
             email: userModel.email,
-            password: hash
+            password: hash,
+            image_name: userModel.image_name
           });
           res.redirect('login');
         });
@@ -83,6 +100,7 @@ accountRouter.post('/edit', function(req, res) {
       let values = {};
       req.body.email && (values.email = req.body.email); // eslint-disable-line
       req.body.password && (values.password = hash); // eslint-disable-line
+      req.body.image && (values.image = req.body.image); // eslint-disable-line
       let selector = {
         where: { username: req.session.username }
       };
@@ -151,7 +169,8 @@ accountRouter.get('/view', function(req, res) {
   } else{
     res.render('view_acct', {
       username: req.session.username,
-      email: req.user.email
+      email: req.user.email,
+      image: req.user.image
     });
   }
 
