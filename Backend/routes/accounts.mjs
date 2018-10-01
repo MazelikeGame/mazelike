@@ -4,12 +4,14 @@ import User from '../models/user.mjs';
 import sql from "../sequelize";
 import multer from 'multer';
 
-var upload = multer({
-  dest: 'Frontend/public/images',
+var storage = multer.diskStorage({
+  destination: 'Frontend/public/images',
   filename: function(req, file, cb) {
-    cb(null, req.body.username);
+    cb(null, file.originalname);
   }
 });
+var upload = multer({ storage: storage });
+
 const accountRouter = express.Router();
 
 /**
@@ -59,17 +61,6 @@ accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), f
         [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
       }
     }).then(function(user) {
-      // if(req.body.image) {
-      //   const image_dir = 'Frontend/public/images/';
-      //   let image_name = req.body.username.toString().concat('.jpeg');
-      //   fs.writeFile(image_dir.concat(image_name), req.body.image, function(err) {
-      //     if(err) {
-      //       throw err;
-      //     }
-      //     console.log('File saved.');
-      //   });
-      //   console.log(req.body);
-      // }
       if(user) {
         res.render('create_acct', { isAuthenticated: true });
       } else {
