@@ -4,15 +4,14 @@ stages:
  - test
  - deploy
 
-artifacts:
-  paths:
-   - docker-compose.test.yml
-   - random
-
 Mazelike_Setup:
   stage: setup
   script:
    - node randomize
+  artifacts:
+    paths:
+    - docker-compose.test.yml
+    - random
 
 Mazelike_Backend_Build:
   stage: build
