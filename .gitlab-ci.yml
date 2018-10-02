@@ -1,8 +1,23 @@
+stages:
+ - build
+ - test
+ - deploy
+
+Mazelike_Backend_Build:
+  stage: build
+  script:
+   - docker-compose build backend
+
+Mazelike_Test_Build:
+  stage: build
+  script:
+   - docker-compose -f docker-compose.test.yml build tests
+
 MazeLike_Tests:
   stage: test
   script:
    - touch runner-result
-   - docker-compose -f docker-compose.test.yml up --build -d
+   - docker-compose -f docker-compose.test.yml up -d
    - node test-stopper.js
 
 MazeLike_Deploy:
@@ -10,7 +25,7 @@ MazeLike_Deploy:
   script:
       # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
       - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
-      - docker build -t "mazelike/backend:$VERSION" .
+      - docker tag mazelike/backend:devel "mazelike/backend:$VERSION"
       - docker tag "mazelike/backend:$VERSION" mazelike/backend:latest
       - docker kill mazelike || echo "Server not running"
       - docker container rm mazelike || echo "Container not found"
@@ -22,9 +37,10 @@ MazeLike_Staging:
   stage: deploy
   script:
       # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-      - docker build -t "mazelike/backend:staging" .
+      - docker tag mazelike/backend:devel "mazelike/backend:staging"
       - docker kill mazelike_staging || echo "Server not running"
       - docker container rm mazelike_staging || echo "Container not found"
       - docker run --name mazelike_staging -d -p 8080:3000 --env-file /etc/mazelike/staging.env -v /etc/mazelike/images_staging:/app/Frontend/public/images "mazelike/backend:staging"
   only:
     - staging
+    - ryanr-acceptance-tests

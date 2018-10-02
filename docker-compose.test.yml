@@ -6,30 +6,13 @@ services:
     build:
       context: .
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASS: password
       DB_DATABASE: mazelike
       DB_STORAGE: ":memory:"
     expose:
       - 3000
-    # depends_on:
-    #   - mysql
     networks:
       - testing
 
-  # mysql:
-  #   container_name: testing_mysql
-  #   image: mysql:5.7
-  #   environment:
-  #     MYSQL_DATABASE: mazelike
-  #     MYSQL_ROOT_PASSWORD: password
-  #   networks:
-  #     - testing
-  #   expose:
-  #     - 3306
-  
   tests:
     container_name: testing_tests
     image: mazelike/tests
