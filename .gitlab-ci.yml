@@ -43,4 +43,3 @@ MazeLike_Staging:
       - docker run --name mazelike_staging -d -p 8080:3000 --env-file /etc/mazelike/staging.env -v /etc/mazelike/images_staging:/app/Frontend/public/images "mazelike/backend:staging"
   only:
     - staging
-    - ryanr-acceptance-tests
