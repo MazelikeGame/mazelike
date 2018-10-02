@@ -16,15 +16,10 @@ Mazelike_Build:
 
 MazeLike_Tests:
   stage: test
-  artifacts:
-    expire_in: 1hour
-    paths:
-    - server.log
   script:
    - touch runner-result
    - docker-compose -f docker-compose.test.yml up -d
-   - docker-compose -f docker-compose.test.yml logs backend >server.log &
-   - node test-stopper.js tests || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
+   - node test-stopper.js || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
 
 MazeLike_Deploy:
   stage: deploy
