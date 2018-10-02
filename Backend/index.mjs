@@ -9,7 +9,7 @@ import exphbs from "express-handlebars";
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import userMiddleware from "./middleware/accounts";
-import sessionStore from "./session-store"
+import sessionStore from "./session-store";
 
 let app = express();
 let server = http.Server(app);
