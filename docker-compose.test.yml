@@ -28,21 +28,6 @@ services:
       - type: bind
         source: ./runner-result
         target: /app/runner-result
-      - type: bind
-        source: ./spec
-        target: /app/spec
-      - type: bind
-        source: ./Frontend
-        target: /app/Frontend
-      - type: bind
-        source: ./Backend
-        target: /app/Backend
-      - type: bind
-        source: ./.eslintrc.js
-        target: /app/.eslintrc.js
-      - type: bind
-        source: ./.eslintignore
-        target: /app/.eslintignore
 
 networks:
   testing:

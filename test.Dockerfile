@@ -1,10 +1,11 @@
-FROM node:8.11
+FROM mazelike/backend:devel
 
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm install
 
-COPY test-inner.sh .
+COPY . .
+
 RUN chmod +x test-inner.sh
 CMD ["/bin/bash", "/app/test-inner.sh"]
