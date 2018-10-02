@@ -1,8 +1,11 @@
-FROM mazelike/backend:devel
+FROM node:8.11
 
 WORKDIR /app
 
-RUN npm install
+RUN npm i -g npm
+
+COPY package*.json ./
+RUN npm ci
 
 COPY . .
 
