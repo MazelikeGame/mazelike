@@ -1,12 +1,15 @@
-/* global describe it */
+/* global describe it SERVER_URL requestAsync */
 var request = require('request');
 var chai = require('chai');
 var assert = chai.assert;
 var expect = chai.expect;
 
-var login_url = `http://localhost:3000/account/login`;
-var create_url = `http://localhost:3000/account/create`;
-var edit_url = `http://localhost:3000/account/edit`;
+var login_url = `${SERVER_URL}/account/login`;
+var create_url = `${SERVER_URL}/account/create`;
+var edit_url = `${SERVER_URL}/account/edit`;
+
+var view_url = `${SERVER_URL}/account/view`;
+var dashboard_url = `${SERVER_URL}/account/dashboard`;
 
 const random = Math.floor(Math.random() * 10000000);
 
@@ -73,6 +76,44 @@ describe('Login route tests', () => {
       done();
     });
   });
+
+  itAsync("can redirect users to their original url", async() => {
+    await requestAsync({
+      method: "get",
+      url: `${SERVER_URL}/account/logout`,
+      followRedirect: false,
+      jar: true
+    });
+
+    let {res} = await requestAsync({
+      method: "post",
+      url: `${SERVER_URL}/account/create?returnUrl=%2Fgame%2Fnew`,
+      followRedirect: false,
+      jar: true,
+      form: {
+        username: "bazinga",
+        email: "bazinga@bazinga.com",
+        password: "bazinga"
+      }
+    });
+
+    chai.should().equal(res.statusCode, 302);
+    chai.should().equal(res.headers.location, "/account/login?returnUrl=%2Fgame%2Fnew");
+
+    let {res: res2} = await requestAsync({
+      method: "post",
+      url: `${SERVER_URL}${res.headers.location}`,
+      followRedirect: false,
+      jar: true,
+      form: {
+        username: "bazinga",
+        password: "bazinga"
+      }
+    });
+
+    chai.should().equal(res2.statusCode, 302);
+    chai.should().equal(res2.headers.location, "/game/new");
+  });
 });
 
 describe('Edit route tests', () => {
@@ -86,53 +127,30 @@ describe('Edit route tests', () => {
       done();
     });
   });
+});
 
-  it('Can not post to edit route if the user is not logged in', (done) => {
-    request.post({
-      url: edit_url,
-      form: { username: `test-account-${random}`, password: 'password' }
-    }, function(err, response, body) {
+describe('Visit route test', () => {
+  it('Can visit the view route', (done) => {
+    request.get(view_url, function(err, response, body) {
       try {
-        assert.equal(response.statusCode, 302);
-      } catch (e) {
+        assert.equal(response.statusCode, 200);
+        done();
+      } catch(e) {
         done(e);
       }
-      done();
     });
   });
+});
 
-  it('Can post to edit, provided that the user is logged in', (done) => {
-    request.post({
-      url: create_url,
-      form: { username: `test-account-${random}`, password: `test-account-${random}`, email: `test-account-${random}@test.com` }
-    }, function(err, response, body) {
+describe('Dashboard route test', () => {
+  it('Can visit the dashboard route', (done) => {
+    request.get(dashboard_url, function(err, response, body) {
       try {
         assert.equal(response.statusCode, 200);
+        done();
       } catch(e) {
         done(e);
       }
-    });
-    request.post({
-      url: login_url,
-      form: { username: `test-account-${random}`, password: 'password' }
-    }, function(err, response, body) {
-      try {
-        assert.equal(response.statusCode, 200);
-      } catch(e) {
-        done(e);
-      }
-      done();
-    });
-    request.post({
-      url: edit_url,
-      form: { username: `test-account-${random}`, password: 'password_edited' }
-    }, function(err, response, body) {
-      try {
-        assert.equal(response.statusCode, 302);
-      } catch (e) {
-        done(e);
-      }
-      done();
     });
   });
 });

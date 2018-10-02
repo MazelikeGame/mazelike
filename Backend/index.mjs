@@ -9,6 +9,7 @@ import exphbs from "express-handlebars";
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import userMiddleware from "./middleware/accounts";
+import sessionStore from "./session-store";
 
 let app = express();
 let server = http.Server(app);
@@ -23,6 +24,7 @@ app.use(session({
   secret: 'mazelike',
   resave: true,
   saveUninitialized: false,
+  store: sessionStore,
   cookie: {
     expires: 600000 //Switch this if we want to stay logged in forever.
   }
@@ -49,17 +51,21 @@ let nextId = 0;
 
 io.on("connection", (client) => {
   const id = ++nextId;
+  let gameId;
 
-  client.once("ready", () => {
+  client.once("ready", (_gameId) => {
+    gameId = _gameId;
     client.emit("id", id);
   });
 
   client.on("position", (pos) => {
-    io.emit("setR", pos);
+    io.emit("set", pos);
   });
 
   client.on("disconnect", () => {
-    io.emit("remove", id);
+    if(gameId) {
+      io.emit("remove", {id, gameId});
+    }
   });
 });
 
@@ -69,6 +75,7 @@ const sleep = (ms) => {
   });
 };
 
+const MAX_RETRIES = 50;
 const start = async() => {
   // make several attempts to connect to mysql
   for(let i = 0;; ++i) {
@@ -76,10 +83,10 @@ const start = async() => {
       await sequelize.authenticate();
       break;
     } catch(err) {
-      process.stderr.write(`MySql connection failed ${err.message} (retrying in 5s)\n`);
+      process.stderr.write(`[${i + 1}/${MAX_RETRIES}] MySql connection failed ${err.message} (retrying in 5s)\n`);
       await sleep(5000);
 
-      if(i === 30) {
+      if(i === MAX_RETRIES) {
         process.stderr.write(err.stack);
         process.exit(1);
       }

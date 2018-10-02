@@ -18,7 +18,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <link href='http://fonts.googleapis.com/css?family=Oxygen:400,300,700|Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
 <!--//webfonts-->
 </head>
- 
+
 <body>
 	<div class="main">
 		<div class="user">
@@ -36,8 +36,12 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 				<!--END ERRORS-->
 
 				<!-----start-main---->
-				<form action="../../account/create" method="POST">
-			         <div>
+				<form action="../../account/create{{returnUrl}}" method="POST" enctype="multipart/form-data">
+          <div>
+						<span><label>Avatar</label></span>
+						<span><input type="file" name="avatar" id="active"></span>
+          </div>
+           <div>
 						<span><label>Email</label></span>
 						<span><input type="email" name="email" class="textbox" id="active"></span>
 					 </div>
@@ -62,9 +66,9 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 		</div>
 		 <!-----start-copyright---->
    					<div class="copy-right">
-						<p>Template by <a href="http://w3layouts.com">w3layouts</a></p> 
+						<p>Template by <a href="http://w3layouts.com">w3layouts</a></p>
 					</div>
 				<!-----//end-copyright---->
-	 
+
 </body>
 </html>

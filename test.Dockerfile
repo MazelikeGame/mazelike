@@ -2,13 +2,9 @@ FROM mazelike/backend:devel
 
 WORKDIR /app
 
-COPY package*.json ./
 RUN npm install
 
-COPY .eslintignore .eslintignore
-COPY .eslintrc.js .eslintrc.js
-COPY Frontend Frontend
-COPY Backend Backend
-COPY spec spec
+COPY . .
 
-CMD npm run eslint && ./node_modules/.bin/jasmine
+RUN chmod +x test-inner.sh
+CMD ["/bin/bash", "/app/test-inner.sh"]
