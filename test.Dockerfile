@@ -7,7 +7,6 @@ RUN npm i -g npm
 COPY package*.json ./
 RUN npm ci
 
-COPY . .
-
+COPY test-inner.sh .
 RUN chmod +x test-inner.sh
 CMD ["/bin/bash", "/app/test-inner.sh"]
