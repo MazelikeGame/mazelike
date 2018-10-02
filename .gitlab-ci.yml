@@ -1,27 +1,17 @@
 stages:
- - setup
  - build
  - test
  - deploy
 
-Mazelike_Setup:
-  stage: setup
+Mazelike_Build:
+  stage: build
   script:
    - node randomize
+   - docker-compose -f docker-compose.test.yml build || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
   artifacts:
     paths:
     - docker-compose.test.yml
     - random
-
-Mazelike_Backend_Build:
-  stage: build
-  script:
-   - docker-compose -f docker-compose.test.yml build backend || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
-
-Mazelike_Test_Build:
-  stage: build
-  script:
-   - docker-compose -f docker-compose.test.yml build tests || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
 
 MazeLike_Tests:
   stage: test
