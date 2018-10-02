@@ -7,7 +7,7 @@ Mazelike_Build:
   stage: build
   script:
    - node randomize
-   - docker-compose -f docker-compose.test.yml build || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
+   - node parallel-build || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
   artifacts:
     paths:
     - docker-compose.test.yml
