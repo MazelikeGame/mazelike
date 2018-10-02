@@ -58,6 +58,6 @@ Mazelike_Cleanup:
   stage: deploy
   script:
     - docker-compose -f docker-compose.test.yml down --rmi all && exit 1
-  not:
+  except:
     - master
     - staging
