@@ -2,6 +2,7 @@ FROM mazelike/backend:devel
 
 WORKDIR /app
 
+COPY package*.json ./
 RUN npm install
 
 COPY . .
