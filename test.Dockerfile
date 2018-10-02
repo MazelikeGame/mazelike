@@ -2,10 +2,8 @@ FROM node:8.11
 
 WORKDIR /app
 
-RUN npm i -g npm
-
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY test-inner.sh .
 RUN chmod +x test-inner.sh
