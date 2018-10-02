@@ -13,15 +13,10 @@ Mazelike_Setup:
     - docker-compose.test.yml
     - random
 
-Mazelike_Backend_Build:
+Mazelike_Build:
   stage: build
   script:
-   - docker-compose -f docker-compose.test.yml build backend || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
-
-Mazelike_Test_Build:
-  stage: build
-  script:
-   - docker-compose -f docker-compose.test.yml build tests || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
+   - docker-compose -f docker-compose.test.yml build || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
 
 MazeLike_Tests:
   stage: test

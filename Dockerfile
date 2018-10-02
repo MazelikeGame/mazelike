@@ -12,4 +12,3 @@ COPY Backend Backend
 EXPOSE 3000
 
 CMD ["npm", "start"]
-askdla
