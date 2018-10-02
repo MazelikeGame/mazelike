@@ -1,35 +1,42 @@
 stages:
+ - setup
  - build
  - test
  - deploy
 
+Mazelike_Setup:
+  stage: setup
+  script:
+   - node randomize
+
 Mazelike_Backend_Build:
   stage: build
   script:
-   - docker-compose -f docker-compose.test.yml build backend
+   - docker-compose -f docker-compose.test.yml build backend || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
 
 Mazelike_Test_Build:
   stage: build
   script:
-   - docker-compose -f docker-compose.test.yml build tests
+   - docker-compose -f docker-compose.test.yml build tests || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
 
 MazeLike_Tests:
   stage: test
   script:
    - touch runner-result
    - docker-compose -f docker-compose.test.yml up -d
-   - node test-stopper.js
+   - node test-stopper.js || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
 
 MazeLike_Deploy:
   stage: deploy
   script:
       # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
       - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
-      - docker tag mazelike/backend:devel "mazelike/backend:$VERSION"
+      - docker tag "mazelike/backend:devel-$(cat random)" "mazelike/backend:$VERSION"
       - docker tag "mazelike/backend:$VERSION" mazelike/backend:latest
       - docker kill mazelike || echo "Server not running"
       - docker container rm mazelike || echo "Container not found"
       - docker run --name mazelike -d -p 80:3000 --env-file /etc/mazelike/.env -v /etc/mazelike/images:/app/Frontend/public/images "mazelike/backend:$VERSION"
+      - docker-compose -f docker-compose.test.yml down --rmi all && exit 1
   only:
     - master
 
@@ -37,9 +44,20 @@ MazeLike_Staging:
   stage: deploy
   script:
       # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-      - docker tag mazelike/backend:devel "mazelike/backend:staging"
+      - docker build mazelike/backend:devel "mazelike/backend:staging"
       - docker kill mazelike_staging || echo "Server not running"
       - docker container rm mazelike_staging || echo "Container not found"
       - docker run --name mazelike_staging -d -p 8080:3000 --env-file /etc/mazelike/staging.env -v /etc/mazelike/images_staging:/app/Frontend/public/images "mazelike/backend:staging"
+      - docker rmi -f "mazelike/backend:devel-$(cat random)"
+      - docker rmi -f "mazelike/tests:$(cat random)"
+      - docker-compose -f docker-compose.test.yml down --rmi all && exit 1
   only:
+    - staging
+
+Mazelike_Cleanup:
+  stage: deploy
+  script:
+    - docker-compose -f docker-compose.test.yml down --rmi all && exit 1
+  not:
+    - master
     - staging
