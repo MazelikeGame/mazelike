@@ -9,16 +9,22 @@ Mazelike_Build:
    - node randomize
    - docker-compose -f docker-compose.test.yml build || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
   artifacts:
+    expire_in: 5mins
     paths:
     - docker-compose.test.yml
     - random
 
 MazeLike_Tests:
   stage: test
+  artifacts:
+    expire_in: 1hour
+    paths:
+    - server.log
   script:
    - touch runner-result
    - docker-compose -f docker-compose.test.yml up -d
-   - node test-stopper.js || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
+   - docker-compose -f docker-compose.test.yml logs backend >server.log &
+   - node test-stopper.js tests || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
 
 MazeLike_Deploy:
   stage: deploy
