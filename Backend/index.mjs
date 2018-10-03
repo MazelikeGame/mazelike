@@ -10,6 +10,8 @@ import bodyParser from 'body-parser';
 import session from 'express-session';
 import userMiddleware from "./middleware/accounts";
 import sessionStore from "./session-store";
+import winston from 'winston';
+import expressWinston from 'express-winston';
 
 let app = express();
 let server = http.Server(app);
@@ -37,6 +39,18 @@ app.set('views', 'Frontend/views');
 
 // Middleware
 app.use(userMiddleware);
+// Winston request logging
+app.use(expressWinston.logger({
+  transports: [
+    new winston.transports.Console({
+      json: true
+    })
+  ],
+  msg: '{{req.method}} {{req.url}}, res.statusCode: {{res.statusCode}} res.responseTime: {{res.responseTime}}ms',
+  expressFormat: false,
+  meta: false
+}));
+
 
 //Routes
 app.use("/game", gameRouter);
@@ -50,6 +64,15 @@ app.get('/', function(req, res) {
     res.render('index', { version: process.env.npm_package_version });
   }
 });
+
+// Winston error logger. Must be placed after routes
+app.use(expressWinston.errorLogger({
+  transports: [
+    new winston.transports.Console({
+      colorize: true
+    })
+  ]
+}));
 
 let nextId = 0;
 
