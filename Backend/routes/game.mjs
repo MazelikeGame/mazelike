@@ -97,6 +97,13 @@ gameRouter.get("/lobby/:id", async(req, res) => {
     };
   });
 
+
+  //SWITCH THIS TO ONE QUERY
+  for(var i = 0; i < players.length; i++) {
+    var result = await sql.query(`SELECT image_name FROM users WHERE username = '${players[i].id}'`);
+    players[i].image_name = result[0][0].image_name;
+  }
+
   let isHost = host.playerId === req.user.username;
 
   res.render("lobby", {
@@ -152,7 +159,8 @@ export const joinRoute = async(req, res) => {
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
-    playerId: req.user.username
+    playerId: req.user.username,
+    image_name: req.user.image_name
   });
 
   res.redirect(`/game/lobby/${lobby.lobbyId}`);

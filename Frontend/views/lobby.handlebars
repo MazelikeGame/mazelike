@@ -19,6 +19,18 @@
       h2, .alert {
         margin-top: 10px;
       }
+
+      .userinfo {
+        position: relative;
+        height: 64px;
+        width: auto;
+      }
+
+      .avatar {
+        margin-right: 15px;
+        width: 64px;
+        height: 64px;
+      }
     </style>
   </head>
   <body>
@@ -61,11 +73,19 @@
         <div class="list-group">
           {{#each players}}
             <div class="list-group-item d-flex justify-content-between align-items-center" data-player-id="{{id}}">
-              {{id}}
+              <div class="userinfo">
+              {{#if image_name}}
+                <img src="../../public/images/{{image_name}}" class="avatar rounded float-left">
+              {{else}}
+              <img src="../../img/profilepic.jpg" class="avatar rounded float-left">
+              {{/if}}
+                <span class="username">{{id}}<span>
+            </div>
               {{#if isHost}}
+                <span class="badge badge-dark">HOST</span>
               {{else}}
                 {{#if ../isHost}}
-                  <a class="drop-link" href="/game/lobby/{{../id}}/drop/{{id}}">Drop</a>
+                  <a class="drop-link" class="btn btn-danger" href="/game/lobby/{{../id}}/drop/{{id}}">Drop</a>
                 {{/if}}
               {{/if}}
             </div>
