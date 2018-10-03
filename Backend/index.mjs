@@ -42,7 +42,11 @@ app.get("/j/:id", joinRoute);
 app.use('/account', accountRouter);
 
 app.get('/', function(req, res) {
-  res.render('index', { version: process.env.npm_package_version });
+  if(req.session.authenticated) {
+    res.redirect('/account/dashboard');
+  } else {
+    res.render('index', { version: process.env.npm_package_version });
+  }
 });
 
 let nextId = 0;
