@@ -1,33 +1,55 @@
 version: "3.2"
 services:
   backend:
+    container_name: testing_backend
     image: mazelike/backend:devel
     build:
       context: .
-    env_file: .env
-    ports:
-      - 3000:3000
-    depends_on:
-      - mysql
-    networks:
-      - backend
-
-  mysql:
-    image: mysql:5.7
     environment:
-      MYSQL_DATABASE: mazelike
-      MYSQL_ROOT_PASSWORD: password
-    volumes:
-      - type: volume
-        source: mysql-data
-        target: /var/lib/mysql
+      DB_STORAGE: ":memory:"
+    expose:
+      - 3000
     networks:
-      - backend
-    ports:
-      - 5506:3306
+      - testing
+    volumes:
+      - type: bind
+        source: ./Frontend
+        target: /app/Frontend
+      - type: bind
+        source: ./Backend
+        target: /app/Backend
 
-volumes:
-  mysql-data:
+  tests:
+    container_name: testing_tests
+    image: mazelike/tests
+    build:
+      context: .
+      dockerfile: test.Dockerfile
+    depends_on:
+      - backend
+    networks:
+      - testing
+    environment:
+      IS_RUNNING_IN_DOCKER: ok
+    volumes:
+      - type: bind
+        source: ./runner-result
+        target: /app/runner-result
+      - type: bind
+        source: ./spec
+        target: /app/spec
+      - type: bind
+        source: ./Frontend
+        target: /app/Frontend
+      - type: bind
+        source: ./Backend
+        target: /app/Backend
+      - type: bind
+        source: ./.eslintrc.js
+        target: /app/.eslintrc.js
+      - type: bind
+        source: ./.eslintignore
+        target: /app/.eslintignore
 
 networks:
-  backend:
+  testing:

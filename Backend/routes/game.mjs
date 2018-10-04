@@ -10,8 +10,7 @@ export let gameRouter = express.Router();
 
 // List all lobbies
 gameRouter.get("/all", async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -19,7 +18,7 @@ gameRouter.get("/all", async(req, res) => {
   let lobbies = await sql.query(`
     SELECT l1.playerId, l1.lobbyId FROM lobbies l1
       WHERE l1.lobbyId IN (SELECT l.lobbyId FROM lobbies l WHERE l.playerId = :userId)
-      && l1.isHost = 1
+      AND l1.isHost = 1
       ORDER BY l1.lobbyId;`, {
     replacements: {
       userId: req.user.username
@@ -113,8 +112,7 @@ gameRouter.get("/lobby/:id", async(req, res) => {
 // Join a lobby
 // /j/:id (from the root)
 export const joinRoute = async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -173,8 +171,7 @@ const SECRET_LENGTH = 3;
 
 // Create a new lobby
 gameRouter.get("/new", async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -193,8 +190,7 @@ gameRouter.get("/new", async(req, res) => {
 
 // Delete a lobby
 gameRouter.get("/lobby/:id/delete", async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -227,8 +223,7 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
 
 // Drop a player from the lobby
 gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -269,8 +264,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
 
 // Start the game for this lobby
 gameRouter.get("/lobby/:id/start", async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 

@@ -9,6 +9,9 @@ import exphbs from "express-handlebars";
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import userMiddleware from "./middleware/accounts";
+import sessionStore from "./session-store";
+import winston from 'winston';
+import expressWinston from 'express-winston';
 
 let app = express();
 let server = http.Server(app);
@@ -23,6 +26,7 @@ app.use(session({
   secret: 'mazelike',
   resave: true,
   saveUninitialized: false,
+  store: sessionStore,
   cookie: {
     expires: 600000 //Switch this if we want to stay logged in forever.
   }
@@ -35,6 +39,18 @@ app.set('views', 'Frontend/views');
 
 // Middleware
 app.use(userMiddleware);
+// Winston request logging
+app.use(expressWinston.logger({
+  transports: [
+    new winston.transports.Console({
+      json: true
+    })
+  ],
+  msg: '{{req.method}} {{req.url}}, res.statusCode: {{res.statusCode}} res.responseTime: {{res.responseTime}}ms',
+  expressFormat: false,
+  meta: false
+}));
+
 
 //Routes
 app.use("/game", gameRouter);
@@ -42,8 +58,21 @@ app.get("/j/:id", joinRoute);
 app.use('/account', accountRouter);
 
 app.get('/', function(req, res) {
-  res.render('index', { version: process.env.npm_package_version });
+  if(req.session.authenticated) {
+    res.redirect('/account/dashboard');
+  } else {
+    res.render('index', { version: process.env.npm_package_version });
+  }
 });
+
+// Winston error logger. Must be placed after routes
+app.use(expressWinston.errorLogger({
+  transports: [
+    new winston.transports.Console({
+      colorize: true
+    })
+  ]
+}));
 
 let nextId = 0;
 

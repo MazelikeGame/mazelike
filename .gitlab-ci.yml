@@ -1,9 +1,10 @@
 MazeLike_Tests:
   stage: test
   script:
+   - docker-compose -f docker-compose.test.yml build
    - touch runner-result
-   - docker-compose -f docker-compose.test.yml up --build -d
-   - node test-stopper.js
+   - docker-compose -f docker-compose.test.yml up -d
+   - node test-stopper.js || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
 
 MazeLike_Deploy:
   stage: deploy
