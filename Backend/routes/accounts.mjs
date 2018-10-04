@@ -218,12 +218,16 @@ accountRouter.get('/view', function(req, res) {
   if(res.loginRedirect()) {
     return;
   }
-  
+
   res.render('view_acct', {
     username: req.session.username,
     email: req.user.email,
     image: req.user.image_name || "../../img/profilepic.jpg"
   });
+});
+
+accountRouter.get('/forgot-password', function(req, res) {
+  res.render('forgot-password');
 });
 
 accountRouter.get('/dashboard', function(req, res) {
