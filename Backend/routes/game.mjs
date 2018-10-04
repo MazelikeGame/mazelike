@@ -212,9 +212,8 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
           lobbyId: req.params.id
         }
       });
-
       io.emit("lobby-delete", req.params.id);
-      res.end("Lobby deleted");
+      res.redirect("/account/dashboard");
     } else {
       res.status(401);
       res.end("Only the host can delete this lobby.");
