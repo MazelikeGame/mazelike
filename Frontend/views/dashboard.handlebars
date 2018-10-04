@@ -14,8 +14,6 @@
     <link href="../css/bootstrap.css" rel="stylesheet">
     <!--external css-->
     <link href="../font-awesome/css/font-awesome.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="../js/bootstrap-datepicker/css/datepicker.css" />
-    <link rel="stylesheet" type="text/css" href="../js/bootstrap-daterangepicker/daterangepicker.css" />
 
     <!-- Custom styles for this template -->
     <link href="../css/loggedinstyle.css" rel="stylesheet">
@@ -94,7 +92,11 @@
                                 <h5>Games</h5>
                             </div>
                             <div class="row">
-                                <h5>Games Here</h5>
+                                {{#each lobbies}}
+                                <tr>
+                                    <input type="radio" name="gender" value="male" id={{lobbyId}} >     {{lobbyId}}<br>
+                                </tr>
+                                {{/each}}
                             </div>
                         </div>
                     </div><!-- /col-md-4-->
@@ -106,7 +108,7 @@
                                 <h5>Game Stats</h5>
                             </div>
                             <div class="row">
-                                <h5>Games Stats Here</h5>
+                                <h5 id = "game stats">No Game Selected</h5>
                             </div>
                         </div>
                     </div><!-- /col-md-4 -->
@@ -117,13 +119,13 @@
                                 <h5>Options</h5>
                             </div>
                             <div class="row">
-                                <a href="/game/new"><button class="blue-btn" type="button"> Create New Game </button></a>
+                                <a href="/game/new"><button class="blue-btn" type="button" id="new button"> Create New Game </button></a>
                             </div>
                             <div class="row">
-                                <button class="blue-btn" type="button"> Continue Game </button>
+                                <button class="blue-btn" type="button" id = "continue button" > Continue Game </button>
                             </div>
                             <div class="row">
-                                <button class="blue-btn" type="button"> Delete Game </button>
+                               <button class="blue-btn" type="button" id = "delete button" > Delete Game </button>
                             </div>
                         </div>
                     </div><!-- /col-md-4 -->
@@ -155,42 +157,39 @@
             <script src="../js/sparkline-chart.js"></script>
             <script src="../js/zabuto_calendar.js"></script>
 
-            <script type="application/javascript">
-                $(document).ready(function () {
-                    $("#date-popover").popover({ html: true, trigger: "manual" });
-                    $("#date-popover").hide();
-                    $("#date-popover").click(function (e) {
-                        $(this).hide();
-                    });
-
-                    $("#my-calendar").zabuto_calendar({
-                        action: function () {
-                            return myDateFunction(this.id, false);
-                        },
-                        action_nav: function () {
-                            return myNavFunction(this.id);
-                        },
-                        ajax: {
-                            url: "show_data.php?action=1",
-                            modal: true
-                        },
-                        legend: [
-                            { type: "text", label: "Special event", badge: "00" },
-                            { type: "block", label: "Regular event", }
-                        ]
+            <script>
+                // radio button listeners
+                $('input:radio').each(function () {
+                    document.getElementById(this.id).addEventListener('click', function (event) {
+                        document.getElementById("game stats").innerText = "Game <" + this.id + "> selected.";
                     });
                 });
-
-
-                function myNavFunction(id) {
-                    $("#date-popover").hide();
-                    var nav = $("#" + id).data("navigation");
-                    var to = $("#" + id).data("to");
-                    console.log('nav ' + nav + ' to: ' + to.month + '/' + to.year);
-                }
+                // continue button listener
+                document.getElementById("continue button").addEventListener('click', function (event) {
+                    var selectedlobby = -1;
+                    $('input:radio').each(function () {
+                        if (this.checked == true)
+                            selectedlobby = this.id;
+                    });
+                    if (selectedlobby == -1)
+                        alert("Please select a game.");
+                    else window.location.href = "/game/lobby/" + selectedlobby;
+                });
+                // delete button listener
+                document.getElementById("delete button").addEventListener('click', function (event) {
+                    var selectedlobby = -1;
+                    $('input:radio').each(function () {
+                        if (this.checked == true)
+                            selectedlobby = this.id;
+                    });
+                    if (selectedlobby == -1)
+                        alert("Please select a game.");
+                    else{
+                        alert("Game deleted.")
+                        window.location.href = "/game/lobby/" + selectedlobby + "/delete";
+                    }
+                });
             </script>
-
-
 </body>
 
 </html>

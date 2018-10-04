@@ -23,27 +23,17 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-md navbar-light bg-light">
-      <a class="navbar-brand" href="/">Mazelike</a>
+      <a class="navbar-brand" href="/account/dashboard">Mazelike</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="/game/new">New lobby</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/game/all">My games</a>
-          </li>
-          {{#if isHost}}
-            <li class="nav-item">
-            <a class="nav-link" href="/game/lobby/{{id}}/delete">Delete lobby</a>
-          </li>
-          {{/if}}
         </ul>
         <span class="navbar-text">
           {{#if user}}
-            {{user}}
+            {{user}} &nbsp; &nbsp; 
+            <a href="/account/dashboard"><button class="btn btn-primary" type="button" > Dashboard </button></a>
           {{else}}
             <a href="/account/login">Login</a>
           {{/if}}

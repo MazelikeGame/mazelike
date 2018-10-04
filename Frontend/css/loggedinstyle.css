@@ -1110,7 +1110,10 @@ PANELS CONFIGURATIONS
 
 /*White Panel */
 .white-panel {
-	text-align: center;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    text-align: center;
 	background: #ffffff;
 	color: #7a7d81;
 }
@@ -1120,6 +1123,11 @@ PANELS CONFIGURATIONS
 	font-weight: 700;
 	margin-left: 15px;
 }
+
+.white-panel section.content {
+    flex: 1;
+}
+
 .white-panel .white-header {
 	background: rgba(97, 150, 255, 0.39);
 	padding: 3px;
