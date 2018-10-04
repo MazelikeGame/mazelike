@@ -233,7 +233,7 @@ accountRouter.get('/dashboard', async(req, res) => {
   let lobbies = await sql.query(`
     SELECT l1.playerId, l1.lobbyId FROM lobbies l1
     WHERE l1.lobbyId IN (SELECT l.lobbyId FROM lobbies l WHERE l.playerId = :userId)
-    && l1.isHost = 1
+    AND l1.isHost = 1
     ORDER BY l1.lobbyId;`, {
     replacements: {
       userId: req.user.username
