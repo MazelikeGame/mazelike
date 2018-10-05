@@ -46,8 +46,10 @@ sock.on("lobby-add", ({id, playerId, image_name}) => {
   let playerItem = document.createElement("div");
   playerItem.setAttribute("class", "list-group-item d-flex justify-content-between align-items-center");
   playerItem.setAttribute("data-player-id", playerId);
-  playerItem.innerText = playerId;
   
+  let userInfo = document.createElement("div");
+  userInfo.setAttribute("class", "userinfo");
+
   let playerImage = document.createElement("img");
   if(image_name !== null) {
     playerImage.setAttribute("src", `../../public/images/${image_name}`);
@@ -56,8 +58,14 @@ sock.on("lobby-add", ({id, playerId, image_name}) => {
   }
   playerImage.setAttribute("class", "avatar rounded float-left");
 
+  let usernameElement = document.createElement("span");
+  usernameElement.setAttribute("class", "username");
+  usernameElement.innerText = playerId;
+
   group.appendChild(playerItem);
-  group.appendChild(playerImage);
+  playerItem.appendChild(userInfo);
+  userInfo.appendChild(playerImage);
+  userInfo.appendChild(usernameElement);
 
   // Create the drop link if we are the host
   if(hydrate.ishost === "true") {
