@@ -230,6 +230,28 @@ accountRouter.get('/forgot-password', function(req, res) {
   res.render('forgot-password');
 });
 
+accountRouter.post('/forgot-password', function(req, res) {
+  var userModel = new User(sql);
+
+  userModel.sync().then(() => {
+    userModel.findOne({
+      where: {
+        [Sequelize.Op.or]: [{ username: req.body.username }, {email: req.body.username}]
+      }
+    }).then((user) => {
+      if(user) {
+        res.render('forgot-password', {
+          accountFound: true
+        });
+      } else {
+        res.render('forgot-password', {
+          noEmailExists: true
+        });
+      }
+    });
+  });
+});
+
 accountRouter.get('/dashboard', function(req, res) {
   if(res.loginRedirect()) {
     return;
