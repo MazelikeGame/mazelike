@@ -1,10 +1,7 @@
-/* global PIXI io */
-import {KeyHandler, KEY_CODES} from "./input.js";
-
-let sock = io(location.host);
-
-let gameIdMatch = location.pathname.match(/\/game\/(.+)/);
-let gameId = gameIdMatch ? gameIdMatch[1] : "default";
+/* global PIXI  */
+/* eslint-disable complexity */
+import GameMap from "./game-map.js";
+import {KEY_CODES} from "./input.js";
 
 let app = new PIXI.Application({
   antialias: true
@@ -17,146 +14,76 @@ app.renderer.view.style.position = "absolute";
 app.renderer.view.style.display = "block";
 app.renderer.autoResize = true;
 
-let onresize = () => {
+window.onresize = () => {
   app.renderer.resize(innerWidth, innerHeight);
 };
 
-onresize();
+window.onresize();
 
-/**
- * VelocityMod takes an object, a direction, an up and a down key.
- * VelocityMod sets object.direction to 1 when up keys is pressed and to -1
- * when the down key is pressed.
- */
-class VelocityMod extends KeyHandler {
-  constructor(object, direction, upKey, downKey) {
-    super(upKey, downKey);
-    this.obj = object;
-    this.dir = direction;
-    this.upKey = upKey;
+let pageX = 0;
+let pageY = 0;
 
-    this.obj[this.dir] = 0;
-  }
-
-  onDown(key) {
-    this.obj[this.dir] = key === this.upKey ? 1 : -1;
-  }
-
-  onUp() {
-    this.obj[this.dir] = 0;
-  }
-}
-
-// the width and height of the grass square
-const GRASS_WIDTH = 45;
-const GRASS_HEIGHT = 41;
-
-const updatePlayers = (players, dogTexture) => {
-  for(let [_, player] of players) { // eslint-disable-line no-unused-vars
-    if(!player.sprite) {
-      player.sprite = new PIXI.Sprite(dogTexture);
-      player.sprite.scale.set(2, 2);
-      app.stage.addChild(player.sprite);
+window.addEventListener("keydown", (e) => {
+  if(e.keyCode === KEY_CODES.UP_ARROW) {
+    --pageY;
+    if(pageY < 0) {
+      pageY = 0;
     }
-
-    player.sprite.position.set(player.x, player.y);
   }
-};
+  
+  if(e.keyCode === KEY_CODES.DOWN_ARROW) {
+    ++pageY;
+    if(pageY > 10000) {
+      pageY = 10000;
+    }
+  }
+   
+  if(e.keyCode === KEY_CODES.LEFT_ARROW) {
+    --pageX;
+    if(pageX < 0) {
+      pageX = 0;
+    }
+  }
+  
+  if(e.keyCode === KEY_CODES.RIGHT_ARROW) {
+    ++pageX;
+    if(pageX > 10000) {
+      pageX = 10000;
+    }
+  }
+});
 
 function setup() {
-  // get the grass texture from the sprite sheet
-  let grassTexture = PIXI.loader.resources.floor.textures["0-0-box-big"];
+  let map = GameMap.generate();
+  let sprites = [];
+  let lastRender = Date.now();
 
-  // render the ground
-  for(let y = 0; y < innerHeight; y += GRASS_HEIGHT) {
-    for(let x = 0; x < innerWidth; x += GRASS_WIDTH) {
-      let floor = new PIXI.Sprite(grassTexture);
+  let fpsMsg = new PIXI.Text("Fps");
+  fpsMsg.position.set(10, 10);
+  app.stage.addChild(fpsMsg);
 
-      floor.x = x;
-      floor.y = y;
-
-      app.stage.addChild(floor);
-    }
-  }
-
-  let dogTexture = PIXI.loader.resources.dog.texture;
-  dogTexture.frame = new PIXI.Rectangle(0, 0, 16, 16);
-
-  let dog = new PIXI.Sprite(dogTexture);
-
-  // position the dog
-  dog.x = Math.floor(Math.random() * app.stage.width / 2);
-  dog.y = Math.floor(Math.random() * app.stage.height / 2);
-
-  dog.scale.set(2, 2);
-
-  // bind the dogs velocity values (vx and vy) to the arrow keys
-  new VelocityMod(dog, "vx", KEY_CODES.RIGHT_ARROW, KEY_CODES.LEFT_ARROW);
-  new VelocityMod(dog, "vy", KEY_CODES.DOWN_ARROW, KEY_CODES.UP_ARROW);
-
-  app.stage.addChild(dog);
-
-  let id;
-  let players = new Map();
-
-  // move the dog based on its velocity every 60th of a second
   app.ticker.add(() => {
-    dog.x += dog.vx;
-    dog.y += dog.vy;
+    let frameTime = Date.now() - lastRender;
+    fpsMsg.setText(`${frameTime}ms (${Math.round(1000 / frameTime)}fps)`);
+    lastRender = Date.now();
 
-    updatePlayers(players, dogTexture);
-
-    if(id && (dog.vx !== 0 || dog.vy !== 0)) {
-      sock.emit("position", {
-        id,
-        gameId,
-        x: dog.x,
-        y: dog.y
-      });
-    }
-  });
-
-  sock.on("id", (_id) => {
-    id = _id;
-
-    sock.emit("position", {
-      id,
-      gameId,
-      x: dog.x,
-      y: dog.y
-    });
-  });
-
-  sock.emit("ready", gameId);
-
-  sock.on("set", (pos) => {
-    if(pos.id === id || pos.gameId !== gameId) {
-      return;
+    while(sprites.length) {
+      app.stage.removeChild(sprites.pop());
     }
 
-    if(players.has(pos.id)) {
-      Object.assign(players.get(pos.id), pos);
-    } else {
-      players.set(pos.id, pos);
-    }
-  });
-
-  sock.on("remove", ({gameId: _gameId, id: _id}) => {
-    if(_gameId !== gameId) {
-      return;
+    for(let m of map.getMapFor(pageX, pageY, innerWidth + pageX, innerHeight + pageY)) {
+      let s = new PIXI.Sprite(PIXI.loader.resources.floor.textures[m.type]);
+      s.position.set(m.x - pageX, m.y - pageY);
+      app.stage.addChild(s);
+      sprites.push(s);
     }
 
-    let player = players.get(_id);
-    if(player) {
-      app.stage.removeChild(player.sprite);
-    }
-
-    players.delete(_id);
+    app.stage.removeChild(fpsMsg);
+    app.stage.addChild(fpsMsg);
   });
 }
 
 // load the textures
 PIXI.loader
   .add("floor", "DawnLike/Objects/Floor.json")
-  .add("dog", "DawnLike/Characters/Dog0.png")
   .load(setup);

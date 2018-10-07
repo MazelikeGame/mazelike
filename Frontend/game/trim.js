@@ -63,7 +63,7 @@ window.download = function() {
     return "No name given";
   }
 
-  let blob = new Blob([JSON.stringify(window.result.frames, null, 2)], { type: "application/json" });
+  let blob = new Blob([JSON.stringify(window.result, null, 2)], { type: "application/json" });
   let a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `${downName}.json`;
