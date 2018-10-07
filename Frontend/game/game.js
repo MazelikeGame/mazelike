@@ -2,6 +2,7 @@
 /* eslint-disable complexity */
 import GameMap from "./game-map.js";
 import {KEY_CODES} from "./input.js";
+import FpsCounter from "./fps-counter.js";
 
 let app = new PIXI.Application({
   antialias: true
@@ -19,6 +20,20 @@ window.onresize = () => {
 };
 
 window.onresize();
+
+let panTimer;
+
+window.ml.stopPan = function() {
+  clearInterval(panTimer);
+};
+
+window.ml.startPan = function() {
+  clearInterval(panTimer);
+  panTimer = setInterval(() => {
+    ++pageX;
+    ++pageY;
+  }, 1000 / 48);
+};
 
 let pageX = 0;
 let pageY = 0;
@@ -56,17 +71,9 @@ window.addEventListener("keydown", (e) => {
 function setup() {
   let map = GameMap.generate();
   let sprites = [];
-  let lastRender = Date.now();
-
-  let fpsMsg = new PIXI.Text("Fps");
-  fpsMsg.position.set(10, 10);
-  app.stage.addChild(fpsMsg);
+  let fps = new FpsCounter();
 
   app.ticker.add(() => {
-    let frameTime = Date.now() - lastRender;
-    fpsMsg.setText(`${frameTime}ms (${Math.round(1000 / frameTime)}fps)`);
-    lastRender = Date.now();
-
     while(sprites.length) {
       app.stage.removeChild(sprites.pop());
     }
@@ -78,8 +85,7 @@ function setup() {
       sprites.push(s);
     }
 
-    app.stage.removeChild(fpsMsg);
-    app.stage.addChild(fpsMsg);
+    fps.render(app);
   });
 }
 
