@@ -3,7 +3,8 @@ import {KeyHandler, KEY_CODES} from "./input.js";
 
 let sock = io(location.host);
 
-let gameId = location.pathname.match(/\/game\/(.+)/)[1];
+let gameIdMatch = location.pathname.match(/\/game\/(.+)/);
+let gameId = gameIdMatch ? gameIdMatch[1] : "default";
 
 let app = new PIXI.Application({
   antialias: true
@@ -64,8 +65,7 @@ const updatePlayers = (players, dogTexture) => {
 
 function setup() {
   // get the grass texture from the sprite sheet
-  let grassTexture = PIXI.loader.resources.floor.texture;
-  grassTexture.frame = new PIXI.Rectangle(114, 52, GRASS_WIDTH, GRASS_HEIGHT);
+  let grassTexture = PIXI.loader.resources.floor.textures["0-0-box-big"];
 
   // render the ground
   for(let y = 0; y < innerHeight; y += GRASS_HEIGHT) {
@@ -157,6 +157,6 @@ function setup() {
 
 // load the textures
 PIXI.loader
-  .add("floor", "DawnLike/Objects/Floor.png")
+  .add("floor", "DawnLike/Objects/Floor.json")
   .add("dog", "DawnLike/Characters/Dog0.png")
   .load(setup);
