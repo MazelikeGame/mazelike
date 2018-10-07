@@ -1,9 +1,11 @@
 /* global PIXI */
-
-let ml = window.ml || (window.ml = {});
+import {ml} from "./debug.js";
 
 ml.FPS_BUFFER_SIZE = 10;
 
+/**
+ * A basic fps counter
+ */
 export default class FpsCounter {
   constructor() {
     this._avgBuf = [];
@@ -12,6 +14,10 @@ export default class FpsCounter {
     this._text.position.set(10, 10);
   }
 
+  /**
+   * Update and render the fps counter (should be called every frame)
+   * @param {PIXI.Application} app The current PIXI app
+   */
   render(app) {
     let now = Date.now();
     

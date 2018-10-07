@@ -3,6 +3,7 @@
 import GameMap from "./game-map.js";
 import {KEY_CODES} from "./input.js";
 import FpsCounter from "./fps-counter.js";
+import {command} from "./debug.js";
 
 let app = new PIXI.Application({
   antialias: true
@@ -21,19 +22,17 @@ window.onresize = () => {
 
 window.onresize();
 
-let panTimer;
+command("stopPan", function() {
+  clearInterval(this._panTimer);
+});
 
-window.ml.stopPan = function() {
-  clearInterval(panTimer);
-};
-
-window.ml.startPan = function() {
-  clearInterval(panTimer);
-  panTimer = setInterval(() => {
+command("startPan", function() {
+  clearInterval(this._panTimer);
+  this._panTimer = setInterval(() => {
     ++pageX;
     ++pageY;
   }, 1000 / 48);
-};
+});
 
 let pageX = 0;
 let pageY = 0;
