@@ -71,24 +71,32 @@ window.addEventListener("keydown", (e) => {
 function setup() {
   let map = GameMap.generate([
     {
-      size: {
-        width: 1,
-        height: 1
-      },
+      width: 1,
+      height: 1,
       generate($map, x, y) {
         $map.set(x, y, "0-0-box-big");
       }
     },
     {
-      size: {
-        width: 2,
-        height: 2
-      },
+      width: 2,
+      height: 2,
       generate($map, x, y) {
         $map.set(x, y, "1-0-box-big");
         $map.set(x + 1, y, "2-0-box-big");
         $map.set(x, y + 1, "2-0-box-big");
         $map.set(x + 1, y + 1, "1-0-box-big");
+      }
+    },
+    {
+      width: 4,
+      height: 4,
+      rarity: 0.1,
+      generate($map, mx, my) {
+        for(let y = my; y < my + 4; ++y) {
+          for(let x = mx; x < mx + 4; ++x) {
+            $map.set(x, y, "0-6-box-big");
+          }
+        }
       }
     }
   ]);

@@ -41,11 +41,16 @@ export default class GameMap {
         // try to find a generator that fits
         for(;;) {
           let generator = generators[Math.floor(Math.random() * generators.length)];
+
+          if((generator.rarity || 1) < Math.random()) {
+            continue;
+          }
+
           let fits = true;
           
           // Check all the blocks that this generator wants to use to ensure they are empty
-          for(let yf = y; yf < generator.size.height + y && fits; ++yf) {
-            for(let xf = x; xf < generator.size.width + x && fits; ++xf) {
+          for(let yf = y; yf < generator.height + y && fits; ++yf) {
+            for(let xf = x; xf < generator.width + x && fits; ++xf) {
               fits = yf < SIZE &&
                 xf < SIZE &&
                 !map.map[d2(xf, yf)];
@@ -56,7 +61,7 @@ export default class GameMap {
             continue;
           }
 
-          debugGen.log(`Using generator ${generator.name} ${generator.size.width}x${generator.size.height} at (${x}, ${y})`);
+          debugGen.log(`Using generator ${generator.name} ${generator.width}x${generator.height} at (${x}, ${y})`);
           generator.generate(map, x, y);
           break;
         }
