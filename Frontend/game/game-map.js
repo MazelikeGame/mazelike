@@ -24,17 +24,6 @@ const d12 = (i, size = SIZE) => {
 };
 
 /**
- * Make sure that a child map exists at key in the map parent
- * @param {*} parent 
- * @param {*} key 
- */
-const ensureMap = (parent, key) => {
-  if(!parent.has(key)) {
-    parent.set(key, new Map());
-  }
-};
-
-/**
  * A map for a game
  */
 export default class GameMap {
@@ -49,10 +38,7 @@ export default class GameMap {
   static generate() {
     let map = new GameMap();
     
-    let {edges, boxes} = generateMap(generateMaze());
-
-    map.edges = edges;
-    map.boxes = boxes;
+    Object.assign(map, generateMap(generateMaze()));
 
     map._buildMap();
 
@@ -101,8 +87,8 @@ export default class GameMap {
       }
 
       // render the corridor to the box to the left
-      if(i % SIZE > 0 && this.edges.get(i).has(i - 1)) {
-        let edge = this.edges.get(i).get(i - 1);
+      if(i % SIZE > 0 && this.edges[i][i - 1]) {
+        let edge = this.edges[i][i - 1];
 
         for(let bx = edge.x; bx <= edge.x + edge.weight; ++bx) {
           this.map[d21(bx, edge.y, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
@@ -111,8 +97,8 @@ export default class GameMap {
       }
       
       // render the corridor to the box above
-      if(i >= SIZE && this.edges.get(i).has(i - SIZE)) {
-        let edge = this.edges.get(i).get(i - SIZE);
+      if(i >= SIZE && this.edges[i][i - SIZE]) {
+        let edge = this.edges[i][i - SIZE];
 
         for(let by = edge.y; by <= edge.y + edge.weight; ++by) {
           this.map[d21(edge.x, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
@@ -120,6 +106,31 @@ export default class GameMap {
         }
       }
     }
+  }
+
+  /**
+   * Serialize the game map
+   */
+  serialize() {
+    return JSON.stringify({
+      edges: this.edges,
+      boxes: this.boxes
+    });
+  }
+
+  /**
+   * Parse a previously serialized map
+   * @param {*} The serialized map
+   * @returns {GameMap}
+   */
+  static parse(raw) {
+    let map = new GameMap();
+
+    Object.assign(map, JSON.parse(raw));
+
+    map._buildMap();
+
+    return map;
   }
 }
 
@@ -174,21 +185,15 @@ const generateMaze = () => {
 
     // create the edges for the corridors
     if(!corridors.has(toCell)) {
-      corridors.set(toCell, {
-        edges: new Set(),
-        weights: new Map()
-      });
+      corridors.set(toCell, new Set());
     }
 
     if(!corridors.has(current)) {
-      corridors.set(current, {
-        edges: new Set(),
-        weights: new Map()
-      });
+      corridors.set(current, new Set());
     }
 
-    corridors.get(toCell).edges.add(current);
-    corridors.get(current).edges.add(toCell);
+    corridors.get(toCell).add(current);
+    corridors.get(current).add(toCell);
 
     stack.push(toCell);
   }
@@ -210,7 +215,7 @@ const generateMap = (corridors) => {
   // Location width and heights of all boxes
   let boxes = [];
   // More detailed edge representations
-  let edges = new Map();
+  let edges = {};
 
   // Place boxes/rooms onto the map
   for(let i = 0; i < NODES; ++i) {
@@ -225,7 +230,7 @@ const generateMap = (corridors) => {
     let height = 2;
 
     // determine if this box should be a room
-    if(Math.random() < ROOM_CHANCE || corridors.get(i).edges.size === 1) {
+    if(Math.random() < ROOM_CHANCE || corridors.get(i).size === 1) {
       width = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
       height = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
     }
@@ -238,7 +243,7 @@ const generateMap = (corridors) => {
     maxHeight = Math.max(height, maxHeight);
 
     // Render a corridor to the box to our left (if there is one)
-    if(i % SIZE > 0 && corridors.get(i).edges.has(i - 1)) {
+    if(i % SIZE > 0 && corridors.get(i).has(i - 1)) {
       let box = boxes[i - 1];
 
       // find a row that we have in common
@@ -253,15 +258,17 @@ const generateMap = (corridors) => {
         y: y + yOffset
       };
 
-      ensureMap(edges, i);
-      ensureMap(edges, i - 1);
+      /* eslint-disable no-unused-expressions */
+      edges[i] || (edges[i] = {});
+      edges[i - 1] || (edges[i - 1] = {});
+      /* eslint-enable no-unused-expressions */
 
-      edges.get(i).set(i - 1, edge);
-      edges.get(i - 1).set(i, edge); 
+      edges[i][i - 1] = edge;
+      edges[i - 1][i] = edge;
     }
 
     // Render a corridor to the box above us
-    if(y > 0 && corridors.get(i).edges.has(i - SIZE)) {
+    if(y > 0 && corridors.get(i).has(i - SIZE)) {
       let box = boxes[i - SIZE];
 
       // find a column that we have in common
@@ -277,11 +284,13 @@ const generateMap = (corridors) => {
         y: box.y + box.height
       };
 
-      ensureMap(edges, i);
-      ensureMap(edges, i - SIZE);
+      /* eslint-disable no-unused-expressions */
+      edges[i] || (edges[i] = {});
+      edges[i - SIZE] || (edges[i - SIZE] = {});
+      /* eslint-enable no-unused-expressions */
 
-      edges.get(i).set(i - SIZE, edge);
-      edges.get(i - SIZE).set(i, edge); 
+      edges[i][i - SIZE] = edge;
+      edges[i - SIZE][i] = edge;
     }
 
     x += width + 1;
