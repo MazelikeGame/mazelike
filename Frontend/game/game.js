@@ -17,11 +17,12 @@ app.renderer.view.style.display = "block";
 app.renderer.autoResize = true;
 
 window.onresize = () => {
-  app.renderer.resize(innerWidth, innerHeight);
+  app.renderer.resize(innerWidth - 1, innerHeight - 1);
 };
 
 window.onresize();
 
+// Pan commands for
 command("stopPan", function() {
   clearInterval(this._panTimer);
 });
@@ -39,28 +40,28 @@ let pageY = 0;
 
 window.addEventListener("keydown", (e) => {
   if(e.keyCode === KEY_CODES.UP_ARROW) {
-    --pageY;
+    pageY -= 10;
     if(pageY < 0) {
       pageY = 0;
     }
   }
   
   if(e.keyCode === KEY_CODES.DOWN_ARROW) {
-    ++pageY;
+    pageY += 10;
     if(pageY > 10000) {
       pageY = 10000;
     }
   }
    
   if(e.keyCode === KEY_CODES.LEFT_ARROW) {
-    --pageX;
+    pageX -= 10;
     if(pageX < 0) {
       pageX = 0;
     }
   }
   
   if(e.keyCode === KEY_CODES.RIGHT_ARROW) {
-    ++pageX;
+    pageX += 10;
     if(pageX > 10000) {
       pageX = 10000;
     }
