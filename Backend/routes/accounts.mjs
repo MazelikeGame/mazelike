@@ -235,10 +235,8 @@ accountRouter.get('/forgot-password', function(req, res) {
 
 accountRouter.post('/forgot-password', async(req, res) => {
   var userModel = new User(sql);
-  let token = await crypto.randomBytes(20, (err, buf) => {
-    var token = buf.toString('hex');
-  });
-
+  const buf = crypto.randomBytes(20);
+  var token = buf.toString('hex');
   let user = await userModel.findOne({
     where: {
       username: req.body.username
@@ -249,16 +247,8 @@ accountRouter.post('/forgot-password', async(req, res) => {
       noUserExists: true
     });
   } else {
-    let values = {
-      resetPasswordToken: token,
-      resetPasswordExpires: Date.now() + 3600000
-    };
-    let selector = {
-      where: {
-        username: req.body.username
-      }
-    };
-    await userModel.update(values, selector);
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000;
   }
 
   let smtpTransport = nodemailer.createTransport({
@@ -272,8 +262,11 @@ accountRouter.post('/forgot-password', async(req, res) => {
     from: process.env.MAILER_EMAIL_ID,
     to: user.email,
     subject: 'MazeLike Password Reset',
-    text: 'This is a test'
+    text: 'Greetings ' + req.body.username + ',\n\nPlease click the following link, or paste this into your browser to complete the process.\n\n' +
+    ' http://' + req.headers.host + '/account/reset/' + token + ' \n\n' +
+    'If you did not request this, please ignore this email and your password will remain unchanged.\n\nThank you,\nMazeLike'
   };
+  console.log(mailOptions);
   let sendMail = await smtpTransport.sendMail(mailOptions, (err) => {
     if(err) {
       return res.render('forgot-password', {
