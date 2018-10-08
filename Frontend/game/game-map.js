@@ -1,13 +1,11 @@
 /* eslint-disable complexity,no-extra-parens,no-mixed-operators */
-// import {dbgLog} from "./debug.js";
-// let debugGen = dbgLog("generator");
 
-const BLOCK_SIZE = 48;
-const BLOCK_TYPE = "0-1-box-big";
-const SIZE = 10;
+const BLOCK_SIZE = 16;
+const BLOCK_TYPE = "0-1-box-small";
+const SIZE = 6;
 const NODES = SIZE ** 2;
 const MIN_ROOM = 4;
-const MAX_ROOM = 10;
+const MAX_ROOM = 6;
 const MAX_Y_DIST = 3;
 const ROOM_CHANCE = 0.2;
 const MAX_SCREEN_WIDTH = SIZE * (MAX_ROOM + MAX_Y_DIST);
@@ -98,14 +96,18 @@ export default class GameMap {
       stack.push(toCell);
     }
 
+    // Coords for the room we are placing
     let x = 1;
     let y = 1;
+    // Height of the tallest room in this row
     let maxHeight = 0;
-    let rowLength = Math.sqrt(NODES);
+    // Location width and heights of all boxes
     let boxes = [];
 
+    // Place boxes/rooms onto the map
     for(let i = 0; i < NODES; ++i) {
-      if(i % rowLength === 0 && i > 0) {
+      // We are at the end of this row tart a new row
+      if(i % SIZE === 0 && i > 0) {
         x = 1;
         y += maxHeight + Math.floor(Math.random() * (MAX_Y_DIST - 1)) + 1;
         maxHeight = 0;
@@ -114,6 +116,7 @@ export default class GameMap {
       let width = 1;
       let height = 1;
 
+      // determine if this box should be a room
       if(Math.random() < ROOM_CHANCE || corridors.get(i).size === 1) {
         width = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
         height = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
@@ -121,18 +124,23 @@ export default class GameMap {
 
       x += Math.max(MAX_ROOM - width, 0);
 
+      // save for corridor rendering
       boxes.push({x, y, width, height});
 
       maxHeight = Math.max(height, maxHeight);
 
+      // render the box
       for(let by = y; by < y + height; ++by) {
         for(let bx = x; bx < x + width; ++bx) {
           map.map[d21(bx, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
         }
       }
 
-      if(i % rowLength > 0 && corridors.get(i).has(i - 1)) {
+      // Render a corridor to the box to our left (if there is one)
+      if(i % SIZE > 0 && corridors.get(i).has(i - 1)) {
         let box = boxes[i - 1];
+
+        // find a row that we have in common
         let sharedHeight = Math.min(box.height, height);
         let yOffset = Math.floor(Math.random() * sharedHeight);
 
@@ -141,8 +149,11 @@ export default class GameMap {
         }
       }
 
+      // Render a corridor to the box above us
       if(y > 0 && corridors.get(i).has(i - SIZE)) {
         let box = boxes[i - SIZE];
+
+        // find a column that we have in common
         let xStart = Math.max(x, box.x);
         let sharedWidth = Math.min(width - (x - xStart), box.width - (box.x - xStart));
         let xPos = Math.floor(Math.random() * sharedWidth) + xStart;
