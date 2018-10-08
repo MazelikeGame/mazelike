@@ -1,11 +1,11 @@
 /* eslint-disable complexity,no-extra-parens,no-mixed-operators */
 
-const BLOCK_SIZE = 16;
-const BLOCK_TYPE = "0-1-box-small";
-const SIZE = 6;
+const BLOCK_SIZE = 48;
+const BLOCK_TYPE = "0-1-box-big";
+const SIZE = 10;
 const NODES = SIZE ** 2;
 const MIN_ROOM = 4;
-const MAX_ROOM = 6;
+const MAX_ROOM = 10;
 const MAX_Y_DIST = 3;
 const ROOM_CHANCE = 0.2;
 const MAX_SCREEN_WIDTH = SIZE * (MAX_ROOM + MAX_Y_DIST);
@@ -113,8 +113,8 @@ export default class GameMap {
         maxHeight = 0;
       }
 
-      let width = 1;
-      let height = 1;
+      let width = 2;
+      let height = 2;
 
       // determine if this box should be a room
       if(Math.random() < ROOM_CHANCE || corridors.get(i).size === 1) {
@@ -141,11 +141,12 @@ export default class GameMap {
         let box = boxes[i - 1];
 
         // find a row that we have in common
-        let sharedHeight = Math.min(box.height, height);
+        let sharedHeight = Math.min(box.height, height) - 1;
         let yOffset = Math.floor(Math.random() * sharedHeight);
 
         for(let bx = x - 1; bx >= box.x + box.width; --bx) {
           map.map[d21(bx, y + yOffset, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+          map.map[d21(bx, y + yOffset + 1, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
         }
       }
 
@@ -155,11 +156,12 @@ export default class GameMap {
 
         // find a column that we have in common
         let xStart = Math.max(x, box.x);
-        let sharedWidth = Math.min(width - (x - xStart), box.width - (box.x - xStart));
+        let sharedWidth = Math.min(width - (x - xStart), box.width - (box.x - xStart)) - 1;
         let xPos = Math.floor(Math.random() * sharedWidth) + xStart;
 
         for(let by = y - 1; by >= box.y + box.height; --by) {
           map.map[d21(xPos, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+          map.map[d21(xPos + 1, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
         }
       }
 
