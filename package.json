@@ -22,6 +22,7 @@
     "mysql2": "^1.6.1",
     "nodemailer": "^4.6.8",
     "sequelize": "^4.38.1",
+    "sequelize-cli": "^4.1.1",
     "socket.io": "^2.1.1",
     "sqlite": "^3.0.0",
     "winston": "^3.1.0"
