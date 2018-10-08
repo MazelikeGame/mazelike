@@ -148,13 +148,6 @@ export default class GameMap {
 
       maxHeight = Math.max(height, maxHeight);
 
-      // render the box
-      for(let by = y; by < y + height; ++by) {
-        for(let bx = x; bx < x + width; ++bx) {
-          map.map[d21(bx, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-        }
-      }
-
       // Render a corridor to the box to our left (if there is one)
       if(i % SIZE > 0 && corridors.get(i).edges.has(i - 1)) {
         let box = boxes[i - 1];
@@ -167,7 +160,7 @@ export default class GameMap {
         let edge = {
           weight: x - (box.x + box.width),
           xDir: true,
-          x: x - 1,
+          x: box.x + box.width,
           y: y + yOffset
         };
 
@@ -175,12 +168,7 @@ export default class GameMap {
         ensureMap(edges, i - 1);
 
         edges.get(i).set(i - 1, edge);
-        edges.get(i - 1).set(i, edge);
-
-        for(let bx = x - 1; bx >= box.x + box.width; --bx) {
-          map.map[d21(bx, y + yOffset, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-          map.map[d21(bx, y + yOffset + 1, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-        }
+        edges.get(i - 1).set(i, edge); 
       }
 
       // Render a corridor to the box above us
@@ -204,12 +192,7 @@ export default class GameMap {
         ensureMap(edges, i - SIZE);
 
         edges.get(i).set(i - SIZE, edge);
-        edges.get(i - SIZE).set(i, edge);
-
-        for(let by = y - 1; by >= box.y + box.height; --by) {
-          map.map[d21(xPos, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-          map.map[d21(xPos + 1, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-        }
+        edges.get(i - SIZE).set(i, edge); 
       }
 
       x += width + 1;
@@ -217,6 +200,8 @@ export default class GameMap {
 
     map.edges = edges;
     map.boxes = boxes;
+
+    map._buildMap();
 
     return map;
   }
@@ -244,5 +229,43 @@ export default class GameMap {
     }
 
     return out;
+  }
+
+  /**
+   * Generate the tile matrix based on the graph
+   */
+  _buildMap() {
+    this.map = [];
+
+    for(let i = 0; i < this.boxes.length; ++i) {
+      let box = this.boxes[i];
+
+      // render the box
+      for(let by = box.y; by < box.y + box.height; ++by) {
+        for(let bx = box.x; bx < box.x + box.width; ++bx) {
+          this.map[d21(bx, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+        }
+      }
+
+      // render the corridor to the box to the left
+      if(i % SIZE > 0 && this.edges.get(i).has(i - 1)) {
+        let edge = this.edges.get(i).get(i - 1);
+
+        for(let bx = edge.x; bx <= edge.x + edge.weight; ++bx) {
+          this.map[d21(bx, edge.y, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+          this.map[d21(bx, edge.y + 1, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+        }
+      }
+      
+      // render the corridor to the box above
+      if(i >= SIZE && this.edges.get(i).has(i - SIZE)) {
+        let edge = this.edges.get(i).get(i - SIZE);
+
+        for(let by = edge.y; by <= edge.y + edge.weight; ++by) {
+          this.map[d21(edge.x, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+          this.map[d21(edge.x + 1, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+        }
+      }
+    }
   }
 }
