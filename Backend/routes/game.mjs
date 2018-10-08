@@ -109,7 +109,7 @@ gameRouter.get("/lobby/:id", async(req, res) => {
   }
 
   /*
-  //Two querys...
+  //Multiple queries...
   for(var i = 0; i < players.length; i++) {
     var result = await sql.query(`SELECT image_name FROM users WHERE username = '${players[i].id}'`);
     players[i].image_name = result[0][0].image_name;
