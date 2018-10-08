@@ -246,11 +246,10 @@ accountRouter.post('/forgot-password', async(req, res) => {
     return res.render('forgot-password', {
       noUserExists: true
     });
-  } else {
-    user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 3600000;
-    user.save();
   }
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = Date.now() + 3600000;
+  user.save();
 
   let smtpTransport = nodemailer.createTransport({
     service: process.env.MAILER_SERVICE_PROVIDER,
@@ -263,10 +262,14 @@ accountRouter.post('/forgot-password', async(req, res) => {
     from: process.env.MAILER_EMAIL_ID,
     to: user.email,
     subject: 'MazeLike Password Reset',
-    text: 'Greetings ' + req.body.username + ',\n\nPlease click the following link, or paste this into your browser to complete the process.\n\n' +
+    // eslint-disable-next-line prefer-template
+    text: 'Greetings ' + req.body.username +
+    ',\n\nPlease click the following link, or paste this into your browser to complete the process.\n\n' +
     ' http://' + req.headers.host + '/account/reset/' + token + ' \n\n' +
-    'If you did not request this, please ignore this email and your password will remain unchanged.\n\nThank you,\nMazeLike'
+    'If you did not request this, please ignore this email and your password will remain unchanged.' +
+    '\n\nThank you,\nMazeLike'
   };
+  // eslint-disable-next-line
   let sendMail = await smtpTransport.sendMail(mailOptions, (err) => {
     if(err) {
       return res.render('forgot-password', {
@@ -274,7 +277,7 @@ accountRouter.post('/forgot-password', async(req, res) => {
       });
     }
   });
-  res.render('forgot-password', {
+  return res.render('forgot-password', {
     accountFound: true
   });
 });
@@ -291,7 +294,7 @@ accountRouter.get('/reset/:token', async(req, res) => {
       badError: 'Password reset token is invalid or has expired. '.concat(user)
     });
   }
-  res.render('reset_password', {
+  return res.render('reset_password', {
     token: req.params.token,
     username: user.username
   });
