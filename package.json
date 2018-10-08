@@ -5,7 +5,8 @@
     "test": "jasmine",
     "start": "node --experimental-modules Backend/index.mjs",
     "doc": "jsdoc -r Frontend Backend -d Documents",
-    "eslint": "eslint Frontend Backend --ext .js,.mjs"
+    "eslint": "eslint Frontend Backend --ext .js,.mjs",
+    "debug": "node --experimental-modules --inspect Backend/index.mjs"
   },
   "license": "ISC",
   "dependencies": {
