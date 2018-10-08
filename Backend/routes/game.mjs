@@ -101,13 +101,19 @@ gameRouter.get("/lobby/:id", async(req, res) => {
     return player.id;
   });
 
-  let playerImages = await sql.query(`SELECT image_name FROM users WHERE username IN (?)`, { 
-    replacements: usernames, 
+  let playerImages = await sql.query(`SELECT image_name, username FROM users WHERE username IN (:usernames)`, { 
+    replacements: {
+      usernames: usernames
+    }, 
     type: sql.QueryTypes.SELECT 
   });
  
-  playerImages.forEach((image, index) => {
-    players[index].image_name = image.image_name;
+  playerImages.forEach((image) => {
+    players.forEach((player) => {
+      if(player.id === image.username) {
+        player.image_name = image.image_name;
+      }
+    });
   });
 
   let isHost = host.playerId === req.user.username;
