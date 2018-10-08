@@ -3,7 +3,14 @@
 // let debugGen = dbgLog("generator");
 
 const BLOCK_SIZE = 16;
-let SIZE = 20;
+const BLOCK_TYPE = "0-1-box-small";
+const SIZE = 8;
+const NODES = SIZE ** 2;
+const MIN_ROOM = 3;
+const MAX_ROOM = 6;
+const MAX_Y_DIST = 3;
+const ROOM_CHANCE = 0.25;
+const MAX_SCREEN_WIDTH = SIZE * (MAX_ROOM + MAX_Y_DIST);
 
 /**
  * Map a 2d coordinate to a 1d coordinate
@@ -36,7 +43,7 @@ export default class GameMap {
     let corridors = new Map();
     let stack = [];
 
-    for(let i = 0; i < SIZE ** 2; ++i) {
+    for(let i = 0; i < NODES; ++i) {
       unvisited.add(i);
     }
 
@@ -91,18 +98,61 @@ export default class GameMap {
       stack.push(toCell);
     }
 
-    SIZE *= 2;
+    let x = 1;
+    let y = 1;
+    let maxHeight = 0;
+    let rowLength = Math.sqrt(NODES);
+    let boxes = [];
 
-    for(let i = 0; i < (SIZE / 2) ** 2; ++i) {
-      let [x, y] = d12(i, SIZE / 2);
-      x *= 2;
-      y *= 2;
-      map.map[d21(x, y)] = "0-0-box-small";
+    for(let i = 0; i < NODES; ++i) {
+      if(i % rowLength === 0 && i > 0) {
+        x = 1;
+        y += maxHeight + Math.floor(Math.random() * (MAX_Y_DIST - 1)) + 1;
+        maxHeight = 0;
+      }
 
-      /* eslint-disable max-len */
-      map.map[d21(x + 1, y)] = (corridors.get(i) || new Set()).has(d21(x / 2 + 1, y / 2, SIZE / 2)) ? "0-1-box-small" : "";
-      map.map[d21(x, y + 1)] = (corridors.get(i) || new Set()).has(d21(x / 2, y / 2 + 1, SIZE / 2)) ? "0-1-box-small" : "";
-      /* eslint-enable max-len */
+      let width = 1;
+      let height = 1;
+
+      if(Math.random() < ROOM_CHANCE) {
+        width = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
+        height = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
+      }
+
+      x += Math.max(MAX_ROOM - width, 0);
+
+      boxes.push({x, y, width, height});
+
+      maxHeight = Math.max(height, maxHeight);
+
+      for(let by = y; by < y + height; ++by) {
+        for(let bx = x; bx < x + width; ++bx) {
+          map.map[d21(bx, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+        }
+      }
+
+      if(i % rowLength > 0 && corridors.get(i).has(i - 1)) {
+        let box = boxes[i - 1];
+        let sharedHeight = Math.min(box.height, height);
+        let yOffset = Math.floor(Math.random() * sharedHeight);
+
+        for(let bx = x - 1; bx >= box.x + box.width; --bx) {
+          map.map[d21(bx, y + yOffset, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+        }
+      }
+
+      if(y > 0 && corridors.get(i).has(i - SIZE)) {
+        let box = boxes[i - SIZE];
+        let xStart = Math.max(x, box.x);
+        let sharedWidth = Math.min(width - (x - xStart), box.width - (box.x - xStart));
+        let xPos = Math.floor(Math.random() * sharedWidth) + xStart;
+
+        for(let by = y - 1; by >= box.y + box.height; --by) {
+          map.map[d21(xPos, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+        }
+      }
+
+      x += width + 1;
     }
 
     return map;
@@ -111,14 +161,14 @@ export default class GameMap {
   getMapFor(xMin, yMin, xMax, yMax) {
     let out = [];
 
-    for(let y = Math.floor(yMin / BLOCK_SIZE); y < Math.ceil(yMax / BLOCK_SIZE) && y < SIZE; ++y) {
-      for(let x = Math.floor(xMin / BLOCK_SIZE); x < Math.ceil(xMax / BLOCK_SIZE) && x < SIZE; ++x) {
+    for(let y = Math.floor(yMin / BLOCK_SIZE); y < Math.ceil(yMax / BLOCK_SIZE) && y < MAX_SCREEN_WIDTH; ++y) {
+      for(let x = Math.floor(xMin / BLOCK_SIZE); x < Math.ceil(xMax / BLOCK_SIZE) && x < MAX_SCREEN_WIDTH; ++x) {
         out.push({
           x: x * BLOCK_SIZE,
           y: y * BLOCK_SIZE,
           width: BLOCK_SIZE,
           height: BLOCK_SIZE,
-          type: this.map[d21(x, y)]
+          type: this.map[d21(x, y, MAX_SCREEN_WIDTH)]
         });
       }
     }
