@@ -97,12 +97,16 @@ gameRouter.get("/lobby/:id", async(req, res) => {
     };
   });
 
-  //One query...
   var tempPlayers = [];
-  for(var i = 0; i < players.length; i++) {
-    tempPlayers.push("'" + players[i].id + "'"); // eslint-disable-line
-  }
-  let playerImages = await sql.query(`SELECT image_name FROM users WHERE username IN (${tempPlayers})`);
+
+  players.forEach((player) => { 
+    tempPlayers.push(player.id);
+  });
+
+  let playerImages = await sql.query(`SELECT image_name FROM users WHERE username IN (?)`, { 
+    replacements: tempPlayers, 
+    type: sql.QueryTypes.SELECT 
+  });
 
   for(var j = 0; j < playerImages[0].length; j++) {
     players[j].image_name = playerImages[0][j].image_name;
