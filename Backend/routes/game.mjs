@@ -97,27 +97,18 @@ gameRouter.get("/lobby/:id", async(req, res) => {
     };
   });
 
-  var tempPlayers = [];
-
-  players.forEach((player) => { 
-    tempPlayers.push(player.id);
+  let usernames = players.map((player) => {
+    return player.id;
   });
 
   let playerImages = await sql.query(`SELECT image_name FROM users WHERE username IN (?)`, { 
-    replacements: tempPlayers, 
+    replacements: usernames, 
     type: sql.QueryTypes.SELECT 
   });
-
-  for(var j = 0; j < playerImages[0].length; j++) {
-    players[j].image_name = playerImages[0][j].image_name;
-  }
-
-  /*
-  //Multiple queries...
-  for(var i = 0; i < players.length; i++) {
-    var result = await sql.query(`SELECT image_name FROM users WHERE username = '${players[i].id}'`);
-    players[i].image_name = result[0][0].image_name;
-  }*/
+ 
+  playerImages.forEach((image, index) => {
+    players[index].image_name = image.image_name;
+  });
 
   let isHost = host.playerId === req.user.username;
 
