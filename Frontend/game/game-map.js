@@ -2,14 +2,14 @@
 // import {dbgLog} from "./debug.js";
 // let debugGen = dbgLog("generator");
 
-const BLOCK_SIZE = 16;
-const BLOCK_TYPE = "0-1-box-small";
-const SIZE = 8;
+const BLOCK_SIZE = 48;
+const BLOCK_TYPE = "0-1-box-big";
+const SIZE = 10;
 const NODES = SIZE ** 2;
-const MIN_ROOM = 3;
-const MAX_ROOM = 6;
+const MIN_ROOM = 4;
+const MAX_ROOM = 10;
 const MAX_Y_DIST = 3;
-const ROOM_CHANCE = 0.25;
+const ROOM_CHANCE = 0.2;
 const MAX_SCREEN_WIDTH = SIZE * (MAX_ROOM + MAX_Y_DIST);
 
 /**
@@ -114,7 +114,7 @@ export default class GameMap {
       let width = 1;
       let height = 1;
 
-      if(Math.random() < ROOM_CHANCE) {
+      if(Math.random() < ROOM_CHANCE || corridors.get(i).size === 1) {
         width = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
         height = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
       }

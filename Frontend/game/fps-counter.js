@@ -10,7 +10,9 @@ export default class FpsCounter {
   constructor() {
     this._avgBuf = [];
     this._lastFrame = 0;
-    this._text = new PIXI.Text("Loading");
+    this._text = new PIXI.Text("Loading", new PIXI.TextStyle({
+      fill: "#fff"
+    }));
     this._text.position.set(10, 10);
   }
 
