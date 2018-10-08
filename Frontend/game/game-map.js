@@ -24,6 +24,17 @@ const d12 = (i, size = SIZE) => {
 };
 
 /**
+ * Make sure that a child map exists at key in the map parent
+ * @param {*} parent 
+ * @param {*} key 
+ */
+const ensureMap = (parent, key) => {
+  if(!parent.has(key)) {
+    parent.set(key, new Map());
+  }
+};
+
+/**
  * A map for a game
  */
 export default class GameMap {
@@ -83,15 +94,21 @@ export default class GameMap {
 
       // create the edges for the corridors
       if(!corridors.has(toCell)) {
-        corridors.set(toCell, new Set());
+        corridors.set(toCell, {
+          edges: new Set(),
+          weights: new Map()
+        });
       }
 
       if(!corridors.has(current)) {
-        corridors.set(current, new Set());
+        corridors.set(current, {
+          edges: new Set(),
+          weights: new Map()
+        });
       }
 
-      corridors.get(toCell).add(current);
-      corridors.get(current).add(toCell);
+      corridors.get(toCell).edges.add(current);
+      corridors.get(current).edges.add(toCell);
 
       stack.push(toCell);
     }
@@ -103,6 +120,8 @@ export default class GameMap {
     let maxHeight = 0;
     // Location width and heights of all boxes
     let boxes = [];
+    // More detailed edge representations
+    let edges = new Map();
 
     // Place boxes/rooms onto the map
     for(let i = 0; i < NODES; ++i) {
@@ -117,7 +136,7 @@ export default class GameMap {
       let height = 2;
 
       // determine if this box should be a room
-      if(Math.random() < ROOM_CHANCE || corridors.get(i).size === 1) {
+      if(Math.random() < ROOM_CHANCE || corridors.get(i).edges.size === 1) {
         width = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
         height = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
       }
@@ -137,12 +156,26 @@ export default class GameMap {
       }
 
       // Render a corridor to the box to our left (if there is one)
-      if(i % SIZE > 0 && corridors.get(i).has(i - 1)) {
+      if(i % SIZE > 0 && corridors.get(i).edges.has(i - 1)) {
         let box = boxes[i - 1];
 
         // find a row that we have in common
         let sharedHeight = Math.min(box.height, height) - 1;
         let yOffset = Math.floor(Math.random() * sharedHeight);
+
+        // Add weights to the graph
+        let edge = {
+          weight: x - (box.x + box.width),
+          xDir: true,
+          x: x - 1,
+          y: y + yOffset
+        };
+
+        ensureMap(edges, i);
+        ensureMap(edges, i - 1);
+
+        edges.get(i).set(i - 1, edge);
+        edges.get(i - 1).set(i, edge);
 
         for(let bx = x - 1; bx >= box.x + box.width; --bx) {
           map.map[d21(bx, y + yOffset, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
@@ -151,13 +184,27 @@ export default class GameMap {
       }
 
       // Render a corridor to the box above us
-      if(y > 0 && corridors.get(i).has(i - SIZE)) {
+      if(y > 0 && corridors.get(i).edges.has(i - SIZE)) {
         let box = boxes[i - SIZE];
 
         // find a column that we have in common
         let xStart = Math.max(x, box.x);
         let sharedWidth = Math.min(width - (x - xStart), box.width - (box.x - xStart)) - 1;
         let xPos = Math.floor(Math.random() * sharedWidth) + xStart;
+
+        // Add weights to the graph
+        let edge = {
+          weight: y - (box.y + box.height),
+          xDir: false,
+          x: xPos,
+          y: box.y + box.height
+        };
+
+        ensureMap(edges, i);
+        ensureMap(edges, i - SIZE);
+
+        edges.get(i).set(i - SIZE, edge);
+        edges.get(i - SIZE).set(i, edge);
 
         for(let by = y - 1; by >= box.y + box.height; --by) {
           map.map[d21(xPos, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
@@ -168,9 +215,19 @@ export default class GameMap {
       x += width + 1;
     }
 
+    map.edges = edges;
+    map.boxes = boxes;
+
     return map;
   }
 
+  /**
+   * Get a subset of the map inside rectangle specified by the coordiates
+   * @param {*} xMin 
+   * @param {*} yMin 
+   * @param {*} xMax 
+   * @param {*} yMax 
+   */
   getMapFor(xMin, yMin, xMax, yMax) {
     let out = [];
 
