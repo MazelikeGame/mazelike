@@ -54,5 +54,8 @@ MAILER_PASSWORD=sneakybeakylike
 MAILER_SERVICE_PROVIDER=Gmail
 ```
 
-## Running migrations
+## Generating Migrations
+`node_modules/.bin/sequelize migration:generate --config "config/config.js" --models-path "Backend/models" --name "model name"`
+
+## Running Migrations
 `node_modules/.bin/sequelize db:migrate --config "config/config.js" --models-path "Backend/models"`
