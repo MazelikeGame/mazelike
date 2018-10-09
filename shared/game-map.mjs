@@ -10,6 +10,13 @@ const MAX_Y_DIST = 3;
 const ROOM_CHANCE = 0.2;
 const MAX_SCREEN_WIDTH = SIZE * (MAX_ROOM + MAX_Y_DIST);
 
+// The map file header
+const HEADER = [
+  0x4d, 0x4c, // magic
+  1, // version
+  0 // padding
+];
+
 /**
  * Map a 2d coordinate to a 1d coordinate
  * @param {*} x 
@@ -110,29 +117,179 @@ export default class GameMap {
 
   /**
    * Serialize the game map
-   * @returns The serialized map
+   * 
+   * Game map format 
+   * NAME    | size (in bytes)
+   * magic   | 2
+   * version | 1
+   * --- 1 byte padding ---
+   * num edges | 2 (16-bit little endian)
+   * --- edges 5 bytes each ---
+   * --- rooms 3 bytes each ---
+   * 
+   * NOTE: There are always NODES nodes in a map
+   * 
+   * Edge format
+   * NAME         | size (in bytes)
+   * from node id | 1
+   * to node id   | 1
+   * x            | 1
+   * y            | 1
+   * xDir         | 1/8 (shares this byte with weight)
+   * weight       | 7/8 (offset 1 bit)
+   * 
+   * Room format
+   * NAME       | size (in bytes)
+   * x          | 1
+   * y          | 1
+   * width - 2  | 1/2 (shares this byte with height)
+   * height - 2 | 1/2 (offset 4 bits)
+   * 
+   * @returns {ArrayBuffer} The serialized map
    */
   serialize() {
-    return JSON.stringify({
-      edges: this.edges,
-      boxes: this.boxes
+    /* eslint-disable arrow-parens,arrow-body-style */
+    let numEdges = Object.keys(this.edges)
+      .map(edge => Object.keys(this.edges[edge]).length)
+      .reduce((a, b) => a + b, 0);
+    /* eslint-enable arrow-parens,arrow-body-style */
+
+    let bufferLength = HEADER.length + 2 + (numEdges / 2 * 5) + (NODES * 3);
+    let buffer = new ArrayBuffer(bufferLength);
+    let u8 = new Uint8Array(buffer);
+    let u16 = new Uint16Array(buffer, HEADER.length, HEADER.length + 2);
+
+    HEADER.forEach((value, i) => {
+      u8[i] = value;
     });
+
+    u16[0] = numEdges / 2;
+
+    let offset = HEADER.length + 2;
+
+    for(let fromNode of Object.keys(this.edges)) {
+      for(let toNode of [fromNode - 1, fromNode - SIZE]) {
+        let edge = this.edges[fromNode][toNode];
+
+        if(!edge) {
+          continue;
+        }
+
+        if(edge.x > 255 || edge.y > 255) {
+          throw new Error("Edge x or y values exceded treshhold");
+        }
+
+        if(edge.weight > 128) {
+          throw new Error("Edge weight value exceded threshold");
+        }
+
+        if(typeof edge.xDir !== "boolean") {
+          throw new Error("Expected edge.xDir to be a boolean");
+        }
+
+        u8[offset++] = +fromNode;
+        u8[offset++] = +toNode;
+        u8[offset++] = edge.x;
+        u8[offset++] = edge.y;
+        u8[offset++] = (edge.weight << 1) | (+edge.xDir); // eslint-disable-line no-bitwise
+      }
+    }
+
+    for(let room of this.boxes) {
+      if(room.x > 255 || room.y > 255) {
+        throw new Error("Room x or y values exceded treshhold");
+      }
+
+      if(room.width > 17 || room.height > 17) {
+        throw new Error("Room width or height values exceded threshold");
+      }
+
+      u8[offset++] = room.x;
+      u8[offset++] = room.y;
+      u8[offset++] = (room.width - 2) | ((room.height - 2) << 4); // eslint-disable-line no-bitwise
+    }
+
+    if(offset !== buffer.byteLength) {
+      throw new Error(`Offset does not match buffer ${offset} != ${buffer.byteLength}`);
+    }
+
+    return buffer;
   }
 
   /**
    * Parse a previously serialized map
-   * @param {*} raw The serialized map
+   * @param {ArrayBuffer} buffer The serialized map
    * @returns {GameMap}
    */
-  static parse(raw) {
-    let map = new GameMap();
+  static parse(buffer) {
+    let u8 = new Uint8Array(buffer);
 
-    Object.assign(map, JSON.parse(raw));
+    if(u8[0] !== HEADER[0] || u8[1] !== HEADER[1]) {
+      throw new Error("File is not a map");
+    }
 
-    map._buildMap();
-
-    return map;
+    switch(u8[2]) {
+    case 1:
+      return v1Parse(buffer);
+    
+    default:
+      throw new Error(`Unsupported version ${u8[2]}`);
+    }
   }
+}
+
+/**
+ * Map parser for version 1
+ * @param buffer The raw map
+ * @returns {GameMap}
+ */
+function v1Parse(buffer) {
+  let map = new GameMap();
+  map.edges = {};
+  map.boxes = [];
+
+  let u8 = new Uint8Array(buffer);
+  let u16 = new Uint16Array(buffer, HEADER.length, HEADER.length + 2);
+  let offset = HEADER.length + 2;
+
+  let numEdges = u16[0];
+
+  for(let i = 0; i < numEdges; ++i) {
+    let fromNode = u8[offset++];
+    let toNode = u8[offset++];
+
+    let edge = {
+      x: u8[offset++],
+      y: u8[offset++]
+    };
+
+    let wd = u8[offset++];
+    edge.xDir = !!(wd & 1); // eslint-disable-line no-bitwise
+    edge.weight = (edge.weight >> 1) & 128; // eslint-disable-line no-bitwise
+
+    /* eslint-disable no-unused-expressions */
+    map.edges[fromNode] || (map.edges[fromNode] = {});
+    map.edges[toNode] || (map.edges[toNode] = {});
+    /* eslint-enable no-unused-expressions */
+
+    map.edges[fromNode][toNode] = edge;
+    map.edges[toNode][fromNode] = edge;
+  }
+
+  for(let i = 0; i < NODES; ++i) {
+    let room = {
+      x: u8[offset++],
+      y: u8[offset++]
+    };
+
+    let wh = u8[offset++];
+    room.width = (wh & 15) + 2; // eslint-disable-line no-bitwise
+    room.height = ((wh >> 4) & 15) + 2; // eslint-disable-line no-bitwise
+
+    map.boxes.push(room);
+  }
+
+  return map;
 }
 
 /**
