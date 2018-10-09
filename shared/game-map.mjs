@@ -30,6 +30,12 @@ const d12 = (i, size = SIZE) => {
   return [i % size, Math.floor(i / size)];
 };
 
+const ensureMap = (parent, key) => {
+  if(!parent.has(key)) {
+    parent.set(key, new Map());
+  }
+};
+
 /**
  * A map for a game
  */
@@ -83,8 +89,8 @@ export default class GameMap {
   _buildMap() {
     this.map = [];
 
-    for(let i = 0; i < this.boxes.length; ++i) {
-      let box = this.boxes[i];
+    for(let i = 0; i < this.rooms.length; ++i) {
+      let box = this.rooms[i];
 
       // render the box
       for(let by = box.y; by < box.y + box.height; ++by) {
@@ -94,8 +100,8 @@ export default class GameMap {
       }
 
       // render the corridor to the box to the left
-      if(i % SIZE > 0 && this.edges[i][i - 1]) {
-        let edge = this.edges[i][i - 1];
+      if(i % SIZE > 0 && this.edges.get(i).has(i - 1)) {
+        let edge = this.edges.get(i).get(i - 1);
 
         for(let bx = edge.x; bx <= edge.x + edge.weight; ++bx) {
           this.map[d21(bx, edge.y, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
@@ -104,8 +110,8 @@ export default class GameMap {
       }
       
       // render the corridor to the box above
-      if(i >= SIZE && this.edges[i][i - SIZE]) {
-        let edge = this.edges[i][i - SIZE];
+      if(i >= SIZE && this.edges.get(i).has(i - SIZE)) {
+        let edge = this.edges.get(i).get(i - SIZE);
 
         for(let by = edge.y; by <= edge.y + edge.weight; ++by) {
           this.map[d21(edge.x, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
@@ -149,8 +155,8 @@ export default class GameMap {
    */
   serialize() {
     /* eslint-disable arrow-parens,arrow-body-style */
-    let numEdges = Object.keys(this.edges)
-      .map(edge => Object.keys(this.edges[edge]).length)
+    let numEdges = Array.from(this.edges.values())
+      .map(edge => edge.size)
       .reduce((a, b) => a + b, 0);
     /* eslint-enable arrow-parens,arrow-body-style */
 
@@ -167,9 +173,9 @@ export default class GameMap {
 
     let offset = HEADER.length + 2;
 
-    for(let fromNode of Object.keys(this.edges)) {
+    for(let [fromNode, subEdges] of this.edges) {
       for(let toNode of [fromNode - 1, fromNode - SIZE]) {
-        let edge = this.edges[fromNode][toNode];
+        let edge = subEdges.get(toNode);
 
         if(!edge) {
           continue;
@@ -187,15 +193,15 @@ export default class GameMap {
           throw new Error("Expected edge.xDir to be a boolean");
         }
 
-        u8[offset++] = +fromNode;
-        u8[offset++] = +toNode;
+        u8[offset++] = fromNode;
+        u8[offset++] = toNode;
         u8[offset++] = edge.x;
         u8[offset++] = edge.y;
         u8[offset++] = (edge.weight << 1) | (+edge.xDir); // eslint-disable-line no-bitwise
       }
     }
 
-    for(let room of this.boxes) {
+    for(let room of this.rooms) {
       if(room.x > 255 || room.y > 255) {
         throw new Error("Room x or y values exceded treshhold");
       }
@@ -245,8 +251,8 @@ export default class GameMap {
  */
 function v1Parse(buffer) {
   let map = new GameMap();
-  map.edges = {};
-  map.boxes = [];
+  map.edges = new Map();
+  map.rooms = [];
 
   let u8 = new Uint8Array(buffer);
   let u16 = new Uint16Array(buffer, HEADER.length, HEADER.length + 2);
@@ -267,13 +273,11 @@ function v1Parse(buffer) {
     edge.xDir = !!(wd & 1); // eslint-disable-line no-bitwise
     edge.weight = (wd >> 1) & 127; // eslint-disable-line no-bitwise
 
-    /* eslint-disable no-unused-expressions */
-    map.edges[fromNode] || (map.edges[fromNode] = {});
-    map.edges[toNode] || (map.edges[toNode] = {});
-    /* eslint-enable no-unused-expressions */
+    ensureMap(map.edges, fromNode);
+    ensureMap(map.edges, toNode);
 
-    map.edges[fromNode][toNode] = edge;
-    map.edges[toNode][fromNode] = edge;
+    map.edges.get(fromNode).set(toNode, edge);
+    map.edges.get(toNode).set(fromNode, edge);
   }
 
   for(let i = 0; i < NODES; ++i) {
@@ -286,7 +290,7 @@ function v1Parse(buffer) {
     room.width = (wh & 15) + 2; // eslint-disable-line no-bitwise
     room.height = ((wh >> 4) & 15) + 2; // eslint-disable-line no-bitwise
 
-    map.boxes.push(room);
+    map.rooms.push(room);
   }
 
   map._buildMap();
@@ -372,12 +376,12 @@ const generateMap = (corridors) => {
   let y = 1;
   // Height of the tallest room in this row
   let maxHeight = 0;
-  // Location width and heights of all boxes
-  let boxes = [];
+  // Location width and heights of all rooms
+  let rooms = [];
   // More detailed edge representations
-  let edges = {};
+  let edges = new Map();
 
-  // Place boxes/rooms onto the map
+  // Place rooms onto the map
   for(let i = 0; i < NODES; ++i) {
     // We are at the end of this row tart a new row
     if(i % SIZE === 0 && i > 0) {
@@ -398,13 +402,13 @@ const generateMap = (corridors) => {
     x += Math.max(MAX_ROOM - width, 0);
 
     // save for corridor rendering
-    boxes.push({x, y, width, height});
+    rooms.push({x, y, width, height});
 
     maxHeight = Math.max(height, maxHeight);
 
     // Render a corridor to the box to our left (if there is one)
     if(i % SIZE > 0 && corridors.get(i).has(i - 1)) {
-      let box = boxes[i - 1];
+      let box = rooms[i - 1];
 
       // find a row that we have in common
       let sharedHeight = Math.min(box.height, height) - 1;
@@ -418,18 +422,16 @@ const generateMap = (corridors) => {
         y: y + yOffset
       };
 
-      /* eslint-disable no-unused-expressions */
-      edges[i] || (edges[i] = {});
-      edges[i - 1] || (edges[i - 1] = {});
-      /* eslint-enable no-unused-expressions */
+      ensureMap(edges, i);
+      ensureMap(edges, i - 1);
 
-      edges[i][i - 1] = edge;
-      edges[i - 1][i] = edge;
+      edges.get(i).set(i - 1, edge);
+      edges.get(i - 1).set(i, edge);
     }
 
     // Render a corridor to the box above us
     if(y > 0 && corridors.get(i).has(i - SIZE)) {
-      let box = boxes[i - SIZE];
+      let box = rooms[i - SIZE];
 
       // find a column that we have in common
       let xStart = Math.max(x, box.x);
@@ -444,17 +446,15 @@ const generateMap = (corridors) => {
         y: box.y + box.height
       };
 
-      /* eslint-disable no-unused-expressions */
-      edges[i] || (edges[i] = {});
-      edges[i - SIZE] || (edges[i - SIZE] = {});
-      /* eslint-enable no-unused-expressions */
+      ensureMap(edges, i);
+      ensureMap(edges, i - SIZE);
 
-      edges[i][i - SIZE] = edge;
-      edges[i - SIZE][i] = edge;
+      edges.get(i).set(i - SIZE, edge);
+      edges.get(i - SIZE).set(i, edge);
     }
 
     x += width + 1;
   }
 
-  return {edges, boxes};
+  return {edges, rooms};
 };
