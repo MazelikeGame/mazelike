@@ -110,6 +110,7 @@ export default class GameMap {
 
   /**
    * Serialize the game map
+   * @returns The serialized map
    */
   serialize() {
     return JSON.stringify({
@@ -120,7 +121,7 @@ export default class GameMap {
 
   /**
    * Parse a previously serialized map
-   * @param {*} The serialized map
+   * @param {*} raw The serialized map
    * @returns {GameMap}
    */
   static parse(raw) {
