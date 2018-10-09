@@ -5,6 +5,13 @@ import util from "util";
 import Lobby from "../models/lobby";
 import sql from "../sequelize";
 import path from "path";
+import GameMap from "../../shared/game-map";
+import buffer from "buffer";
+import fs from "fs";
+
+const {Buffer} = buffer;
+const mkdir = util.promisify(fs.mkdir);
+const writeFile = util.promisify(fs.writeFile);
 
 export let gameRouter = express.Router();
 
@@ -283,6 +290,15 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     });
 
     // Create game here (TODO)
+    let mapBuffer = new Buffer.from(GameMap.generate().serialize());
+    
+    try {
+      await mkdir("Frontend/public/maps");
+    } catch(err) {
+      // pass
+    }
+
+    await writeFile(`Frontend/public/maps/${req.params.id}`, mapBuffer);
 
     io.emit("lobby-start", req.params.id);
 

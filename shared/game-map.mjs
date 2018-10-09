@@ -179,7 +179,7 @@ export default class GameMap {
           throw new Error("Edge x or y values exceded treshhold");
         }
 
-        if(edge.weight > 128) {
+        if(edge.weight > 127) {
           throw new Error("Edge weight value exceded threshold");
         }
 
@@ -265,7 +265,7 @@ function v1Parse(buffer) {
 
     let wd = u8[offset++];
     edge.xDir = !!(wd & 1); // eslint-disable-line no-bitwise
-    edge.weight = (edge.weight >> 1) & 128; // eslint-disable-line no-bitwise
+    edge.weight = (wd >> 1) & 127; // eslint-disable-line no-bitwise
 
     /* eslint-disable no-unused-expressions */
     map.edges[fromNode] || (map.edges[fromNode] = {});
@@ -288,6 +288,8 @@ function v1Parse(buffer) {
 
     map.boxes.push(room);
   }
+
+  map._buildMap();
 
   return map;
 }

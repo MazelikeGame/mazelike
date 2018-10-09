@@ -4,5 +4,5 @@ node_modules
 .DS_Store
 .env
 runner-result
-Frontend/public/images/*
+Frontend/public/*
 *.sqlite

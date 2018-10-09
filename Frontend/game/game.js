@@ -5,6 +5,9 @@ import {KEY_CODES} from "./input.js";
 import FpsCounter from "./fps-counter.js";
 import {command} from "./debug.js";
 
+let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
+let gameId = gameIdMatch && gameIdMatch[1];
+
 let app = new PIXI.Application({
   antialias: true
 });
@@ -69,8 +72,20 @@ window.addEventListener("keydown", (e) => {
 });
 
 function setup() {
-  let map = GameMap.generate();
+  if(gameId) {
+    fetch(`/public/maps/${gameId}`)
+      .then((res) => {
+        return res.arrayBuffer();
+      })
+      .then((buffer) => {
+        startGame(GameMap.parse(buffer));
+      });
+  } else {
+    startGame(GameMap.generate());
+  }
+}
 
+function startGame(map) {
   let sprites = [];
   let fps = new FpsCounter();
 
