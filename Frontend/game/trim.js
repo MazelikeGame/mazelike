@@ -37,7 +37,8 @@ window.save = function(name) {
       "h": pos.h
     },
     "rotated": false,
-    "trimmed": false,  "spriteSourceSize": {
+    "trimmed": false,
+    "spriteSourceSize": {
       "x": pos.x,
       "y": pos.y,
       "w": pos.w,
