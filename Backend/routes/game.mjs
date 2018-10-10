@@ -101,6 +101,25 @@ gameRouter.get("/lobby/:id", async(req, res) => {
     };
   });
 
+  let usernames = players.map((player) => {
+    return player.id;
+  });
+
+  let playerImages = await sql.query(`SELECT image_name, username FROM users WHERE username IN (:usernames)`, { 
+    replacements: {
+      usernames: usernames
+    }, 
+    type: sql.QueryTypes.SELECT 
+  });
+ 
+  playerImages.forEach((image) => {
+    players.forEach((player) => {
+      if(player.id === image.username) {
+        player.image_name = image.image_name;
+      }
+    });
+  });
+
   let isHost = host.playerId === req.user.username;
 
   res.render("lobby", {
@@ -155,7 +174,8 @@ export const joinRoute = async(req, res) => {
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
-    playerId: req.user.username
+    playerId: req.user.username,
+    image_name: req.user.image_name
   });
 
   res.redirect(`/game/lobby/${lobby.lobbyId}`);
