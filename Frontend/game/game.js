@@ -72,6 +72,7 @@ function setup() {
 }
 
 function startGame(map) {
+  window.map = map;
   let sprites = [];
   let fps = new FpsCounter();
 

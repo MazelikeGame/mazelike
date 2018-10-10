@@ -1,4 +1,4 @@
-/* eslint-disable complexity,no-extra-parens,no-mixed-operators */
+/* eslint-disable complexity,no-extra-parens,no-mixed-operators,consistent-return */
 /** @module GameMap */
 
 const BLOCK_SIZE = 48;
@@ -39,34 +39,93 @@ const d12 = (i, size = SIZE) => {
 };
 
 /**
- * Make sure the map parent has a Map in it for the value key
- * @private
- * @param parent 
- * @param key 
- */
-const ensureMap = (parent, key) => {
-  if(!parent.has(key)) {
-    parent.set(key, new Map());
-  }
-};
-
-/**
  * A room in the maze
  * @typedef {object} Room
  * @prop {number} x X coordinate of the room
  * @prop {number} y Y coordinate of the room
  * @prop {number} width Width coordinate of the room
  * @prop {number} height Height coordinate of the room
+ * @prop {} _block Internal representation of the room using block based coordinates
  */
+class Room {
+  /**
+   * @private
+   * @param i The index of the room
+   * @param x 
+   * @param y 
+   * @param width 
+   * @param height 
+   */
+  constructor(i, x, y, width, height) {
+    this._block = {x, y, width, height};
+
+    this._i = i;
+    this.x = x * BLOCK_SIZE;
+    this.y = y * BLOCK_SIZE;
+    this.width = width * BLOCK_SIZE;
+    this.height = height * BLOCK_SIZE;
+  
+    this._corridors = new Map();
+  }
+
+  /**
+   * Create a corridor between 2 rooms
+   * @private
+   */
+  _connect(room, corridor) {
+    this._corridors.set(room._i, corridor._to(room));
+    room._corridors.set(this._i, corridor._to(this));
+  }
+
+  get corridors() {
+    return Array.from(this._corridors);
+  }
+
+  get left() {
+    return this._corridors.get(this._i - 1);
+  }
+
+  get right() {
+    return this._corridors.get(this._i + 1);
+  }
+
+  get above() {
+    return this._corridors.get(this._i - SIZE);
+  }
+
+  get below() {
+    return this._corridors.get(this._i + SIZE);
+  }
+}
 
 /**
- * An edge in the maze graph
- * @typedef {object} Edge
+ * A corridor in the maze
  * @prop {number} x The x coordinate for the corridor to start
  * @prop {number} y The y coordinate for the corridor to start
- * @prop {number} xDir If the edge weight is in the x direction
+ * @prop {number} width The width of the corridor
+ * @prop {number} height The height of the corridor
  * @prop {number} weight The length or width of the edge
  */
+class Corridor {
+  constructor(x, y, xDir, weight) {
+    this._block = {x, y, weight, xDir};
+
+    this.x = x * BLOCK_SIZE;
+    this.y = y * BLOCK_SIZE;
+    this._xDir = xDir;
+    this.width = (xDir ? weight : 2) * BLOCK_SIZE;
+    this.height = (xDir ? 2 : weight) * BLOCK_SIZE;
+    this.weight = weight;
+  }
+
+  /**
+   * Clone this edge with the room as room
+   * @private
+   */
+  _to(room) {
+    return Object.assign({room}, this);
+  }
+}
 
 /**
  * A map for a game
@@ -85,9 +144,7 @@ export default class GameMap {
    * @returns {GameMap}
    */
   static generate() {
-    let map = new GameMap();
-    
-    Object.assign(map, generateMap(generateMaze()));
+    let map = generateMap(generateMaze());
 
     map._buildMap();
 
@@ -140,18 +197,19 @@ export default class GameMap {
     this.map = [];
 
     for(let i = 0; i < this.rooms.length; ++i) {
-      let box = this.rooms[i];
+      let room = this.rooms[i];
+      let _room = room._block;
 
       // render the box
-      for(let by = box.y; by < box.y + box.height; ++by) {
-        for(let bx = box.x; bx < box.x + box.width; ++bx) {
+      for(let by = _room.y; by < _room.y + _room.height; ++by) {
+        for(let bx = _room.x; bx < _room.x + _room.width; ++bx) {
           this.map[d21(bx, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
         }
       }
 
       // render the corridor to the box to the left
-      if(i % SIZE > 0 && this.edges.get(i).has(i - 1)) {
-        let edge = this.edges.get(i).get(i - 1);
+      if(room.left) {
+        let edge = room.left._block;
 
         for(let bx = edge.x; bx <= edge.x + edge.weight; ++bx) {
           this.map[d21(bx, edge.y, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
@@ -160,8 +218,8 @@ export default class GameMap {
       }
       
       // render the corridor to the box above
-      if(i >= SIZE && this.edges.get(i).has(i - SIZE)) {
-        let edge = this.edges.get(i).get(i - SIZE);
+      if(room.above) {
+        let edge = room.above._block;
 
         for(let by = edge.y; by <= edge.y + edge.weight; ++by) {
           this.map[d21(edge.x, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
@@ -207,8 +265,8 @@ export default class GameMap {
    */
   serialize() {
     /* eslint-disable arrow-parens,arrow-body-style */
-    let numEdges = Array.from(this.edges.values())
-      .map(edge => edge.size)
+    let numEdges = this.rooms
+      .map(room => room.corridors.length)
       .reduce((a, b) => a + b, 0);
     /* eslint-enable arrow-parens,arrow-body-style */
 
@@ -225,15 +283,19 @@ export default class GameMap {
 
     let offset = HEADER.length + 2;
 
-    for(let [fromNode, subEdges] of this.edges) {
-      for(let toNode of [fromNode - 1, fromNode - SIZE]) {
-        let edge = subEdges.get(toNode);
-
+    for(let fromRoom of this.rooms) {
+      for(let edge of [fromRoom.left, fromRoom.above]) {
         if(!edge) {
           continue;
         }
 
-        if(edge.x > 255 || edge.y > 255) {
+        let toRoom = edge.room;
+        let {x, y} = edge;
+
+        x /= BLOCK_SIZE;
+        y /= BLOCK_SIZE;
+
+        if(x > 255 || y > 255) {
           throw new Error("Edge x or y values exceded treshhold");
         }
 
@@ -241,30 +303,35 @@ export default class GameMap {
           throw new Error("Edge weight value exceded threshold");
         }
 
-        if(typeof edge.xDir !== "boolean") {
+        if(typeof edge._xDir !== "boolean") {
           throw new Error("Expected edge.xDir to be a boolean");
         }
 
-        u8[offset++] = fromNode;
-        u8[offset++] = toNode;
-        u8[offset++] = edge.x;
-        u8[offset++] = edge.y;
-        u8[offset++] = (edge.weight << 1) | (+edge.xDir); // eslint-disable-line no-bitwise
+        u8[offset++] = fromRoom._i;
+        u8[offset++] = toRoom._i;
+        u8[offset++] = x;
+        u8[offset++] = y;
+        u8[offset++] = (edge.weight << 1) | (+edge._xDir); // eslint-disable-line no-bitwise
       }
     }
 
-    for(let room of this.rooms) {
-      if(room.x > 255 || room.y > 255) {
+    for(let {x, y, width, height} of this.rooms) {
+      x /= BLOCK_SIZE;
+      y /= BLOCK_SIZE;
+      width /= BLOCK_SIZE;
+      height /= BLOCK_SIZE;
+
+      if(x > 255 || y > 255) {
         throw new Error("Room x or y values exceded treshhold");
       }
 
-      if(room.width > 17 || room.height > 17) {
+      if(width > 17 || height > 17) {
         throw new Error("Room width or height values exceded threshold");
       }
 
-      u8[offset++] = room.x;
-      u8[offset++] = room.y;
-      u8[offset++] = (room.width - 2) | ((room.height - 2) << 4); // eslint-disable-line no-bitwise
+      u8[offset++] = x;
+      u8[offset++] = y;
+      u8[offset++] = (width - 2) | ((height - 2) << 4); // eslint-disable-line no-bitwise
     }
 
     if(offset !== buffer.byteLength) {
@@ -304,46 +371,41 @@ export default class GameMap {
  */
 function v1Parse(buffer) {
   let map = new GameMap();
-  map.edges = new Map();
   map.rooms = [];
 
   let u8 = new Uint8Array(buffer);
   let u16 = new Uint16Array(buffer, HEADER.length, HEADER.length + 2);
-  let offset = HEADER.length + 2;
-
+  
   let numEdges = u16[0];
-
-  for(let i = 0; i < numEdges; ++i) {
-    let fromNode = u8[offset++];
-    let toNode = u8[offset++];
-
-    let edge = {
-      x: u8[offset++],
-      y: u8[offset++]
-    };
-
-    let wd = u8[offset++];
-    edge.xDir = !!(wd & 1); // eslint-disable-line no-bitwise
-    edge.weight = (wd >> 1) & 127; // eslint-disable-line no-bitwise
-
-    ensureMap(map.edges, fromNode);
-    ensureMap(map.edges, toNode);
-
-    map.edges.get(fromNode).set(toNode, edge);
-    map.edges.get(toNode).set(fromNode, edge);
-  }
+  let offset = HEADER.length + 2 + (numEdges * 5);
 
   for(let i = 0; i < NODES; ++i) {
-    let room = {
-      x: u8[offset++],
-      y: u8[offset++]
-    };
+    let x = u8[offset++];
+    let y = u8[offset++];
 
     let wh = u8[offset++];
-    room.width = (wh & 15) + 2; // eslint-disable-line no-bitwise
-    room.height = ((wh >> 4) & 15) + 2; // eslint-disable-line no-bitwise
+    let width = (wh & 15) + 2; // eslint-disable-line no-bitwise
+    let height = ((wh >> 4) & 15) + 2; // eslint-disable-line no-bitwise
 
-    map.rooms.push(room);
+    map.rooms.push(new Room(i, x, y, width, height));
+  }
+
+  offset = HEADER.length + 2;
+
+  for(let i = 0; i < numEdges; ++i) {
+    let fromRoom = map.rooms[u8[offset++]];
+    let toRoom = map.rooms[u8[offset++]];
+
+    let x = u8[offset++];
+    let y = u8[offset++];
+
+    let wd = u8[offset++];
+    let xDir = !!(wd & 1); // eslint-disable-line no-bitwise
+    let weight = (wd >> 1) & 127; // eslint-disable-line no-bitwise
+
+    let edge = new Corridor(x, y, xDir, weight);
+
+    fromRoom._connect(toRoom, edge);
   }
 
   map._buildMap();
@@ -426,15 +488,14 @@ const generateMaze = () => {
  * @returns {Object} {edges, boxes}
  */
 const generateMap = (corridors) => {
+  let map = new GameMap();
   // Coords for the room we are placing
   let x = 1;
   let y = 1;
   // Height of the tallest room in this row
   let maxHeight = 0;
   // Location width and heights of all rooms
-  let rooms = [];
-  // More detailed edge representations
-  let edges = new Map();
+  map.rooms = [];
 
   // Place rooms onto the map
   for(let i = 0; i < NODES; ++i) {
@@ -457,36 +518,29 @@ const generateMap = (corridors) => {
     x += Math.max(MAX_ROOM - width, 0);
 
     // save for corridor rendering
-    rooms.push({x, y, width, height});
+    map.rooms.push(new Room(i, x, y, width, height));
 
     maxHeight = Math.max(height, maxHeight);
 
     // Render a corridor to the box to our left (if there is one)
     if(i % SIZE > 0 && corridors.get(i).has(i - 1)) {
-      let box = rooms[i - 1];
+      let room = map.rooms[i - 1];
+      let box = room._block;
 
       // find a row that we have in common
       let sharedHeight = Math.min(box.height, height) - 1;
       let yOffset = Math.floor(Math.random() * sharedHeight);
 
       // Add weights to the graph
-      let edge = {
-        weight: x - (box.x + box.width),
-        xDir: true,
-        x: box.x + box.width,
-        y: y + yOffset
-      };
+      let edge = new Corridor(box.x + box.width, y + yOffset, true, x - (box.x + box.width));
 
-      ensureMap(edges, i);
-      ensureMap(edges, i - 1);
-
-      edges.get(i).set(i - 1, edge);
-      edges.get(i - 1).set(i, edge);
+      room._connect(map.rooms[i], edge);
     }
 
     // Render a corridor to the box above us
     if(y > 0 && corridors.get(i).has(i - SIZE)) {
-      let box = rooms[i - SIZE];
+      let room = map.rooms[i - SIZE];
+      let box = room._block;
 
       // find a column that we have in common
       let xStart = Math.max(x, box.x);
@@ -494,22 +548,13 @@ const generateMap = (corridors) => {
       let xPos = Math.floor(Math.random() * sharedWidth) + xStart;
 
       // Add weights to the graph
-      let edge = {
-        weight: y - (box.y + box.height),
-        xDir: false,
-        x: xPos,
-        y: box.y + box.height
-      };
+      let edge = new Corridor(xPos, box.y + box.height, false, y - (box.y + box.height));
 
-      ensureMap(edges, i);
-      ensureMap(edges, i - SIZE);
-
-      edges.get(i).set(i - SIZE, edge);
-      edges.get(i - SIZE).set(i, edge);
+      room._connect(map.rooms[i], edge);
     }
 
     x += width + 1;
   }
 
-  return {edges, rooms};
+  return map;
 };
