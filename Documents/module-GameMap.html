@@ -110,52 +110,6 @@
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>edges</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Map.&lt;Map.&lt;Edge>></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The edges/corridors in the map (Map { roomIdx => Map { roomIdx => Edge } })</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>BLOCK_SIZE</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Number of pixels of one square on the map</td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -191,7 +145,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line78">line 78</a>
+        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line216">line 216</a>
     </li></ul></dd>
     
 
@@ -226,6 +180,16 @@
 
     
 
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="module-GameMap-Corridor.html">Corridor</a></dt>
+            <dd></dd>
+        
+            <dt><a href="module-GameMap-Room.html">Room</a></dt>
+            <dd></dd>
+        </dl>
     
 
     
@@ -297,7 +261,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line87">line 87</a>
+        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line226">line 226</a>
     </li></ul></dd>
     
 
@@ -349,7 +313,7 @@
     
 
     
-    <h4 class="name" id=".parse"><span class="type-signature">(static) </span>parse<span class="signature">(buffer)</span><span class="type-signature"> &rarr; {GameMap}</span></h4>
+    <h4 class="name" id=".parse"><span class="type-signature">(static) </span>parse<span class="signature">(json)</span><span class="type-signature"> &rarr; {GameMap}</span></h4>
     
 
     
@@ -393,13 +357,16 @@
 
         <tr>
             
-                <td class="name"><code>buffer</code></td>
+                <td class="name"><code>json</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">ArrayBuffer</span>
+<span class="param-type">string</span>
+|
+
+<span class="param-type">object</span>
 
 
             
@@ -450,7 +417,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line282">line 282</a>
+        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line355">line 355</a>
     </li></ul></dd>
     
 
@@ -502,7 +469,7 @@
     
 
     
-    <h4 class="name" id="getMapFor"><span class="type-signature"></span>getMapFor<span class="signature">(xMin, yMin, xMax, yMax)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="createSprite"><span class="type-signature"></span>createSprite<span class="signature">()</span><span class="type-signature"> &rarr; {SpriteReturn}</span></h4>
     
 
     
@@ -510,7 +477,7 @@
 
 
 <div class="description">
-    Get a subset of the map inside rectangle specified by the coordiates
+    Create an object containing a PIXI.Container (called sprite) and an updatemethod to update the container.  Note the update method is GameMap.updateSpritebut without the container parameter.
 </div>
 
 
@@ -519,124 +486,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>xMin</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">x coordinate for the top left corner</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>yMin</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">y coordinate for the top left corner</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>xMax</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">x coordinate for the bottom right corner</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>yMax</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">y coordinate for the bottom right corner</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -672,7 +521,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line104">line 104</a>
+        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line247">line 247</a>
     </li></ul></dd>
     
 
@@ -695,6 +544,24 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">SpriteReturn</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -830,7 +697,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line128">line 128</a>
+        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line287">line 287</a>
     </li></ul></dd>
     
 
@@ -882,7 +749,7 @@
     
 
     
-    <h4 class="name" id="serialize"><span class="type-signature"></span>serialize<span class="signature">()</span><span class="type-signature"> &rarr; {ArrayBuffer}</span></h4>
+    <h4 class="name" id="serialize"><span class="type-signature"></span>serialize<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
     
 
     
@@ -890,7 +757,7 @@
 
 
 <div class="description">
-    <pre>Serialize the game mapGame map format NAME    | size (in bytes)magic   | 2version | 1--- 1 byte padding ---num edges | 2 (16-bit little endian)--- edges 5 bytes each ------ rooms 3 bytes each ---NOTE: There are always NODES nodes in a mapEdge formatNAME         | size (in bytes)from node id | 1to node id   | 1x            | 1y            | 1xDir         | 1/8 (shares this byte with weight)weight       | 7/8 (offset 1 bit)Room formatNAME       | size (in bytes)x          | 1y          | 1width - 2  | 1/2 (shares this byte with height)height - 2 | 1/2 (offset 4 bits)</pre>
+    Serialize the game map
 </div>
 
 
@@ -934,7 +801,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line208">line 208</a>
+        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line344">line 344</a>
     </li></ul></dd>
     
 
@@ -972,7 +839,7 @@
     </dt>
     <dd>
         
-<span class="param-type">ArrayBuffer</span>
+<span class="param-type">string</span>
 
 
     </dd>
@@ -985,43 +852,34 @@
 
 
         
+            
+
+    
+
+    
+    <h4 class="name" id="updateSprite"><span class="type-signature"></span>updateSprite<span class="signature">(container, xMin, yMin, xMax, yMax)</span><span class="type-signature"></span></h4>
     
 
     
-        <h3 class="subsection-title">Type Definitions</h3>
-
-        
-                
-<h4 class="name" id="~Edge">Edge</h4>
-
 
 
 
 <div class="description">
-    An edge in the maze graph
+    Get a subset of the map inside rectangle specified by the coordiates
 </div>
 
 
 
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">object</span>
-
-
-        </li>
-    </ul>
 
 
 
 
 
-    <h5 class="subsection-title">Properties:</h5>
 
+    <h5>Parameters:</h5>
     
 
-<table class="props">
+<table class="params">
     <thead>
     <tr>
         
@@ -1043,13 +901,13 @@
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>container</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">PIXI.Container</span>
 
 
             
@@ -1059,14 +917,14 @@
 
             
 
-            <td class="description last">The x coordinate for the corridor to start</td>
+            <td class="description last">The container returned by create sprite</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>y</code></td>
+                <td class="name"><code>xMin</code></td>
             
 
             <td class="type">
@@ -1082,14 +940,14 @@
 
             
 
-            <td class="description last">The y coordinate for the corridor to start</td>
+            <td class="description last">x coordinate for the top left corner</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>xDir</code></td>
+                <td class="name"><code>yMin</code></td>
             
 
             <td class="type">
@@ -1105,14 +963,14 @@
 
             
 
-            <td class="description last">If the edge weight is in the x direction</td>
+            <td class="description last">y coordinate for the top left corner</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>weight</code></td>
+                <td class="name"><code>xMax</code></td>
             
 
             <td class="type">
@@ -1128,12 +986,37 @@
 
             
 
-            <td class="description last">The length or width of the edge</td>
+            <td class="description last">x coordinate for the bottom right corner</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>yMax</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">y coordinate for the bottom right corner</td>
         </tr>
 
     
     </tbody>
 </table>
+
+
 
 
 
@@ -1167,7 +1050,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line62">line 62</a>
+        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line264">line 264</a>
     </li></ul></dd>
     
 
@@ -1183,28 +1066,36 @@
 
 
 
-            
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        
                 
-<h4 class="name" id="~Room">Room</h4>
+<h4 class="name" id="~SpriteReturn">SpriteReturn</h4>
 
 
 
 
 <div class="description">
-    A room in the maze
+    Container+update method
 </div>
 
 
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">object</span>
-
-
-        </li>
-    </ul>
 
 
 
@@ -1236,13 +1127,13 @@
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>sprite</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">PIXI.Container</span>
 
 
             
@@ -1252,20 +1143,20 @@
 
             
 
-            <td class="description last">X coordinate of the room</td>
+            <td class="description last">The sprite representing the game map</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>y</code></td>
+                <td class="name"><code>update</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">function</span>
 
 
             
@@ -1275,53 +1166,7 @@
 
             
 
-            <td class="description last">Y coordinate of the room</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Width coordinate of the room</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Height coordinate of the room</td>
+            <td class="description last">GameMap.updateSprite but without the container parameter</td>
         </tr>
 
     
@@ -1360,7 +1205,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line53">line 53</a>
+        <a href="shared_game-map.mjs.html">shared/game-map.mjs</a>, <a href="shared_game-map.mjs.html#line234">line 234</a>
     </li></ul></dd>
     
 
@@ -1390,13 +1235,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-GameMap.html">GameMap</a></li></ul><h3>Classes</h3><ul><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-GameMap.html">GameMap</a></li></ul><h3>Global</h3><ul><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#set">set</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-GameMap.html">GameMap</a></li></ul><h3>Classes</h3><ul><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-GameMap.html">GameMap</a></li><li><a href="module-GameMap-Corridor.html">Corridor</a></li><li><a href="module-GameMap-Room.html">Room</a></li></ul><h3>Global</h3><ul><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#set">set</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 09 2018 21:35:06 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Oct 10 2018 11:42:13 GMT-0500 (Central Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

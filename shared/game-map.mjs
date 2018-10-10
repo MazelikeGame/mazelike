@@ -15,9 +15,12 @@ const CORRIDOR_SIZE = 2 * BLOCK_SIZE;
 const X_PADDING = BLOCK_SIZE;
 const Y_PADDING = BLOCK_SIZE;
 
-// custom floor
+/**
+ * Floor to BLOCK_SIZE
+ * @private
+ */
 const floor = (x) => {
-  return Math.floor(x / 48) * 48;
+  return Math.floor(x / BLOCK_SIZE) * BLOCK_SIZE;
 };
 
 /**
@@ -42,12 +45,10 @@ const d12 = (i, size = SIZE) => {
 
 /**
  * A room in the maze
- * @typedef {object} Room
  * @prop {number} x X coordinate of the room
  * @prop {number} y Y coordinate of the room
  * @prop {number} width Width coordinate of the room
  * @prop {number} height Height coordinate of the room
- * @prop {} _block Internal representation of the room using block based coordinates
  */
 class Room {
   /**
@@ -77,22 +78,42 @@ class Room {
     room._corridors.set(this._i, corridor._to(this));
   }
 
+  /**
+   * All corridors connected to this room
+   * @return {Corridor[]}
+   */
   get corridors() {
     return Array.from(this._corridors.values());
   }
 
+  /**
+   * Get the room to the left of this one (if one exists)
+   * @return {Room}
+   */
   get left() {
     return this._corridors.get(this._i - 1);
   }
 
+  /**
+   * Get the room to the right of this one (if one exists)
+   * @return {Room}
+   */
   get right() {
     return this._corridors.get(this._i + 1);
   }
 
+  /**
+   * Get the room above this one (if one exists)
+   * @return {Room}
+   */
   get above() {
     return this._corridors.get(this._i - SIZE);
   }
 
+  /**
+   * Get the room below this one (if one exists)
+   * @return {Room}
+   */
   get below() {
     return this._corridors.get(this._i + SIZE);
   }
@@ -145,7 +166,7 @@ class Room {
  * @prop {number} y The y coordinate for the corridor to start
  * @prop {number} width The width of the corridor
  * @prop {number} height The height of the corridor
- * @prop {number} weight The length or width of the edge
+ * @prop {number} weight The weight to use for graph algorithms
  */
 class Corridor {
   constructor(x, y, width, height) {
@@ -153,6 +174,7 @@ class Corridor {
     this.y = y;
     this.width = width;
     this.height = height;
+    this.weight = this.width === CORRIDOR_SIZE ? this.height : this.width;
   }
 
   /**
@@ -190,9 +212,6 @@ class Corridor {
 /**
  * A map for a game
  * @prop {Room[]} rooms The rooms in the dungeon
- * @prop {Map<Map<Edge>>} edges The edges/corridors in the map (Map { roomIdx => Map { roomIdx => Edge } })
- * 
- * @prop {number} BLOCK_SIZE Number of pixels of one square on the map
  */
 export default class GameMap {
   constructor() {
@@ -213,9 +232,17 @@ export default class GameMap {
   }
 
   /**
+   * Container+update method
+   * @typedef SpriteReturn
+   * @prop {PIXI.Container} sprite The sprite representing the game map
+   * @prop {Function} update GameMap.updateSprite but without the container parameter
+   */
+
+  /**
    * Create an object containing a PIXI.Container (called sprite) and an update
    * method to update the container.  Note the update method is GameMap.updateSprite
    * but without the container parameter.
+   * @returns {SpriteReturn}
    */
   createSprite() {
     let sprite = new PIXI.Container();
@@ -315,7 +342,9 @@ export default class GameMap {
    * @returns {string} The serialized map
    */
   serialize() {
-    return JSON.stringify(this.rooms);
+    return JSON.stringify({
+      rooms: this.rooms
+    });
   }
 
   /**
@@ -326,9 +355,9 @@ export default class GameMap {
   static parse(json) {
     let map = new GameMap();
     let raw = typeof json === "string" ? JSON.parse(json) : json;
-    
-    for(let i = 0; i < raw.length; ++i) {
-      map.rooms.push(Room._parse(i, map.rooms, raw[i]));
+
+    for(let i = 0; i < raw.rooms.length; ++i) {
+      map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i]));
     }
 
     map._buildMap();
