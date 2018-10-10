@@ -73,22 +73,15 @@ function setup() {
 
 function startGame(map) {
   window.map = map;
-  let sprites = [];
+  let mapSprite = map.createSprite();
   let fps = new FpsCounter();
 
+  app.stage.addChild(mapSprite.sprite);
+  app.stage.addChild(fps.sprite);
+
   app.ticker.add(() => {
-    while(sprites.length) {
-      app.stage.removeChild(sprites.pop());
-    }
-
-    for(let m of map.getMapFor(pageX, pageY, innerWidth + pageX, innerHeight + pageY)) {
-      let s = new PIXI.Sprite(PIXI.loader.resources.floor.textures[m.type]);
-      s.position.set(m.x - pageX, m.y - pageY);
-      app.stage.addChild(s);
-      sprites.push(s);
-    }
-
-    fps.render(app);
+    mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
+    fps.update();
   });
 }
 

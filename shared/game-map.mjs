@@ -1,4 +1,5 @@
 /* eslint-disable complexity,no-extra-parens,no-mixed-operators,consistent-return */
+/* global PIXI */
 /** @module GameMap */
 
 const BLOCK_SIZE = 48;
@@ -212,28 +213,42 @@ export default class GameMap {
   }
 
   /**
+   * Create an object containing a PIXI.Container (called sprite) and an update
+   * method to update the container.  Note the update method is GameMap.updateSprite
+   * but without the container parameter.
+   */
+  createSprite() {
+    let sprite = new PIXI.Container();
+
+    return {
+      sprite,
+      update: this.updateSprite.bind(this, sprite)
+    };
+  }
+
+  /**
    * Get a subset of the map inside rectangle specified by the coordiates
+   * @param {PIXI.Container} container The container returned by create sprite
    * @param {number} xMin x coordinate for the top left corner
    * @param {number} yMin y coordinate for the top left corner
    * @param {number} xMax x coordinate for the bottom right corner
    * @param {number} yMax y coordinate for the bottom right corner
    */
-  getMapFor(xMin, yMin, xMax, yMax) {
-    let out = [];
+  updateSprite(container, xMin, yMin, xMax, yMax) {
+    while(container.children.length) {
+      container.removeChild(container.children[0]);
+    }
 
     for(let y = Math.floor(yMin / BLOCK_SIZE); y < Math.ceil(yMax / BLOCK_SIZE) && y < MAX_SCREEN_WIDTH; ++y) {
       for(let x = Math.floor(xMin / BLOCK_SIZE); x < Math.ceil(xMax / BLOCK_SIZE) && x < MAX_SCREEN_WIDTH; ++x) {
-        out.push({
-          x: x * BLOCK_SIZE,
-          y: y * BLOCK_SIZE,
-          width: BLOCK_SIZE,
-          height: BLOCK_SIZE,
-          type: this._map[d21(x, y, MAX_SCREEN_WIDTH)]
-        });
+        let sprite = new PIXI.Sprite(PIXI.loader.resources.floor.textures[this._map[d21(x, y, MAX_SCREEN_WIDTH)]]);
+
+        sprite.position.set((x * BLOCK_SIZE) - xMin, (y * BLOCK_SIZE) - yMin);
+        sprite.width = BLOCK_SIZE;
+        sprite.height = BLOCK_SIZE;
+        container.addChild(sprite);
       }
     }
-
-    return out;
   }
 
   /**
@@ -246,7 +261,7 @@ export default class GameMap {
     let _x = Math.round(x / BLOCK_SIZE);
     let _y = Math.round(y / BLOCK_SIZE);
 
-    return !!this._map[d21(_x, _y)];
+    return !!this._map[d21(_x, _y, MAX_SCREEN_WIDTH)];
   }
 
   /**

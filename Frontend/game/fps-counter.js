@@ -11,17 +11,16 @@ export default class FpsCounter {
   constructor() {
     this._avgBuf = [];
     this._lastFrame = 0;
-    this._text = new PIXI.Text("Loading", new PIXI.TextStyle({
+    this.sprite = new PIXI.Text("Loading", new PIXI.TextStyle({
       fill: "#fff"
     }));
-    this._text.position.set(10, 10);
+    this.sprite.position.set(10, 10);
   }
 
   /**
    * Update and render the fps counter (should be called every frame)
-   * @param {PIXI.Application} app The current PIXI app
    */
-  render(app) {
+  update() {
     let now = Date.now();
     
     if(this._lastFrame > 0) {
@@ -38,9 +37,6 @@ export default class FpsCounter {
     let frameTime = Math.round(this._avgBuf.reduce((a, b) => a + b, 0) / this._avgBuf.length);
     /* eslint-enable arrow-body-style */
 
-    this._text.setText(`${frameTime}ms (${Math.round(1000 / frameTime)}fps)`);
-
-    app.stage.removeChild(this._text);
-    app.stage.addChild(this._text);
+    this.sprite.setText(`${frameTime}ms (${Math.round(1000 / frameTime)}fps)`);
   }
 }
