@@ -3,7 +3,6 @@
 import GameMap from "/shared/game-map.mjs";
 import {KEY_CODES} from "./input.js";
 import FpsCounter from "./fps-counter.js";
-import {command} from "./debug.js";
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
@@ -24,19 +23,6 @@ window.onresize = () => {
 };
 
 window.onresize();
-
-// Pan commands for
-command("stopPan", function() {
-  clearInterval(this._panTimer);
-});
-
-command("startPan", function() {
-  clearInterval(this._panTimer);
-  this._panTimer = setInterval(() => {
-    ++pageX;
-    ++pageY;
-  }, 1000 / 48);
-});
 
 let pageX = 0;
 let pageY = 0;

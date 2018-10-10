@@ -1,7 +1,8 @@
 /* global PIXI */
-import {ml} from "./debug.js";
+/** @module FpsCounter */
+let ml = window.ml || (window.ml = {});
 
-ml.FPS_BUFFER_SIZE = 10;
+ml.FPS_BUFFER_SIZE = 20;
 
 /**
  * A basic fps counter
