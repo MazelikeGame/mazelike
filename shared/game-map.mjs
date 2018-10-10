@@ -10,26 +10,9 @@ const MIN_ROOM = 4 * BLOCK_SIZE;
 const MAX_ROOM = 10 * BLOCK_SIZE;
 const MAX_Y_DIST = 3 * BLOCK_SIZE;
 const ROOM_CHANCE = 0.2;
-const MAX_SCREEN_WIDTH = SIZE * ((MAX_ROOM + MAX_Y_DIST) / BLOCK_SIZE);
 const CORRIDOR_SIZE = 2 * BLOCK_SIZE;
 const X_PADDING = BLOCK_SIZE;
 const Y_PADDING = BLOCK_SIZE;
-
-/**
- * Floor to BLOCK_SIZE
- * @private
- */
-const floor = (x) => {
-  return Math.floor(x / BLOCK_SIZE) * BLOCK_SIZE;
-};
-
-/**
- * Ceil to BLOCK_SIZE
- * @private
- */
-const ceil = (x) => {
-  return Math.ceil(x / BLOCK_SIZE) * BLOCK_SIZE;
-};
 
 /**
  * Map a 2d coordinate to a 1d coordinate
@@ -285,16 +268,24 @@ export default class GameMap {
     };
 
     // process a single room/corridor
-    let process = (rect) => {
+    let process = (rect, direction) => {
       let x = Math.max(rect.x - xMin, 0);
       let y = Math.max(rect.y - yMin, 0);
       let xEnd = rect.x + rect.width;
       let yEnd = rect.y + rect.height;
-      let width = rect.width - soob(rect.x, xMin, "max") - soob(xEnd, xMax, "min");
-      let height = rect.height - soob(rect.y, yMin, "max") - soob(yEnd, yMax, "min");
+      let relativeX = soob(rect.x, xMin, "max");
+      let relativeY = soob(rect.y, yMin, "max");
+      let width = rect.width - relativeX - soob(xEnd, xMax, "min");
+      let height = rect.height - relativeY - soob(yEnd, yMax, "min");
 
       let texture = PIXI.loader.resources.floor.textures[BLOCK_TYPE];
-      GameMap._tileRectWithSprite(x, y, width, height, texture, container);
+      let sprites = GameMap._tileRectWithSprite(relativeX, relativeY, width, height, texture, direction);
+
+      // positon and size the sprites that were given
+      sprites.position.set(x, y);
+      sprites.width = width;
+      sprites.height = height;
+      container.addChild(sprites);
     };
 
     // process all of the rooms and corridors
@@ -304,28 +295,31 @@ export default class GameMap {
       }
       
       if(room.left && inBounds(room.left)) {
-        process(room.left);
+        process(room.left, "x");
       }
 
       if(room.above && inBounds(room.above)) {
-        process(room.above);
+        process(room.above, "y");
       }
     }
   }
 
-  static _tileRectWithSprite(x, y, width, height, texture, container) {
-    let {width: tWidth, height: tHeight} = texture;
+  static _tileRectWithSprite(x, y, width, height, texture) {
+    let {width: tWidth, height: tHeight} = texture.frame;
+    let container = new PIXI.Container();
 
-    for(let i = x; i < x + width; i += tWidth) {
-      for(let j = y; j < y + height; j += tHeight) {
+    for(let i = 0; i < width; i += tWidth) {
+      for(let j = 0; j < height; j += tHeight) {
         let sprite = new PIXI.Sprite(texture);
 
-        sprite.position.set(i, j);
+        sprite.position.set(i - x, j - y);
         sprite.width = tWidth;
         sprite.height = tHeight;
         container.addChild(sprite);
       }
     }
+
+    return container;
   }
 
   /**
@@ -463,7 +457,7 @@ const generateMap = (corridors) => {
     // We are at the end of this row tart a new row
     if(i % SIZE === 0 && i > 0) {
       x = X_PADDING;
-      y += maxHeight + floor(Math.random() * MAX_Y_DIST) + Y_PADDING;
+      y += maxHeight + Math.floor(Math.random() * MAX_Y_DIST) + Y_PADDING;
       maxHeight = 0;
     }
 
@@ -472,8 +466,8 @@ const generateMap = (corridors) => {
 
     // determine if this box should be a room
     if(Math.random() < ROOM_CHANCE || corridors.get(i).size === 1) {
-      width = floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
-      height = floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
+      width = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
+      height = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
     }
 
     x += Math.max(MAX_ROOM - width, 0);
@@ -489,8 +483,8 @@ const generateMap = (corridors) => {
 
       // find a row that we have in common
       let yStart = Math.max(y, room.y);
-      let sharedHeight = Math.min(height - (y - yStart), room.height - (room.y - yStart)) - BLOCK_SIZE;
-      let yPos = floor(Math.random() * sharedHeight) + yStart;
+      let sharedHeight = Math.min(height - (yStart - y), room.height - (yStart - room.y)) - CORRIDOR_SIZE;
+      let yPos = Math.floor(Math.random() * sharedHeight) + yStart;
 
       // Add weights to the graph
       let edge = new Corridor(room.x + room.width, yPos, x - (room.x + room.width), CORRIDOR_SIZE);
@@ -504,8 +498,8 @@ const generateMap = (corridors) => {
 
       // find a column that we have in common
       let xStart = Math.max(x, room.x);
-      let sharedWidth = Math.min(width - (x - xStart), room.width - (room.x - xStart)) - BLOCK_SIZE;
-      let xPos = floor(Math.random() * sharedWidth) + xStart;
+      let sharedWidth = Math.min(width - (xStart - x), room.width - (xStart - room.x)) - CORRIDOR_SIZE;
+      let xPos = Math.floor(Math.random() * sharedWidth) + xStart;
 
       // Add weights to the graph
       let edge = new Corridor(xPos, room.y + room.height, CORRIDOR_SIZE, y - (room.y + room.height));
