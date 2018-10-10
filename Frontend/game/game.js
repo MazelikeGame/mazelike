@@ -7,6 +7,8 @@ import FpsCounter from "./fps-counter.js";
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
 
+let devMode = location.hostname === "localhost";
+
 let app = new PIXI.Application({
   antialias: true
 });
@@ -55,6 +57,17 @@ window.addEventListener("keydown", (e) => {
       pageX = 10000;
     }
   }
+
+  // Toggle devmode
+  if(e.which === 68 /* d */) {
+    devMode = !devMode;
+
+    if(devMode) {
+      app.stage.addChild(fps.sprite);
+    } else {
+      app.stage.removeChild(fps.sprite);
+    }
+  }
 });
 
 function setup() {
@@ -71,17 +84,24 @@ function setup() {
   }
 }
 
+let fps = new FpsCounter();
+
 function startGame(map) {
   window.map = map;
   let mapSprite = map.createSprite();
-  let fps = new FpsCounter();
 
   app.stage.addChild(mapSprite.sprite);
-  app.stage.addChild(fps.sprite);
+  
+  if(devMode) {
+    app.stage.addChild(fps.sprite);
+  }
 
   app.ticker.add(() => {
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
-    fps.update();
+
+    if(devMode) {
+      fps.update();
+    }
   });
 }
 
