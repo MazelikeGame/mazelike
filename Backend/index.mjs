@@ -27,7 +27,10 @@ app.use(session({
   secret: 'mazelike',
   resave: true,
   saveUninitialized: false,
-  store: sessionStore
+  store: sessionStore,
+  cookie: {
+    expires: 60 * 60 * 24 * 365 // save cookies for 1 year
+  }
 }));
 
 //Handlebars
