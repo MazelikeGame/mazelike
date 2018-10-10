@@ -24,6 +24,14 @@ const floor = (x) => {
 };
 
 /**
+ * Ceil to BLOCK_SIZE
+ * @private
+ */
+const ceil = (x) => {
+  return Math.ceil(x / BLOCK_SIZE) * BLOCK_SIZE;
+};
+
+/**
  * Map a 2d coordinate to a 1d coordinate
  * @private
  * @param {*} x 
@@ -215,7 +223,6 @@ class Corridor {
  */
 export default class GameMap {
   constructor() {
-    this._map = [];
     this.rooms = [];
   }
 
@@ -225,8 +232,6 @@ export default class GameMap {
    */
   static generate() {
     let map = generateMap(generateMaze());
-
-    map._buildMap();
 
     return map;
   }
@@ -266,13 +271,58 @@ export default class GameMap {
       container.removeChild(container.children[0]);
     }
 
-    for(let y = Math.floor(yMin / BLOCK_SIZE); y < Math.ceil(yMax / BLOCK_SIZE) && y < MAX_SCREEN_WIDTH; ++y) {
-      for(let x = Math.floor(xMin / BLOCK_SIZE); x < Math.ceil(xMax / BLOCK_SIZE) && x < MAX_SCREEN_WIDTH; ++x) {
-        let sprite = new PIXI.Sprite(PIXI.loader.resources.floor.textures[this._map[d21(x, y, MAX_SCREEN_WIDTH)]]);
+    // check that a rect is inside the box even partially
+    let inBounds = (rect) => {
+      return ((xMin <= rect.x && rect.x <= xMax) ||
+        (xMin <= rect.x + rect.width && rect.x + rect.width <= xMax)) &&
+        ((yMin <= rect.y && rect.y <= yMax) ||
+        (yMin <= rect.y + rect.height && rect.y + rect.height <= yMax));
+    };
 
-        sprite.position.set((x * BLOCK_SIZE) - xMin, (y * BLOCK_SIZE) - yMin);
-        sprite.width = BLOCK_SIZE;
-        sprite.height = BLOCK_SIZE;
+    // get the size of a rect that is out of bounds
+    const soob = (pos, bound, boundType) => {
+      return pos - Math[boundType](bound, pos);
+    };
+
+    // process a single room/corridor
+    let process = (rect) => {
+      let x = Math.max(rect.x - xMin, 0);
+      let y = Math.max(rect.y - yMin, 0);
+      let xEnd = rect.x + rect.width;
+      let yEnd = rect.y + rect.height;
+      let width = rect.width - soob(rect.x, xMin, "max") - soob(xEnd, xMax, "min");
+      let height = rect.height - soob(rect.y, yMin, "max") - soob(yEnd, yMax, "min");
+
+      let texture = PIXI.loader.resources.floor.textures[BLOCK_TYPE];
+      GameMap._tileRectWithSprite(x, y, width, height, texture, container);
+    };
+
+    // process all of the rooms and corridors
+    for(let room of this.rooms) {
+      if(inBounds(room)) {
+        process(room);
+      }
+      
+      if(room.left && inBounds(room.left)) {
+        process(room.left);
+      }
+
+      if(room.above && inBounds(room.above)) {
+        process(room.above);
+      }
+    }
+  }
+
+  static _tileRectWithSprite(x, y, width, height, texture, container) {
+    let {width: tWidth, height: tHeight} = texture;
+
+    for(let i = x; i < x + width; i += tWidth) {
+      for(let j = y; j < y + height; j += tHeight) {
+        let sprite = new PIXI.Sprite(texture);
+
+        sprite.position.set(i, j);
+        sprite.width = tWidth;
+        sprite.height = tHeight;
         container.addChild(sprite);
       }
     }
@@ -285,56 +335,16 @@ export default class GameMap {
    * @returns {boolean}
    */
   isOnMap(x, y) {
-    let _x = Math.floor(x / BLOCK_SIZE);
-    let _y = Math.floor(y / BLOCK_SIZE);
+    const check = (rect) => {
+      return rect.x <= x && x <= rect.x + rect.width &&
+        rect.y <= y && y <= rect.y + rect.height;
+    };
 
-    return !!this._map[d21(_x, _y, MAX_SCREEN_WIDTH)];
-  }
-
-  /**
-   * Generate the tile matrix based on the graph
-   * @private
-   */
-  _buildMap() {
-    this._map = [];
-
-    for(let i = 0; i < this.rooms.length; ++i) {
-      let room = this.rooms[i];
-
-      // render the box
-      let yEnd = (room.y + room.height) / BLOCK_SIZE;
-      let xEnd = (room.x + room.width) / BLOCK_SIZE;
-
-      for(let by = room.y / BLOCK_SIZE; by < yEnd; ++by) {
-        for(let bx = room.x / BLOCK_SIZE; bx < xEnd; ++bx) {
-          this._map[d21(bx, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-        }
-      }
-
-      // render the corridor to the box to the left
-      if(room.left) {
-        let edge = room.left;
-        let eXEnd = (edge.x + edge.width) / BLOCK_SIZE;
-        let y = edge.y / BLOCK_SIZE;
-
-        for(let bx = edge.x / BLOCK_SIZE; bx <= eXEnd; ++bx) {
-          this._map[d21(bx, y, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-          this._map[d21(bx, y + 1, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-        }
-      }
-      
-      // render the corridor to the box above
-      if(room.above) {
-        let edge = room.above;
-        let eYEnd = (edge.y + edge.height) / BLOCK_SIZE;
-        let x = edge.x / BLOCK_SIZE;
-
-        for(let by = edge.y / BLOCK_SIZE; by <= eYEnd; ++by) {
-          this._map[d21(x, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-          this._map[d21(x + 1, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-        }
-      }
-    }
+    return !!this.rooms.find((room) => {
+      return check(room) ||
+        (room.left && check(room.left)) ||
+        (room.above && check(room.above));
+    });
   }
 
   /**
@@ -359,8 +369,6 @@ export default class GameMap {
     for(let i = 0; i < raw.rooms.length; ++i) {
       map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i]));
     }
-
-    map._buildMap();
 
     return map;
   }
