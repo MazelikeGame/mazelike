@@ -258,8 +258,8 @@ export default class GameMap {
    * @returns {boolean}
    */
   isOnMap(x, y) {
-    let _x = Math.round(x / BLOCK_SIZE);
-    let _y = Math.round(y / BLOCK_SIZE);
+    let _x = Math.floor(x / BLOCK_SIZE);
+    let _y = Math.floor(y / BLOCK_SIZE);
 
     return !!this._map[d21(_x, _y, MAX_SCREEN_WIDTH)];
   }
