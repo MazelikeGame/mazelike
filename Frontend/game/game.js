@@ -59,12 +59,12 @@ window.addEventListener("keydown", (e) => {
 
 function setup() {
   if(gameId) {
-    fetch(`/public/maps/${gameId}`)
+    fetch(`/public/maps/${gameId}.json`)
       .then((res) => {
-        return res.arrayBuffer();
+        return res.json();
       })
-      .then((buffer) => {
-        startGame(GameMap.parse(buffer));
+      .then((json) => {
+        startGame(GameMap.parse(json));
       });
   } else {
     startGame(GameMap.generate());

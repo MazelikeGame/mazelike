@@ -11,13 +11,6 @@ const MAX_Y_DIST = 3;
 const ROOM_CHANCE = 0.2;
 const MAX_SCREEN_WIDTH = SIZE * (MAX_ROOM + MAX_Y_DIST);
 
-// The map file header
-const HEADER = [
-  0x4d, 0x4c, // magic
-  1, // version
-  0 // padding
-];
-
 /**
  * Map a 2d coordinate to a 1d coordinate
  * @private
@@ -78,7 +71,7 @@ class Room {
   }
 
   get corridors() {
-    return Array.from(this._corridors);
+    return Array.from(this._corridors.values());
   }
 
   get left() {
@@ -95,6 +88,47 @@ class Room {
 
   get below() {
     return this._corridors.get(this._i + SIZE);
+  }
+
+  /**
+   * Convert the room to json
+   * @private
+   */
+  toJSON() {
+    let raw = {
+      x: this.x,
+      y: this.y,
+      w: this.width,
+      h: this.height
+    };
+
+    if(this.left) {
+      raw.l = this.left.toJSON();
+    }
+
+    if(this.above) {
+      raw.a = this.above.toJSON();
+    }
+
+    return raw;
+  }
+
+  /**
+   * Convert json into a Room
+   * @private
+   */
+  static _parse(i, rooms, json) {
+    let room = new Room(i, json.x / BLOCK_SIZE, json.y / BLOCK_SIZE, json.w / BLOCK_SIZE, json.h / BLOCK_SIZE);
+
+    if(json.l) {
+      room._connect(rooms[i - 1], Corridor._parse(json.l));
+    }
+
+    if(json.a) {
+      room._connect(rooms[i - SIZE], Corridor._parse(json.a));
+    }
+
+    return room;
   }
 }
 
@@ -123,7 +157,37 @@ class Corridor {
    * @private
    */
   _to(room) {
-    return Object.assign({room}, this);
+    let clone = Object.create(Corridor.prototype);
+    clone.room = room;
+    return Object.assign(clone, this);
+  }
+
+  /**
+   * Convert the corridor to json
+   * @private
+   */
+  toJSON() {
+    return {
+      x: this.x,
+      y: this.y,
+      w: this.width,
+      h: this.height
+    };
+  }
+
+  /**
+   * Convert json into a Corridor
+   * @private
+   */
+  static _parse(json) {
+    let xDir = json.h / BLOCK_SIZE === 2;
+
+    return new Corridor(
+      json.x / BLOCK_SIZE, 
+      json.y / BLOCK_SIZE,
+      xDir,
+      (xDir ? json.w : json.h) / BLOCK_SIZE
+    );
   }
 }
 
@@ -137,6 +201,7 @@ class Corridor {
 export default class GameMap {
   constructor() {
     this.map = [];
+    this.rooms = [];
   }
 
   /**
@@ -230,187 +295,30 @@ export default class GameMap {
   }
 
   /**
-   * <pre>
    * Serialize the game map
-   * 
-   * Game map format 
-   * NAME    | size (in bytes)
-   * magic   | 2
-   * version | 1
-   * --- 1 byte padding ---
-   * num edges | 2 (16-bit little endian)
-   * --- edges 5 bytes each ---
-   * --- rooms 3 bytes each ---
-   * 
-   * NOTE: There are always NODES nodes in a map
-   * 
-   * Edge format
-   * NAME         | size (in bytes)
-   * from node id | 1
-   * to node id   | 1
-   * x            | 1
-   * y            | 1
-   * xDir         | 1/8 (shares this byte with weight)
-   * weight       | 7/8 (offset 1 bit)
-   * 
-   * Room format
-   * NAME       | size (in bytes)
-   * x          | 1
-   * y          | 1
-   * width - 2  | 1/2 (shares this byte with height)
-   * height - 2 | 1/2 (offset 4 bits)
-   * </pre>
-   * 
-   * @returns {ArrayBuffer} The serialized map
+   * @returns {string} The serialized map
    */
   serialize() {
-    /* eslint-disable arrow-parens,arrow-body-style */
-    let numEdges = this.rooms
-      .map(room => room.corridors.length)
-      .reduce((a, b) => a + b, 0);
-    /* eslint-enable arrow-parens,arrow-body-style */
-
-    let bufferLength = HEADER.length + 2 + (numEdges / 2 * 5) + (NODES * 3);
-    let buffer = new ArrayBuffer(bufferLength);
-    let u8 = new Uint8Array(buffer);
-    let u16 = new Uint16Array(buffer, HEADER.length, HEADER.length + 2);
-
-    HEADER.forEach((value, i) => {
-      u8[i] = value;
-    });
-
-    u16[0] = numEdges / 2;
-
-    let offset = HEADER.length + 2;
-
-    for(let fromRoom of this.rooms) {
-      for(let edge of [fromRoom.left, fromRoom.above]) {
-        if(!edge) {
-          continue;
-        }
-
-        let toRoom = edge.room;
-        let {x, y} = edge;
-
-        x /= BLOCK_SIZE;
-        y /= BLOCK_SIZE;
-
-        if(x > 255 || y > 255) {
-          throw new Error("Edge x or y values exceded treshhold");
-        }
-
-        if(edge.weight > 127) {
-          throw new Error("Edge weight value exceded threshold");
-        }
-
-        if(typeof edge._xDir !== "boolean") {
-          throw new Error("Expected edge.xDir to be a boolean");
-        }
-
-        u8[offset++] = fromRoom._i;
-        u8[offset++] = toRoom._i;
-        u8[offset++] = x;
-        u8[offset++] = y;
-        u8[offset++] = (edge.weight << 1) | (+edge._xDir); // eslint-disable-line no-bitwise
-      }
-    }
-
-    for(let {x, y, width, height} of this.rooms) {
-      x /= BLOCK_SIZE;
-      y /= BLOCK_SIZE;
-      width /= BLOCK_SIZE;
-      height /= BLOCK_SIZE;
-
-      if(x > 255 || y > 255) {
-        throw new Error("Room x or y values exceded treshhold");
-      }
-
-      if(width > 17 || height > 17) {
-        throw new Error("Room width or height values exceded threshold");
-      }
-
-      u8[offset++] = x;
-      u8[offset++] = y;
-      u8[offset++] = (width - 2) | ((height - 2) << 4); // eslint-disable-line no-bitwise
-    }
-
-    if(offset !== buffer.byteLength) {
-      throw new Error(`Offset does not match buffer ${offset} != ${buffer.byteLength}`);
-    }
-
-    return buffer;
+    return JSON.stringify(this.rooms);
   }
 
   /**
    * Parse a previously serialized map
-   * @param {ArrayBuffer} buffer The serialized map
+   * @param {string|object} json The serialized map
    * @returns {GameMap}
    */
-  static parse(buffer) {
-    let u8 = new Uint8Array(buffer);
-
-    if(u8[0] !== HEADER[0] || u8[1] !== HEADER[1]) {
-      throw new Error("File is not a map");
-    }
-
-    switch(u8[2]) {
-    case 1:
-      return v1Parse(buffer);
+  static parse(json) {
+    let map = new GameMap();
+    let raw = typeof json === "string" ? JSON.parse(json) : json;
     
-    default:
-      throw new Error(`Unsupported version ${u8[2]}`);
+    for(let i = 0; i < raw.length; ++i) {
+      map.rooms.push(Room._parse(i, map.rooms, raw[i]));
     }
+
+    map._buildMap();
+
+    return map;
   }
-}
-
-/**
- * Map parser for version 1
- * @private
- * @param buffer The raw map
- * @returns {GameMap}
- */
-function v1Parse(buffer) {
-  let map = new GameMap();
-  map.rooms = [];
-
-  let u8 = new Uint8Array(buffer);
-  let u16 = new Uint16Array(buffer, HEADER.length, HEADER.length + 2);
-  
-  let numEdges = u16[0];
-  let offset = HEADER.length + 2 + (numEdges * 5);
-
-  for(let i = 0; i < NODES; ++i) {
-    let x = u8[offset++];
-    let y = u8[offset++];
-
-    let wh = u8[offset++];
-    let width = (wh & 15) + 2; // eslint-disable-line no-bitwise
-    let height = ((wh >> 4) & 15) + 2; // eslint-disable-line no-bitwise
-
-    map.rooms.push(new Room(i, x, y, width, height));
-  }
-
-  offset = HEADER.length + 2;
-
-  for(let i = 0; i < numEdges; ++i) {
-    let fromRoom = map.rooms[u8[offset++]];
-    let toRoom = map.rooms[u8[offset++]];
-
-    let x = u8[offset++];
-    let y = u8[offset++];
-
-    let wd = u8[offset++];
-    let xDir = !!(wd & 1); // eslint-disable-line no-bitwise
-    let weight = (wd >> 1) & 127; // eslint-disable-line no-bitwise
-
-    let edge = new Corridor(x, y, xDir, weight);
-
-    fromRoom._connect(toRoom, edge);
-  }
-
-  map._buildMap();
-
-  return map;
 }
 
 /**
@@ -485,7 +393,7 @@ const generateMaze = () => {
  * Expand the maze generated by generateMaze into something with differently sized rooms
  * @private
  * @param {*} corridors 
- * @returns {Object} {edges, boxes}
+ * @returns {Object} rooms
  */
 const generateMap = (corridors) => {
   let map = new GameMap();
