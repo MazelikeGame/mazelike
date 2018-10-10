@@ -5,11 +5,19 @@ const BLOCK_SIZE = 48;
 const BLOCK_TYPE = "0-1-box-big";
 const SIZE = 10;
 const NODES = SIZE ** 2;
-const MIN_ROOM = 4;
-const MAX_ROOM = 10;
-const MAX_Y_DIST = 3;
+const MIN_ROOM = 4 * BLOCK_SIZE;
+const MAX_ROOM = 10 * BLOCK_SIZE;
+const MAX_Y_DIST = 3 * BLOCK_SIZE;
 const ROOM_CHANCE = 0.2;
-const MAX_SCREEN_WIDTH = SIZE * (MAX_ROOM + MAX_Y_DIST);
+const MAX_SCREEN_WIDTH = SIZE * ((MAX_ROOM + MAX_Y_DIST) / BLOCK_SIZE);
+const CORRIDOR_SIZE = 2 * BLOCK_SIZE;
+const X_PADDING = BLOCK_SIZE;
+const Y_PADDING = BLOCK_SIZE;
+
+// custom floor
+const floor = (x) => {
+  return Math.floor(x / 48) * 48;
+};
 
 /**
  * Map a 2d coordinate to a 1d coordinate
@@ -50,13 +58,11 @@ class Room {
    * @param height 
    */
   constructor(i, x, y, width, height) {
-    this._block = {x, y, width, height};
-
     this._i = i;
-    this.x = x * BLOCK_SIZE;
-    this.y = y * BLOCK_SIZE;
-    this.width = width * BLOCK_SIZE;
-    this.height = height * BLOCK_SIZE;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
   
     this._corridors = new Map();
   }
@@ -118,7 +124,7 @@ class Room {
    * @private
    */
   static _parse(i, rooms, json) {
-    let room = new Room(i, json.x / BLOCK_SIZE, json.y / BLOCK_SIZE, json.w / BLOCK_SIZE, json.h / BLOCK_SIZE);
+    let room = new Room(i, json.x, json.y, json.w, json.h);
 
     if(json.l) {
       room._connect(rooms[i - 1], Corridor._parse(json.l));
@@ -141,15 +147,11 @@ class Room {
  * @prop {number} weight The length or width of the edge
  */
 class Corridor {
-  constructor(x, y, xDir, weight) {
-    this._block = {x, y, weight, xDir};
-
-    this.x = x * BLOCK_SIZE;
-    this.y = y * BLOCK_SIZE;
-    this._xDir = xDir;
-    this.width = (xDir ? weight : 2) * BLOCK_SIZE;
-    this.height = (xDir ? 2 : weight) * BLOCK_SIZE;
-    this.weight = weight;
+  constructor(x, y, width, height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
   }
 
   /**
@@ -180,14 +182,7 @@ class Corridor {
    * @private
    */
   static _parse(json) {
-    let xDir = json.h / BLOCK_SIZE === 2;
-
-    return new Corridor(
-      json.x / BLOCK_SIZE, 
-      json.y / BLOCK_SIZE,
-      xDir,
-      (xDir ? json.w : json.h) / BLOCK_SIZE
-    );
+    return new Corridor(json.x, json.y, json.w, json.h);
   }
 }
 
@@ -200,7 +195,7 @@ class Corridor {
  */
 export default class GameMap {
   constructor() {
-    this.map = [];
+    this._map = [];
     this.rooms = [];
   }
 
@@ -233,7 +228,7 @@ export default class GameMap {
           y: y * BLOCK_SIZE,
           width: BLOCK_SIZE,
           height: BLOCK_SIZE,
-          type: this.map[d21(x, y, MAX_SCREEN_WIDTH)]
+          type: this._map[d21(x, y, MAX_SCREEN_WIDTH)]
         });
       }
     }
@@ -251,7 +246,7 @@ export default class GameMap {
     let _x = Math.round(x / BLOCK_SIZE);
     let _y = Math.round(y / BLOCK_SIZE);
 
-    return !!this.map[d21(_x, _y)];
+    return !!this._map[d21(_x, _y)];
   }
 
   /**
@@ -259,36 +254,42 @@ export default class GameMap {
    * @private
    */
   _buildMap() {
-    this.map = [];
+    this._map = [];
 
     for(let i = 0; i < this.rooms.length; ++i) {
       let room = this.rooms[i];
-      let _room = room._block;
 
       // render the box
-      for(let by = _room.y; by < _room.y + _room.height; ++by) {
-        for(let bx = _room.x; bx < _room.x + _room.width; ++bx) {
-          this.map[d21(bx, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+      let yEnd = (room.y + room.height) / BLOCK_SIZE;
+      let xEnd = (room.x + room.width) / BLOCK_SIZE;
+
+      for(let by = room.y / BLOCK_SIZE; by < yEnd; ++by) {
+        for(let bx = room.x / BLOCK_SIZE; bx < xEnd; ++bx) {
+          this._map[d21(bx, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
         }
       }
 
       // render the corridor to the box to the left
       if(room.left) {
-        let edge = room.left._block;
+        let edge = room.left;
+        let eXEnd = (edge.x + edge.width) / BLOCK_SIZE;
+        let y = edge.y / BLOCK_SIZE;
 
-        for(let bx = edge.x; bx <= edge.x + edge.weight; ++bx) {
-          this.map[d21(bx, edge.y, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-          this.map[d21(bx, edge.y + 1, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+        for(let bx = edge.x / BLOCK_SIZE; bx <= eXEnd; ++bx) {
+          this._map[d21(bx, y, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+          this._map[d21(bx, y + 1, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
         }
       }
       
       // render the corridor to the box above
       if(room.above) {
-        let edge = room.above._block;
+        let edge = room.above;
+        let eYEnd = (edge.y + edge.height) / BLOCK_SIZE;
+        let x = edge.x / BLOCK_SIZE;
 
-        for(let by = edge.y; by <= edge.y + edge.weight; ++by) {
-          this.map[d21(edge.x, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
-          this.map[d21(edge.x + 1, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+        for(let by = edge.y / BLOCK_SIZE; by <= eYEnd; ++by) {
+          this._map[d21(x, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
+          this._map[d21(x + 1, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
         }
       }
     }
@@ -398,8 +399,8 @@ const generateMaze = () => {
 const generateMap = (corridors) => {
   let map = new GameMap();
   // Coords for the room we are placing
-  let x = 1;
-  let y = 1;
+  let x = X_PADDING;
+  let y = Y_PADDING;
   // Height of the tallest room in this row
   let maxHeight = 0;
   // Location width and heights of all rooms
@@ -409,59 +410,58 @@ const generateMap = (corridors) => {
   for(let i = 0; i < NODES; ++i) {
     // We are at the end of this row tart a new row
     if(i % SIZE === 0 && i > 0) {
-      x = 1;
-      y += maxHeight + Math.floor(Math.random() * (MAX_Y_DIST - 1)) + 1;
+      x = X_PADDING;
+      y += maxHeight + floor(Math.random() * MAX_Y_DIST) + Y_PADDING;
       maxHeight = 0;
     }
 
-    let width = 2;
-    let height = 2;
+    let width = CORRIDOR_SIZE;
+    let height = CORRIDOR_SIZE;
 
     // determine if this box should be a room
     if(Math.random() < ROOM_CHANCE || corridors.get(i).size === 1) {
-      width = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
-      height = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
+      width = floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
+      height = floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
     }
 
     x += Math.max(MAX_ROOM - width, 0);
-
+    
     // save for corridor rendering
     map.rooms.push(new Room(i, x, y, width, height));
 
     maxHeight = Math.max(height, maxHeight);
 
     // Render a corridor to the box to our left (if there is one)
-    if(i % SIZE > 0 && corridors.get(i).has(i - 1)) {
+    if(corridors.get(i).has(i - 1)) {
       let room = map.rooms[i - 1];
-      let box = room._block;
 
       // find a row that we have in common
-      let sharedHeight = Math.min(box.height, height) - 1;
-      let yOffset = Math.floor(Math.random() * sharedHeight);
+      let yStart = Math.max(y, room.y);
+      let sharedHeight = Math.min(height - (y - yStart), room.height - (room.y - yStart)) - BLOCK_SIZE;
+      let yPos = floor(Math.random() * sharedHeight) + yStart;
 
       // Add weights to the graph
-      let edge = new Corridor(box.x + box.width, y + yOffset, true, x - (box.x + box.width));
+      let edge = new Corridor(room.x + room.width, yPos, x - (room.x + room.width), CORRIDOR_SIZE);
 
       room._connect(map.rooms[i], edge);
     }
 
     // Render a corridor to the box above us
-    if(y > 0 && corridors.get(i).has(i - SIZE)) {
+    if(corridors.get(i).has(i - SIZE)) {
       let room = map.rooms[i - SIZE];
-      let box = room._block;
 
       // find a column that we have in common
-      let xStart = Math.max(x, box.x);
-      let sharedWidth = Math.min(width - (x - xStart), box.width - (box.x - xStart)) - 1;
-      let xPos = Math.floor(Math.random() * sharedWidth) + xStart;
+      let xStart = Math.max(x, room.x);
+      let sharedWidth = Math.min(width - (x - xStart), room.width - (room.x - xStart)) - BLOCK_SIZE;
+      let xPos = floor(Math.random() * sharedWidth) + xStart;
 
       // Add weights to the graph
-      let edge = new Corridor(xPos, box.y + box.height, false, y - (box.y + box.height));
+      let edge = new Corridor(xPos, room.y + room.height, CORRIDOR_SIZE, y - (room.y + room.height));
 
       room._connect(map.rooms[i], edge);
     }
 
-    x += width + 1;
+    x += width + X_PADDING;
   }
 
   return map;
