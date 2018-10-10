@@ -2,7 +2,7 @@
 /** @module FpsCounter */
 let ml = window.ml || (window.ml = {});
 
-ml.FPS_BUFFER_SIZE = 20;
+ml.FPS_BUFFER_SIZE = 25;
 
 /**
  * A basic fps counter
@@ -11,10 +11,13 @@ export default class FpsCounter {
   constructor() {
     this._avgBuf = [];
     this._lastFrame = 0;
-    this.sprite = new PIXI.Text("Loading", new PIXI.TextStyle({
-      fill: "#fff"
-    }));
-    this.sprite.position.set(10, 10);
+    
+    this._textStyle = new PIXI.TextStyle({
+      fill: "#fff",
+      fontSize: 17
+    });
+
+    this.sprite = new PIXI.Text("Loading", this._textStyle);
   }
 
   /**
@@ -37,6 +40,10 @@ export default class FpsCounter {
     let frameTime = Math.round(this._avgBuf.reduce((a, b) => a + b, 0) / this._avgBuf.length);
     /* eslint-enable arrow-body-style */
 
-    this.sprite.setText(`${frameTime}ms (${Math.round(1000 / frameTime)}fps)`);
+    let text = `${frameTime}ms (${Math.round(1000 / frameTime)}fps)`;
+    this.sprite.setText(text);
+
+    let metrics = PIXI.TextMetrics.measureText(text, this._textStyle);
+    this.sprite.position.set(innerWidth - 10 - metrics.width, 10);
   }
 }
