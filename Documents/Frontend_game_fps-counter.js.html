@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: Frontend/game/fps-counter.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,32 +17,59 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: Frontend/game/fps-counter.js</h1>
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global PIXI */
+/** @module FpsCounter */
+let ml = window.ml || (window.ml = {});
 
+ml.FPS_BUFFER_SIZE = 20;
 
-    <h3> </h3>
+/**
+ * A basic fps counter
+ */
+export default class FpsCounter {
+  constructor() {
+    this._avgBuf = [];
+    this._lastFrame = 0;
+    this.sprite = new PIXI.Text("Loading", new PIXI.TextStyle({
+      fill: "#fff"
+    }));
+    this.sprite.position.set(10, 10);
+  }
 
-
-
-
-
-
-
-
-
-
+  /**
+   * Update and render the fps counter (should be called every frame)
+   */
+  update() {
+    let now = Date.now();
     
+    if(this._lastFrame > 0) {
+      this._avgBuf.push(now - this._lastFrame);
+    }
 
+    this._lastFrame = now;
 
+    while(this._avgBuf.length > ml.FPS_BUFFER_SIZE) {
+      this._avgBuf.shift();
+    }
 
+    /* eslint-disable arrow-body-style */
+    let frameTime = Math.round(this._avgBuf.reduce((a, b) => a + b, 0) / this._avgBuf.length);
+    /* eslint-enable arrow-body-style */
 
-
+    this.sprite.setText(`${frameTime}ms (${Math.round(1000 / frameTime)}fps)`);
+  }
+}</code></pre>
+        </article>
+    </section>
 
 
 
