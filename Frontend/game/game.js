@@ -3,6 +3,7 @@
 import GameMap from "/shared/game-map.mjs";
 import {KEY_CODES} from "./input.js";
 import FpsCounter from "./fps-counter.js";
+import Monster from "./monster.js";
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
@@ -96,9 +97,13 @@ function startGame(map) {
     app.stage.addChild(fps.sprite);
   }
 
+  
+  //let spoopy_monster = new Monster('spoopy monster', 100, 10);
+  //spoopy_monster.create();
+
   app.ticker.add(() => {
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
-
+  
     if(devMode) {
       fps.update();
     }
