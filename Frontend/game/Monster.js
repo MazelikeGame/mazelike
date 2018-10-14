@@ -1,4 +1,4 @@
-/* eslint-disable no-extra-parens,max-len,curly */
+/* eslint-disable no-extra-parens,max-len,curly,no-console */
 /* global PIXI */
 /** @module Monster */
 
@@ -57,12 +57,12 @@ export default class Monster {
   }
   attack(target) {
     var msg = " attacked ";
-    alert(this.name + msg + target);
+    console.log(this.name + msg + target);
     // implement damage later when PC is on map
   }
   create() {
     var msg = " created.";
-    alert(this.name + msg);
+    console.log(this.name + msg);
     // place on map
   }
   die() {
