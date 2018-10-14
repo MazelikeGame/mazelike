@@ -96,10 +96,10 @@ function startGame(map) {
   if(devMode) {
     app.stage.addChild(fps.sprite);
   }
-
   
-  //let spoopy_monster = new Monster('spoopy monster', 100, 10);
-  //spoopy_monster.create();
+  let spoopy_monster = new Monster('spoopy monster', 100, 10);
+  app.stage.addChild(spoopy_monster.sprite);
+  spoopy_monster.attack("the air");
 
   app.ticker.add(() => {
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
@@ -113,4 +113,5 @@ function startGame(map) {
 // load the textures
 PIXI.loader
   .add("floor", "DawnLike/Objects/Floor.json")
+  .add("dog", "DawnLike/Characters/dog.json")
   .load(setup);

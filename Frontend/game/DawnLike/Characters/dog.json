@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "image": "Dog0.png"
+  },
+  "frames":{
+    "0-0": {
+      "frame": {
+        "x": 48,
+        "y": 48,
+        "w": 48,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 48,
+        "y": 48,
+        "w": 48,
+        "h": 48
+      }
+    }
+  }
+}
