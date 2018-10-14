@@ -99,11 +99,10 @@ function startGame(map) {
   
   let spoopy_monster = new Monster('spoopy monster', 100, 10);
   app.stage.addChild(spoopy_monster.sprite);
-  spoopy_monster.attack("the air");
 
   app.ticker.add(() => {
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
-  
+    spoopy_monster.updateSprite(pageX, pageY);
     if(devMode) {
       fps.update();
     }

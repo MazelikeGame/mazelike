@@ -1,8 +1,9 @@
-/* eslint-disable no-extra-parens,max-len,curly,no-console */
+/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity */
 /* global PIXI */
 /** @module Monster */
 
 import GameMap from "/shared/game-map.mjs";
+//import game from "./game.js";
 
 const BLOCK_SIZE = 48;
 
@@ -13,8 +14,8 @@ export default class Monster {
     this.hp = hp_in;
     this.damage = damage_in;
     this.targetAquired = false; // if monster knows where a player is
-    this.x = 5;
-    this.y = 5;
+    this.x = 6;
+    this.y = 3;
     //PCx: -1; // -1 if not seen yet
     //PCy: -1;
 
@@ -34,13 +35,13 @@ export default class Monster {
     // need to check for collisions/ make sure its a floor piece, WIP
     
     var random = Math.floor(Math.random() * 4); 
-    if(random === 0)
+    if(random === 0 && GameMap.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE))
       this.x += 1;
-    else if(random === 1)
+    else if(random === 1 && GameMap.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE))
       this.x -= 1;
-    else if(random === 2)
+    else if(random === 2 && GameMap.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE))
       this.y += 1;
-    else if(random === 3)
+    else if(random === 3 && GameMap.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE))
       this.y -= 1;
     this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
     //setInterval(this.wander(), 1000);
@@ -65,4 +66,7 @@ export default class Monster {
   die() {
     //clearInterval(alive); WIP
   }
-}
+  updateSprite(xPage, yPage) {
+    this.sprite.position.set((this.x * BLOCK_SIZE) - xPage, (this.y * BLOCK_SIZE) - yPage);
+  }
+} 
