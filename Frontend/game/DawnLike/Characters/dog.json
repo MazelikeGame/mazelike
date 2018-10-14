@@ -5,22 +5,22 @@
   "frames":{
     "0-0": {
       "frame": {
-        "x": 48,
-        "y": 48,
-        "w": 48,
-        "h": 48
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
-        "x": 48,
-        "y": 48,
-        "w": 48,
-        "h": 48
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 16,
+        "h": 16
       },
       "pivot": {
         "x": 0.5,
