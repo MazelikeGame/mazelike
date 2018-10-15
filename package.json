@@ -9,7 +9,7 @@
     "debug": "node --experimental-modules --inspect Backend/index.mjs",
     "db:migrate": "sequelize db:migrate",
     "db:migrate:undo": "sequelize db:migrate:undo",
-    "migration:create": "sequelize migration:create"
+    "migration:create": "sequelize migration:create --name"
   },
   "license": "ISC",
   "dependencies": {
