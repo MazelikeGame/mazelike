@@ -18,7 +18,6 @@ let server = http.Server(app);
 global.io = socketio(server);
 
 app.use(express.static("Frontend"));
-app.use("/shared", express.static("shared"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 

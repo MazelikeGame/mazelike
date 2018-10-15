@@ -14,7 +14,7 @@ NOTE: You can run `docker-compose ps` to see if any containers are running and `
 
 Run `npm test`
 
-The server will 
+The server will
 
 ## MySQL auth errors
 
@@ -23,6 +23,13 @@ There may be data left over from a previous mysql instance run `docker-compose d
 ## Generate documentation
 
 Run `npm run doc`
+
+## Migrations
+
+* Run `npm run migration:create "name-of-migration-here"` to generate a skeleton migration
+    * Documentation regarding the creation of migrations can be found here: https://sequelize.readthedocs.io/en/latest/docs/migrations/
+* Run `npm run db:migrate` to migrate changes into the database
+* Run `npm run db:migrate:undo` to undo previous migrations
 
 ## Manual deploy/rollback
 

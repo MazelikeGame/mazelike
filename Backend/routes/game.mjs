@@ -5,7 +5,7 @@ import util from "util";
 import Lobby from "../models/lobby";
 import sql from "../sequelize";
 import path from "path";
-import GameMap from "../../shared/game-map";
+import GameMap from "../../Frontend/game/game-map.mjs";
 import fs from "fs";
 
 const mkdir = util.promisify(fs.mkdir);
