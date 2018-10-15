@@ -3,7 +3,7 @@
   "version": "2.2.0",
   "scripts": {
     "test": "jasmine",
-    "start": "node_modules/.bin/sequelize db:migrate --config config/config.js && node --experimental-modules Backend/index.mjs",
+    "start": "node_modules/.bin/sequelize db:migrate && node --experimental-modules Backend/index.mjs",
     "doc": "jsdoc -r Frontend/game Backend shared -c jsdoc.json -d Documents",
     "eslint": "eslint Frontend Backend shared --ext .js,.mjs",
     "debug": "node --experimental-modules --inspect Backend/index.mjs",
