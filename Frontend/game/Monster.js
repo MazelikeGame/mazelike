@@ -2,50 +2,67 @@
 /* global PIXI */
 /** @module Monster */
 
-import GameMap from "/shared/game-map.mjs";
-//import game from "./game.js";
-
 const BLOCK_SIZE = 48;
 
 export default class Monster {
   
-  constructor(name_in, hp_in, damage_in) {
+  constructor(name_in, hp_in, damage_in, map_in) {
     this.name = name_in;
     this.hp = hp_in;
     this.damage = damage_in;
-    this.targetAquired = false; // if monster knows where a player is
-    this.x = 6;
-    this.y = 3;
+    this.map = map_in;
+    this.targetAquired = false; // "in pursuit" boolean
+    this.x = 5;
+    this.y = 5;
     //PCx: -1; // -1 if not seen yet
     //PCy: -1;
+
+    //this.placeInRandomRoom();
 
     this.sprite = new PIXI.Sprite(PIXI.loader.resources.dog.textures["0-0"]);
     this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
     this.sprite.width = BLOCK_SIZE;
     this.sprite.height = BLOCK_SIZE;
+  }
 
-    this.create();
-  }
+  /** WIP, UNFINISHED (needs to be implemented)
+   *   - need PC to be implemented
+   * Updates targetAquired field, which is true if we're currently in pursuit.
+   * If PC is in sight, PCx and PCy will be updated (last known location coordinates)
+   */
   canSeePC() {
-    // if can see player
-    // set PCx and PCy
-    this.targetAquired = true;
+    this.targetAquired = false;
   }
-  wander() { // if PC not seen yet OR last seen PC location has been explored
-    // need to check for collisions/ make sure its a floor piece, WIP
-    
+
+  /** 2WIP, UNFINISHED (need to check for collisions for items/player/other monsters)
+   * Monster moves to an adjacent, unoccupied location.
+   */
+  wander() {
     var random = Math.floor(Math.random() * 4); 
-    if(random === 0 && GameMap.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE))
+    var prevX = this.x;
+    var prevY = this.y;
+    if(random === 0)
       this.x += 1;
-    else if(random === 1 && GameMap.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE))
+    else if(random === 1)
       this.x -= 1;
-    else if(random === 2 && GameMap.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE))
+    else if(random === 2)
       this.y += 1;
-    else if(random === 3 && GameMap.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE))
+    else if(random === 3)
       this.y -= 1;
+    if(!this.map.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE)) { // wont wander off map
+      this.x = prevX;
+      this.y = prevY;
+      this.wander();
+    }
     this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
-    //setInterval(this.wander(), 1000);
   }
+
+  /** WIP, UNFINISHED (needs to be able to move strategically based on PC last seen location)
+   *   - need PC to be implemented
+   * Moves monster.
+   * If PC has been seen, move strategically towards last seen location.
+   * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
+   */
   move() {
     if(!this.targetAquired) {
       this.wander();
@@ -53,20 +70,35 @@ export default class Monster {
       //move strategically, to be implemented later when PC is on map WIP
     }
   }
+
+  /** WIP, UNFINISHED (need to actually implement target health loss)
+   *   - need PC to be implemented
+   * Monster attacks PC
+   * @param {*} target id for player that monster is attacking
+   */
   attack(target) {
     var msg = " attacked ";
     console.log(this.name + msg + target);
-    // implement damage later when PC is on map WIP
   }
-  create() {
-    var msg = " created.";
-    console.log(this.name + msg);
-    this.wander();
-  }
-  die() {
-    //clearInterval(alive); WIP
-  }
+
+  /**
+   * Updates sprite so that it the sprite appears to "stick" to map rather than move around with screen like FpsCounter.
+   * @param {*} xPage the upper left x coordinate of the page (0 if unshifted)
+   * @param {*} yPage the upper left y coordinate of the page (0 if unshifted)
+   */
   updateSprite(xPage, yPage) {
     this.sprite.position.set((this.x * BLOCK_SIZE) - xPage, (this.y * BLOCK_SIZE) - yPage);
+  }
+
+  /** 1WIP, UNFINISHED (need to add: place monster in a room WITHOUT other monsters)
+   * Places monster in a random room.
+   */
+  placeInRandomRoom() {
+    var numRooms = this.map.rooms.length;
+    this.initialRoom = Math.floor(Math.random() * numRooms); 
+    var randomDiffX = Math.floor(Math.random() * (this.map.rooms[this.initialRoom].width / BLOCK_SIZE)); 
+    this.x = (this.map.rooms[this.initialRoom].x / BLOCK_SIZE) + randomDiffX;
+    var randomDiffY = Math.floor(Math.random() * (this.map.rooms[this.initialRoom].height / BLOCK_SIZE)); 
+    this.y = (this.map.rooms[this.initialRoom].y / BLOCK_SIZE) + randomDiffY;
   }
 } 

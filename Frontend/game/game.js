@@ -87,6 +87,9 @@ function setup() {
 
 let fps = new FpsCounter();
 
+// monsters array should exist for every "level" or game map
+this.monsters = [];
+
 function startGame(map) {
   window.map = map;
   let mapSprite = map.createSprite();
@@ -97,17 +100,22 @@ function startGame(map) {
     app.stage.addChild(fps.sprite);
   }
   
-  let spoopy_monster = new Monster('spoopy monster', 100, 10);
-  app.stage.addChild(spoopy_monster.sprite);
+  // manually creating one monster
+  this.monsters[0] = new Monster('spoopy monster', 100, 10, map);
+  app.stage.addChild(this.monsters[0].sprite);
+  this.monsters[0].move();
 
   app.ticker.add(() => {
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
-    spoopy_monster.updateSprite(pageX, pageY);
+    for(var i = 0; i < this.monsters.length; i++) {
+      this.monsters[0].updateSprite(pageX, pageY);
+    }
     if(devMode) {
       fps.update();
     }
   });
 }
+window.setInterval(this.monsters[0].wander(), 1000);
 
 // load the textures
 PIXI.loader
