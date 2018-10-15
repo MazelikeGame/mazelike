@@ -202,11 +202,22 @@ class Corridor {
 
 /**
  * A map for a game
- * @prop {Room[]} rooms The rooms in the dungeon
+ * @prop {Room[]} rooms The rooms in the map
+ * @prop {Monster[]} monsters The monsters in this map
+ * @prop {Item[]} items The items in this map
+ * @prop {Player[]} players The players in this map
  */
 export default class GameMap {
   constructor() {
+    this.id = `game-id-here`;
     this.rooms = [];
+    this.monsters = [];
+    this.items = [];
+    this.players = [];
+  }
+
+  _init() {
+    //Monster.initMonsters(this);
   }
 
   /**
@@ -215,6 +226,8 @@ export default class GameMap {
    */
   static generate() {
     let map = generateMap(generateMaze());
+
+    map._init();
 
     return map;
   }
@@ -363,6 +376,8 @@ export default class GameMap {
     for(let i = 0; i < raw.rooms.length; ++i) {
       map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i]));
     }
+
+    map._init();
 
     return map;
   }
