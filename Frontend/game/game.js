@@ -1,6 +1,6 @@
 /* global PIXI  */
 /* eslint-disable complexity */
-import GameMap from "/shared/game-map.mjs";
+import GameMap from "../../shared/game-map.mjs";
 import {KEY_CODES} from "./input.js";
 import FpsCounter from "./fps-counter.js";
 
