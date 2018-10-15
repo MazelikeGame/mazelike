@@ -1,10 +1,9 @@
 /* eslint-disable no-extra-parens,max-len,curly,no-console */
-/* global PIXI */
 /** @module Monster */
 
-import GameMap from "/shared/game-map.mjs";
+import GameMap from "../../shared/game-map.mjs"; // eslint-disable-line
 
-const BLOCK_SIZE = 48;
+const BLOCK_SIZE = 48; //eslint-disable-line
 
 export default class Monster {
   
@@ -18,10 +17,11 @@ export default class Monster {
     //PCx: -1; // -1 if not seen yet
     //PCy: -1;
 
+    /*
     this.sprite = new PIXI.Sprite(PIXI.loader.resources.dog.textures["0-0"]);
     this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
     this.sprite.width = BLOCK_SIZE;
-    this.sprite.height = BLOCK_SIZE;
+    this.sprite.height = BLOCK_SIZE;*/
 
     this.create();
   }
@@ -42,7 +42,7 @@ export default class Monster {
       this.y += 1;
     else if(random === 3)
       this.y -= 1;
-    this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
+    //this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
     //setInterval(this.wander(), 1000);
   }
   move() {
