@@ -6,7 +6,8 @@
     "start": "node --experimental-modules Backend/index.mjs",
     "doc": "jsdoc -r Frontend/game Backend shared -c jsdoc.json -d Documents",
     "eslint": "eslint Frontend Backend shared --ext .js,.mjs",
-    "debug": "node --experimental-modules --inspect Backend/index.mjs"
+    "debug": "node --experimental-modules --inspect Backend/index.mjs",
+    "db:migrate": "node_modules/.bin/sequelize db:migrate"
   },
   "license": "ISC",
   "dependencies": {
