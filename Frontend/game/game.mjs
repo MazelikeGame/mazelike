@@ -1,9 +1,9 @@
 /* global PIXI  */
 /* eslint-disable complexity */
 import GameMap from "./game-map.mjs";
-import {KEY_CODES} from "./input.js";
-import FpsCounter from "./fps-counter.js";
-import Monster from "./monster.js";
+import {KEY_CODES} from "./input.mjs";
+import FpsCounter from "./fps-counter.mjs";
+import Monster from "./monster.mjs";
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];

@@ -2,7 +2,7 @@
 /* global PIXI */
 /** @module GameMap */
 
-import Monster from "../game/Monster.mjs";
+import Monster from "./Monster.mjs";
 
 const BLOCK_SIZE = 48;
 const BLOCK_TYPE = "0-1-box-big";
