@@ -1,11 +1,12 @@
 {
   "name": "mazelike",
-  "version": "3.0.0",
+  "version": "2.3.0",
   "scripts": {
     "test": "jasmine",
     "start": "node --experimental-modules Backend/index.mjs",
-    "doc": "jsdoc -r Frontend Backend -d Documents",
-    "eslint": "eslint Frontend Backend --ext .js,.mjs"
+    "doc": "jsdoc -r Frontend/game Backend shared -c jsdoc.json -d Documents",
+    "eslint": "eslint Frontend Backend shared --ext .js,.mjs",
+    "debug": "node --experimental-modules --inspect Backend/index.mjs"
   },
   "license": "ISC",
   "dependencies": {

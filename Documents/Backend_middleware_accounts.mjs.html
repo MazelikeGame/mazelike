@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: Backend/middleware/accounts.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,32 +17,55 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: Backend/middleware/accounts.mjs</h1>
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import userFn from "../models/user";
+import sql from "../sequelize";
+import qs from "querystring";
 
+let User = userFn(sql);
 
-    <h3> </h3>
+// Get the user model for the current user
+export default async function userMiddleware(req, res, next) {
+  if(req.session &amp;&amp; req.session.authenticated) {
+    req.user = await User.findOne({
+      where: {
+        username: req.session.username
+      }
+    });
+  }
 
+  /**
+   * Redirect the user to /account/login if they are not logged in
+   * 
+   * Usage:
+   * if(res.loginRedirect()) {
+   *  return;
+   * }
+   * @param url Optional url to use other than the current url
+   * @return true if the user was redirected
+   */
+  res.loginRedirect = (url) => {
+    if(!req.user) {
+      let returnUrl = qs.escape(url || req.originalUrl);
+      res.redirect(`/account/login?returnUrl=${returnUrl}`);
+      return true;
+    }
 
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
+    return false;
+  };
+  
+  next();
+}</code></pre>
+        </article>
+    </section>
 
 
 

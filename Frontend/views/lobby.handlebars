@@ -14,10 +14,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <script src="/js/bootstrap.min.js"></script>
+    <link rel="icon" href="/img/m main.png"/>
     <meta name="viewport" content="width=device-width"/>
     <style>
       h2, .alert {
         margin-top: 10px;
+      }
+
+      .userinfo {
+        position: relative;
+        height: 64px;
+        width: auto;
+      }
+      
+      .avatar {
+        margin-right: 15px;
+        width: 64px;
+        height: 64px;
       }
     </style>
   </head>
@@ -51,8 +64,16 @@
         <div class="list-group">
           {{#each players}}
             <div class="list-group-item d-flex justify-content-between align-items-center" data-player-id="{{id}}">
-              {{id}}
+              <div class="userinfo">
+              {{#if image_name}}
+                <img src="../../public/images/{{image_name}}" class="avatar rounded float-left">
+              {{else}}
+                <img src="../../img/profilepic.jpg" class="avatar rounded float-left">
+              {{/if}}
+                <span class="username">{{id}}</span>
+            </div>
               {{#if isHost}}
+                <span class="badge badge-dark">HOST</span>
               {{else}}
                 {{#if ../isHost}}
                   <a class="drop-link" href="/game/lobby/{{../id}}/drop/{{id}}">Drop</a>
