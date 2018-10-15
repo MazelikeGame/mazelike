@@ -4,8 +4,8 @@
   "scripts": {
     "test": "jasmine",
     "start": "sequelize db:migrate && node --experimental-modules Backend/index.mjs",
-    "doc": "jsdoc -r Frontend/game Backend shared -c jsdoc.json -d Documents",
-    "eslint": "eslint Frontend Backend shared --ext .js,.mjs",
+    "doc": "jsdoc -r Frontend/game Backend -c jsdoc.json -d Documents",
+    "eslint": "eslint Frontend Backend --ext .js,.mjs",
     "debug": "node --experimental-modules --inspect Backend/index.mjs",
     "db:migrate": "sequelize db:migrate",
     "db:migrate:undo": "sequelize db:migrate:undo",
