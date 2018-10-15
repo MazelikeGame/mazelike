@@ -28,6 +28,11 @@
   },
   "private": true,
   "devDependencies": {
+    "@babel/preset-env": "^7.1.0",
+    "@babel/register": "^7.0.0",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/runtime": "^7.1.2",
     "jasmine": "^3.2.0",
     "jsdoc": "^3.5.5",
     "request": "^2.88.0"
