@@ -8,7 +8,9 @@ RUN npm install --production
 
 COPY Frontend Frontend
 COPY Backend Backend
-COPY shared shared
+COPY config config
+COPY migrations migrations
+COPY seeders seeders
 
 EXPOSE 3000
 

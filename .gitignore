@@ -1,6 +1,5 @@
 node_modules
 .vscode/tasks.json
-.vscode/launch.json
 .DS_Store
 .env
 runner-result

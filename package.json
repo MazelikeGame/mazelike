@@ -1,12 +1,15 @@
 {
   "name": "mazelike",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "scripts": {
     "test": "jasmine",
-    "start": "node --experimental-modules Backend/index.mjs",
-    "doc": "jsdoc -r Frontend/game Backend shared -c jsdoc.json -d Documents",
-    "eslint": "eslint Frontend Backend shared --ext .js,.mjs",
-    "debug": "node --experimental-modules --inspect Backend/index.mjs"
+    "start": "sequelize db:migrate && node --experimental-modules Backend/index.mjs",
+    "doc": "jsdoc -r Frontend/game Backend -c jsdoc.json -d Documents",
+    "eslint": "eslint Frontend Backend --ext .js,.mjs",
+    "debug": "node --experimental-modules --inspect Backend/index.mjs",
+    "db:migrate": "sequelize db:migrate",
+    "db:migrate:undo": "sequelize db:migrate:undo",
+    "migration:create": "sequelize migration:create --name"
   },
   "license": "ISC",
   "dependencies": {
@@ -21,7 +24,9 @@
     "express-winston": "^3.0.0",
     "multer": "^1.4.0",
     "mysql2": "^1.6.1",
+    "nodemailer": "^4.6.8",
     "sequelize": "^4.38.1",
+    "sequelize-cli": "^4.1.1",
     "socket.io": "^2.1.1",
     "sqlite": "^3.0.0",
     "winston": "^3.1.0"
