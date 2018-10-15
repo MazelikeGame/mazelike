@@ -310,7 +310,7 @@ export default class GameMap {
           this._map[d21(bx, by, MAX_SCREEN_WIDTH)] = BLOCK_TYPE;
         }
       }
-
+      
       // render the corridor to the box to the left
       if(room.left) {
         let edge = room.left;
