@@ -7,7 +7,17 @@ export default function User(sequelize) {
     username: Sequelize.STRING,
     email: Sequelize.STRING,
     password: Sequelize.STRING,
-    image_name: Sequelize.STRING
+    image_name: Sequelize.STRING,
+    resetPasswordToken: {
+      type: Sequelize.STRING,
+      allowNull: true,
+      defaultValue: null
+    },
+    resetPasswordExpires: {
+      type: Sequelize.STRING,
+      allowNull: true,
+      defaultValue: null
+    }
   });
 
   user.encryptPassword = function(password, callback) {
