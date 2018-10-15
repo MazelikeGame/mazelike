@@ -6,21 +6,21 @@ module.exports = {
     password: process.env.DB_PASS,
     database: process.env.DB_DATABASE,
     host: process.env.DB_HOST,
-    dialect: 'mysql'
+    dialect: process.env.DB_STORAGE ? "sqlite" : 'mysql'
   },
   test: {
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_DATABASE,
     host: process.env.DB_HOST,
-    dialect: 'mysql'
+    dialect: process.env.DB_STORAGE ? "sqlite" : 'mysql'
   },
   production: {
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_DATABASE,
     host: process.env.DB_HOST,
-    dialect: 'mysql'
+    dialect: process.env.DB_STORAGE ? "sqlite" : 'mysql'
   }
 };
 
@@ -47,3 +47,9 @@ module.exports = {
 //     "dialect": "mysql"
 //   }
 // }
+=======
+    dialect: process.env.DB_STORAGE ? "sqlite" : 'mysql'
+  }
+};
+
+>>>>>>> dd8bf0c101703a52951f572015a33df2d487acde

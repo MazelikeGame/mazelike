@@ -24,6 +24,13 @@ There may be data left over from a previous mysql instance run `docker-compose d
 
 Run `npm run doc`
 
+## Migrations
+
+* Run `npm run migration:create "name-of-migration-here"` to generate a skeleton migration
+    * Documentation regarding the creation of migrations can be found here: https://sequelize.readthedocs.io/en/latest/docs/migrations/
+* Run `npm run db:migrate` to migrate changes into the database
+* Run `npm run db:migrate:undo` to undo previous migrations
+
 ## Manual deploy/rollback
 
 1. Ssh into the server
@@ -53,9 +60,3 @@ MAILER_EMAIL_ID=noreplymazelike@gmail.com
 MAILER_PASSWORD=sneakybeakylike
 MAILER_SERVICE_PROVIDER=Gmail
 ```
-
-## Generating Migrations
-`node_modules/.bin/sequelize migration:generate --config "config/config.js" --models-path "Backend/models" --name "model name"`
-
-## Running Migrations
-`node_modules/.bin/sequelize db:migrate --config "config/config.js" --models-path "Backend/models"`

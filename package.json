@@ -3,10 +3,13 @@
   "version": "2.3.0",
   "scripts": {
     "test": "jasmine",
-    "start": "node --experimental-modules Backend/index.mjs",
+    "start": "sequelize db:migrate && node --experimental-modules Backend/index.mjs",
     "doc": "jsdoc -r Frontend/game Backend shared -c jsdoc.json -d Documents",
     "eslint": "eslint Frontend Backend shared --ext .js,.mjs",
-    "debug": "node --experimental-modules --inspect Backend/index.mjs"
+    "debug": "node --experimental-modules --inspect Backend/index.mjs",
+    "db:migrate": "sequelize db:migrate",
+    "db:migrate:undo": "sequelize db:migrate:undo",
+    "migration:create": "sequelize migration:create"
   },
   "license": "ISC",
   "dependencies": {
