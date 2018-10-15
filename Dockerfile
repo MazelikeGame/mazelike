@@ -8,7 +8,6 @@ RUN npm install --production
 
 COPY Frontend Frontend
 COPY Backend Backend
-COPY shared shared
 
 EXPOSE 3000
 
