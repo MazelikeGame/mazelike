@@ -16,6 +16,7 @@ MazeLike_Deploy:
       - docker kill mazelike || echo "Server not running"
       - docker container rm mazelike || echo "Container not found"
       - docker run --name mazelike -d -p 80:3000 --env-file /etc/mazelike/.env -v /etc/mazelike/data:/app/Frontend/public "mazelike/backend:$VERSION"
+      - /home/ryan/bin/push Master "Deployed version $VERSION"
   only:
     - master
 
@@ -23,9 +24,11 @@ MazeLike_Staging:
   stage: deploy
   script:
       # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
+      - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
       - docker build -t "mazelike/backend:staging" .
       - docker kill mazelike_staging || echo "Server not running"
       - docker container rm mazelike_staging || echo "Container not found"
       - docker run --name mazelike_staging -d -p 8080:3000 --env-file /etc/mazelike/staging.env -v /etc/mazelike/data_staging:/app/Frontend/public "mazelike/backend:staging"
+      - /home/ryan/bin/push Staging "Deployed version $VERSION"
   only:
     - staging
