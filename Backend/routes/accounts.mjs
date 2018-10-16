@@ -270,7 +270,6 @@ accountRouter.post('/forgot-password', async(req, res) => {
     '\n\nThank you,\nMazeLike'
   };
   try {
-    // eslint-disable-next-line
     await smtpTransport.sendMail(mailOptions);
   } catch (err) {
     return res.render('forgot-password', {
