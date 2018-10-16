@@ -269,14 +269,13 @@ accountRouter.post('/forgot-password', async(req, res) => {
     'If you did not request this, please ignore this email and your password will remain unchanged.' +
     '\n\nThank you,\nMazeLike'
   };
-  // eslint-disable-next-line
-  let sendMail = await smtpTransport.sendMail(mailOptions, (err) => {
-    if(err) {
-      return res.render('forgot-password', {
-        badError: err
-      });
-    }
-  });
+  try {
+    await smtpTransport.sendMail(mailOptions);
+  } catch (err) {
+    return res.render('forgot-password', {
+      badError: err
+    });
+  }
   return res.render('forgot-password', {
     accountFound: true
   });
