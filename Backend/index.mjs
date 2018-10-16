@@ -1,4 +1,5 @@
 /* global io */
+// jshint esversion: 6
 import sequelize from "./sequelize";
 import express from "express";
 import http from "http";
