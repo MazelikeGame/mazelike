@@ -13,15 +13,15 @@ export default class Monster {
     this.map = map_in;
     this.id = id_in;
     this.targetAquired = false; // "in pursuit" boolean
-    this.x = 5;
-    this.y = 5;
+    this.x = 20;
+    this.y = 2;
 
     this.PCx = -1; // -1 if not seen yet or previously seen location explored
     this.PCy = -1;
 
-    this.placeInRandomRoom();
+    //this.placeInRandomRoom(); todo testing
 
-    this.sprite = new PIXI.Sprite(PIXI.loader.resources.dog.textures["0-0"]);
+    this.sprite = new PIXI.Sprite(PIXI.loader.resources.demon.textures["red demon"]);
     this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
     this.sprite.width = BLOCK_SIZE;
     this.sprite.height = BLOCK_SIZE;
@@ -32,9 +32,18 @@ export default class Monster {
    * 
    * Updates targetAquired field, which is true if we're currently in pursuit.
    * If PC is in sight, PCx and PCy will be updated (last known location coordinates)
+   * If multiple PCs in sight, targets closest.
    */
   canSeePC() {
     this.targetAquired = false;
+    let distances = [];
+    let visionIncomplete = true;
+    for(let i = 0; i < this.map.numPCs; i++) {
+      while(visionIncomplete) {
+
+        visionIncomplete = false;
+      }
+    }
   }
 
   /** 
@@ -79,6 +88,7 @@ export default class Monster {
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
    */
   move() {
+    this.canSeePC();
     if(!this.targetAquired) {
       this.wander();
     } else {

@@ -116,4 +116,6 @@ function startGame(map) {
 PIXI.loader
   .add("floor", "DawnLike/Objects/Floor.json")
   .add("dog", "DawnLike/Characters/dog.json")
+  .add("demon", "DawnLike/Characters/demon.json")
+  .add("player", "DawnLike/Characters/player.json")
   .load(setup);

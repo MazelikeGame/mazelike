@@ -216,6 +216,11 @@ export default class GameMap {
     this.monsters = [];
     this.items = [];
     this.players = [];
+    //todo testing
+    this.PC1x = 15;
+    this.PC1y = 1;
+    this.numPCs = 1;
+    //end katie testing, only temporary
   }
 
   _init() {
@@ -225,8 +230,8 @@ export default class GameMap {
   /**
    * Puts a monster in half of all "rooms".
    */
-  generateMonsters() {
-    for(let i = 0; i < this.rooms.length / 2; i++) {
+  generateMonsters() { //this.rooms.length / 2 todo for testing
+    for(let i = 0; i < 1; i++) {
       this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i);
     }
   }
