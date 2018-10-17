@@ -19,7 +19,7 @@ GameMap.register({
   },
 
   render({x, y, width, height, map}) {
-    let texture = PIXI.loader.resources.floor.textures[`${map.getTheme()}-box-big`].clone();
+    let texture = PIXI.loader.resources.floor.textures[`${map.theme}-box-big`].clone();
     let defaultFrame = texture.frame;
     
     let tWidth = defaultFrame.width - 12;

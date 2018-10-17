@@ -229,6 +229,8 @@ class Corridor {
 
 /**
  * A map for a game
+ * @prop {string} id Unique id for this map
+ * @prop {string} theme The theme for this map
  * @prop {Room[]} rooms The rooms in the map
  * @prop {Monster[]} monsters The monsters in this map
  * @prop {Item[]} items The items in this map
@@ -236,7 +238,6 @@ class Corridor {
  */
 export default class GameMap {
   constructor() {
-    this.id = `game-id-here`;
     this.rooms = [];
     this.monsters = [];
     this.items = [];
@@ -263,8 +264,13 @@ export default class GameMap {
       xPadding: (params.xPadding || 4) * MIN_SIZE,
       yPadding: (params.xPadding || 4) * MIN_SIZE,
       theme: params.theme || THEMES[Math.floor(Math.random() * THEMES.length)],
-      spawn: params.spawn
+      spawn: params.spawn,
+      id: params.id
     };
+
+    if(!this._params.id) {
+      throw new Error("Id missing");
+    }
 
     if(!this._params.spawn) {
       this._params.spawn = Math.floor(Math.random() * this._params.nodes);
@@ -496,9 +502,14 @@ export default class GameMap {
         xPadding: this._params.xPadding / MIN_SIZE,
         yPadding: this._params.xPadding / MIN_SIZE,
         theme: this._params.theme,
-        spawn: this._params.spawn
+        spawn: this._params.spawn,
+        id: this._params.id
       }
     });
+  }
+
+  get id() {
+    return this._params.id;
   }
 
   /**
@@ -690,11 +701,7 @@ export default class GameMap {
     }
   }
 
-  /**
-   * Get the theme of this map
-   * @returns {string}
-   */
-  getTheme() {
+  get theme() {
     return this._params.theme;
   }
 

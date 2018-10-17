@@ -81,7 +81,9 @@ function setup() {
         startGame(GameMap.parse(json));
       });
   } else {
-    startGame(GameMap.generate());
+    startGame(GameMap.generate({
+      id: "single-player"
+    }));
   }
 }
 
