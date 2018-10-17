@@ -2,17 +2,8 @@
 /* global PIXI */
 /** @module GameMap */
 
-const BLOCK_SIZE = 48;
-const SIZE = 10;
-const NODES = SIZE ** 2;
-const MIN_ROOM = 4 * BLOCK_SIZE;
-const MAX_ROOM = 10 * BLOCK_SIZE;
-const MAX_Y_DIST = 3 * BLOCK_SIZE;
-const ROOM_CHANCE = 0.2;
-const CORRIDOR_SIZE = 2 * BLOCK_SIZE;
-const X_PADDING = BLOCK_SIZE;
-const Y_PADDING = BLOCK_SIZE;
 const DEFAULT_RENDERER = "tile-renderer-floor-0-1-box-big";
+const MIN_SIZE = 48;
 
 /**
  * Map a 2d coordinate to a 1d coordinate
@@ -20,7 +11,7 @@ const DEFAULT_RENDERER = "tile-renderer-floor-0-1-box-big";
  * @param {*} x 
  * @param {*} y 
  */
-const d21 = (x, y, size = SIZE) => {
+const d21 = (x, y, size) => {
   return y * size + x;
 };
 
@@ -30,7 +21,7 @@ const d21 = (x, y, size = SIZE) => {
  * @param {*} x 
  * @param {*} y 
  */
-const d12 = (i, size = SIZE) => {
+const d12 = (i, size) => {
   return [i % size, Math.floor(i / size)];
 };
 
@@ -50,12 +41,13 @@ class Room {
    * @param width 
    * @param height 
    */
-  constructor(i, x, y, width, height) {
+  constructor(i, x, y, width, height, mapParams) {
     this._i = i;
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+    this._params = mapParams;
   
     this._corridors = new Map();
   }
@@ -98,7 +90,7 @@ class Room {
    * @return {Room}
    */
   get above() {
-    return this._corridors.get(this._i - SIZE);
+    return this._corridors.get(this._i - this._params.size);
   }
 
   /**
@@ -106,7 +98,7 @@ class Room {
    * @return {Room}
    */
   get below() {
-    return this._corridors.get(this._i + SIZE);
+    return this._corridors.get(this._i + this._params.size);
   }
 
   /**
@@ -115,10 +107,10 @@ class Room {
    */
   toJSON() {
     let raw = {
-      x: this.x,
-      y: this.y,
-      w: this.width,
-      h: this.height,
+      x: this.x / MIN_SIZE,
+      y: this.y / MIN_SIZE,
+      w: this.width / MIN_SIZE,
+      h: this.height / MIN_SIZE,
       r: this._rendererName
     };
 
@@ -137,15 +129,22 @@ class Room {
    * Convert json into a Room
    * @private
    */
-  static _parse(i, rooms, json) {
-    let room = new Room(i, json.x, json.y, json.w, json.h);
+  static _parse(i, rooms, json, mapParams) {
+    let room = new Room(
+      i,
+      json.x * MIN_SIZE,
+      json.y * MIN_SIZE,
+      json.w * MIN_SIZE,
+      json.h * MIN_SIZE,
+      mapParams
+    );
 
     if(json.l) {
-      room._connect(rooms[i - 1], Corridor._parse(json.l));
+      room._connect(rooms[i - 1], Corridor._parse(json.l, mapParams));
     }
 
     if(json.a) {
-      room._connect(rooms[i - SIZE], Corridor._parse(json.a));
+      room._connect(rooms[i - room._params.size], Corridor._parse(json.a, mapParams));
     }
 
     room._rendererName = json.r;
@@ -163,12 +162,13 @@ class Room {
  * @prop {number} weight The weight to use for graph algorithms
  */
 class Corridor {
-  constructor(x, y, width, height) {
+  constructor(x, y, width, height, mapParams) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
-    this.weight = this.width === CORRIDOR_SIZE ? this.height : this.width;
+    this._params = mapParams;
+    this.weight = this.width === this._params.corridorSize ? this.height : this.width;
   }
 
   /**
@@ -187,10 +187,10 @@ class Corridor {
    */
   toJSON() {
     return {
-      x: this.x,
-      y: this.y,
-      w: this.width,
-      h: this.height,
+      x: this.x / MIN_SIZE,
+      y: this.y / MIN_SIZE,
+      w: this.width / MIN_SIZE,
+      h: this.height / MIN_SIZE,
       r: this._rendererName
     };
   }
@@ -199,8 +199,15 @@ class Corridor {
    * Convert json into a Corridor
    * @private
    */
-  static _parse(json) {
-    let corridor = new Corridor(json.x, json.y, json.w, json.h);
+  static _parse(json, mapParams) {
+    let corridor = new Corridor(
+      json.x * MIN_SIZE,
+      json.y * MIN_SIZE,
+      json.w * MIN_SIZE,
+      json.h * MIN_SIZE,
+      mapParams
+    );
+
     corridor._rendererName = json.r;
     return corridor;
   }
@@ -227,11 +234,37 @@ export default class GameMap {
   }
 
   /**
+   * Initialize the map generation parameters
+   * @private
+   * @param params 
+   */
+  _initParams(params = {}) {
+    this._params = {
+      nodes: params.nodes || 100,
+      minRoom: (params.minRoom || 4) * MIN_SIZE,
+      maxRoom: (params.maxRoom || 10) * MIN_SIZE,
+      maxYDist: (params.maxYDist || 3) * MIN_SIZE,
+      roomChance: params.roomChange || 0.2,
+      corridorSize: (params.corridorSize || 2) * MIN_SIZE,
+      xPadding: (params.xPadding || 1) * MIN_SIZE,
+      yPadding: (params.xPadding || 1) * MIN_SIZE
+    };
+
+    this._params.size = Math.sqrt(this._params.nodes);
+    if(this._params.size !== Math.floor(this._params.size)) {
+      throw new Error("nodes must be a perfect square");
+    }
+  }
+
+  /**
    * Geneate a game map
    * @returns {GameMap}
    */
-  static generate() {
-    let map = generateMap(generateMaze());
+  static generate(params) {
+    let map = new GameMap();
+    map._initParams(params);
+
+    map.generateMap(map.generateMaze());
 
     map._init();
 
@@ -412,7 +445,17 @@ export default class GameMap {
    */
   serialize() {
     return JSON.stringify({
-      rooms: this.rooms
+      rooms: this.rooms,
+      params: {
+        nodes: this._params.nodes,
+        minRoom: this._params.minRoom / MIN_SIZE,
+        maxRoom: this._params.maxRoom / MIN_SIZE,
+        maxYDist: this._params.maxYDist / MIN_SIZE,
+        roomChance: this._params.roomChange,
+        corridorSize: this._params.corridorSize / MIN_SIZE,
+        xPadding: this._params.xPadding / MIN_SIZE,
+        yPadding: this._params.xPadding / MIN_SIZE
+      }
     });
   }
 
@@ -425,184 +468,186 @@ export default class GameMap {
     let map = new GameMap();
     let raw = typeof json === "string" ? JSON.parse(json) : json;
 
+    map._initParams(raw);
+
     for(let i = 0; i < raw.rooms.length; ++i) {
-      map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i]));
+      map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i], map._params));
     }
 
     map._init();
 
     return map;
   }
+
+  /**
+   * The basic maze generation algorithm.
+   * @private
+   * @returns A map of edges
+   */
+  generateMaze() {
+    let unvisited = new Set();
+    let corridors = new Map();
+    let stack = [];
+
+    for(let i = 0; i < this._params.nodes; ++i) {
+      unvisited.add(i);
+    }
+
+    let startingPoint = Math.floor(Math.random() * unvisited.size);
+    stack.push(startingPoint);
+
+    while(stack.length) {
+      let current = stack[stack.length - 1];
+      let [x, y] = d12(current, this._params.size);
+      
+      // find all unvisited neighbours
+      let unvisitedNeighbours = [];
+
+      if(unvisited.has(d21(x + 1, y, this._params.size)) && x + 1 < this._params.size) {
+        unvisitedNeighbours.push(d21(x + 1, y, this._params.size));
+      }
+
+      if(unvisited.has(d21(x, y + 1, this._params.size)) && y + 1 < this._params.size) {
+        unvisitedNeighbours.push(d21(x, y + 1, this._params.size));
+      }
+
+      if(unvisited.has(d21(x - 1, y, this._params.size)) && x - 1 >= 0) {
+        unvisitedNeighbours.push(d21(x - 1, y, this._params.size));
+      }
+
+      if(unvisited.has(d21(x, y - 1, this._params.size)) && y - 1 >= 0) {
+        unvisitedNeighbours.push(d21(x, y - 1, this._params.size));
+      }
+
+      // all of our neighbours have been visited go back to the previous node
+      if(!unvisitedNeighbours.length) {
+        stack.pop();
+        continue;
+      }
+
+      // visit a neighbouring cell
+      let toCell = unvisitedNeighbours[Math.floor(Math.random() * unvisitedNeighbours.length)];
+      unvisited.delete(toCell);
+
+      // create the edges for the corridors
+      if(!corridors.has(toCell)) {
+        corridors.set(toCell, new Set());
+      }
+
+      if(!corridors.has(current)) {
+        corridors.set(current, new Set());
+      }
+
+      corridors.get(toCell).add(current);
+      corridors.get(current).add(toCell);
+
+      stack.push(toCell);
+    }
+
+    return corridors;
+  }
+
+  /**
+   * Expand the maze generated by generateMaze into something with differently sized rooms
+   * @private
+   * @param {*} corridors 
+   * @returns {Object} rooms
+   */
+  generateMap(corridors) {
+    let map = this;
+    // Coords for the room we are placing
+    let x = this._params.xPadding;
+    let y = this._params.yPadding;
+    // Height of the tallest room in this row
+    let maxHeight = 0;
+    // Location width and heights of all rooms
+    map.rooms = [];
+    let renderers = Array.from(GameMap._renderers.values());
+
+    // Place rooms onto the map
+    for(let i = 0; i < this._params.nodes; ++i) {
+      // We are at the end of this row tart a new row
+      if(i % this._params.size === 0 && i > 0) {
+        x = this._params.xPadding;
+        y += maxHeight + Math.floor(Math.random() * this._params.maxYDist) + this._params.yPadding;
+        maxHeight = 0;
+      }
+
+      let width = this._params.corridorSize;
+      let height = this._params.corridorSize;
+
+      // determine if this box should be a room
+      if(Math.random() < this._params.roomChance || corridors.get(i).size === 1) {
+        width = Math.floor(Math.random() * (this._params.maxRoom - this._params.minRoom)) + this._params.minRoom;
+        height = Math.floor(Math.random() * (this._params.maxRoom - this._params.minRoom)) + this._params.minRoom;
+      }
+
+      x += Math.max(this._params.maxRoom - width, 0);
+      
+      // save for corridor rendering
+      let newRoom = new Room(i, x, y, width, height, this._params);
+      map.rooms.push(newRoom);
+
+      // pick a renderer
+      let renderer;
+      do {
+        renderer = renderers[Math.floor(Math.random() * renderers.length)];
+      } while(!renderer.canRender(newRoom));
+
+      newRoom._rendererName = renderer.name;
+
+      maxHeight = Math.max(height, maxHeight);
+
+      // Render a corridor to the box to our left (if there is one)
+      if(corridors.get(i).has(i - 1)) {
+        let room = map.rooms[i - 1];
+
+        // find a row that we have in common
+        let yStart = Math.max(y, room.y);
+        let sharedHeight = Math.min(height - (yStart - y), room.height - (yStart - room.y)) - this._params.corridorSize;
+        let yPos = Math.floor(Math.random() * sharedHeight) + yStart;
+
+        // Add weights to the graph
+        let edge = new Corridor(
+          room.x + room.width, yPos, x - (room.x + room.width), this._params.corridorSize, this._params);
+
+        // pick a corridor renderer
+        do {
+          renderer = renderers[Math.floor(Math.random() * renderers.length)];
+        } while(!renderer.canRender(newRoom));
+
+        edge._rendererName = renderer.name;
+
+        room._connect(map.rooms[i], edge);
+      }
+
+      // Render a corridor to the box above us
+      if(corridors.get(i).has(i - this._params.size)) {
+        let room = map.rooms[i - this._params.size];
+
+        // find a column that we have in common
+        let xStart = Math.max(x, room.x);
+        let sharedWidth = Math.min(width - (xStart - x), room.width - (xStart - room.x)) - this._params.corridorSize;
+        let xPos = Math.floor(Math.random() * sharedWidth) + xStart;
+
+        // Add weights to the graph
+        let edge = new Corridor(
+          xPos, room.y + room.height, this._params.corridorSize, y - (room.y + room.height), this._params);
+
+        // pick a corridor renderer
+        do {
+          renderer = renderers[Math.floor(Math.random() * renderers.length)];
+        } while(!renderer.canRender(newRoom));
+
+        edge._rendererName = renderer.name;
+
+        room._connect(map.rooms[i], edge);
+      }
+
+      x += width + this._params.xPadding;
+    }
+  }
 }
-
-/**
- * The basic maze generation algorithm.
- * @private
- * @returns A map of edges
- */
-const generateMaze = () => {
-  let unvisited = new Set();
-  let corridors = new Map();
-  let stack = [];
-
-  for(let i = 0; i < NODES; ++i) {
-    unvisited.add(i);
-  }
-
-  let startingPoint = Math.floor(Math.random() * unvisited.size);
-  stack.push(startingPoint);
-
-  while(stack.length) {
-    let current = stack[stack.length - 1];
-    let [x, y] = d12(current);
-    
-    // find all unvisited neighbours
-    let unvisitedNeighbours = [];
-
-    if(unvisited.has(d21(x + 1, y)) && x + 1 < SIZE) {
-      unvisitedNeighbours.push(d21(x + 1, y));
-    }
-
-    if(unvisited.has(d21(x, y + 1)) && y + 1 < SIZE) {
-      unvisitedNeighbours.push(d21(x, y + 1));
-    }
-
-    if(unvisited.has(d21(x - 1, y)) && x - 1 >= 0) {
-      unvisitedNeighbours.push(d21(x - 1, y));
-    }
-
-    if(unvisited.has(d21(x, y - 1)) && y - 1 >= 0) {
-      unvisitedNeighbours.push(d21(x, y - 1));
-    }
-
-    // all of our neighbours have been visited go back to the previous node
-    if(!unvisitedNeighbours.length) {
-      stack.pop();
-      continue;
-    }
-
-    // visit a neighbouring cell
-    let toCell = unvisitedNeighbours[Math.floor(Math.random() * unvisitedNeighbours.length)];
-    unvisited.delete(toCell);
-
-    // create the edges for the corridors
-    if(!corridors.has(toCell)) {
-      corridors.set(toCell, new Set());
-    }
-
-    if(!corridors.has(current)) {
-      corridors.set(current, new Set());
-    }
-
-    corridors.get(toCell).add(current);
-    corridors.get(current).add(toCell);
-
-    stack.push(toCell);
-  }
-
-  return corridors;
-};
-
-/**
- * Expand the maze generated by generateMaze into something with differently sized rooms
- * @private
- * @param {*} corridors 
- * @returns {Object} rooms
- */
-const generateMap = (corridors) => {
-  let map = new GameMap();
-  // Coords for the room we are placing
-  let x = X_PADDING;
-  let y = Y_PADDING;
-  // Height of the tallest room in this row
-  let maxHeight = 0;
-  // Location width and heights of all rooms
-  map.rooms = [];
-  let renderers = Array.from(GameMap._renderers.values());
-
-  // Place rooms onto the map
-  for(let i = 0; i < NODES; ++i) {
-    // We are at the end of this row tart a new row
-    if(i % SIZE === 0 && i > 0) {
-      x = X_PADDING;
-      y += maxHeight + Math.floor(Math.random() * MAX_Y_DIST) + Y_PADDING;
-      maxHeight = 0;
-    }
-
-    let width = CORRIDOR_SIZE;
-    let height = CORRIDOR_SIZE;
-
-    // determine if this box should be a room
-    if(Math.random() < ROOM_CHANCE || corridors.get(i).size === 1) {
-      width = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
-      height = Math.floor(Math.random() * (MAX_ROOM - MIN_ROOM)) + MIN_ROOM;
-    }
-
-    x += Math.max(MAX_ROOM - width, 0);
-    
-    // save for corridor rendering
-    let newRoom = new Room(i, x, y, width, height);
-    map.rooms.push(newRoom);
-
-    // pick a renderer
-    let renderer;
-    do {
-      renderer = renderers[Math.floor(Math.random() * renderers.length)];
-    } while(!renderer.canRender(newRoom));
-
-    newRoom._rendererName = renderer.name;
-
-    maxHeight = Math.max(height, maxHeight);
-
-    // Render a corridor to the box to our left (if there is one)
-    if(corridors.get(i).has(i - 1)) {
-      let room = map.rooms[i - 1];
-
-      // find a row that we have in common
-      let yStart = Math.max(y, room.y);
-      let sharedHeight = Math.min(height - (yStart - y), room.height - (yStart - room.y)) - CORRIDOR_SIZE;
-      let yPos = Math.floor(Math.random() * sharedHeight) + yStart;
-
-      // Add weights to the graph
-      let edge = new Corridor(room.x + room.width, yPos, x - (room.x + room.width), CORRIDOR_SIZE);
-
-      // pick a corridor renderer
-      do {
-        renderer = renderers[Math.floor(Math.random() * renderers.length)];
-      } while(!renderer.canRender(newRoom));
-
-      edge._rendererName = renderer.name;
-
-      room._connect(map.rooms[i], edge);
-    }
-
-    // Render a corridor to the box above us
-    if(corridors.get(i).has(i - SIZE)) {
-      let room = map.rooms[i - SIZE];
-
-      // find a column that we have in common
-      let xStart = Math.max(x, room.x);
-      let sharedWidth = Math.min(width - (xStart - x), room.width - (xStart - room.x)) - CORRIDOR_SIZE;
-      let xPos = Math.floor(Math.random() * sharedWidth) + xStart;
-
-      // Add weights to the graph
-      let edge = new Corridor(xPos, room.y + room.height, CORRIDOR_SIZE, y - (room.y + room.height));
-
-      // pick a corridor renderer
-      do {
-        renderer = renderers[Math.floor(Math.random() * renderers.length)];
-      } while(!renderer.canRender(newRoom));
-
-      edge._rendererName = renderer.name;
-
-      room._connect(map.rooms[i], edge);
-    }
-
-    x += width + X_PADDING;
-  }
-
-  return map;
-};
 
 GameMap._renderers = new Map();
 
