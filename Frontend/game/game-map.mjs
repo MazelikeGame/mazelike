@@ -3,7 +3,7 @@
 /** @module GameMap */
 
 const DEFAULT_RENDERER = "tile-renderer-floor-0-1-box-big";
-const MIN_SIZE = 48;
+const MIN_SIZE = 16;
 
 /**
  * Map a 2d coordinate to a 1d coordinate
@@ -241,13 +241,13 @@ export default class GameMap {
   _initParams(params = {}) {
     this._params = {
       nodes: params.nodes || 100,
-      minRoom: (params.minRoom || 4) * MIN_SIZE,
-      maxRoom: (params.maxRoom || 10) * MIN_SIZE,
-      maxYDist: (params.maxYDist || 3) * MIN_SIZE,
+      minRoom: (params.minRoom || 16) * MIN_SIZE,
+      maxRoom: (params.maxRoom || 40) * MIN_SIZE,
+      maxYDist: (params.maxYDist || 12) * MIN_SIZE,
       roomChance: params.roomChange || 0.2,
-      corridorSize: (params.corridorSize || 2) * MIN_SIZE,
-      xPadding: (params.xPadding || 1) * MIN_SIZE,
-      yPadding: (params.xPadding || 1) * MIN_SIZE
+      corridorSize: (params.corridorSize || 8) * MIN_SIZE,
+      xPadding: (params.xPadding || 4) * MIN_SIZE,
+      yPadding: (params.xPadding || 4) * MIN_SIZE
     };
 
     this._params.size = Math.sqrt(this._params.nodes);
@@ -650,7 +650,3 @@ export default class GameMap {
 }
 
 GameMap._renderers = new Map();
-
-GameMap.register(GameMap.createTileRenderer("floor", "0-0-box-big"));
-GameMap.register(GameMap.createTileRenderer("floor", "0-1-box-big")); // DEFAULT
-GameMap.register(GameMap.createTileRenderer("floor", "0-3-box-big"));
