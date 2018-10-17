@@ -262,8 +262,17 @@ export default class GameMap {
       corridorSize: (params.corridorSize || 8) * MIN_SIZE,
       xPadding: (params.xPadding || 4) * MIN_SIZE,
       yPadding: (params.xPadding || 4) * MIN_SIZE,
-      theme: params.theme || THEMES[Math.floor(Math.random() * THEMES.length)]
+      theme: params.theme || THEMES[Math.floor(Math.random() * THEMES.length)],
+      spawn: params.spawn
     };
+
+    if(!this._params.spawn) {
+      this._params.spawn = Math.floor(Math.random() * this._params.nodes);
+    }
+
+    if(this._params.spawn >= this._params.nodes || this._params.spawn < 0) {
+      throw new Error("Spawn must be less that nodes and greater than or equal to 0");
+    }
 
     this._params.size = Math.sqrt(this._params.nodes);
     if(this._params.size !== Math.floor(this._params.size)) {
@@ -317,6 +326,21 @@ export default class GameMap {
    * @param {number} yMax y coordinate for the bottom right corner
    */
   updateSprite(container, xMin, yMin, xMax, yMax) {
+    /* eslint-disable no-param-reassign */
+    xMin = Math.max(0, xMin);
+    yMin = Math.max(0, yMin);
+    /* eslint-enable no-param-reassign */
+
+    if(container.__prevXMin === xMin && container.__prevXMax === xMax && 
+      container.__prevYMin === yMin && container.__prevYMax === yMax) {
+      return;
+    }
+
+    container.__prevXMin = xMin;
+    container.__prevXMax = xMax;
+    container.__prevYMin = yMin;
+    container.__prevYMax = yMax;
+
     while(container.children.length) {
       container.removeChild(container.children[0]);
     }
@@ -471,7 +495,8 @@ export default class GameMap {
         corridorSize: this._params.corridorSize / MIN_SIZE,
         xPadding: this._params.xPadding / MIN_SIZE,
         yPadding: this._params.xPadding / MIN_SIZE,
-        theme: this._params.theme
+        theme: this._params.theme,
+        spawn: this._params.spawn
       }
     });
   }
@@ -663,6 +688,31 @@ export default class GameMap {
 
       x += width + this._params.xPadding;
     }
+  }
+
+  /**
+   * Get the theme of this map
+   * @returns {string}
+   */
+  getTheme() {
+    return this._params.theme;
+  }
+
+  /**
+   * Get the spawn point for a player
+   * @returns {object} {x,y}
+   */
+  getSpawnPoint() {
+    let room = this.rooms[this._params.spawn];
+
+    let x = room.x + Math.floor(Math.random() * (room.width * 3 / 4)) + Math.floor(room.width / 4);
+    let y = room.y + Math.floor(Math.random() * (room.height * 3 / 4)) + Math.floor(room.height / 4);
+
+    if(!this.isOnMap(x, y)) {
+      throw new Error("Spawn point not on map");
+    }
+
+    return {x, y};
   }
 }
 
