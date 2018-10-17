@@ -219,7 +219,16 @@ export default class GameMap {
   }
 
   _init() {
-    this.monsters[0] = new Monster('spoopy monster', 100, 10, this.map);
+    this.generateMonsters();
+  }
+
+  /**
+   * Puts a monster in half of all "rooms".
+   */
+  generateMonsters() {
+    for(let i = 0; i < this.rooms.length / 2; i++) {
+      this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i);
+    }
   }
 
   /**

@@ -3,7 +3,6 @@
 import GameMap from "./game-map.mjs";
 import {KEY_CODES} from "./input.mjs";
 import FpsCounter from "./fps-counter.mjs";
-import Monster from "./monster.mjs";
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
@@ -87,9 +86,6 @@ function setup() {
 
 let fps = new FpsCounter();
 
-// monsters array should exist for every "level" or game map
-//let monsters = [];
-
 function startGame(map) {
   window.map = map;
   let mapSprite = map.createSprite();
@@ -100,20 +96,15 @@ function startGame(map) {
     app.stage.addChild(fps.sprite);
   }
   
-  // manually creating one monster
-  //monsters[0] = new Monster('spoopy monster', 100, 10, map);
-  //app.stage.addChild(monsters[0].sprite);
-  //monsters[0].move();
-
-  // window.setInterval(function() {
-  //   map.monsters[0].move();
-  // }, 500);
+  window.setInterval(function() {
+    map.monsters[0].move();
+    for(let i = 0; i < this.map.monsters.length; i++) {
+      map.monsters[i].move();
+    }
+  }, 500);
 
   app.ticker.add(() => {
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
-    // for(var i = 0; i < monsters.length; i++) {
-    //   monsters[0].updateSprite(pageX, pageY);
-    // }
     if(devMode) {
       fps.update();
     }
