@@ -10,6 +10,8 @@ let gameId = gameIdMatch && gameIdMatch[1];
 
 let devMode = location.hostname === "localhost";
 
+window.devMode = devMode; //Added for client side testing access.
+
 let app = new PIXI.Application({
   antialias: true
 });
