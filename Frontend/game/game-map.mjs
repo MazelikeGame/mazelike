@@ -219,7 +219,7 @@ export default class GameMap {
   }
 
   _init() {
-    //Monster.initMonsters(this);
+    this.monsters[0] = new Monster('spoopy monster', 100, 10, this.map);
   }
 
   /**
@@ -316,6 +316,14 @@ export default class GameMap {
       if(room.above && inBounds(room.above)) {
         process(room.above, "y");
       }
+    }
+
+    // monster movement
+    for(let i = 0; i < this.monsters.length; i++) {
+      let x = this.monsters[i].x * BLOCK_SIZE - xMin;
+      let y = this.monsters[i].y * BLOCK_SIZE - yMin;
+      this.monsters[i].sprite.position.set(x, y);
+      container.addChild(this.monsters[i].sprite);
     }
   }
 

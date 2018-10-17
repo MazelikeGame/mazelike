@@ -16,8 +16,8 @@ export default class Monster {
     this.y = 5;
     //PCx: -1; // -1 if not seen yet
     //PCy: -1;
-
-    this.placeInRandomRoom();
+    //console.log(this.map.rooms.length);
+    //this.placeInRandomRoom();
 
     this.sprite = new PIXI.Sprite(PIXI.loader.resources.dog.textures["0-0"]);
     this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
@@ -96,6 +96,7 @@ export default class Monster {
   placeInRandomRoom() {
     let numRooms = this.map.rooms.length;
     this.initialRoom = Math.floor(Math.random() * numRooms); 
+    //this.initialRoom = 0; //remove after testing
     let randomDiffX = Math.floor(Math.random() * (this.map.rooms[this.initialRoom].width / BLOCK_SIZE)); 
     this.x = (this.map.rooms[this.initialRoom].x / BLOCK_SIZE) + randomDiffX;
     let randomDiffY = Math.floor(Math.random() * (this.map.rooms[this.initialRoom].height / BLOCK_SIZE)); 
