@@ -3,7 +3,6 @@
 /** @module GameMap */
 
 const BLOCK_SIZE = 48;
-const BLOCK_TYPE = "0-1-box-big";
 const SIZE = 10;
 const NODES = SIZE ** 2;
 const MIN_ROOM = 4 * BLOCK_SIZE;
@@ -13,6 +12,7 @@ const ROOM_CHANCE = 0.2;
 const CORRIDOR_SIZE = 2 * BLOCK_SIZE;
 const X_PADDING = BLOCK_SIZE;
 const Y_PADDING = BLOCK_SIZE;
+const DEFAULT_RENDERER = "tile-renderer-floor-0-1-box-big";
 
 /**
  * Map a 2d coordinate to a 1d coordinate
@@ -118,7 +118,8 @@ class Room {
       x: this.x,
       y: this.y,
       w: this.width,
-      h: this.height
+      h: this.height,
+      r: this._rendererName
     };
 
     if(this.left) {
@@ -146,6 +147,8 @@ class Room {
     if(json.a) {
       room._connect(rooms[i - SIZE], Corridor._parse(json.a));
     }
+
+    room._rendererName = json.r;
 
     return room;
   }
@@ -187,7 +190,8 @@ class Corridor {
       x: this.x,
       y: this.y,
       w: this.width,
-      h: this.height
+      h: this.height,
+      r: this._rendererName
     };
   }
 
@@ -196,7 +200,9 @@ class Corridor {
    * @private
    */
   static _parse(json) {
-    return new Corridor(json.x, json.y, json.w, json.h);
+    let corridor = new Corridor(json.x, json.y, json.w, json.h);
+    corridor._rendererName = json.r;
+    return corridor;
   }
 }
 
@@ -277,6 +283,12 @@ export default class GameMap {
 
     // process a single room/corridor
     let process = (rect) => {
+      let renderer = GameMap._renderers.get(rect._rendererName);
+
+      if(!renderer) {
+        renderer = GameMap._renderers.get(DEFAULT_RENDERER);
+      }
+
       // get corrds relative to the screen
       let x = rect.x - xMin;
       let y = rect.y - yMin;
@@ -290,8 +302,7 @@ export default class GameMap {
       let relativeWidth = width - relativeX - Math.max(xEnd - xMax, 0);
       let relativeHeight = height - relativeY - Math.max(yEnd - yMax, 0);
 
-      let texture = PIXI.loader.resources.floor.textures[BLOCK_TYPE];
-      let sprites = GameMap._tileRectWithSprite({
+      let sprites = renderer.render({
         x: relativeX,
         y: relativeY,
         width: relativeWidth,
@@ -301,7 +312,7 @@ export default class GameMap {
         xMax,
         yMin,
         yMax
-      }, texture);
+      });
 
       // positon and size the sprites that were given
       sprites.position.set(x, y);
@@ -326,22 +337,54 @@ export default class GameMap {
     }
   }
 
-  static _tileRectWithSprite({x, y, width, height}, texture) {
-    let {width: tWidth, height: tHeight} = texture.frame;
-    let container = new PIXI.Container();
+  /**
+   * A room and corridor renderer
+   * @typedef Renderer
+   * @prop {string} name The name of the renderer
+   * @prop {Function} canRender Can this render the room or corridor that is passed in
+   * @prop {Function} render Render the actual room or corridor
+   */
 
-    for(let i = 0; i < width; i += tWidth) {
-      for(let j = 0; j < height; j += tHeight) {
-        let sprite = new PIXI.Sprite(texture);
+  /**
+   * Regester a renderer for rooms and corridors
+   * @param renderer {Renderer} The renderer to use 
+   */
+  static register(renderer) {
+    GameMap._renderers.set(renderer.name, renderer);
+  }
 
-        sprite.position.set(i - x, j - y);
-        sprite.width = tWidth;
-        sprite.height = tHeight;
-        container.addChild(sprite);
+  /**
+   * Create a renderer that just tiles a specific sprite
+   * @param texture The texture to tile
+   * @returns {Renderer}
+   */
+  static createTileRenderer(res, name) {
+    return {
+      name: `tile-renderer-${res}-${name}`,
+
+      canRender() {
+        return true;
+      },
+
+      render({x, y, width, height}) {
+        let texture = PIXI.loader.resources[res].textures[name];
+        let {width: tWidth, height: tHeight} = texture.frame;
+        let container = new PIXI.Container();
+
+        for(let i = 0; i < width; i += tWidth) {
+          for(let j = 0; j < height; j += tHeight) {
+            let sprite = new PIXI.Sprite(texture);
+
+            sprite.position.set(i - x, j - y);
+            sprite.width = tWidth;
+            sprite.height = tHeight;
+            container.addChild(sprite);
+          }
+        }
+
+        return container;
       }
-    }
-
-    return container;
+    };
   }
 
   /**
@@ -475,6 +518,7 @@ const generateMap = (corridors) => {
   let maxHeight = 0;
   // Location width and heights of all rooms
   map.rooms = [];
+  let renderers = Array.from(GameMap._renderers.values());
 
   // Place rooms onto the map
   for(let i = 0; i < NODES; ++i) {
@@ -497,7 +541,16 @@ const generateMap = (corridors) => {
     x += Math.max(MAX_ROOM - width, 0);
     
     // save for corridor rendering
-    map.rooms.push(new Room(i, x, y, width, height));
+    let newRoom = new Room(i, x, y, width, height);
+    map.rooms.push(newRoom);
+
+    // pick a renderer
+    let renderer;
+    do {
+      renderer = renderers[Math.floor(Math.random() * renderers.length)];
+    } while(!renderer.canRender(newRoom));
+
+    newRoom._rendererName = renderer.name;
 
     maxHeight = Math.max(height, maxHeight);
 
@@ -512,6 +565,13 @@ const generateMap = (corridors) => {
 
       // Add weights to the graph
       let edge = new Corridor(room.x + room.width, yPos, x - (room.x + room.width), CORRIDOR_SIZE);
+
+      // pick a corridor renderer
+      do {
+        renderer = renderers[Math.floor(Math.random() * renderers.length)];
+      } while(!renderer.canRender(newRoom));
+
+      edge._rendererName = renderer.name;
 
       room._connect(map.rooms[i], edge);
     }
@@ -528,6 +588,13 @@ const generateMap = (corridors) => {
       // Add weights to the graph
       let edge = new Corridor(xPos, room.y + room.height, CORRIDOR_SIZE, y - (room.y + room.height));
 
+      // pick a corridor renderer
+      do {
+        renderer = renderers[Math.floor(Math.random() * renderers.length)];
+      } while(!renderer.canRender(newRoom));
+
+      edge._rendererName = renderer.name;
+
       room._connect(map.rooms[i], edge);
     }
 
@@ -536,3 +603,9 @@ const generateMap = (corridors) => {
 
   return map;
 };
+
+GameMap._renderers = new Map();
+
+GameMap.register(GameMap.createTileRenderer("floor", "0-0-box-big"));
+GameMap.register(GameMap.createTileRenderer("floor", "0-1-box-big")); // DEFAULT
+GameMap.register(GameMap.createTileRenderer("floor", "0-3-box-big"));
