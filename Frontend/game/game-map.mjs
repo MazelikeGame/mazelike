@@ -5,6 +5,20 @@
 const DEFAULT_RENDERER = "tile-renderer-floor-0-1-box-big";
 const MIN_SIZE = 16;
 
+const THEMES = (() => {
+  let themes = [];
+
+  for(let i = 0; i < 3; ++i) {
+    for(let j = 0; j < 8; ++j) {
+      if(i < 2 && j < 5) {
+        themes.push(`${i}-${j}`);
+      }
+    }
+  }
+
+  return themes;
+})();
+
 /**
  * Map a 2d coordinate to a 1d coordinate
  * @private
@@ -247,7 +261,8 @@ export default class GameMap {
       roomChance: params.roomChange || 0.2,
       corridorSize: (params.corridorSize || 8) * MIN_SIZE,
       xPadding: (params.xPadding || 4) * MIN_SIZE,
-      yPadding: (params.xPadding || 4) * MIN_SIZE
+      yPadding: (params.xPadding || 4) * MIN_SIZE,
+      theme: params.theme || THEMES[Math.floor(Math.random() * THEMES.length)]
     };
 
     this._params.size = Math.sqrt(this._params.nodes);
@@ -344,7 +359,8 @@ export default class GameMap {
         xMin,
         xMax,
         yMin,
-        yMax
+        yMax,
+        map: this
       });
 
       // positon and size the sprites that were given
@@ -399,8 +415,8 @@ export default class GameMap {
         return true;
       },
 
-      render({x, y, width, height}) {
-        let texture = PIXI.loader.resources[res].textures[name];
+      render({x, y, width, height, map}) {
+        let texture = PIXI.loader.resources[res].textures[`${map._params.theme}${name}`];
         let {width: tWidth, height: tHeight} = texture.frame;
         let container = new PIXI.Container();
 
@@ -454,7 +470,8 @@ export default class GameMap {
         roomChance: this._params.roomChange,
         corridorSize: this._params.corridorSize / MIN_SIZE,
         xPadding: this._params.xPadding / MIN_SIZE,
-        yPadding: this._params.xPadding / MIN_SIZE
+        yPadding: this._params.xPadding / MIN_SIZE,
+        theme: this._params.theme
       }
     });
   }
@@ -468,7 +485,7 @@ export default class GameMap {
     let map = new GameMap();
     let raw = typeof json === "string" ? JSON.parse(json) : json;
 
-    map._initParams(raw);
+    map._initParams(raw.params);
 
     for(let i = 0; i < raw.rooms.length; ++i) {
       map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i], map._params));

@@ -2,7 +2,7 @@
 import GameMap from "./game-map.mjs";
 
 // support old maps
-let defaultRenderer = GameMap.createTileRenderer("floor", "0-1-box-big");
+let defaultRenderer = GameMap.createTileRenderer("floor", "-box-big");
 
 defaultRenderer.canRender = () => {
   return false;
@@ -18,8 +18,8 @@ GameMap.register({
     return true;
   },
 
-  render({x, y, width, height}) {
-    let texture = PIXI.loader.resources.floor.textures["0-1-box-big"].clone();
+  render({x, y, width, height, map}) {
+    let texture = PIXI.loader.resources.floor.textures[`${map._params.theme}-box-big`].clone();
     let defaultFrame = texture.frame;
     
     let tWidth = defaultFrame.width - 12;
