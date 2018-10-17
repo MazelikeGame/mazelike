@@ -217,8 +217,10 @@ export default class GameMap {
     this.items = [];
     this.players = [];
     //todo testing
-    this.PC1x = 15;
-    this.PC1y = 1;
+    // this.PC1x = 9; // false
+    // this.PC1y = 3;
+    this.PC1x = 18; // true
+    this.PC1y = 3;
     this.numPCs = 1;
     //end katie testing, only temporary
   }

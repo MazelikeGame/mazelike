@@ -97,7 +97,6 @@ function startGame(map) {
   }
   
   window.setInterval(function() {
-    map.monsters[0].move();
     for(let i = 0; i < this.map.monsters.length; i++) {
       map.monsters[i].move();
     }

@@ -25,6 +25,9 @@ export default class Monster {
     this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
     this.sprite.width = BLOCK_SIZE;
     this.sprite.height = BLOCK_SIZE;
+
+    this.canSeePC();
+
   }
 
   /**
@@ -37,13 +40,38 @@ export default class Monster {
   canSeePC() {
     this.targetAquired = false;
     let distances = [];
-    let visionIncomplete = true;
+    let boxClear = true;
+    let x1 = -1, x2 = -1, y1 = -1, y2 = -1;
     for(let i = 0; i < this.map.numPCs; i++) {
-      while(visionIncomplete) {
-
-        visionIncomplete = false;
+      //if theres a clean box with opposite corners being a pc and monster
+      if(this.map.PC1x < this.x) {
+        x1 = this.map.PC1x;
+        x2 = this.x;
+      } else {
+        x1 = this.x;
+        x2 = this.map.PC1x;
+      }
+      if(this.map.PC1y < this.y) {
+        y1 = this.map.PC1y;
+        y2 = this.y;
+      } else {
+        y1 = this.y;
+        y2 = this.map.PC1y;
+      }
+      distances[i] = (x2 - x1 + 1) + (y2 - y1 + 1);
+      boxClear = true;
+      for(let j = x1; j <= x2; j++) {
+        for(let k = y1; k <= y2; k++) {
+          if(!this.map.isOnMap(j * BLOCK_SIZE, k * BLOCK_SIZE)) {
+            boxClear = false;
+            console.log("NOPE");
+          }
+        }
       }
     }
+    //only works for one pc todo
+    this.targetAquired = boxClear;
+    console.log(this.targetAquired);
   }
 
   /** 
@@ -69,8 +97,6 @@ export default class Monster {
     for(let i = 0; i < this.map.monsters.length; i++) {
       if(i !== this.id && this.map.monsters[i].x === this.x && this.map.monsters[i].y === this.y)
         redo = true;
-      if(redo)
-        console.log("redo");
     } 
     if(redo || !this.map.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE)) {
       this.x = prevX;
@@ -88,11 +114,12 @@ export default class Monster {
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
    */
   move() {
-    this.canSeePC();
+    //this.canSeePC();
     if(!this.targetAquired) {
       this.wander();
     } else {
       //move strategically, to be implemented later when PC is on map WIP
+      console.log("omw bro");
     }
   }
 
@@ -100,21 +127,39 @@ export default class Monster {
    * todoWIP, UNFINISHED (need to actually implement target health loss)
    * 
    * Monster attacks PC
-   * @param {*} target id for player that monster is attacking
+   * @param {*} PCid id for player that monster is attacking
    */
-  attack(target) {
-    let msg = " attacked ";
-    console.log(this.name + msg + target);
+  attack(PCid) {
+    let msg = " attacked player "; // SEND TO JACOB FOR IMPLEMENTATION open to suggestions tho
+    //(decrement pc health and check for pc death) within PC's beAttacked method
+    // below: psuedo until PC is implemented
+    this.map.PC[PCid].beAttacked(this.damage);
+    console.log(this.name + msg + PCid);
   }
 
   /**
    * todoWIP, UNFINISHED
    * 
-   * Monster attacks PC
+   * PC attacks Monster
+   * @param {*} hp health points that the monster's health decrements by
    */
   beAttacked(hp) {
-    let msg = " was attacked, -";
+    let msg = " was attacked, hp -= ";
+    this.hp -= hp;
+    if(this.hp <= 0)
+      this.die();
     console.log(this.name + msg + hp);
+  }
+
+  /**
+   * todoWIP drop items down the road
+   * 
+   * Monster dies.
+   */
+  die() {
+    // remove sprite
+    // remove from monsters array
+    // drop item
   }
 
   /** 
