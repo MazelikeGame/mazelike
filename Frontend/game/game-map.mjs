@@ -275,29 +275,38 @@ export default class GameMap {
         (yMin <= rect.y + rect.height && rect.y + rect.height <= yMax));
     };
 
-    // get the size of a rect that is out of bounds
-    const soob = (pos, bound, boundType) => {
-      return pos - Math[boundType](bound, pos);
-    };
-
     // process a single room/corridor
-    let process = (rect, direction) => {
-      let x = Math.max(rect.x - xMin, 0);
-      let y = Math.max(rect.y - yMin, 0);
-      let xEnd = rect.x + rect.width;
-      let yEnd = rect.y + rect.height;
-      let relativeX = soob(rect.x, xMin, "max");
-      let relativeY = soob(rect.y, yMin, "max");
-      let width = rect.width - relativeX - soob(xEnd, xMax, "min");
-      let height = rect.height - relativeY - soob(yEnd, yMax, "min");
+    let process = (rect) => {
+      // get corrds relative to the screen
+      let x = rect.x - xMin;
+      let y = rect.y - yMin;
+      let xEnd = x + rect.width;
+      let yEnd = y + rect.height;
+      let width = xEnd - x;
+      let height = yEnd - y;
+      // get corrds relative to the rect
+      let relativeX = Math.max(x - rect.x, 0);
+      let relativeY = Math.max(y - rect.y, 0);
+      let relativeWidth = width - relativeX - Math.max(xEnd - xMax, 0);
+      let relativeHeight = height - relativeY - Math.max(yEnd - yMax, 0);
 
       let texture = PIXI.loader.resources.floor.textures[BLOCK_TYPE];
-      let sprites = GameMap._tileRectWithSprite(relativeX, relativeY, width, height, texture, direction);
+      let sprites = GameMap._tileRectWithSprite({
+        x: relativeX,
+        y: relativeY,
+        width: relativeWidth,
+        height: relativeHeight,
+        rect,
+        xMin,
+        xMax,
+        yMin,
+        yMax
+      }, texture);
 
       // positon and size the sprites that were given
       sprites.position.set(x, y);
-      sprites.width = width;
-      sprites.height = height;
+      sprites.width = Math.min(xMax, xEnd) - x;
+      sprites.height = Math.min(yMax, yEnd) - y;
       container.addChild(sprites);
     };
 
@@ -308,16 +317,16 @@ export default class GameMap {
       }
       
       if(room.left && inBounds(room.left)) {
-        process(room.left, "x");
+        process(room.left);
       }
 
       if(room.above && inBounds(room.above)) {
-        process(room.above, "y");
+        process(room.above);
       }
     }
   }
 
-  static _tileRectWithSprite(x, y, width, height, texture) {
+  static _tileRectWithSprite({x, y, width, height}, texture) {
     let {width: tWidth, height: tHeight} = texture.frame;
     let container = new PIXI.Container();
 
