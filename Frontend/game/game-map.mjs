@@ -614,7 +614,7 @@ export default class GameMap {
         // pick a corridor renderer
         do {
           renderer = renderers[Math.floor(Math.random() * renderers.length)];
-        } while(!renderer.canRender(newRoom));
+        } while(!renderer.canRender(edge));
 
         edge._rendererName = renderer.name;
 
@@ -637,7 +637,7 @@ export default class GameMap {
         // pick a corridor renderer
         do {
           renderer = renderers[Math.floor(Math.random() * renderers.length)];
-        } while(!renderer.canRender(newRoom));
+        } while(!renderer.canRender(edge));
 
         edge._rendererName = renderer.name;
 
