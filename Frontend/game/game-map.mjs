@@ -352,8 +352,8 @@ export default class GameMap {
    */
   isOnMap(x, y) {
     const check = (rect) => {
-      return rect.x <= x && x <= rect.x + rect.width &&
-        rect.y <= y && y <= rect.y + rect.height;
+      return rect.x < x && x < rect.x + rect.width &&
+        rect.y < y && y < rect.y + rect.height;
     };
 
     return !!this.rooms.find((room) => {
