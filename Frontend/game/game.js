@@ -1,6 +1,7 @@
 /* global PIXI  */
 /* eslint-disable complexity */
 import GameMap from "./game-map.mjs";
+import "./game-map-renderers.mjs";
 import {KEY_CODES} from "./input.js";
 import FpsCounter from "./fps-counter.js";
 
@@ -80,14 +81,23 @@ function setup() {
         startGame(GameMap.parse(json));
       });
   } else {
-    startGame(GameMap.generate());
+    startGame(GameMap.generate({
+      id: "single-player"
+    }));
   }
 }
 
 let fps = new FpsCounter();
 
 function startGame(map) {
-  window.map = map;
+  window.ml.map = map;
+  
+  let spawn = map.getSpawnPoint();
+  /* eslint-disable no-extra-parens */
+  pageX = spawn.x - (innerWidth / 2);
+  pageY = spawn.y - (innerHeight / 2);
+  /* eslint-enable no-extra-parens */
+
   let mapSprite = map.createSprite();
 
   app.stage.addChild(mapSprite.sprite);
