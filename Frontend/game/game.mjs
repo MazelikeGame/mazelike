@@ -3,6 +3,7 @@
 import GameMap from "./game-map.mjs";
 import {KEY_CODES} from "./input.mjs";
 import FpsCounter from "./fps-counter.mjs";
+import "./game-map-renderers.mjs";
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
@@ -80,14 +81,23 @@ function setup() {
         startGame(GameMap.parse(json));
       });
   } else {
-    startGame(GameMap.generate());
+    startGame(GameMap.generate({
+      id: "single-player"
+    }));
   }
 }
 
 let fps = new FpsCounter();
 
 function startGame(map) {
-  window.map = map;
+  window.ml.map = map;
+  
+  let spawn = map.getSpawnPoint();
+  /* eslint-disable no-extra-parens */
+  pageX = spawn.x - (innerWidth / 2);
+  pageY = spawn.y - (innerHeight / 2);
+  /* eslint-enable no-extra-parens */
+
   let mapSprite = map.createSprite();
 
   app.stage.addChild(mapSprite.sprite);

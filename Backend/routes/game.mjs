@@ -6,6 +6,7 @@ import Lobby from "../models/lobby";
 import sql from "../sequelize";
 import path from "path";
 import GameMap from "../../Frontend/game/game-map.mjs";
+import "../../Frontend/game/game-map-renderers.mjs";
 import fs from "fs";
 
 const mkdir = util.promisify(fs.mkdir);
@@ -308,7 +309,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     });
 
     // Create game here (TODO)
-    let rawMap = GameMap.generate().serialize();
+    let rawMap = GameMap.generate({ id: req.params.id }).serialize();
     
     try {
       await mkdir("Frontend/public/maps");
