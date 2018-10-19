@@ -2,7 +2,7 @@
 /* global PIXI */
 /** @module Monster */
 
-const BLOCK_SIZE = 48;
+const SPRITE_SIZE = 48;
 
 export default class Monster {
   
@@ -13,21 +13,25 @@ export default class Monster {
     this.map = map_in;
     this.id = id_in;
     this.targetAquired = false; // "in pursuit" boolean
-    this.x = 20;
-    this.y = 2;
-
-    this.PCx = -1; // -1 if not seen yet or previously seen location explored
+    this.x = 0; // (x,y) = upper left pixel coordinate
+    this.y = 0;
+    this.targetx = -1; //location where monster wants to move
+    this.targety = -1;
+    this.PCx = -1; // (-1,-1) if not seen yet or previously seen location explored
     this.PCy = -1;
+    this.setup = true;
 
-    //this.placeInRandomRoom(); todo testing
+    this.placeInRandomRoom();
 
+    //this.canSeePC();
+
+  }
+
+  createSprite() {
     this.sprite = new PIXI.Sprite(PIXI.loader.resources.demon.textures["red demon"]);
-    this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
-    this.sprite.width = BLOCK_SIZE;
-    this.sprite.height = BLOCK_SIZE;
-
-    this.canSeePC();
-
+    this.sprite.position.set(this.x, this.y);
+    this.sprite.width = SPRITE_SIZE;
+    this.sprite.height = SPRITE_SIZE;
   }
 
   /**
@@ -62,9 +66,8 @@ export default class Monster {
       boxClear = true;
       for(let j = x1; j <= x2; j++) {
         for(let k = y1; k <= y2; k++) {
-          if(!this.map.isOnMap(j * BLOCK_SIZE, k * BLOCK_SIZE)) {
+          if(!this.map.isOnMap(j * SPRITE_SIZE, k * SPRITE_SIZE)) {
             boxClear = false;
-            console.log("NOPE");
           }
         }
       }
@@ -86,24 +89,42 @@ export default class Monster {
     let prevX = this.x;
     let prevY = this.y;
     if(random === 0)
-      this.x += 1;
+      this.x += SPRITE_SIZE;
     else if(random === 1)
-      this.x -= 1;
+      this.x -= SPRITE_SIZE;
     else if(random === 2)
-      this.y += 1;
+      this.y += SPRITE_SIZE;
     else if(random === 3)
-      this.y -= 1;
+      this.y -= SPRITE_SIZE;
     let redo = false;
-    for(let i = 0; i < this.map.monsters.length; i++) {
-      if(i !== this.id && this.map.monsters[i].x === this.x && this.map.monsters[i].y === this.y)
-        redo = true;
-    } 
-    if(redo || !this.map.isOnMap(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE)) {
+    // for(let i = 0; i < this.map.monsters.length; i++) { //todo fix 
+    //   if(i !== this.id && this.map.monsters[i].x === this.x && this.map.monsters[i].y === this.y)
+    //     redo = true;
+    // } 
+    if(redo || !this.spriteIsOnMap()) {
       this.x = prevX;
       this.y = prevY;
       this.wander();
     }
-    this.sprite.position.set(this.x * BLOCK_SIZE, this.y * BLOCK_SIZE);
+    this.targetx = this.x;
+    this.x = prevX;
+    this.targety = this.y;
+    this.y = prevY;
+  }
+
+  /**
+   * Sets the position closer to the target position.
+   */
+  move() {
+    if(this.targetx < this.x)
+      this.x--;
+    else this.x++;
+    if(this.targety < this.y)
+      this.y--;
+    else this.y++;
+    if(this.spriteCollision())
+      this.wander();
+    this.sprite.position.set(this.x, this.y);
   }
 
   /**
@@ -113,7 +134,7 @@ export default class Monster {
    * If PC has been seen, move strategically towards last seen location.
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
    */
-  move() {
+  figureOutWhereToGo() {
     //this.canSeePC();
     if(!this.targetAquired) {
       this.wander();
@@ -124,13 +145,13 @@ export default class Monster {
   }
 
   /**
-   * todoWIP, UNFINISHED (need to actually implement target health loss)
+   * ~WIP, UNFINISHED (merge logic with PC class once implemented)
    * 
    * Monster attacks PC
    * @param {*} PCid id for player that monster is attacking
    */
   attack(PCid) {
-    let msg = " attacked player "; // SEND TO JACOB FOR IMPLEMENTATION open to suggestions tho
+    let msg = " attacked player ";
     //(decrement pc health and check for pc death) within PC's beAttacked method
     // below: psuedo until PC is implemented
     this.map.PC[PCid].beAttacked(this.damage);
@@ -138,7 +159,7 @@ export default class Monster {
   }
 
   /**
-   * todoWIP, UNFINISHED
+   * ~WIP, UNFINISHED (merge logic with PC class once implemented)
    * 
    * PC attacks Monster
    * @param {*} hp health points that the monster's health decrements by
@@ -152,14 +173,14 @@ export default class Monster {
   }
 
   /**
-   * todoWIP drop items down the road
+   * ~WIP drop items down the road todo
    * 
    * Monster dies.
    */
   die() {
     // remove sprite
     // remove from monsters array
-    // drop item
+    // drop item in the future
   }
 
   /** 
@@ -173,9 +194,38 @@ export default class Monster {
         this.placeInRandomRoom();
       }
     }
-    let randomDiffX = Math.floor(Math.random() * (this.map.rooms[this.initialRoom].width / BLOCK_SIZE)); 
-    this.x = (this.map.rooms[this.initialRoom].x / BLOCK_SIZE) + randomDiffX;
-    let randomDiffY = Math.floor(Math.random() * (this.map.rooms[this.initialRoom].height / BLOCK_SIZE)); 
-    this.y = (this.map.rooms[this.initialRoom].y / BLOCK_SIZE) + randomDiffY;
+    let randomDiffX = Math.floor(Math.random() * this.map.rooms[this.initialRoom].width); 
+    this.x = this.map.rooms[this.initialRoom].x + randomDiffX;
+    let randomDiffY = Math.floor(Math.random() * this.map.rooms[this.initialRoom].height); 
+    this.y = this.map.rooms[this.initialRoom].y + randomDiffY;
+    if(!this.spriteIsOnMap())
+      this.placeInRandomRoom();
+  }
+
+  /**
+   * Check to see if whole sprite is on the map.
+   * @returns {boolean}
+   */
+  spriteIsOnMap() {
+    return this.map.isOnMap(this.x, this.y) && this.map.isOnMap(this.x + SPRITE_SIZE, this.y) 
+    && this.map.isOnMap(this.x, this.y + SPRITE_SIZE) && this.map.isOnMap(this.x + SPRITE_SIZE, this.y + SPRITE_SIZE);
+  }
+
+  /**
+   * Checks to see if there's a monster colliding with this monster. todo untested
+   * Compares corners of each sprite to do so.
+   * @returns {boolean}
+   */
+  spriteCollision() {
+    for(let i = 0; i < this.map.monsters.length; i++) {
+      if(this.id !== i) {
+        if(this.map.monsters[i].x >= this.x && this.map.monsters[i].x <= this.x + SPRITE_SIZE) { // upper right and lower right
+          if(this.map.monsters[i].y >= this.y && this.map.monsters[i].y <= this.y + SPRITE_SIZE) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 } 

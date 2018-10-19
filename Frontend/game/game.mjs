@@ -105,12 +105,17 @@ function startGame(map) {
   if(devMode) {
     app.stage.addChild(fps.sprite);
   }
-  
+
   window.setInterval(function() {
-    for(let i = 0; i < this.map.monsters.length; i++) {
-      map.monsters[i].move();
+    for(let i = 0; i < map.monsters.length; i++) {
+      map.monsters[i].figureOutWhereToGo();
     }
   }, 500);
+  window.setInterval(function() {
+    for(let i = 0; i < map.monsters.length; i++) {
+      map.monsters[i].move();
+    }
+  }, 10);
 
   app.ticker.add(() => {
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);

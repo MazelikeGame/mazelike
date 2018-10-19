@@ -3,9 +3,6 @@
 /** @module GameMap */
 
 import Monster from "./Monster.mjs";
-
-const BLOCK_SIZE = 48;
-
 const DEFAULT_RENDERER = "tile-renderer-floor-0-1-box-big";
 const MIN_SIZE = 16;
 
@@ -246,11 +243,11 @@ export default class GameMap {
     this.monsters = [];
     this.items = [];
     this.players = [];
-    //todo testing
+    // todo testing
     // this.PC1x = 9; // false
     // this.PC1y = 3;
-    this.PC1x = 18; // true
-    this.PC1y = 3;
+    this.PC1x = 26; // true
+    this.PC1y = 4;
     this.numPCs = 1;
     //end katie testing, only temporary
   }
@@ -263,7 +260,7 @@ export default class GameMap {
    * Puts a monster in half of all "rooms".
    */
   generateMonsters() { //this.rooms.length / 2 todo for testing
-    for(let i = 0; i < 1; i++) {
+    for(let i = 0; i < this.rooms.length / 2; i++) {
       this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i);
     }
   }
@@ -336,7 +333,9 @@ export default class GameMap {
    */
   createSprite() {
     let sprite = new PIXI.Container();
-
+    for(let i = 0; i < this.monsters.length; i++) {
+      this.monsters[i].createSprite();
+    }
     return {
       sprite,
       update: this.updateSprite.bind(this, sprite)
@@ -437,9 +436,12 @@ export default class GameMap {
 
     // monster movement
     for(let i = 0; i < this.monsters.length; i++) {
-      let x = this.monsters[i].x * BLOCK_SIZE - xMin;
-      let y = this.monsters[i].y * BLOCK_SIZE - yMin;
-      this.monsters[i].sprite.position.set(x, y);
+      if(this.monsters[i].setup === false) {
+        this.monsters[i].x -= xMin;
+        this.monsters[i].y -= yMin;
+      }
+      this.monsters[i].setup = false;
+      this.monsters[i].sprite.position.set(this.monsters[i].x - xMin, this.monsters[i].y - yMin);
       container.addChild(this.monsters[i].sprite);
     }
   }
