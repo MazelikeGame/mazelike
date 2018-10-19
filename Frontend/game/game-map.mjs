@@ -243,7 +243,7 @@ export default class GameMap {
     this.monsters = [];
     this.items = [];
     this.players = [];
-    // todo testing
+    // KATIE will remove this once im done testing some stuff
     // this.PC1x = 9; // false
     // this.PC1y = 3;
     this.PC1x = 26; // true
