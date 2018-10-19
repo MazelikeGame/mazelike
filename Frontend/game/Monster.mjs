@@ -12,6 +12,7 @@ export default class Monster {
     this.damage = damage_in;
     this.map = map_in;
     this.id = id_in;
+
     this.targetAquired = false; // "in pursuit" boolean
     this.x = 0; // (x,y) = upper left pixel coordinate
     this.y = 0;
@@ -23,10 +24,11 @@ export default class Monster {
 
     this.placeInRandomRoom();
 
-    //this.canSeePC();
-
   }
 
+  /**
+   * Generates sprite for monster.
+   */
   createSprite() {
     this.sprite = new PIXI.Sprite(PIXI.loader.resources.demon.textures["red demon"]);
     this.sprite.position.set(this.x, this.y);
@@ -35,7 +37,7 @@ export default class Monster {
   }
 
   /**
-   * todoWIP, UNFINISHED
+   * todo WIP, UNFINISHED
    * 
    * Updates targetAquired field, which is true if we're currently in pursuit.
    * If PC is in sight, PCx and PCy will be updated (last known location coordinates)
@@ -128,14 +130,14 @@ export default class Monster {
   }
 
   /**
-   * todoWIP, UNFINISHED (needs to be able to move strategically based on PC last seen location
+   * todo WIP, UNFINISHED (needs to be able to move strategically based on PC last seen location
    * 
    * Moves monster.
    * If PC has been seen, move strategically towards last seen location.
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
    */
   figureOutWhereToGo() {
-    //this.canSeePC();
+    //this.canSeePC(); // todo
     if(!this.targetAquired) {
       this.wander();
     } else {
@@ -151,11 +153,9 @@ export default class Monster {
    * @param {*} PCid id for player that monster is attacking
    */
   attack(PCid) {
-    let msg = " attacked player ";
     //(decrement pc health and check for pc death) within PC's beAttacked method
     // below: psuedo until PC is implemented
     this.map.PC[PCid].beAttacked(this.damage);
-    console.log(this.name + msg + PCid);
   }
 
   /**
@@ -165,21 +165,18 @@ export default class Monster {
    * @param {*} hp health points that the monster's health decrements by
    */
   beAttacked(hp) {
-    let msg = " was attacked, hp -= ";
     this.hp -= hp;
     if(this.hp <= 0)
       this.die();
-    console.log(this.name + msg + hp);
   }
 
-  /**
-   * ~WIP drop items down the road todo
+  /** todo test
+   * ~WIP drop items down the road
    * 
    * Monster dies.
    */
   die() {
-    // remove sprite
-    // remove from monsters array
+    this.map.monsters.splice(this.id, 1);
     // drop item in the future
   }
 
@@ -219,8 +216,8 @@ export default class Monster {
   spriteCollision() {
     for(let i = 0; i < this.map.monsters.length; i++) {
       if(this.id !== i) {
-        if(this.map.monsters[i].x >= this.x && this.map.monsters[i].x <= this.x + SPRITE_SIZE) { // upper right and lower right
-          if(this.map.monsters[i].y >= this.y && this.map.monsters[i].y <= this.y + SPRITE_SIZE) {
+        if(this.map.monsters[i].x >= this.x && this.map.monsters[i].x <= this.x + SPRITE_SIZE) { // within x bounds
+          if(this.map.monsters[i].y >= this.y && this.map.monsters[i].y <= this.y + SPRITE_SIZE) { // and within y bounds
             return true;
           }
         }
