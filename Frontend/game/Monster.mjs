@@ -82,7 +82,7 @@ export default class Monster {
   /** 
    * ~WIP, UNFINISHED (need to check for collisions for items/players)
    * 
-   * Monster moves to an adjacent, unoccupied location.
+   * Monster moves to an adjacent, unoccupied location. todo make them go in longer lines
    * 
    * isOnMap not quite working
    */
@@ -98,12 +98,7 @@ export default class Monster {
       this.y += SPRITE_SIZE;
     else if(random === 3)
       this.y -= SPRITE_SIZE;
-    let redo = false;
-    // for(let i = 0; i < this.map.monsters.length; i++) { //todo fix 
-    //   if(i !== this.id && this.map.monsters[i].x === this.x && this.map.monsters[i].y === this.y)
-    //     redo = true;
-    // } 
-    if(redo || !this.spriteIsOnMap()) {
+    if(!this.spriteIsOnMap()) {
       this.x = prevX;
       this.y = prevY;
       this.wander();
@@ -126,7 +121,6 @@ export default class Monster {
     else this.y++;
     if(this.spriteCollision())
       this.wander();
-    this.sprite.position.set(this.x, this.y);
   }
 
   /**

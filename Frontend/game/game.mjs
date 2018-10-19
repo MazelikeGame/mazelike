@@ -118,6 +118,7 @@ function startGame(map) {
   }, 10);
 
   app.ticker.add(() => {
+    console.log("asdf");
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
     if(devMode) {
       fps.update();

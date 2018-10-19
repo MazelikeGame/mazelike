@@ -429,10 +429,6 @@ export default class GameMap {
 
     // monster movement
     for(let i = 0; i < this.monsters.length; i++) {
-      if(this.monsters[i].setup === false) {
-        this.monsters[i].x -= xMin;
-        this.monsters[i].y -= yMin;
-      }
       this.monsters[i].setup = false;
       this.monsters[i].sprite.position.set(this.monsters[i].x - xMin, this.monsters[i].y - yMin);
       container.addChild(this.monsters[i].sprite);
