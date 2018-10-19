@@ -94,8 +94,8 @@ function startGame(map) {
   
   let spawn = map.getSpawnPoint();
   /* eslint-disable no-extra-parens */
-  pageX = spawn.x - (innerWidth / 2);
-  pageY = spawn.y - (innerHeight / 2);
+  pageX = Math.max(spawn.x - (innerWidth / 2), 0);
+  pageY = Math.max(spawn.y - (innerHeight / 2), 0);
   /* eslint-enable no-extra-parens */
 
   let mapSprite = map.createSprite();
