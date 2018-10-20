@@ -52,6 +52,10 @@
 
 
 
+<div class="description">
+    <span style="color: red;">Constructor is private.</span>See GameMap.parse or GameMap.generate for instances of GameMap
+</div>
+
 
 
 
@@ -260,7 +264,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line239">line 239</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line256">line 256</a>
     </li></ul></dd>
     
 
@@ -420,7 +424,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line440">line 440</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line461">line 461</a>
     </li></ul></dd>
     
 
@@ -524,7 +528,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line293">line 293</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line314">line 314</a>
     </li></ul></dd>
     
 
@@ -680,7 +684,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line520">line 520</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line555">line 555</a>
     </li></ul></dd>
     
 
@@ -833,7 +837,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line431">line 431</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line452">line 452</a>
     </li></ul></dd>
     
 
@@ -919,7 +923,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line317">line 317</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line338">line 338</a>
     </li></ul></dd>
     
 
@@ -954,6 +958,185 @@
     <dd>
         
 <span class="param-type">SpriteReturn</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getRect"><span class="type-signature"></span>getRect<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {Room|Corridor}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get the room of corridor that contains the x, y corrdinate otherwise return undefined
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line506">line 506</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Room</span>
+|
+
+<span class="param-type">Corridor</span>
 
 
     </dd>
@@ -1023,7 +1206,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line712">line 712</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line747">line 747</a>
     </li></ul></dd>
     
 
@@ -1203,7 +1386,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line475">line 475</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line496">line 496</a>
     </li></ul></dd>
     
 
@@ -1307,7 +1490,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line492">line 492</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line527">line 527</a>
     </li></ul></dd>
     
 
@@ -1556,7 +1739,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line334">line 334</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line355">line 355</a>
     </li></ul></dd>
     
 
@@ -1734,7 +1917,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line419">line 419</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line440">line 440</a>
     </li></ul></dd>
     
 
@@ -1871,7 +2054,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line304">line 304</a>
+        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line325">line 325</a>
     </li></ul></dd>
     
 
@@ -1907,7 +2090,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Oct 17 2018 17:53:24 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 20 2018 12:51:02 GMT-0500 (Central Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -49,12 +49,15 @@ const d12 = (i, size) => {
  */
 class Room {
   /**
+   * <span style="color: red;">Constructor is private.</span>
+   * See GameMap.rooms or GameMap.getRect for instances of Room.
    * @private
    * @param i The index of the room
    * @param x 
    * @param y 
    * @param width 
    * @param height 
+   * @param mapParams 
    */
   constructor(i, x, y, width, height, mapParams) {
     this._i = i;
@@ -179,6 +182,16 @@ class Room {
  * @prop {string} type Always corridor
  */
 class Corridor {
+  /**
+   * <span style="color: red;">Constructor is private.</span>
+   * See Room or GameMap.getRect for instances of Corridor.
+   * @private
+   * @param x 
+   * @param y 
+   * @param width 
+   * @param height 
+   * @param mapParams 
+   */
   constructor(x, y, width, height, mapParams) {
     this.x = x;
     this.y = y;
@@ -241,6 +254,10 @@ class Corridor {
  * @prop {Player[]} players The players in this map
  */
 export default class GameMap {
+  /**
+   * <span style="color: red;">Constructor is private.</span>
+   * See GameMap.parse or GameMap.generate for instances of GameMap
+   */
   constructor() {
     this.rooms = [];
     this.monsters = [];
