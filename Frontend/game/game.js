@@ -1,7 +1,6 @@
 /* global PIXI  */
 /* eslint-disable complexity */
 import Floor from "./browser/floor.mjs";
-import {KEY_CODES} from "./input.js";
 import FpsCounter from "./fps-counter.js";
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
@@ -29,19 +28,19 @@ const addArrowKeyListener = (floor) => {
   window.addEventListener("keydown", (e) => {
     let viewport = floor.getViewport();
 
-    if(e.keyCode === KEY_CODES.UP_ARROW) {
+    if(e.keyCode === 38 /* UP_ARROW */) {
       viewport.y -= 10;
     }
     
-    if(e.keyCode === KEY_CODES.DOWN_ARROW) {
+    if(e.keyCode === 40 /* DOWN_ARROW */) {
       viewport.y += 10;
     }
     
-    if(e.keyCode === KEY_CODES.LEFT_ARROW) {
+    if(e.keyCode === 37 /* LEFT_ARROW */) {
       viewport.x -= 10;
     }
     
-    if(e.keyCode === KEY_CODES.RIGHT_ARROW) {
+    if(e.keyCode === 39 /* RIGHT_ARROW */) {
       viewport.x += 10;
     }
 
