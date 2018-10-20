@@ -5,12 +5,11 @@ import util from "util";
 import Lobby from "../models/lobby";
 import sql from "../sequelize";
 import path from "path";
-import GameMap from "../../Frontend/game/game-map.mjs";
+import Floor from "../game/floor";
 import "../../Frontend/game/game-map-renderers.mjs";
 import fs from "fs";
 
 const mkdir = util.promisify(fs.mkdir);
-const writeFile = util.promisify(fs.writeFile);
 
 export let gameRouter = express.Router();
 
@@ -309,7 +308,10 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     });
 
     // Create game here (TODO)
-    let rawMap = GameMap.generate({ id: req.params.id }).serialize();
+    let floor = Floor.generate({
+      gameId: req.params.id,
+      floorIdx: 0
+    });
     
     try {
       await mkdir("Frontend/public/maps");
@@ -317,7 +319,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       // pass
     }
 
-    await writeFile(`Frontend/public/maps/${req.params.id}.json`, rawMap);
+    await floor.save();
 
     io.emit("lobby-start", req.params.id);
 

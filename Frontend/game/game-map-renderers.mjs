@@ -1,5 +1,5 @@
 /* global PIXI */
-import GameMap from "./game-map.mjs";
+import GameMap from "./common/game-map.mjs";
 
 // support old maps
 let defaultRenderer = GameMap.createTileRenderer("floor", "-box-big");

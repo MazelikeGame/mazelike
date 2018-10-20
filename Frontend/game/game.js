@@ -1,6 +1,6 @@
 /* global PIXI  */
 /* eslint-disable complexity */
-import GameMap from "./game-map.mjs";
+import Floor from "./browser/floor.mjs";
 import "./game-map-renderers.mjs";
 import {KEY_CODES} from "./input.js";
 import FpsCounter from "./fps-counter.js";
@@ -71,34 +71,29 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-function setup() {
+async function setup() {
   if(gameId) {
-    fetch(`/public/maps/${gameId}.json`)
-      .then((res) => {
-        return res.json();
-      })
-      .then((json) => {
-        startGame(GameMap.parse(json));
-      });
+    startGame(await Floor.load(gameId, 0));
   } else {
-    startGame(GameMap.generate({
-      id: "single-player"
+    startGame(Floor.generate({
+      gameId,
+      floorIdx: 0
     }));
   }
 }
 
 let fps = new FpsCounter();
 
-function startGame(map) {
-  window.ml.map = map;
+function startGame(floor) {
+  window.ml.floor = floor;
   
-  let spawn = map.getSpawnPoint();
+  let spawn = floor.map.getSpawnPoint();
   /* eslint-disable no-extra-parens */
   pageX = Math.max(spawn.x - (innerWidth / 2), 0);
   pageY = Math.max(spawn.y - (innerHeight / 2), 0);
   /* eslint-enable no-extra-parens */
 
-  let mapSprite = map.createSprite();
+  let mapSprite = floor.map.createSprite();
 
   app.stage.addChild(mapSprite.sprite);
   

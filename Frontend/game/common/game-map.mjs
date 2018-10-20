@@ -260,13 +260,6 @@ export default class GameMap {
    */
   constructor() {
     this.rooms = [];
-    this.monsters = [];
-    this.items = [];
-    this.players = [];
-  }
-
-  _init() {
-    //Monster.initMonsters(this);
   }
 
   /**
@@ -285,13 +278,8 @@ export default class GameMap {
       xPadding: (params.xPadding || 4) * MIN_SIZE,
       yPadding: (params.xPadding || 4) * MIN_SIZE,
       theme: params.theme || THEMES[Math.floor(Math.random() * THEMES.length)],
-      spawn: params.spawn,
-      id: params.id
+      spawn: params.spawn
     };
-
-    if(!this._params.id) {
-      throw new Error("Id missing");
-    }
 
     if(!this._params.spawn) {
       this._params.spawn = Math.floor(Math.random() * this._params.nodes);
@@ -309,15 +297,13 @@ export default class GameMap {
 
   /**
    * Geneate a game map
+   * @param {GameMap} The game map to store everything in
    * @returns {GameMap}
    */
-  static generate(params) {
-    let map = new GameMap();
+  static generate(map, params) {
     map._initParams(params);
 
     map.generateMap(map.generateMaze());
-
-    map._init();
 
     return map;
   }
@@ -537,14 +523,9 @@ export default class GameMap {
         xPadding: this._params.xPadding / MIN_SIZE,
         yPadding: this._params.xPadding / MIN_SIZE,
         theme: this._params.theme,
-        spawn: this._params.spawn,
-        id: this._params.id
+        spawn: this._params.spawn
       }
     });
-  }
-
-  get id() {
-    return this._params.id;
   }
 
   /**
@@ -561,8 +542,6 @@ export default class GameMap {
     for(let i = 0; i < raw.rooms.length; ++i) {
       map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i], map._params));
     }
-
-    map._init();
 
     return map;
   }
