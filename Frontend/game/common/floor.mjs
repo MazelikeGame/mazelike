@@ -1,4 +1,4 @@
-import GameMap from "./game-map.mjs";
+import "./game-map/game-map-renderers.mjs";
 
 /**
  * The game map, monsters, players and items for this floor

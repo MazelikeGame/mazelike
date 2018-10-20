@@ -1,4 +1,4 @@
-import GameMapCommon from "../../Frontend/game/common/game-map.mjs";
+import GameMapCommon from "../../Frontend/game/common/game-map/game-map.mjs";
 import fs from "fs";
 import util from "util";
 
@@ -22,7 +22,7 @@ export default class GameMap extends GameMapCommon {
     // for backwards compatability the map for floorIdx == 0 is just the gameId
     let mapId = floor.id.replace("-0", "");
 
-    floor.map = GameMap.parse(await readFile(`Frontend/public/maps/${mapId}.json`, "utf8"));
+    floor.map = GameMap.parse(await readFile(`Frontend/public/maps/${mapId}.json`, "utf8"), new GameMap());
   }
 
   /**

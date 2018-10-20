@@ -1,7 +1,6 @@
 /* global PIXI  */
 /* eslint-disable complexity */
 import Floor from "./browser/floor.mjs";
-import "./game-map-renderers.mjs";
 import {KEY_CODES} from "./input.js";
 import FpsCounter from "./fps-counter.js";
 
@@ -93,16 +92,16 @@ function startGame(floor) {
   pageY = Math.max(spawn.y - (innerHeight / 2), 0);
   /* eslint-enable no-extra-parens */
 
-  let mapSprite = floor.map.createSprite();
+  let mapRenderer = floor.map.createRenderer();
 
-  app.stage.addChild(mapSprite.sprite);
+  app.stage.addChild(mapRenderer.sprite);
   
   if(devMode) {
     app.stage.addChild(fps.sprite);
   }
 
   app.ticker.add(() => {
-    mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
+    mapRenderer.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
 
     if(devMode) {
       fps.update();

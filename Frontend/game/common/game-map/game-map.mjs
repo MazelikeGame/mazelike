@@ -1,23 +1,8 @@
 /* eslint-disable complexity,no-extra-parens,no-mixed-operators,consistent-return */
-/* global PIXI */
 /** @module GameMap */
-
-const DEFAULT_RENDERER = "tile-renderer-floor-0-1-box-big";
-const MIN_SIZE = 16;
-
-const THEMES = (() => {
-  let themes = [];
-
-  for(let i = 0; i < 3; ++i) {
-    for(let j = 0; j < 8; ++j) {
-      if(i < 2 && j < 5) {
-        themes.push(`${i}-${j}`);
-      }
-    }
-  }
-
-  return themes;
-})();
+import {MIN_SIZE, THEMES} from "./game-map-const.mjs";
+import Room from "./room.mjs";
+import Corridor from "./corridor.mjs";
 
 /**
  * Map a 2d coordinate to a 1d coordinate
@@ -38,211 +23,6 @@ const d21 = (x, y, size) => {
 const d12 = (i, size) => {
   return [i % size, Math.floor(i / size)];
 };
-
-/**
- * A room in the maze
- * @prop {number} x X coordinate of the room
- * @prop {number} y Y coordinate of the room
- * @prop {number} width Width coordinate of the room
- * @prop {number} height Height coordinate of the room
- * @prop {string} type Always room
- */
-class Room {
-  /**
-   * <span style="color: red;">Constructor is private.</span>
-   * See GameMap.rooms or GameMap.getRect for instances of Room.
-   * @private
-   * @param i The index of the room
-   * @param x 
-   * @param y 
-   * @param width 
-   * @param height 
-   * @param mapParams 
-   */
-  constructor(i, x, y, width, height, mapParams) {
-    this._i = i;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this._params = mapParams;
-    this.type = "room";
-  
-    this._corridors = new Map();
-  }
-
-  /**
-   * Create a corridor between 2 rooms
-   * @private
-   */
-  _connect(room, corridor) {
-    this._corridors.set(room._i, corridor._to(room));
-    room._corridors.set(this._i, corridor._to(this));
-  }
-
-  /**
-   * All corridors connected to this room
-   * @return {Corridor[]}
-   */
-  get corridors() {
-    return Array.from(this._corridors.values());
-  }
-
-  /**
-   * Get the room to the left of this one (if one exists)
-   * @return {Room}
-   */
-  get left() {
-    return this._corridors.get(this._i - 1);
-  }
-
-  /**
-   * Get the room to the right of this one (if one exists)
-   * @return {Room}
-   */
-  get right() {
-    return this._corridors.get(this._i + 1);
-  }
-
-  /**
-   * Get the room above this one (if one exists)
-   * @return {Room}
-   */
-  get above() {
-    return this._corridors.get(this._i - this._params.size);
-  }
-
-  /**
-   * Get the room below this one (if one exists)
-   * @return {Room}
-   */
-  get below() {
-    return this._corridors.get(this._i + this._params.size);
-  }
-
-  /**
-   * Convert the room to json
-   * @private
-   */
-  toJSON() {
-    let raw = {
-      x: this.x / MIN_SIZE,
-      y: this.y / MIN_SIZE,
-      w: this.width / MIN_SIZE,
-      h: this.height / MIN_SIZE,
-      r: this._rendererName
-    };
-
-    if(this.left) {
-      raw.l = this.left.toJSON();
-    }
-
-    if(this.above) {
-      raw.a = this.above.toJSON();
-    }
-
-    return raw;
-  }
-
-  /**
-   * Convert json into a Room
-   * @private
-   */
-  static _parse(i, rooms, json, mapParams) {
-    let room = new Room(
-      i,
-      json.x * MIN_SIZE,
-      json.y * MIN_SIZE,
-      json.w * MIN_SIZE,
-      json.h * MIN_SIZE,
-      mapParams
-    );
-
-    if(json.l) {
-      room._connect(rooms[i - 1], Corridor._parse(json.l, mapParams));
-    }
-
-    if(json.a) {
-      room._connect(rooms[i - room._params.size], Corridor._parse(json.a, mapParams));
-    }
-
-    room._rendererName = json.r;
-
-    return room;
-  }
-}
-
-/**
- * A corridor in the maze
- * @prop {number} x The x coordinate for the corridor to start
- * @prop {number} y The y coordinate for the corridor to start
- * @prop {number} width The width of the corridor
- * @prop {number} height The height of the corridor
- * @prop {number} weight The weight to use for graph algorithms
- * @prop {string} type Always corridor
- */
-class Corridor {
-  /**
-   * <span style="color: red;">Constructor is private.</span>
-   * See Room or GameMap.getRect for instances of Corridor.
-   * @private
-   * @param x 
-   * @param y 
-   * @param width 
-   * @param height 
-   * @param mapParams 
-   */
-  constructor(x, y, width, height, mapParams) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this._params = mapParams;
-    this.weight = this.width === this._params.corridorSize ? this.height : this.width;
-    this.type = "corridor";
-  }
-
-  /**
-   * Clone this edge with the room as room
-   * @private
-   */
-  _to(room) {
-    let clone = Object.create(Corridor.prototype);
-    clone.room = room;
-    return Object.assign(clone, this);
-  }
-
-  /**
-   * Convert the corridor to json
-   * @private
-   */
-  toJSON() {
-    return {
-      x: this.x / MIN_SIZE,
-      y: this.y / MIN_SIZE,
-      w: this.width / MIN_SIZE,
-      h: this.height / MIN_SIZE,
-      r: this._rendererName
-    };
-  }
-
-  /**
-   * Convert json into a Corridor
-   * @private
-   */
-  static _parse(json, mapParams) {
-    let corridor = new Corridor(
-      json.x * MIN_SIZE,
-      json.y * MIN_SIZE,
-      json.w * MIN_SIZE,
-      json.h * MIN_SIZE,
-      mapParams
-    );
-
-    corridor._rendererName = json.r;
-    return corridor;
-  }
-}
 
 /**
  * A map for a game
@@ -309,121 +89,6 @@ export default class GameMap {
   }
 
   /**
-   * Container+update method
-   * @typedef SpriteReturn
-   * @prop {PIXI.Container} sprite The sprite representing the game map
-   * @prop {Function} update GameMap.updateSprite but without the container parameter
-   */
-
-  /**
-   * Create an object containing a PIXI.Container (called sprite) and an update
-   * method to update the container.  Note the update method is GameMap.updateSprite
-   * but without the container parameter.
-   * @returns {SpriteReturn}
-   */
-  createSprite() {
-    let sprite = new PIXI.Container();
-
-    return {
-      sprite,
-      update: this.updateSprite.bind(this, sprite)
-    };
-  }
-
-  /**
-   * Get a subset of the map inside rectangle specified by the coordiates
-   * @param {PIXI.Container} container The container returned by create sprite
-   * @param {number} xMin x coordinate for the top left corner
-   * @param {number} yMin y coordinate for the top left corner
-   * @param {number} xMax x coordinate for the bottom right corner
-   * @param {number} yMax y coordinate for the bottom right corner
-   */
-  updateSprite(container, xMin, yMin, xMax, yMax) {
-    /* eslint-disable no-param-reassign */
-    xMin = Math.max(0, xMin);
-    yMin = Math.max(0, yMin);
-    /* eslint-enable no-param-reassign */
-
-    if(container.__prevXMin === xMin && container.__prevXMax === xMax && 
-      container.__prevYMin === yMin && container.__prevYMax === yMax) {
-      return;
-    }
-
-    container.__prevXMin = xMin;
-    container.__prevXMax = xMax;
-    container.__prevYMin = yMin;
-    container.__prevYMax = yMax;
-
-    while(container.children.length) {
-      container.removeChild(container.children[0]);
-    }
-
-    // check that a rect is inside the box even partially
-    let inBounds = (rect) => {
-      return ((xMin <= rect.x && rect.x <= xMax) ||
-        (xMin <= rect.x + rect.width && rect.x + rect.width <= xMax)) &&
-        ((yMin <= rect.y && rect.y <= yMax) ||
-        (yMin <= rect.y + rect.height && rect.y + rect.height <= yMax));
-    };
-
-    // process a single room/corridor
-    let process = (rect) => {
-      let renderer = GameMap._renderers.get(rect._rendererName);
-
-      if(!renderer) {
-        renderer = GameMap._renderers.get(DEFAULT_RENDERER);
-      }
-
-      // get corrds relative to the screen
-      let x = rect.x - xMin;
-      let y = rect.y - yMin;
-      let xEnd = x + rect.width;
-      let yEnd = y + rect.height;
-      let width = xEnd - x;
-      let height = yEnd - y;
-      // get corrds relative to the rect
-      let relativeX = Math.max(x - rect.x, 0);
-      let relativeY = Math.max(y - rect.y, 0);
-      let relativeWidth = width - relativeX - Math.max(xEnd - xMax, 0);
-      let relativeHeight = height - relativeY - Math.max(yEnd - yMax, 0);
-
-      let sprites = renderer.render({
-        x: relativeX,
-        y: relativeY,
-        width: relativeWidth,
-        height: relativeHeight,
-        rect,
-        xMin,
-        xMax,
-        yMin,
-        yMax,
-        map: this
-      });
-
-      // positon and size the sprites that were given
-      sprites.position.set(x, y);
-      sprites.width = Math.min(xMax, xEnd) - x;
-      sprites.height = Math.min(yMax, yEnd) - y;
-      container.addChild(sprites);
-    };
-
-    // process all of the rooms and corridors
-    for(let room of this.rooms) {
-      if(inBounds(room)) {
-        process(room);
-      }
-      
-      if(room.left && inBounds(room.left)) {
-        process(room.left);
-      }
-
-      if(room.above && inBounds(room.above)) {
-        process(room.above);
-      }
-    }
-  }
-
-  /**
    * A room and corridor renderer
    * @typedef Renderer
    * @prop {string} name The name of the renderer
@@ -437,40 +102,6 @@ export default class GameMap {
    */
   static register(renderer) {
     GameMap._renderers.set(renderer.name, renderer);
-  }
-
-  /**
-   * Create a renderer that just tiles a specific sprite
-   * @param texture The texture to tile
-   * @returns {Renderer}
-   */
-  static createTileRenderer(res, name) {
-    return {
-      name: `tile-renderer-${res}-${name}`,
-
-      canRender() {
-        return true;
-      },
-
-      render({x, y, width, height, map}) {
-        let texture = PIXI.loader.resources[res].textures[`${map._params.theme}${name}`];
-        let {width: tWidth, height: tHeight} = texture.frame;
-        let container = new PIXI.Container();
-
-        for(let i = 0; i < width; i += tWidth) {
-          for(let j = 0; j < height; j += tHeight) {
-            let sprite = new PIXI.Sprite(texture);
-
-            sprite.position.set(i - x, j - y);
-            sprite.width = tWidth;
-            sprite.height = tHeight;
-            container.addChild(sprite);
-          }
-        }
-
-        return container;
-      }
-    };
   }
 
   /**
@@ -522,7 +153,7 @@ export default class GameMap {
         corridorSize: this._params.corridorSize / MIN_SIZE,
         xPadding: this._params.xPadding / MIN_SIZE,
         yPadding: this._params.xPadding / MIN_SIZE,
-        theme: this._params.theme,
+        theme: this._params.theme || "0-0",
         spawn: this._params.spawn
       }
     });
@@ -531,10 +162,10 @@ export default class GameMap {
   /**
    * Parse a previously serialized map
    * @param {string|object} json The serialized map
+   * @param {GameMap} map The game map to use
    * @returns {GameMap}
    */
-  static parse(json) {
-    let map = new GameMap();
+  static parse(json, map) {
     let raw = typeof json === "string" ? JSON.parse(json) : json;
 
     map._initParams(raw.params);
