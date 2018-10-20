@@ -45,15 +45,19 @@ const d12 = (i, size) => {
  * @prop {number} y Y coordinate of the room
  * @prop {number} width Width coordinate of the room
  * @prop {number} height Height coordinate of the room
+ * @prop {string} type Always room
  */
 class Room {
   /**
+   * <span style="color: red;">Constructor is private.</span>
+   * See GameMap.rooms or GameMap.getRect for instances of Room.
    * @private
    * @param i The index of the room
    * @param x 
    * @param y 
    * @param width 
    * @param height 
+   * @param mapParams 
    */
   constructor(i, x, y, width, height, mapParams) {
     this._i = i;
@@ -62,6 +66,7 @@ class Room {
     this.width = width;
     this.height = height;
     this._params = mapParams;
+    this.type = "room";
   
     this._corridors = new Map();
   }
@@ -174,8 +179,19 @@ class Room {
  * @prop {number} width The width of the corridor
  * @prop {number} height The height of the corridor
  * @prop {number} weight The weight to use for graph algorithms
+ * @prop {string} type Always corridor
  */
 class Corridor {
+  /**
+   * <span style="color: red;">Constructor is private.</span>
+   * See Room or GameMap.getRect for instances of Corridor.
+   * @private
+   * @param x 
+   * @param y 
+   * @param width 
+   * @param height 
+   * @param mapParams 
+   */
   constructor(x, y, width, height, mapParams) {
     this.x = x;
     this.y = y;
@@ -183,6 +199,7 @@ class Corridor {
     this.height = height;
     this._params = mapParams;
     this.weight = this.width === this._params.corridorSize ? this.height : this.width;
+    this.type = "corridor";
   }
 
   /**
@@ -237,6 +254,10 @@ class Corridor {
  * @prop {Player[]} players The players in this map
  */
 export default class GameMap {
+  /**
+   * <span style="color: red;">Constructor is private.</span>
+   * See GameMap.parse or GameMap.generate for instances of GameMap
+   */
   constructor() {
     this.rooms = [];
     this.monsters = [];
@@ -473,16 +494,30 @@ export default class GameMap {
    * @returns {boolean}
    */
   isOnMap(x, y) {
+    return !!this.getRect(x, y);
+  }
+
+  /**
+   * Get the room of corridor that contains the x, y corrdinate otherwise return undefined
+   * @param {number} x
+   * @param {number} y
+   * @returns {Room|Corridor}
+   */
+  getRect(x, y) {
     const check = (rect) => {
       return rect.x < x && x < rect.x + rect.width &&
         rect.y < y && y < rect.y + rect.height;
     };
 
-    return !!this.rooms.find((room) => {
-      return check(room) ||
-        (room.left && check(room.left)) ||
-        (room.above && check(room.above));
-    });
+    for(let room of this.rooms) {
+      if(check(room)) {
+        return room;
+      } else if(room.left && check(room.left)) {
+        return room.left;
+      } else if(room.above && check(room.above)) {
+        return room.above;
+      }
+    }
   }
 
   /**
