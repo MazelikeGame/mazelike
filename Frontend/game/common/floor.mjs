@@ -1,3 +1,4 @@
+/** @module common/Floor */
 import "./game-map/game-map-renderers.mjs";
 
 /**

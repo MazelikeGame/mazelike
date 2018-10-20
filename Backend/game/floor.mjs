@@ -1,3 +1,4 @@
+/** @module backend/game/Floor */
 import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
 

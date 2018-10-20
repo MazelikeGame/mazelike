@@ -1,3 +1,4 @@
+/** @module backend/game/GameMap */
 import GameMapCommon from "../../Frontend/game/common/game-map/game-map.mjs";
 import fs from "fs";
 import util from "util";

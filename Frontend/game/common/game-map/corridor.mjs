@@ -1,3 +1,4 @@
+/** @module common/game-map/Corridor */
 import {MIN_SIZE} from "./game-map-const.mjs";
 
 /**
