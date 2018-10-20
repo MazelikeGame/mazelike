@@ -7,8 +7,6 @@ import FpsCounter from "./fps-counter.js";
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
 
-let devMode = location.hostname === "localhost";
-
 let app = new PIXI.Application({
   antialias: true
 });
@@ -26,84 +24,59 @@ window.onresize = () => {
 
 window.onresize();
 
-let pageX = 0;
-let pageY = 0;
+// This should be removed once player controls the viewport
+const addArrowKeyListener = (floor) => {
+  window.addEventListener("keydown", (e) => {
+    let viewport = floor.getViewport();
 
-window.addEventListener("keydown", (e) => {
-  if(e.keyCode === KEY_CODES.UP_ARROW) {
-    pageY -= 10;
-    if(pageY < 0) {
-      pageY = 0;
+    if(e.keyCode === KEY_CODES.UP_ARROW) {
+      viewport.y -= 10;
     }
-  }
-  
-  if(e.keyCode === KEY_CODES.DOWN_ARROW) {
-    pageY += 10;
-    if(pageY > 10000) {
-      pageY = 10000;
+    
+    if(e.keyCode === KEY_CODES.DOWN_ARROW) {
+      viewport.y += 10;
     }
-  }
-   
-  if(e.keyCode === KEY_CODES.LEFT_ARROW) {
-    pageX -= 10;
-    if(pageX < 0) {
-      pageX = 0;
+    
+    if(e.keyCode === KEY_CODES.LEFT_ARROW) {
+      viewport.x -= 10;
     }
-  }
-  
-  if(e.keyCode === KEY_CODES.RIGHT_ARROW) {
-    pageX += 10;
-    if(pageX > 10000) {
-      pageX = 10000;
+    
+    if(e.keyCode === KEY_CODES.RIGHT_ARROW) {
+      viewport.x += 10;
     }
-  }
 
-  // Toggle devmode
-  if(e.which === 68 /* d */) {
-    devMode = !devMode;
-
-    if(devMode) {
-      app.stage.addChild(fps.sprite);
-    } else {
-      app.stage.removeChild(fps.sprite);
-    }
-  }
-});
+    floor.setViewport(viewport.x, viewport.y);
+  });
+};
 
 async function setup() {
+  let floor;
+
   if(gameId) {
-    startGame(await Floor.load(gameId, 0));
+    floor = await Floor.load(gameId, 0);
   } else {
-    startGame(Floor.generate({
+    floor = Floor.generate({
       gameId,
       floorIdx: 0
-    }));
+    });
   }
-}
 
-let fps = new FpsCounter();
+  app.stage.addChild(floor.sprite);
 
-function startGame(floor) {
-  window.ml.floor = floor;
-  
-  let spawn = floor.map.getSpawnPoint();
-  /* eslint-disable no-extra-parens */
-  pageX = Math.max(spawn.x - (innerWidth / 2), 0);
-  pageY = Math.max(spawn.y - (innerHeight / 2), 0);
-  /* eslint-enable no-extra-parens */
-
-  let mapRenderer = floor.map.createRenderer();
-
-  app.stage.addChild(mapRenderer.sprite);
-  
-  if(devMode) {
+  // Show the fps counter on dev machines
+  let fps;
+  if(location.hostname === "localhost") {
+    fps = new FpsCounter();
     app.stage.addChild(fps.sprite);
   }
 
+  window.ml.floor = floor;
+  addArrowKeyListener(floor);
+  
   app.ticker.add(() => {
-    mapRenderer.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
+    floor.update();
 
-    if(devMode) {
+    if(fps) {
       fps.update();
     }
   });

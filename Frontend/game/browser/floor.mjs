@@ -1,7 +1,15 @@
+/* global PIXI */
 import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
 
 export default class Floor extends FloorCommon {
+  constructor(gameId, floorIdx) {
+    super(gameId, floorIdx);
+    // the top left corrner of the user's screen
+    this._viewportX = 0;
+    this._viewportY = 0;
+  }
+
   /**
    * Generate a new floor (runs on the server and the browser)
    * @param gameId The game id for the game we want to generate
@@ -12,6 +20,8 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
 
     floor.map = GameMap.generate(map);
+
+    floor._initRendering();
 
     return floor;
   }
@@ -31,10 +41,65 @@ export default class Floor extends FloorCommon {
       GameMap.load(floor)
     ]);
 
+    floor._initRendering();
+
     return floor;
   }
 
   save() {
-    // stub
+    // stub: no use for this yet
+  }
+
+  /**
+   * Do any rendering setup and add all sprites to the stage
+   */
+  _initRendering() {
+    this.sprite = new PIXI.Container();
+
+    // Move the viewport to the spawn point
+    let spawn = this.map.getSpawnPoint();
+    this.setViewport(spawn.x, spawn.y);
+
+    this._mapRenderer = this.map.createRenderer();
+    this.sprite.addChild(this._mapRenderer.sprite);
+  }
+
+  /**
+   * Render/update the game
+   */
+  update() {
+    this._mapRenderer.update(
+      this._viewportX,
+      this._viewportY,
+      this._viewportX + innerWidth,
+      this._viewportY + innerHeight
+    );
+  }
+
+  /**
+   * Set the viewport of the cient (ie the coordiates for the center of their screen)
+   * @param {number} x
+   * @param {number} y
+   */
+  setViewport(x, y) {
+    let halfWidth = innerWidth / 2;
+    let halfHeight = innerHeight / 2;
+
+    this._viewportX = Math.max(x - halfWidth, 0);
+    this._viewportY = Math.max(y - halfHeight, 0);
+  }
+
+  /**
+   * Get the current viewport
+   * @returns {object} {x, y}
+   */
+  getViewport() {
+    let halfWidth = innerWidth / 2;
+    let halfHeight = innerHeight / 2;
+
+    return {
+      x: this._viewportX + halfWidth,
+      y: this._viewportY + halfHeight
+    };
   }
 }
