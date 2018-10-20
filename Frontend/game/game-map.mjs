@@ -45,6 +45,7 @@ const d12 = (i, size) => {
  * @prop {number} y Y coordinate of the room
  * @prop {number} width Width coordinate of the room
  * @prop {number} height Height coordinate of the room
+ * @prop {string} type Always room
  */
 class Room {
   /**
@@ -62,6 +63,7 @@ class Room {
     this.width = width;
     this.height = height;
     this._params = mapParams;
+    this.type = "room";
   
     this._corridors = new Map();
   }
@@ -174,6 +176,7 @@ class Room {
  * @prop {number} width The width of the corridor
  * @prop {number} height The height of the corridor
  * @prop {number} weight The weight to use for graph algorithms
+ * @prop {string} type Always corridor
  */
 class Corridor {
   constructor(x, y, width, height, mapParams) {
@@ -183,6 +186,7 @@ class Corridor {
     this.height = height;
     this._params = mapParams;
     this.weight = this.width === this._params.corridorSize ? this.height : this.width;
+    this.type = "corridor";
   }
 
   /**
@@ -473,16 +477,30 @@ export default class GameMap {
    * @returns {boolean}
    */
   isOnMap(x, y) {
+    return !!this.getRect(x, y);
+  }
+
+  /**
+   * Get the room of corridor that contains the x, y corrdinate otherwise return undefined
+   * @param {number} x
+   * @param {number} y
+   * @returns {Room|Corridor}
+   */
+  getRect(x, y) {
     const check = (rect) => {
       return rect.x < x && x < rect.x + rect.width &&
         rect.y < y && y < rect.y + rect.height;
     };
 
-    return !!this.rooms.find((room) => {
-      return check(room) ||
-        (room.left && check(room.left)) ||
-        (room.above && check(room.above));
-    });
+    for(let room of this.rooms) {
+      if(check(room)) {
+        return room;
+      } else if(room.left && check(room.left)) {
+        return room.left;
+      } else if(room.above && check(room.above)) {
+        return room.above;
+      }
+    }
   }
 
   /**
