@@ -428,10 +428,16 @@ export default class GameMap {
     }
 
     // monster movement
+    this.updateMonsters(xMin, yMin);
+    for(let i = 0; i < this.monsters.length; i++) {
+      container.addChild(this.monsters[i].sprite);
+    }
+  }
+
+  updateMonsters(xMin, yMin) {
     for(let i = 0; i < this.monsters.length; i++) {
       this.monsters[i].setup = false;
       this.monsters[i].sprite.position.set(this.monsters[i].x - xMin, this.monsters[i].y - yMin);
-      container.addChild(this.monsters[i].sprite);
     }
   }
 

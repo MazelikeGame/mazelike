@@ -115,6 +115,7 @@ function startGame(map) {
     for(let i = 0; i < map.monsters.length; i++) {
       map.monsters[i].move();
     }
+    map.updateMonsters(pageX, pageY);
   }, 10);
 
   app.ticker.add(() => {

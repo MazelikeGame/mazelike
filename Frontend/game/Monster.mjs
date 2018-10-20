@@ -113,6 +113,7 @@ export default class Monster {
    * Sets the position closer to the target position.
    */
   move() {
+    console.log("moving");
     if(this.targetx < this.x)
       this.x--;
     else this.x++;
