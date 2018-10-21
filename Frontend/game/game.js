@@ -8,9 +8,7 @@ import Monster from "./monster.js";
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
 
-let devMode = location.hostname === "localhost";
-
-window.devMode = devMode; //Added for client side testing access.
+var devMode = location.hostname === "localhost";
 
 let app = new PIXI.Application({
   antialias: true
@@ -64,6 +62,7 @@ window.addEventListener("keydown", (e) => {
   // Toggle devmode
   if(e.which === 68 /* d */) {
     devMode = !devMode;
+    console.log(devMode);
 
     if(devMode) {
       app.stage.addChild(fps.sprite);
@@ -91,6 +90,7 @@ let fps = new FpsCounter();
 
 function startGame(map) {
   window.map = map;
+
   let mapSprite = map.createSprite();
 
   app.stage.addChild(mapSprite.sprite);
@@ -105,10 +105,12 @@ function startGame(map) {
 
   app.ticker.add(() => {
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
-  
+    
     if(devMode) {
       fps.update();
     }
+
+    window.devMode = devMode; //Added for client side testing access.
   });
 }
 
