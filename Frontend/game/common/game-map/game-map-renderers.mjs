@@ -1,15 +1,6 @@
 /* global PIXI */
 import GameMap from "./game-map.mjs";
 
-// support old maps
-let defaultRenderer = GameMap.createTileRenderer("floor", "-box-big");
-
-defaultRenderer.canRender = () => {
-  return false;
-};
-
-GameMap.register(defaultRenderer);
-
 // New specialized renderers
 GameMap.register({
   name: "smooth-renderer",
