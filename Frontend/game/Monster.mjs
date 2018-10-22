@@ -123,8 +123,6 @@ export default class Monster {
    * ~WIP, UNFINISHED (need to check for collisions for items/players)
    * 
    * Monster moves to an adjacent, unoccupied location.
-   * 
-   * isOnMap not quite working
    */
   wander() {
     let random = Math.floor(Math.random() * 4); 
