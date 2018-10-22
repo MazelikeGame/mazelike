@@ -5,10 +5,11 @@ import util from "util";
 import Lobby from "../models/lobby";
 import sql from "../sequelize";
 import path from "path";
-import Floor from "../game/floor";
 import fs from "fs";
+import spawnGame from "../manager";
 
 const mkdir = util.promisify(fs.mkdir);
+let gameAddrs = new Map();
 
 export let gameRouter = express.Router();
 
@@ -305,12 +306,6 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
         lobbyId: req.params.id
       }
     });
-
-    // Create game here (TODO)
-    let floor = Floor.generate({
-      gameId: req.params.id,
-      floorIdx: 0
-    });
     
     try {
       await mkdir("Frontend/public/maps");
@@ -318,7 +313,10 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       // pass
     }
 
-    await floor.save();
+    gameAddrs.set(req.params.id, spawnGame({
+      gameId: req.params.id,
+      isNewGame: "yes"
+    }));
 
     io.emit("lobby-start", req.params.id);
 
