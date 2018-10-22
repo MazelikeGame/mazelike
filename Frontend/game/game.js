@@ -62,7 +62,6 @@ window.addEventListener("keydown", (e) => {
   // Toggle devmode
   if(e.which === 68 /* d */) {
     devMode = !devMode;
-    console.log(devMode);
 
     if(devMode) {
       app.stage.addChild(fps.sprite);
