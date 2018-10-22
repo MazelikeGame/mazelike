@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: module:GameMap</title>
+    <title>JSDoc: Class: module:common/game-map/GameMap</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: module:GameMap</h1>
+    <h1 class="page-title">Class: module:common/game-map/GameMap</h1>
 
     
 
@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>module:GameMap<span class="signature">()</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>module:common/game-map/GameMap<span class="signature">()</span><span class="type-signature"></span></h2>
         
             <div class="class-description">A map for a game</div>
         
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="module:GameMap"><span class="type-signature"></span>new module:GameMap<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="module:common/game-map/GameMap"><span class="type-signature"></span>new module:common/game-map/GameMap<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -264,7 +264,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line256">line 256</a>
+        <a href="Frontend_game_common_game-map_game-map.mjs.html">Frontend/game/common/game-map/game-map.mjs</a>, <a href="Frontend_game_common_game-map_game-map.mjs.html#line36">line 36</a>
     </li></ul></dd>
     
 
@@ -300,16 +300,6 @@
     
 
     
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="module-GameMap-Corridor.html">Corridor</a></dt>
-            <dd></dd>
-        
-            <dt><a href="module-GameMap-Room.html">Room</a></dt>
-            <dd></dd>
-        </dl>
-    
 
     
 
@@ -328,7 +318,7 @@
     
 
     
-    <h4 class="name" id=".createTileRenderer"><span class="type-signature">(static) </span>createTileRenderer<span class="signature">(texture)</span><span class="type-signature"> &rarr; {Renderer}</span></h4>
+    <h4 class="name" id=".generate"><span class="type-signature">(static) </span>generate<span class="signature">(map, params)</span><span class="type-signature"> &rarr; {GameMap}</span></h4>
     
 
     
@@ -336,7 +326,7 @@
 
 
 <div class="description">
-    Create a renderer that just tiles a specific sprite
+    Geneate a game map
 </div>
 
 
@@ -372,10 +362,15 @@
 
         <tr>
             
-                <td class="name"><code>texture</code></td>
+                <td class="name"><code>map</code></td>
             
 
             <td class="type">
+            
+                
+<span class="param-type">GameMap</span>
+
+
             
             </td>
 
@@ -383,7 +378,30 @@
 
             
 
-            <td class="description last">The texture to tile</td>
+            <td class="description last">The game map to store everything in</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The game map generation parameters for the game map</td>
         </tr>
 
     
@@ -424,111 +442,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line461">line 461</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Renderer</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".generate"><span class="type-signature">(static) </span>generate<span class="signature">()</span><span class="type-signature"> &rarr; {GameMap}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Geneate a game map
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line314">line 314</a>
+        <a href="Frontend_game_common_game-map_game-map.mjs.html">Frontend/game/common/game-map/game-map.mjs</a>, <a href="Frontend_game_common_game-map_game-map.mjs.html#line84">line 84</a>
     </li></ul></dd>
     
 
@@ -580,7 +494,7 @@
     
 
     
-    <h4 class="name" id=".parse"><span class="type-signature">(static) </span>parse<span class="signature">(json)</span><span class="type-signature"> &rarr; {GameMap}</span></h4>
+    <h4 class="name" id=".parse"><span class="type-signature">(static) </span>parse<span class="signature">(json, map)</span><span class="type-signature"> &rarr; {GameMap}</span></h4>
     
 
     
@@ -647,6 +561,29 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>map</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">GameMap</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The game map to use</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -684,7 +621,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line555">line 555</a>
+        <a href="Frontend_game_common_game-map_game-map.mjs.html">Frontend/game/common/game-map/game-map.mjs</a>, <a href="Frontend_game_common_game-map_game-map.mjs.html#line169">line 169</a>
     </li></ul></dd>
     
 
@@ -837,7 +774,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line452">line 452</a>
+        <a href="Frontend_game_common_game-map_game-map.mjs.html">Frontend/game/common/game-map/game-map.mjs</a>, <a href="Frontend_game_common_game-map_game-map.mjs.html#line104">line 104</a>
     </li></ul></dd>
     
 
@@ -860,110 +797,6 @@
 
 
 
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="createSprite"><span class="type-signature"></span>createSprite<span class="signature">()</span><span class="type-signature"> &rarr; {SpriteReturn}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Create an object containing a PIXI.Container (called sprite) and an updatemethod to update the container.  Note the update method is GameMap.updateSpritebut without the container parameter.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line338">line 338</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">SpriteReturn</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -1099,7 +932,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line506">line 506</a>
+        <a href="Frontend_game_common_game-map_game-map.mjs.html">Frontend/game/common/game-map/game-map.mjs</a>, <a href="Frontend_game_common_game-map_game-map.mjs.html#line124">line 124</a>
     </li></ul></dd>
     
 
@@ -1206,7 +1039,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line747">line 747</a>
+        <a href="Frontend_game_common_game-map_game-map.mjs.html">Frontend/game/common/game-map/game-map.mjs</a>, <a href="Frontend_game_common_game-map_game-map.mjs.html#line358">line 358</a>
     </li></ul></dd>
     
 
@@ -1386,7 +1219,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line496">line 496</a>
+        <a href="Frontend_game_common_game-map_game-map.mjs.html">Frontend/game/common/game-map/game-map.mjs</a>, <a href="Frontend_game_common_game-map_game-map.mjs.html#line114">line 114</a>
     </li></ul></dd>
     
 
@@ -1490,7 +1323,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line527">line 527</a>
+        <a href="Frontend_game_common_game-map_game-map.mjs.html">Frontend/game/common/game-map/game-map.mjs</a>, <a href="Frontend_game_common_game-map_game-map.mjs.html#line145">line 145</a>
     </li></ul></dd>
     
 
@@ -1535,233 +1368,6 @@
 </dl>
 
     
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="updateSprite"><span class="type-signature"></span>updateSprite<span class="signature">(container, xMin, yMin, xMax, yMax)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Get a subset of the map inside rectangle specified by the coordiates
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>container</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">PIXI.Container</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The container returned by create sprite</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>xMin</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">x coordinate for the top left corner</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>yMin</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">y coordinate for the top left corner</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>xMax</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">x coordinate for the bottom right corner</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>yMax</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">y coordinate for the bottom right corner</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line355">line 355</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1917,144 +1523,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line440">line 440</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-            
-                
-<h4 class="name" id="~SpriteReturn">SpriteReturn</h4>
-
-
-
-
-<div class="description">
-    Container+update method
-</div>
-
-
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>sprite</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">PIXI.Container</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The sprite representing the game map</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>update</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">GameMap.updateSprite but without the container parameter</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_game-map.mjs.html">Frontend/game/game-map.mjs</a>, <a href="Frontend_game_game-map.mjs.html#line325">line 325</a>
+        <a href="Frontend_game_common_game-map_game-map.mjs.html">Frontend/game/common/game-map/game-map.mjs</a>, <a href="Frontend_game_common_game-map_game-map.mjs.html#line92">line 92</a>
     </li></ul></dd>
     
 
@@ -2084,13 +1553,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-GameMap.html">GameMap</a></li></ul><h3>Classes</h3><ul><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-GameMap.html">GameMap</a></li><li><a href="module-GameMap-Corridor.html">Corridor</a></li><li><a href="module-GameMap-Room.html">Room</a></li></ul><h3>Global</h3><ul><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#set">set</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li></ul><h3>Classes</h3><ul><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li></ul><h3>Global</h3><ul><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#set">set</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 20 2018 12:51:02 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 20 2018 18:43:38 GMT-0500 (Central Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

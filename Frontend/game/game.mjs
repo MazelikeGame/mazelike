@@ -1,14 +1,11 @@
 /* global PIXI  */
 /* eslint-disable complexity */
-import GameMap from "./game-map.mjs";
-import {KEY_CODES} from "./input.mjs";
-import FpsCounter from "./fps-counter.mjs";
-import "./game-map-renderers.mjs";
+
+import Floor from "./browser/floor.mjs";
+import FpsCounter from "./fps-counter.js";
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
-
-let devMode = location.hostname === "localhost";
 
 let app = new PIXI.Application({
   antialias: true
@@ -27,100 +24,71 @@ window.onresize = () => {
 
 window.onresize();
 
-let pageX = 0;
-let pageY = 0;
+// This should be removed once player controls the viewport
+const addArrowKeyListener = (floor) => {
+  window.addEventListener("keydown", (e) => {
+    let viewport = floor.getViewport();
 
-window.addEventListener("keydown", (e) => {
-  if(e.keyCode === KEY_CODES.UP_ARROW) {
-    pageY -= 10;
-    if(pageY < 0) {
-      pageY = 0;
+    if(e.keyCode === 38 /* UP_ARROW */) {
+      viewport.y -= 10;
     }
-  }
-  
-  if(e.keyCode === KEY_CODES.DOWN_ARROW) {
-    pageY += 10;
-    if(pageY > 10000) {
-      pageY = 10000;
+    
+    if(e.keyCode === 40 /* DOWN_ARROW */) {
+      viewport.y += 10;
     }
-  }
-   
-  if(e.keyCode === KEY_CODES.LEFT_ARROW) {
-    pageX -= 10;
-    if(pageX < 0) {
-      pageX = 0;
+    
+    if(e.keyCode === 37 /* LEFT_ARROW */) {
+      viewport.x -= 10;
     }
-  }
-  
-  if(e.keyCode === KEY_CODES.RIGHT_ARROW) {
-    pageX += 10;
-    if(pageX > 10000) {
-      pageX = 10000;
+    
+    if(e.keyCode === 39 /* RIGHT_ARROW */) {
+      viewport.x += 10;
     }
-  }
 
-  // Toggle devmode
-  if(e.which === 68 /* d */) {
-    devMode = !devMode;
+    floor.setViewport(viewport.x, viewport.y);
+  });
+};
 
-    if(devMode) {
-      app.stage.addChild(fps.sprite);
-    } else {
-      app.stage.removeChild(fps.sprite);
-    }
-  }
-});
+async function setup() {
+  let floor;
 
-function setup() {
   if(gameId) {
-    fetch(`/public/maps/${gameId}.json`)
-      .then((res) => {
-        return res.json();
-      })
-      .then((json) => {
-        startGame(GameMap.parse(json));
-      });
+    floor = await Floor.load(gameId, 0);
   } else {
-    startGame(GameMap.generate({
-      id: "single-player"
-    }));
+    floor = Floor.generate({
+      gameId,
+      floorIdx: 0
+    });
   }
-}
 
-let fps = new FpsCounter();
+  app.stage.addChild(floor.sprite);
 
-function startGame(map) {
-  window.ml.map = map;
-  
-  // let spawn = map.getSpawnPoint();
-  /* eslint-disable no-extra-parens */
-  // pageX = spawn.x - (innerWidth / 2);
-  // pageY = spawn.y - (innerHeight / 2);
-  /* eslint-enable no-extra-parens */
-
-  let mapSprite = map.createSprite();
-
-  app.stage.addChild(mapSprite.sprite);
-  
-  if(devMode) {
+  // Show the fps counter on dev machines
+  let fps;
+  if(location.hostname === "localhost") {
+    fps = new FpsCounter();
     app.stage.addChild(fps.sprite);
   }
 
+  window.ml.floor = floor;
+  addArrowKeyListener(floor);
+
   window.setInterval(function() {
-    for(let i = 0; i < map.monsters.length; i++) {
-      map.monsters[i].figureOutWhereToGo();
+    for(let i = 0; i < floor.monsters.length; i++) {
+      floor.monsters[i].figureOutWhereToGo();
     }
   }, 500);
   window.setInterval(function() {
-    for(let i = 0; i < map.monsters.length; i++) {
-      map.monsters[i].move();
+    for(let i = 0; i < floor.monsters.length; i++) {
+      floor.monsters[i].move();
     }
-    map.updateMonsters(pageX, pageY);
+    //floor.updateMonsters(pageX, pageY); // katie todo
   }, 10);
   
   app.ticker.add(() => {
-    mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
-    if(devMode) {
+    floor.update();
+
+    if(fps) {
       fps.update();
     }
   });

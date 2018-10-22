@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Frontend/game/game-map.mjs</title>
+    <title>JSDoc: Source: Frontend/game/common/game-map/game-map.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Frontend/game/game-map.mjs</h1>
+    <h1 class="page-title">Source: Frontend/game/common/game-map/game-map.mjs</h1>
 
     
 
@@ -27,25 +27,10 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/* eslint-disable complexity,no-extra-parens,no-mixed-operators,consistent-return */
-/* global PIXI */
-/** @module GameMap */
-
-const DEFAULT_RENDERER = "tile-renderer-floor-0-1-box-big";
-const MIN_SIZE = 16;
-
-const THEMES = (() => {
-  let themes = [];
-
-  for(let i = 0; i &lt; 3; ++i) {
-    for(let j = 0; j &lt; 8; ++j) {
-      if(i &lt; 2 &amp;&amp; j &lt; 5) {
-        themes.push(`${i}-${j}`);
-      }
-    }
-  }
-
-  return themes;
-})();
+/** @module common/game-map/GameMap */
+import {MIN_SIZE, THEMES} from "./game-map-const.mjs";
+import Room from "./room.mjs";
+import Corridor from "./corridor.mjs";
 
 /**
  * Map a 2d coordinate to a 1d coordinate
@@ -68,211 +53,6 @@ const d12 = (i, size) => {
 };
 
 /**
- * A room in the maze
- * @prop {number} x X coordinate of the room
- * @prop {number} y Y coordinate of the room
- * @prop {number} width Width coordinate of the room
- * @prop {number} height Height coordinate of the room
- * @prop {string} type Always room
- */
-class Room {
-  /**
-   * &lt;span style="color: red;">Constructor is private.&lt;/span>
-   * See GameMap.rooms or GameMap.getRect for instances of Room.
-   * @private
-   * @param i The index of the room
-   * @param x 
-   * @param y 
-   * @param width 
-   * @param height 
-   * @param mapParams 
-   */
-  constructor(i, x, y, width, height, mapParams) {
-    this._i = i;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this._params = mapParams;
-    this.type = "room";
-  
-    this._corridors = new Map();
-  }
-
-  /**
-   * Create a corridor between 2 rooms
-   * @private
-   */
-  _connect(room, corridor) {
-    this._corridors.set(room._i, corridor._to(room));
-    room._corridors.set(this._i, corridor._to(this));
-  }
-
-  /**
-   * All corridors connected to this room
-   * @return {Corridor[]}
-   */
-  get corridors() {
-    return Array.from(this._corridors.values());
-  }
-
-  /**
-   * Get the room to the left of this one (if one exists)
-   * @return {Room}
-   */
-  get left() {
-    return this._corridors.get(this._i - 1);
-  }
-
-  /**
-   * Get the room to the right of this one (if one exists)
-   * @return {Room}
-   */
-  get right() {
-    return this._corridors.get(this._i + 1);
-  }
-
-  /**
-   * Get the room above this one (if one exists)
-   * @return {Room}
-   */
-  get above() {
-    return this._corridors.get(this._i - this._params.size);
-  }
-
-  /**
-   * Get the room below this one (if one exists)
-   * @return {Room}
-   */
-  get below() {
-    return this._corridors.get(this._i + this._params.size);
-  }
-
-  /**
-   * Convert the room to json
-   * @private
-   */
-  toJSON() {
-    let raw = {
-      x: this.x / MIN_SIZE,
-      y: this.y / MIN_SIZE,
-      w: this.width / MIN_SIZE,
-      h: this.height / MIN_SIZE,
-      r: this._rendererName
-    };
-
-    if(this.left) {
-      raw.l = this.left.toJSON();
-    }
-
-    if(this.above) {
-      raw.a = this.above.toJSON();
-    }
-
-    return raw;
-  }
-
-  /**
-   * Convert json into a Room
-   * @private
-   */
-  static _parse(i, rooms, json, mapParams) {
-    let room = new Room(
-      i,
-      json.x * MIN_SIZE,
-      json.y * MIN_SIZE,
-      json.w * MIN_SIZE,
-      json.h * MIN_SIZE,
-      mapParams
-    );
-
-    if(json.l) {
-      room._connect(rooms[i - 1], Corridor._parse(json.l, mapParams));
-    }
-
-    if(json.a) {
-      room._connect(rooms[i - room._params.size], Corridor._parse(json.a, mapParams));
-    }
-
-    room._rendererName = json.r;
-
-    return room;
-  }
-}
-
-/**
- * A corridor in the maze
- * @prop {number} x The x coordinate for the corridor to start
- * @prop {number} y The y coordinate for the corridor to start
- * @prop {number} width The width of the corridor
- * @prop {number} height The height of the corridor
- * @prop {number} weight The weight to use for graph algorithms
- * @prop {string} type Always corridor
- */
-class Corridor {
-  /**
-   * &lt;span style="color: red;">Constructor is private.&lt;/span>
-   * See Room or GameMap.getRect for instances of Corridor.
-   * @private
-   * @param x 
-   * @param y 
-   * @param width 
-   * @param height 
-   * @param mapParams 
-   */
-  constructor(x, y, width, height, mapParams) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this._params = mapParams;
-    this.weight = this.width === this._params.corridorSize ? this.height : this.width;
-    this.type = "corridor";
-  }
-
-  /**
-   * Clone this edge with the room as room
-   * @private
-   */
-  _to(room) {
-    let clone = Object.create(Corridor.prototype);
-    clone.room = room;
-    return Object.assign(clone, this);
-  }
-
-  /**
-   * Convert the corridor to json
-   * @private
-   */
-  toJSON() {
-    return {
-      x: this.x / MIN_SIZE,
-      y: this.y / MIN_SIZE,
-      w: this.width / MIN_SIZE,
-      h: this.height / MIN_SIZE,
-      r: this._rendererName
-    };
-  }
-
-  /**
-   * Convert json into a Corridor
-   * @private
-   */
-  static _parse(json, mapParams) {
-    let corridor = new Corridor(
-      json.x * MIN_SIZE,
-      json.y * MIN_SIZE,
-      json.w * MIN_SIZE,
-      json.h * MIN_SIZE,
-      mapParams
-    );
-
-    corridor._rendererName = json.r;
-    return corridor;
-  }
-}
-
-/**
  * A map for a game
  * @prop {string} id Unique id for this map
  * @prop {string} theme The theme for this map
@@ -288,13 +68,6 @@ export default class GameMap {
    */
   constructor() {
     this.rooms = [];
-    this.monsters = [];
-    this.items = [];
-    this.players = [];
-  }
-
-  _init() {
-    //Monster.initMonsters(this);
   }
 
   /**
@@ -313,13 +86,8 @@ export default class GameMap {
       xPadding: (params.xPadding || 4) * MIN_SIZE,
       yPadding: (params.xPadding || 4) * MIN_SIZE,
       theme: params.theme || THEMES[Math.floor(Math.random() * THEMES.length)],
-      spawn: params.spawn,
-      id: params.id
+      spawn: params.spawn
     };
-
-    if(!this._params.id) {
-      throw new Error("Id missing");
-    }
 
     if(!this._params.spawn) {
       this._params.spawn = Math.floor(Math.random() * this._params.nodes);
@@ -337,132 +105,16 @@ export default class GameMap {
 
   /**
    * Geneate a game map
+   * @param {GameMap} map The game map to store everything in
+   * @param {object} params The game map generation parameters for the game map
    * @returns {GameMap}
    */
-  static generate(params) {
-    let map = new GameMap();
+  static generate(map, params) {
     map._initParams(params);
 
     map.generateMap(map.generateMaze());
 
-    map._init();
-
     return map;
-  }
-
-  /**
-   * Container+update method
-   * @typedef SpriteReturn
-   * @prop {PIXI.Container} sprite The sprite representing the game map
-   * @prop {Function} update GameMap.updateSprite but without the container parameter
-   */
-
-  /**
-   * Create an object containing a PIXI.Container (called sprite) and an update
-   * method to update the container.  Note the update method is GameMap.updateSprite
-   * but without the container parameter.
-   * @returns {SpriteReturn}
-   */
-  createSprite() {
-    let sprite = new PIXI.Container();
-
-    return {
-      sprite,
-      update: this.updateSprite.bind(this, sprite)
-    };
-  }
-
-  /**
-   * Get a subset of the map inside rectangle specified by the coordiates
-   * @param {PIXI.Container} container The container returned by create sprite
-   * @param {number} xMin x coordinate for the top left corner
-   * @param {number} yMin y coordinate for the top left corner
-   * @param {number} xMax x coordinate for the bottom right corner
-   * @param {number} yMax y coordinate for the bottom right corner
-   */
-  updateSprite(container, xMin, yMin, xMax, yMax) {
-    /* eslint-disable no-param-reassign */
-    xMin = Math.max(0, xMin);
-    yMin = Math.max(0, yMin);
-    /* eslint-enable no-param-reassign */
-
-    if(container.__prevXMin === xMin &amp;&amp; container.__prevXMax === xMax &amp;&amp; 
-      container.__prevYMin === yMin &amp;&amp; container.__prevYMax === yMax) {
-      return;
-    }
-
-    container.__prevXMin = xMin;
-    container.__prevXMax = xMax;
-    container.__prevYMin = yMin;
-    container.__prevYMax = yMax;
-
-    while(container.children.length) {
-      container.removeChild(container.children[0]);
-    }
-
-    // check that a rect is inside the box even partially
-    let inBounds = (rect) => {
-      return ((xMin &lt;= rect.x &amp;&amp; rect.x &lt;= xMax) ||
-        (xMin &lt;= rect.x + rect.width &amp;&amp; rect.x + rect.width &lt;= xMax)) &amp;&amp;
-        ((yMin &lt;= rect.y &amp;&amp; rect.y &lt;= yMax) ||
-        (yMin &lt;= rect.y + rect.height &amp;&amp; rect.y + rect.height &lt;= yMax));
-    };
-
-    // process a single room/corridor
-    let process = (rect) => {
-      let renderer = GameMap._renderers.get(rect._rendererName);
-
-      if(!renderer) {
-        renderer = GameMap._renderers.get(DEFAULT_RENDERER);
-      }
-
-      // get corrds relative to the screen
-      let x = rect.x - xMin;
-      let y = rect.y - yMin;
-      let xEnd = x + rect.width;
-      let yEnd = y + rect.height;
-      let width = xEnd - x;
-      let height = yEnd - y;
-      // get corrds relative to the rect
-      let relativeX = Math.max(x - rect.x, 0);
-      let relativeY = Math.max(y - rect.y, 0);
-      let relativeWidth = width - relativeX - Math.max(xEnd - xMax, 0);
-      let relativeHeight = height - relativeY - Math.max(yEnd - yMax, 0);
-
-      let sprites = renderer.render({
-        x: relativeX,
-        y: relativeY,
-        width: relativeWidth,
-        height: relativeHeight,
-        rect,
-        xMin,
-        xMax,
-        yMin,
-        yMax,
-        map: this
-      });
-
-      // positon and size the sprites that were given
-      sprites.position.set(x, y);
-      sprites.width = Math.min(xMax, xEnd) - x;
-      sprites.height = Math.min(yMax, yEnd) - y;
-      container.addChild(sprites);
-    };
-
-    // process all of the rooms and corridors
-    for(let room of this.rooms) {
-      if(inBounds(room)) {
-        process(room);
-      }
-      
-      if(room.left &amp;&amp; inBounds(room.left)) {
-        process(room.left);
-      }
-
-      if(room.above &amp;&amp; inBounds(room.above)) {
-        process(room.above);
-      }
-    }
   }
 
   /**
@@ -479,40 +131,6 @@ export default class GameMap {
    */
   static register(renderer) {
     GameMap._renderers.set(renderer.name, renderer);
-  }
-
-  /**
-   * Create a renderer that just tiles a specific sprite
-   * @param texture The texture to tile
-   * @returns {Renderer}
-   */
-  static createTileRenderer(res, name) {
-    return {
-      name: `tile-renderer-${res}-${name}`,
-
-      canRender() {
-        return true;
-      },
-
-      render({x, y, width, height, map}) {
-        let texture = PIXI.loader.resources[res].textures[`${map._params.theme}${name}`];
-        let {width: tWidth, height: tHeight} = texture.frame;
-        let container = new PIXI.Container();
-
-        for(let i = 0; i &lt; width; i += tWidth) {
-          for(let j = 0; j &lt; height; j += tHeight) {
-            let sprite = new PIXI.Sprite(texture);
-
-            sprite.position.set(i - x, j - y);
-            sprite.width = tWidth;
-            sprite.height = tHeight;
-            container.addChild(sprite);
-          }
-        }
-
-        return container;
-      }
-    };
   }
 
   /**
@@ -564,24 +182,19 @@ export default class GameMap {
         corridorSize: this._params.corridorSize / MIN_SIZE,
         xPadding: this._params.xPadding / MIN_SIZE,
         yPadding: this._params.xPadding / MIN_SIZE,
-        theme: this._params.theme,
-        spawn: this._params.spawn,
-        id: this._params.id
+        theme: this._params.theme || "0-0",
+        spawn: this._params.spawn
       }
     });
-  }
-
-  get id() {
-    return this._params.id;
   }
 
   /**
    * Parse a previously serialized map
    * @param {string|object} json The serialized map
+   * @param {GameMap} map The game map to use
    * @returns {GameMap}
    */
-  static parse(json) {
-    let map = new GameMap();
+  static parse(json, map) {
     let raw = typeof json === "string" ? JSON.parse(json) : json;
 
     map._initParams(raw.params);
@@ -589,8 +202,6 @@ export default class GameMap {
     for(let i = 0; i &lt; raw.rooms.length; ++i) {
       map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i], map._params));
     }
-
-    map._init();
 
     return map;
   }
@@ -796,13 +407,13 @@ GameMap._renderers = new Map();</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-GameMap.html">GameMap</a></li></ul><h3>Classes</h3><ul><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-GameMap.html">GameMap</a></li><li><a href="module-GameMap-Corridor.html">Corridor</a></li><li><a href="module-GameMap-Room.html">Room</a></li></ul><h3>Global</h3><ul><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#set">set</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li></ul><h3>Classes</h3><ul><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li></ul><h3>Global</h3><ul><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#set">set</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 20 2018 12:51:02 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 20 2018 18:43:38 GMT-0500 (Central Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
