@@ -19,4 +19,11 @@ export default class Player extends PlayerCommon {
   constructor(name, hp, spawn) {
     super(name, hp, spawn);
   }
+
+  /**
+   * Load a Player
+   */
+  async load() {
+
+  }
 }

@@ -19,12 +19,19 @@ export default class Player extends PlayerCommon {
   }
 
   /**
-   * Generate sprite for player
+   * Create a sprite for player
    */
   createSprite() {
     this.sprite = new PIXI.Sprite(PIXI.loader.resources.player.textures['player1']);
     this.sprite.position.set(this.xPos, this.yPos);
     this.sprite.width = SPRITE_SIZE;
     this.sprite.height = SPRITE_SIZE;
+  }
+
+  /**
+   * Load a Player
+   */
+  async load(floor) {
+
   }
 }
