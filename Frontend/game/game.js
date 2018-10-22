@@ -14,6 +14,8 @@ let app = new PIXI.Application({
   antialias: true
 });
 
+window.app = app;
+
 document.body.appendChild(app.view);
 
 // make the game fill the window
@@ -100,6 +102,7 @@ function startGame(map) {
   
   let spoopy_monster = new Monster('spoopy monster', 100, 10);
   app.stage.addChild(spoopy_monster.sprite);
+
   spoopy_monster.attack("the air");
 
   app.ticker.add(() => {
