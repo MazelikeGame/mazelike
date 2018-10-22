@@ -122,6 +122,7 @@
     if (currentWindowOnload) {
       currentWindowOnload();
     }
+
     htmlReporter.initialize();
     env.execute();
   };
