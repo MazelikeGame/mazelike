@@ -92,10 +92,10 @@ let fps = new FpsCounter();
 function startGame(map) {
   window.ml.map = map;
   
-  let spawn = map.getSpawnPoint();
+  // let spawn = map.getSpawnPoint();
   /* eslint-disable no-extra-parens */
-  pageX = spawn.x - (innerWidth / 2);
-  pageY = spawn.y - (innerHeight / 2);
+  // pageX = spawn.x - (innerWidth / 2);
+  // pageY = spawn.y - (innerHeight / 2);
   /* eslint-enable no-extra-parens */
 
   let mapSprite = map.createSprite();
@@ -117,7 +117,7 @@ function startGame(map) {
     }
     map.updateMonsters(pageX, pageY);
   }, 10);
-
+  
   app.ticker.add(() => {
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
     if(devMode) {

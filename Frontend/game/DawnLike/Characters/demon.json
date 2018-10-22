@@ -5,16 +5,16 @@
   "frames":{
     "red demon": {
       "frame": {
-        "x": 32,
-        "y": 48,
+        "x": 33,
+        "y": 49,
         "w": 16,
         "h": 16
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
-        "x": 32,
-        "y": 48,
+        "x": 33,
+        "y": 49,
         "w": 16,
         "h": 16
       },

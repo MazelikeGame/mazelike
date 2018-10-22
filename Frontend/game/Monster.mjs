@@ -1,4 +1,4 @@
-/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity */
+/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
 /* global PIXI */
 /** @module Monster */
 
@@ -16,14 +16,17 @@ export default class Monster {
     this.targetAquired = false; // "in pursuit" boolean
     this.x = 0; // (x,y) = upper left pixel coordinate
     this.y = 0;
-    this.targetx = -1; //location where monster wants to move
+    this.targetx = -1; // location where monster wants to move
     this.targety = -1;
     this.PCx = -1; // (-1,-1) if not seen yet or previously seen location explored
     this.PCy = -1;
-    this.setup = true;
+    this.maneuver = false;
 
     this.placeInRandomRoom();
 
+    this.figureOutWhereToGo();
+
+    this.die();
   }
 
   /**
@@ -36,53 +39,90 @@ export default class Monster {
     this.sprite.height = SPRITE_SIZE;
   }
 
-  /**
-   * todo WIP, UNFINISHED
-   * 
-   * Updates targetAquired field, which is true if we're currently in pursuit.
-   * If PC is in sight, PCx and PCy will be updated (last known location coordinates)
-   * If multiple PCs in sight, targets closest.
+  /** 
+   * Returns true if monster can see given pixel coordinate.
+   * @param x 
+   * @param y 
    */
-  canSeePC() {
-    this.targetAquired = false;
-    let distances = [];
-    let boxClear = true;
+  canSee(x, y) {
+    this.maneuver = false;
     let x1 = -1, x2 = -1, y1 = -1, y2 = -1;
-    for(let i = 0; i < this.map.numPCs; i++) {
-      //if theres a clean box with opposite corners being a pc and monster
-      if(this.map.PC1x < this.x) {
-        x1 = this.map.PC1x;
-        x2 = this.x;
-      } else {
-        x1 = this.x;
-        x2 = this.map.PC1x;
+    let cornerx = this.x, cornery = this.y; // upper left
+    let clear = true;
+    let totalCorners = 0;
+    for(let i = 0; i < 4; i++) {
+      if(i === 1) {
+        cornerx += SPRITE_SIZE; // upper right
+      } else if(i === 2) {
+        cornery += SPRITE_SIZE; // lower right
+      } else if(i === 3) {
+        cornerx -= SPRITE_SIZE; // lower left
       }
-      if(this.map.PC1y < this.y) {
-        y1 = this.map.PC1y;
-        y2 = this.y;
+      if(x < cornerx) {
+        x1 = x;
+        x2 = cornerx;
       } else {
-        y1 = this.y;
-        y2 = this.map.PC1y;
+        x1 = cornerx;
+        x2 = x;
       }
-      distances[i] = (x2 - x1 + 1) + (y2 - y1 + 1);
-      boxClear = true;
+      if(y < cornery) {
+        y1 = y;
+        y2 = cornery;
+      } else {
+        y1 = cornery;
+        y2 = y;
+      }
+      clear = true;
       for(let j = x1; j <= x2; j++) {
         for(let k = y1; k <= y2; k++) {
-          if(!this.map.isOnMap(j * SPRITE_SIZE, k * SPRITE_SIZE)) {
-            boxClear = false;
+          if(!this.map.isOnMap(j, k)) {
+            clear = false;
+            break;
           }
+          if(!clear)
+            break;
         }
       }
+      if(clear)
+        totalCorners++;
     }
-    //only works for one pc todo
-    this.targetAquired = boxClear;
-    console.log(this.targetAquired);
+    if(totalCorners === 0)
+      return false;
+    if(totalCorners < 4)
+      this.maneuver = true;
+    return true;
+  }
+
+  /** todo test properly
+   * Finds distance between monster and coodinate.
+   * @param x 
+   * @param y 
+   * @return {double}
+   */
+  findDistance(x, y) {
+    let asquared = Math.pow(x - this.x, 2);
+    let bsquared = Math.pow(y - this.y, 2);
+    let c = Math.sqrt(asquared + bsquared);
+    return c;
+  }
+
+  /** ~WIP, UNFINISHED (need PC implementation)
+   * Finds closest PC that can be seen and targets it.
+   */
+  canSeePC() {
+    // this.targetAquired = false;
+    // let indexArray = [];
+    // for i = 0 to map.numPcs/map.PCarray.length
+    // __if(canSee(PC[i].x, PC[i].y));, repeat for all (most) pixels of pc
+    // ____push i onto indexArray;
+    // find closest PC that can be seen: use this.findDistance(pcx, pcy) and find minimum to find closest pc of PCs of indexArray
+    // assign targetx and targety to closest pc that can be seen
   }
 
   /** 
    * ~WIP, UNFINISHED (need to check for collisions for items/players)
    * 
-   * Monster moves to an adjacent, unoccupied location. todo make them go in longer lines
+   * Monster moves to an adjacent, unoccupied location.
    * 
    * isOnMap not quite working
    */
@@ -113,7 +153,6 @@ export default class Monster {
    * Sets the position closer to the target position.
    */
   move() {
-    console.log("moving");
     if(this.targetx < this.x)
       this.x--;
     else this.x++;
@@ -125,14 +164,14 @@ export default class Monster {
   }
 
   /**
-   * todo WIP, UNFINISHED (needs to be able to move strategically based on PC last seen location
+   * ~WIP, UNFINISHED (needs to be able to move strategically based on PC last seen location
    * 
    * Moves monster.
    * If PC has been seen, move strategically towards last seen location.
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
    */
   figureOutWhereToGo() {
-    //this.canSeePC(); // todo
+    //this.canSeePC();
     if(!this.targetAquired) {
       this.wander();
     } else {
@@ -171,7 +210,8 @@ export default class Monster {
    * Monster dies.
    */
   die() {
-    this.map.monsters.splice(this.id, 1);
+    //this.map.monsters.splice(this.id, 1);
+    //console.log("DEATH: " + this.map.monsters.length);
     // drop item in the future
   }
 
@@ -181,6 +221,7 @@ export default class Monster {
   placeInRandomRoom() {
     let numRooms = this.map.rooms.length;
     this.initialRoom = Math.floor(Math.random() * numRooms);
+    this.initialRoom = 0;
     for(let i = 0; i < this.map.monsters.length; i++) {
       if(this.id !== i && this.map.monsters[i].initialRoom === this.initialRoom) {
         this.placeInRandomRoom();
@@ -220,4 +261,92 @@ export default class Monster {
     }
     return false;
   }
-} 
+
+  // changes for an actual test case: todo
+  // remove any monsters in room one
+  // place monster in room one
+  // manually placing pc
+  // replace this.x with this.map.monsters[0].x
+  // outputs: all true
+  pursue_test() {
+    // TEST 1: directly left/right/up/down
+    let pcx = this.x;
+    let pcy = this.y;
+    let cantplacepc = false;
+    
+    pcx += 1.5 * SPRITE_SIZE; // right
+    if(!this.map.isOnMap(pcx, pcy)) { 
+      pcx -= 2 * SPRITE_SIZE; // left
+      if(!this.map.isOnMap(pcx, pcy)) { 
+        pcx = this.x;
+        pcy += 1.5 * SPRITE_SIZE; // down
+        if(!this.map.isOnMap(pcx, pcy)) { 
+          pcy -= 2 * SPRITE_SIZE; // up
+          if(!this.map.isOnMap(pcx, pcy)) { 
+            cantplacepc = true;
+          }
+        }
+      }
+    }
+
+    let test1 = false;
+    if(!cantplacepc) {
+      test1 = this.canSee(pcx, pcy);
+      console.log("test1: " + test1);
+    } else {
+      console.log("Could not place pc for test1."); // should not occur
+    }
+
+    // TEST 2: diagonal 
+    pcx = this.x;
+    pcy = this.y;
+    cantplacepc = false;
+    
+    pcx += 1.5 * SPRITE_SIZE; // lower right
+    pcy += 1.5 * SPRITE_SIZE;
+    if(!this.map.isOnMap(pcx, pcy)) { 
+      pcx -= 2 * SPRITE_SIZE; // lower left
+      if(!this.map.isOnMap(pcx, pcy)) { 
+        pcy -= 2 * SPRITE_SIZE; // upper left
+        if(!this.map.isOnMap(pcx, pcy)) { 
+          pcx += 2 * SPRITE_SIZE; // upper right
+          if(!this.map.isOnMap(pcx, pcy)) { 
+            cantplacepc = true;
+          }
+        }
+      }
+    }
+
+    let test2 = false;
+    if(!cantplacepc) {
+      test2 = this.canSee(pcx, pcy);
+      console.log("test2: " + test2);
+      if(!test2)
+        console.log(pcx, pcy, "monster:", this.x, this.y);
+    } else {
+      console.log("Could not place pc for test2. Run test on new map, as room 0 was generated as a corridor.");
+    }
+
+    // TEST 3: pc off map
+    pcx = 0;
+    pcy = 0;
+
+    let test3 = false;
+    test3 = !this.canSee(pcx, pcy);
+    console.log("test3: " + test3);
+
+    // TEST 4: place in far away room
+    pcx = 0;
+    pcy = 0;
+
+    let pcRoom = this.map.rooms.length - 1; // a room far away from the testing monster
+    let randomDiffX = Math.floor(Math.random() * this.map.rooms[pcRoom].width); 
+    pcx = this.map.rooms[pcRoom].x + randomDiffX;
+    let randomDiffY = Math.floor(Math.random() * this.map.rooms[pcRoom].height); 
+    pcy = this.map.rooms[pcRoom].y + randomDiffY;
+
+    let test4 = false;
+    test4 = !this.canSee(pcx, pcy);
+    console.log("test4: " + test4);
+  } 
+}
