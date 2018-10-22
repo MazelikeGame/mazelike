@@ -2,6 +2,7 @@
 /** @module browser/Floor */
 import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
+import Player from "./Player.mjs";
 
 export default class Floor extends FloorCommon {
   constructor(gameId, floorIdx) {
@@ -19,6 +20,8 @@ export default class Floor extends FloorCommon {
    */
   static generate({gameId, floorIdx, map}) {
     let floor = new Floor(gameId, floorIdx);
+    let players = [];
+    players.push(new Player('billy bob', 100, map, 0, map.getSpawnPoint()));
 
     floor.map = GameMap.generate(map);
 
