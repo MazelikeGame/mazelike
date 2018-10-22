@@ -1,4 +1,3 @@
-/* global PIXI */
 /** @module Player */
 
 /**
@@ -39,9 +38,11 @@ export default class Player {
   }
 
   /**
-   * Return the
+   * Get the hp of this player
+   * @return {int} This player's hp.
    */
   getHp() {
     return this.hp;
   }
 }
+
