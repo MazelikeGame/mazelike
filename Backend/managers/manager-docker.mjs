@@ -2,7 +2,7 @@ import dockerApi from "node-docker-api";
 import poll from "./manager-connect.mjs";
 
 const IMAGE_NAME = process.env.IMAGE_NAME || "mazelike/backend:devel";
-const ADDRESS = process.env.EXTERN_ADDRESS || "localhost";
+const ADDRESS = process.env.EXTERN_ADDRESS;
 const STARTING_PORT = +process.env.STARTING_PORT || 5900;
 const ENDING_PORT = +process.env.ENDING_PORT || 5999;
 const PREFIX = process.env.CONTAINER_PREFIX || "";
@@ -48,7 +48,7 @@ export default async function spawn(gameEnv = {}) {
   await container.start();
 
   // wait for the server to start
-  await poll(`${hostname}:${port}`);
+  await poll(`${ADDRESS}:${port}`);
 
   return `${ADDRESS}:${port}`;
 }
