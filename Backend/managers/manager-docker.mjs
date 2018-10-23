@@ -46,6 +46,9 @@ export default async function spawn(gameEnv = {}) {
 
   await container.start();
 
+  // eslint-disable-next-line
+  console.log(await container.status());
+
   // wait for the server to start
   await sleep(1500);
 
