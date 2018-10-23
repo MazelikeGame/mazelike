@@ -36,7 +36,16 @@ async function main() {
     process.stdout.write(`Game server listening on ${PORT}\n`);
   });
 
-  let io = socketIO(httpd); // eslint-disable-line
+  // eslint-disable-next-line
+
+  let io = socketIO(httpd); 
+
+  io.on("connection", (sock) => {
+    sock.on("save", async() => {
+      await floor.save();
+      sock.emit("save-complete");
+    });
+  });
 }
 
 main();

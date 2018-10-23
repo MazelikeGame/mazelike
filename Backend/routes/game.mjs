@@ -327,6 +327,11 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
   res.end("No such lobby or you are not the host");
 });
 
+// Get the game server address
+gameRouter.get("/addr/:id", (req, res) => {
+  res.end(gameAddrs.get(req.params.id));
+});
+
 // Serve /game/:id as /game/
 gameRouter.get(/[A-Za-z0-9]{12}/, (req, res) => {
   res.sendFile(path.resolve("Frontend/game/index.html"));

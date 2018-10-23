@@ -1,4 +1,4 @@
-/* global PIXI  */
+/* global PIXI io  */
 /* eslint-disable complexity */
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
@@ -49,14 +49,16 @@ const addArrowKeyListener = (floor) => {
 };
 
 async function setup() {
+  let sock = io(`http://${await (await fetch(`/game/addr/${gameId}`)).text()}`);
   let floor;
 
   if(gameId) {
-    floor = await Floor.load(gameId, 0);
+    floor = await Floor.load(gameId, 0, sock);
   } else {
     floor = Floor.generate({
       gameId,
-      floorIdx: 0
+      floorIdx: 0,
+      sock
     });
   }
 

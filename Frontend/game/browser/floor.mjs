@@ -4,8 +4,9 @@ import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
 
 export default class Floor extends FloorCommon {
-  constructor(gameId, floorIdx) {
+  constructor(gameId, floorIdx, sock) {
     super(gameId, floorIdx);
+    this.sock = sock;
     // the top left corrner of the user's screen
     this._viewportX = 0;
     this._viewportY = 0;
@@ -17,8 +18,8 @@ export default class Floor extends FloorCommon {
    * @param floorIdx The index of floor we want to generate
    * @param {object} opts The options of the specific generators
    */
-  static generate({gameId, floorIdx, map}) {
-    let floor = new Floor(gameId, floorIdx);
+  static generate({gameId, floorIdx, map, sock}) {
+    let floor = new Floor(gameId, floorIdx, sock);
 
     floor.map = GameMap.generate(map);
 
@@ -32,8 +33,8 @@ export default class Floor extends FloorCommon {
    * @param gameId The game id for the game we want to load
    * @param floorIdx The index of floor we want to load
    */
-  static async load(gameId, floorIdx) {
-    let floor = new Floor(gameId, floorIdx);
+  static async load(gameId, floorIdx, sock) {
+    let floor = new Floor(gameId, floorIdx, sock);
 
     await Promise.all([
       // NOTE: You should define your functions here and they should
@@ -48,7 +49,11 @@ export default class Floor extends FloorCommon {
   }
 
   save() {
-    // stub: no use for this yet
+    this.sock.emit("save");
+
+    return new Promise((resolve) => {
+      this.sock.once("save-complete", resolve);
+    });
   }
 
   /**
