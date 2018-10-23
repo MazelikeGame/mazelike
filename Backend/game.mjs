@@ -1,6 +1,7 @@
 import socketIO from "socket.io";
 import http from "http";
 import Floor from "./game/floor";
+import saveHandler from "./handlers/save";
 
 async function main() {
   // Parse the env vars
@@ -25,15 +26,10 @@ async function main() {
     process.stdout.write(`Game server listening on ${PORT}\n`);
   });
 
-  // eslint-disable-next-line
-
   let io = socketIO(httpd); 
 
   io.on("connection", (sock) => {
-    sock.on("save", async() => {
-      await floor.save();
-      sock.emit("save-complete");
-    });
+    saveHandler(sock, floor);
   });
 }
 
