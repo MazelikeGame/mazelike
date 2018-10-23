@@ -10,8 +10,9 @@ const PUBLIC_DIR = process.env.PUBLIC_DIR;
 
 let docker = new dockerApi.Docker({ socketPath: "/var/run/docker.sock" });
 let inUsePorts = new Set();
+let portMap = new Map();
 
-export default async function spawn(gameEnv = {}) {
+export async function spawnGame(gameEnv = {}) {
   // prefix all mazelike env vars
   let envArray = [];
   for(let key of Object.keys(gameEnv)) {
@@ -22,6 +23,7 @@ export default async function spawn(gameEnv = {}) {
   let port = pickPort();
 
   inUsePorts.add(port);
+  portMap.set(gameEnv.gameId, port);
 
   let container = await docker.container.create({
     name: hostname,
@@ -62,11 +64,12 @@ export default async function spawn(gameEnv = {}) {
     }
 
     inUsePorts.delete(port);
+    portMap.delete(gameEnv.gameId);
 
     throw err;
   }
 
-  waitForClose(container, port); // DO NOT AWAIT THIS
+  waitForClose(container, port, gameEnv.gameId); // DO NOT AWAIT THIS
 
   return `${ADDRESS}:${port}`;
 }
@@ -84,8 +87,13 @@ function pickPort() {
   return port;
 }
 
-async function waitForClose(container, port) {
+async function waitForClose(container, port, gameId) {
   await container.wait();
   await container.delete({ force: true });
   inUsePorts.delete(port);
+  portMap.delete(gameId);
+}
+
+export function getGameAddr(gameId) {
+  return `${ADDRESS}:${portMap.get(gameId)}`;
 }

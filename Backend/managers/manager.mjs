@@ -1,12 +1,17 @@
-import child from "./manager-child";
-import docker from "./manager-docker";
+import * as child from "./manager-child";
+import * as docker from "./manager-docker";
 
-let spawn;
+let exp;
 
-if(process.env.CLUSTER_MANAGER === "docker") {
-  spawn = docker;
-} else {
-  spawn = child;
+switch(process.env.CLUSTER_MANAGER) {
+case "docker":
+  exp = docker;
+  break;
+
+default:
+  exp = child;
+  break;
 }
 
-export default spawn;
+export let getGameAddr = exp.getGameAddr;
+export let spawnGame = exp.spawnGame;

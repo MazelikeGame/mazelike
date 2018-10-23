@@ -7,11 +7,10 @@ import Lobby from "../models/lobby";
 import sql from "../sequelize";
 import path from "path";
 import fs from "fs";
-import spawnGame from "../managers/manager";
+import {spawnGame, getGameAddr} from "../managers/manager";
 import Floor from "../game/floor";
 
 const mkdir = util.promisify(fs.mkdir);
-let gameAddrs = new Map();
 
 export let gameRouter = express.Router();
 
@@ -322,9 +321,9 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     }).save();
 
     try {
-      gameAddrs.set(req.params.id, await spawnGame({
+      await spawnGame({
         gameId: req.params.id
-      }));
+      });
 
       io.emit("lobby-start", req.params.id);
 
@@ -341,7 +340,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
 
 // Get the game server address
 gameRouter.get("/addr/:id", (req, res) => {
-  res.end(gameAddrs.get(req.params.id));
+  res.end(getGameAddr(req.params.id));
 });
 
 // Serve /game/:id as /game/

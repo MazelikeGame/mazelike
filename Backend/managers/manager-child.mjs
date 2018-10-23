@@ -3,11 +3,13 @@ import poll from "./manager-connect.mjs";
 
 const CHILD_MAIN = "Backend/game.mjs";
 const ADDRESS = process.env.EXTERN_ADDRESS || "localhost";
-const STARTING_PORT = 5900;
-const ENDING_PORT = 5999;
+const STARTING_PORT = +process.env.STARTING_PORT || 5900;
+const ENDING_PORT = +process.env.ENDING_PORT || 5999;
 let inUsePorts = new Set();
+let portMap = new Map();
 
-export default function spawn(gameEnv = {}) {
+export function spawnGame(gameEnv = {}) {
+  let gameId = gameEnv.gameId;
   // prefix all mazelike env vars
   for(let key of Object.keys(gameEnv)) {
     gameEnv[`MAZELIKE_${key}`] = gameEnv[key];
@@ -15,6 +17,7 @@ export default function spawn(gameEnv = {}) {
   }
 
   let port = pickPort();
+  portMap.set(gameId, port);
 
   let child = child_process.spawn("node", ["--experimental-modules", CHILD_MAIN, port], {
     env: gameEnv,
@@ -27,6 +30,7 @@ export default function spawn(gameEnv = {}) {
     }
 
     inUsePorts.delete(port);
+    portMap.delete(gameId);
   });
 
   return Promise.race([
@@ -35,6 +39,7 @@ export default function spawn(gameEnv = {}) {
       child.on("error", (err) => {
         reject(new Error(`An error occured when spawning the game server: ${err.message}`));
         inUsePorts.delete(port);
+        portMap.delete(gameId);
       });  
     }),
 
@@ -57,4 +62,8 @@ function pickPort() {
   }
 
   return port;
+}
+
+export function getGameAddr(gameId) {
+  return `${ADDRESS}:${portMap.get(gameId)}`;
 }
