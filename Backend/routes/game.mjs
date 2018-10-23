@@ -313,7 +313,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       // pass
     }
 
-    gameAddrs.set(req.params.id, spawnGame({
+    gameAddrs.set(req.params.id, await spawnGame({
       gameId: req.params.id,
       isNewGame: "yes"
     }));

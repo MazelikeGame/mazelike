@@ -1,4 +1,5 @@
 import child_process from "child_process";
+import poll from "./manager-connect.mjs";
 
 const CHILD_MAIN = "Backend/game.mjs";
 const ADDRESS = process.env.EXTERN_ADDRESS || "localhost";
@@ -28,12 +29,21 @@ export default function spawn(gameEnv = {}) {
     inUsePorts.delete(port);
   });
 
-  child.on("error", (err) => {
-    process.stderr.write(`An error occured when spawning the game server: ${err.message}\n`);
-    inUsePorts.delete(port);
-  });
+  return Promise.race([
+    // listen for spawn errors
+    new Promise((resolve, reject) => {
+      child.on("error", (err) => {
+        reject(new Error(`An error occured when spawning the game server: ${err.message}`));
+        inUsePorts.delete(port);
+      });  
+    }),
 
-  return `${ADDRESS}:${port}`;
+    // wait for the server to start
+    poll(`${ADDRESS}:${port}`)
+      .then(() => {
+        return `${ADDRESS}:${port}`;
+      })
+  ]);
 }
 
 function pickPort() {
