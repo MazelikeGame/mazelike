@@ -66,7 +66,7 @@ export default async function spawn(gameEnv = {}) {
     throw err;
   }
 
-  waitForClose(); // DO NOT AWAIT THIS
+  waitForClose(container, port); // DO NOT AWAIT THIS
 
   return `${ADDRESS}:${port}`;
 }
