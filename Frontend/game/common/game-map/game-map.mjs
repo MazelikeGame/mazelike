@@ -29,7 +29,6 @@ const d12 = (i, size) => {
  * @prop {string} id Unique id for this map
  * @prop {string} theme The theme for this map
  * @prop {Room[]} rooms The rooms in the map
- * @prop {Monster[]} monsters The monsters in this map
  * @prop {Item[]} items The items in this map
  * @prop {Player[]} players The players in this map
  */

@@ -1,6 +1,7 @@
 /** @module backend/game/Floor */
 import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
+import Monster from "./monster.mjs";
 
 export default class Floor extends FloorCommon {
   /**
@@ -13,6 +14,8 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
 
     floor.map = GameMap.generate(map);
+    
+    floor.generateMonsters(); //todo
 
     return floor;
   }
@@ -26,7 +29,8 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
 
     await Promise.all([
-      GameMap.load(floor)
+      GameMap.load(floor),
+      Monster.load(floor) // todo
     ]);
 
     return floor;
@@ -37,7 +41,9 @@ export default class Floor extends FloorCommon {
    */
   save() {
     return Promise.all([
-      this.map.save(this.id)
+      this.map.save(this.id),
+      Monster.save(this) //todo
     ]);
   }
+
 }

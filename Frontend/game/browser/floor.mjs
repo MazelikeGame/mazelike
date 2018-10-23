@@ -1,7 +1,9 @@
+/* eslint-disable complexity */
 /* global PIXI */
 /** @module browser/Floor */
 import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
+import Monster from "./monster.mjs";
 
 export default class Floor extends FloorCommon {
   constructor(gameId, floorIdx) {
@@ -22,6 +24,8 @@ export default class Floor extends FloorCommon {
 
     floor.map = GameMap.generate(map);
 
+    floor.generateMonsters();
+
     floor._initRendering();
 
     return floor;
@@ -39,7 +43,8 @@ export default class Floor extends FloorCommon {
       // NOTE: You should define your functions here and they should
       // return a promise for when they complete.  All modifications to
       // floor should be done to the floor variable you pass in like so.
-      GameMap.load(floor)
+      GameMap.load(floor),
+      Monster.load(floor)
     ]);
 
     floor._initRendering();
@@ -63,6 +68,12 @@ export default class Floor extends FloorCommon {
 
     this._mapRenderer = this.map.createRenderer();
     this.sprite.addChild(this._mapRenderer.sprite);
+
+    // Monster.createSprites(this); //todo
+    // for(let i = 0; i < this.monsters.length; i++) {
+    //   this.sprite.addChild(this.monsters[i].sprite);
+    // }
+
   }
 
   /**
@@ -75,6 +86,7 @@ export default class Floor extends FloorCommon {
       this._viewportX + innerWidth,
       this._viewportY + innerHeight
     );
+    // Monster.update(this._viewportX, this._viewportY); //todo
   }
 
   /**
@@ -103,4 +115,5 @@ export default class Floor extends FloorCommon {
       y: this._viewportY + halfHeight
     };
   }
+
 }

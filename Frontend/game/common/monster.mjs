@@ -1,17 +1,17 @@
 /* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
-/* global PIXI */
 /** @module Monster */
 
 const SPRITE_SIZE = 48;
 
-export default class Monster {
+export default class MonsterCommon {
   
-  constructor(name_in, hp_in, damage_in, map_in, id_in) {
+  constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
     this.name = name_in;
     this.hp = hp_in;
     this.damage = damage_in;
-    this.map = map_in;
+    this.floor = floor_in;
     this.id = id_in;
+    this.type = type_in;
 
     this.targetAquired = false; // "in pursuit" boolean
     this.x = 0; // (x,y) = upper left pixel coordinate
@@ -26,17 +26,7 @@ export default class Monster {
 
     this.figureOutWhereToGo();
 
-    this.die();
-  }
-
-  /**
-   * Generates sprite for monster.
-   */
-  createSprite() {
-    this.sprite = new PIXI.Sprite(PIXI.loader.resources.demon.textures["red demon"]);
-    this.sprite.position.set(this.x, this.y);
-    this.sprite.width = SPRITE_SIZE;
-    this.sprite.height = SPRITE_SIZE;
+    //this.die();
   }
 
   /** 
@@ -75,7 +65,7 @@ export default class Monster {
       clear = true;
       for(let j = x1; j <= x2; j++) {
         for(let k = y1; k <= y2; k++) {
-          if(!this.map.isOnMap(j, k)) {
+          if(!this.floor.map.isOnMap(j, k)) {
             clear = false;
             break;
           }
@@ -187,7 +177,7 @@ export default class Monster {
   attack(PCid) {
     //(decrement pc health and check for pc death) within PC's beAttacked method
     // below: psuedo until PC is implemented
-    this.map.PC[PCid].beAttacked(this.damage);
+    this.floor.map.PC[PCid].beAttacked(this.damage);
   }
 
   /**
@@ -208,8 +198,8 @@ export default class Monster {
    * Monster dies.
    */
   die() {
-    //this.map.monsters.splice(this.id, 1);
-    //console.log("DEATH: " + this.map.monsters.length);
+    //this.floor.monsters.splice(this.id, 1);
+    //console.log("DEATH: " + this.floor.monsters.length);
     // drop item in the future
   }
 
@@ -217,18 +207,17 @@ export default class Monster {
    * Places monster in a random "room" with no other monsters.
    */
   placeInRandomRoom() {
-    let numRooms = this.map.rooms.length;
+    let numRooms = this.floor.map.rooms.length;
     this.initialRoom = Math.floor(Math.random() * numRooms);
-    this.initialRoom = 0;
-    for(let i = 0; i < this.map.monsters.length; i++) {
-      if(this.id !== i && this.map.monsters[i].initialRoom === this.initialRoom) {
+    for(let i = 0; i < this.floor.monsters.length; i++) {
+      if(this.id !== i && this.floor.monsters[i].initialRoom === this.initialRoom) {
         this.placeInRandomRoom();
       }
     }
-    let randomDiffX = Math.floor(Math.random() * this.map.rooms[this.initialRoom].width); 
-    this.x = this.map.rooms[this.initialRoom].x + randomDiffX;
-    let randomDiffY = Math.floor(Math.random() * this.map.rooms[this.initialRoom].height); 
-    this.y = this.map.rooms[this.initialRoom].y + randomDiffY;
+    let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].width); 
+    this.x = this.floor.map.rooms[this.initialRoom].x + randomDiffX;
+    let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].height); 
+    this.y = this.floor.map.rooms[this.initialRoom].y + randomDiffY;
     if(!this.spriteIsOnMap())
       this.placeInRandomRoom();
   }
@@ -238,8 +227,8 @@ export default class Monster {
    * @returns {boolean}
    */
   spriteIsOnMap() {
-    return this.map.isOnMap(this.x, this.y) && this.map.isOnMap(this.x + SPRITE_SIZE, this.y) 
-    && this.map.isOnMap(this.x, this.y + SPRITE_SIZE) && this.map.isOnMap(this.x + SPRITE_SIZE, this.y + SPRITE_SIZE);
+    return this.floor.map.isOnMap(this.x, this.y) && this.floor.map.isOnMap(this.x + SPRITE_SIZE, this.y) 
+    && this.floor.map.isOnMap(this.x, this.y + SPRITE_SIZE) && this.floor.map.isOnMap(this.x + SPRITE_SIZE, this.y + SPRITE_SIZE);
   }
 
   /**
@@ -248,10 +237,10 @@ export default class Monster {
    * @returns {boolean}
    */
   spriteCollision() {
-    for(let i = 0; i < this.map.monsters.length; i++) {
+    for(let i = 0; i < this.floor.monsters.length; i++) {
       if(this.id !== i) {
-        if(this.map.monsters[i].x >= this.x && this.map.monsters[i].x <= this.x + SPRITE_SIZE) { // within x bounds
-          if(this.map.monsters[i].y >= this.y && this.map.monsters[i].y <= this.y + SPRITE_SIZE) { // and within y bounds
+        if(this.floor.monsters[i].x >= this.x && this.floor.monsters[i].x <= this.x + SPRITE_SIZE) { // within x bounds
+          if(this.floor.monsters[i].y >= this.y && this.floor.monsters[i].y <= this.y + SPRITE_SIZE) { // and within y bounds
             return true;
           }
         }
@@ -264,87 +253,87 @@ export default class Monster {
   // remove any monsters in room one
   // place monster in room one
   // manually placing pc
-  // replace this.x with this.map.monsters[0].x
+  // replace this.x with this.floor.monsters[0].x
   // outputs: all true
-  pursue_test() {
-    // TEST 1: directly left/right/up/down
-    let pcx = this.x;
-    let pcy = this.y;
-    let cantplacepc = false;
+  // pursue_test() {
+  //   // TEST 1: directly left/right/up/down
+  //   let pcx = this.x;
+  //   let pcy = this.y;
+  //   let cantplacepc = false;
     
-    pcx += 1.5 * SPRITE_SIZE; // right
-    if(!this.map.isOnMap(pcx, pcy)) { 
-      pcx -= 2 * SPRITE_SIZE; // left
-      if(!this.map.isOnMap(pcx, pcy)) { 
-        pcx = this.x;
-        pcy += 1.5 * SPRITE_SIZE; // down
-        if(!this.map.isOnMap(pcx, pcy)) { 
-          pcy -= 2 * SPRITE_SIZE; // up
-          if(!this.map.isOnMap(pcx, pcy)) { 
-            cantplacepc = true;
-          }
-        }
-      }
-    }
+  //   pcx += 1.5 * SPRITE_SIZE; // right
+  //   if(!this.floor.map.isOnMap(pcx, pcy)) { 
+  //     pcx -= 2 * SPRITE_SIZE; // left
+  //     if(!this.floor.map.isOnMap(pcx, pcy)) { 
+  //       pcx = this.x;
+  //       pcy += 1.5 * SPRITE_SIZE; // down
+  //       if(!this.floor.map.isOnMap(pcx, pcy)) { 
+  //         pcy -= 2 * SPRITE_SIZE; // up
+  //         if(!this.floor.map.isOnMap(pcx, pcy)) { 
+  //           cantplacepc = true;
+  //         }
+  //       }
+  //     }
+  //   }
 
-    let test1 = false;
-    if(!cantplacepc) {
-      test1 = this.canSee(pcx, pcy);
-      console.log("test1: " + test1);
-    } else {
-      console.log("Could not place pc for test1."); // should not occur
-    }
+  //   let test1 = false;
+  //   if(!cantplacepc) {
+  //     test1 = this.canSee(pcx, pcy);
+  //     console.log("test1: " + test1);
+  //   } else {
+  //     console.log("Could not place pc for test1."); // should not occur
+  //   }
 
-    // TEST 2: diagonal 
-    pcx = this.x;
-    pcy = this.y;
-    cantplacepc = false;
+  //   // TEST 2: diagonal 
+  //   pcx = this.x;
+  //   pcy = this.y;
+  //   cantplacepc = false;
     
-    pcx += 1.5 * SPRITE_SIZE; // lower right
-    pcy += 1.5 * SPRITE_SIZE;
-    if(!this.map.isOnMap(pcx, pcy)) { 
-      pcx -= 2 * SPRITE_SIZE; // lower left
-      if(!this.map.isOnMap(pcx, pcy)) { 
-        pcy -= 2 * SPRITE_SIZE; // upper left
-        if(!this.map.isOnMap(pcx, pcy)) { 
-          pcx += 2 * SPRITE_SIZE; // upper right
-          if(!this.map.isOnMap(pcx, pcy)) { 
-            cantplacepc = true;
-          }
-        }
-      }
-    }
+  //   pcx += 1.5 * SPRITE_SIZE; // lower right
+  //   pcy += 1.5 * SPRITE_SIZE;
+  //   if(!this.floor.map.isOnMap(pcx, pcy)) { 
+  //     pcx -= 2 * SPRITE_SIZE; // lower left
+  //     if(!this.floor.map.isOnMap(pcx, pcy)) { 
+  //       pcy -= 2 * SPRITE_SIZE; // upper left
+  //       if(!this.floor.map.isOnMap(pcx, pcy)) { 
+  //         pcx += 2 * SPRITE_SIZE; // upper right
+  //         if(!this.floor.map.isOnMap(pcx, pcy)) { 
+  //           cantplacepc = true;
+  //         }
+  //       }
+  //     }
+  //   }
 
-    let test2 = false;
-    if(!cantplacepc) {
-      test2 = this.canSee(pcx, pcy);
-      console.log("test2: " + test2);
-      if(!test2)
-        console.log(pcx, pcy, "monster:", this.x, this.y);
-    } else {
-      console.log("Could not place pc for test2. Run test on new map, as room 0 was generated as a corridor.");
-    }
+  //   let test2 = false;
+  //   if(!cantplacepc) {
+  //     test2 = this.canSee(pcx, pcy);
+  //     console.log("test2: " + test2);
+  //     if(!test2)
+  //       console.log(pcx, pcy, "monster:", this.x, this.y);
+  //   } else {
+  //     console.log("Could not place pc for test2. Run test on new map, as room 0 was generated as a corridor.");
+  //   }
 
-    // TEST 3: pc off map
-    pcx = 0;
-    pcy = 0;
+  //   // TEST 3: pc off map
+  //   pcx = 0;
+  //   pcy = 0;
 
-    let test3 = false;
-    test3 = !this.canSee(pcx, pcy);
-    console.log("test3: " + test3);
+  //   let test3 = false;
+  //   test3 = !this.canSee(pcx, pcy);
+  //   console.log("test3: " + test3);
 
-    // TEST 4: place in far away room
-    pcx = 0;
-    pcy = 0;
+  //   // TEST 4: place in far away room
+  //   pcx = 0;
+  //   pcy = 0;
 
-    let pcRoom = this.map.rooms.length - 1; // a room far away from the testing monster
-    let randomDiffX = Math.floor(Math.random() * this.map.rooms[pcRoom].width); 
-    pcx = this.map.rooms[pcRoom].x + randomDiffX;
-    let randomDiffY = Math.floor(Math.random() * this.map.rooms[pcRoom].height); 
-    pcy = this.map.rooms[pcRoom].y + randomDiffY;
+  //   let pcRoom = this.floor.map.rooms.length - 1; // a room far away from the testing monster
+  //   let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[pcRoom].width); 
+  //   pcx = this.floor.map.rooms[pcRoom].x + randomDiffX;
+  //   let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[pcRoom].height); 
+  //   pcy = this.floor.map.rooms[pcRoom].y + randomDiffY;
 
-    let test4 = false;
-    test4 = !this.canSee(pcx, pcy);
-    console.log("test4: " + test4);
-  } 
+  //   let test4 = false;
+  //   test4 = !this.canSee(pcx, pcy);
+  //   console.log("test4: " + test4);
+  // } 
 }
