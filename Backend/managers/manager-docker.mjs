@@ -21,6 +21,8 @@ export default async function spawn(gameEnv = {}) {
   let hostname = `mazelike-${PREFIX}${gameEnv.gameId}`;
   let port = pickPort();
 
+  inUsePorts.add(port);
+
   let container = await docker.container.create({
     name: hostname,
     Hostname: hostname,
