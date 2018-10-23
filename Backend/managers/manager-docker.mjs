@@ -48,7 +48,7 @@ export default async function spawn(gameEnv = {}) {
   await container.start();
 
   // wait for the server to start
-  await poll(`${ADDRESS}:${port}`);
+  await poll(`${hostname}:${port}`);
 
   return `${ADDRESS}:${port}`;
 }
