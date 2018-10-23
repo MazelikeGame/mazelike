@@ -16,15 +16,7 @@ async function main() {
   }
 
   // Load/generate the ground floor
-  let floor;
-  if(gameEnv.isNewGame === "yes") {
-    floor = Floor.generate({
-      gameId: gameEnv.gameId,
-      floorIdx: 0
-    });
-  } else {
-    floor = Floor.load(gameEnv.gameId, 0);
-  }
+  let floor = Floor.load(gameEnv.gameId, 0);
 
   // put the initial game state in the database 
   await floor.save();

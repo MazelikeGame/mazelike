@@ -1,0 +1,62 @@
+import dockerApi from "node-docker-api";
+import poll from "./manager-connect.mjs";
+
+const IMAGE_NAME = "mazelike/backend:devel";
+const ADDRESS = process.env.EXTERN_ADDRESS || "localhost";
+const STARTING_PORT = 5900;
+const ENDING_PORT = 5999;
+const PREFIX = "";
+let docker = new dockerApi.Docker({ socketPath: "\\\\.\\pipe\\docker_engine" });
+let inUsePorts = new Set();
+
+export default async function spawn(gameEnv = {}) {
+  // prefix all mazelike env vars
+  let envArray = [];
+  for(let key of Object.keys(gameEnv)) {
+    envArray.push(`MAZELIKE_${key}=${gameEnv[key]}`);
+  }
+
+  let hostname = `mazelike-${PREFIX}${gameEnv.gameId}`;
+  let port = pickPort();
+
+  let container = await docker.container.create({
+    name: hostname,
+    Hostname: hostname,
+    Image: IMAGE_NAME,
+    Cmd: ["node", "--experimental-modules", "Backend/game.mjs", `${port}`],
+    Env: envArray,
+    ExposedPorts: {
+      [`${port}/tcp`]: {}
+    },
+    HostConfig: {
+      PortBindings: {
+        [`${port}/tcp`]: [{
+          HostPort: `${port}`
+        }]
+      }
+    },
+    Labels: {
+      "edu.iastate.ryanr": `mazelike-${PREFIX}`
+    }
+  });
+
+  await container.start();
+
+  // wait for the server to start
+  await poll(`${ADDRESS}:${port}`);
+
+  return `${ADDRESS}:${port}`;
+}
+
+function pickPort() {
+  let port = STARTING_PORT;
+  while(inUsePorts.has(port)) {
+    ++port;
+
+    if(port > ENDING_PORT) {
+      throw new Error(`All ports in use`);
+    }
+  }
+
+  return port;
+}

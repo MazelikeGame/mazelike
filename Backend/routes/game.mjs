@@ -1,4 +1,5 @@
 /* global io */
+/* eslint-disable complexity */
 import express from "express";
 import crypto from "crypto";
 import util from "util";
@@ -6,7 +7,8 @@ import Lobby from "../models/lobby";
 import sql from "../sequelize";
 import path from "path";
 import fs from "fs";
-import spawnGame from "../manager";
+import spawnGame from "../managers/manager";
+import Floor from "../game/floor";
 
 const mkdir = util.promisify(fs.mkdir);
 let gameAddrs = new Map();
@@ -313,14 +315,24 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       // pass
     }
 
-    gameAddrs.set(req.params.id, await spawnGame({
+    // Generate the game
+    await Floor.generate({
       gameId: req.params.id,
-      isNewGame: "yes"
-    }));
+      floorIdx: 0
+    }).save();
 
-    io.emit("lobby-start", req.params.id);
+    try {
+      gameAddrs.set(req.params.id, await spawnGame({
+        gameId: req.params.id
+      }));
 
-    res.end("Game started");
+      io.emit("lobby-start", req.params.id);
+
+      res.end("Game started");
+    } catch(err) {
+      process.stderr.write(`Error starting game: ${err.message}\n`);
+      res.end("An error occured while starting game");
+    }
     return;
   }
 
