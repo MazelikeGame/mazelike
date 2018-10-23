@@ -59,9 +59,12 @@ export default async function spawn(gameEnv = {}) {
       // pass
     }
 
+    inUsePorts.delete(port);
+
     throw err;
   }
 
+  waitForClose(); // DO NOT AWAIT THIS
 
   return `${ADDRESS}:${port}`;
 }
@@ -77,4 +80,10 @@ function pickPort() {
   }
 
   return port;
+}
+
+async function waitForClose(container, port) {
+  await container.wait();
+  await container.delete({ force: true });
+  inUsePorts.delete(port);
 }

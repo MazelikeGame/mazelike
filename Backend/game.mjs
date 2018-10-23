@@ -38,3 +38,8 @@ async function main() {
 }
 
 main();
+
+// don't run forever (keep until ganes exit on their own)
+setTimeout(() => {
+  process.exit(0);
+}, 60000);
