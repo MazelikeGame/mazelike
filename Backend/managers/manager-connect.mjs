@@ -36,6 +36,7 @@ export default async function poll(address, count = 50) {
   try {
     await ping(address);
   } catch(err) {
+    console.log(err.message);
     // The server is up but something is wrong
     if(err.message === "Invalid status code") {
       throw err;
