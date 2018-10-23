@@ -50,6 +50,12 @@ export default async function spawn(gameEnv = {}) {
   // wait for the server to start
   await poll(`${ADDRESS}:${port}`);
 
+  try {
+    await container.kill();
+  } catch(err) {
+    // pass
+  }
+
   return `${ADDRESS}:${port}`;
 }
 
