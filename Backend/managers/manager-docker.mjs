@@ -8,7 +8,7 @@ const ENDING_PORT = +process.env.ENDING_PORT || 5999;
 const PREFIX = process.env.CONTAINER_PREFIX || "";
 const PUBLIC_DIR = process.env.PUBLIC_DIR;
 
-let docker = new dockerApi.Docker({ socketPath: "/var/run/docker.dock" });
+let docker = new dockerApi.Docker({ socketPath: "/var/run/docker.sock" });
 let inUsePorts = new Set();
 
 export default async function spawn(gameEnv = {}) {
