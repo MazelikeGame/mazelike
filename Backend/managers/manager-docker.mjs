@@ -1,4 +1,5 @@
 import dockerApi from "node-docker-api";
+import poll from "./manager-connect";
 
 const IMAGE_NAME = process.env.IMAGE_NAME || "mazelike/backend:devel";
 const ADDRESS = process.env.EXTERN_ADDRESS;
@@ -46,11 +47,21 @@ export default async function spawn(gameEnv = {}) {
 
   await container.start();
 
-  // eslint-disable-next-line
-  console.log((await container.status()).data.NetworkSettings.IPAddress);
+  let ip = (await container.status()).data.NetworkSettings.IPAddress;
 
   // wait for the server to start
-  await sleep(1500);
+  try {
+    await poll(`${ip}:${port}`);
+  } catch(err) {
+    try {
+      await container.kill();
+    } catch(err2) {
+      // pass
+    }
+
+    throw err;
+  }
+
 
   return `${ADDRESS}:${port}`;
 }
@@ -66,10 +77,4 @@ function pickPort() {
   }
 
   return port;
-}
-
-function sleep(ms) { 
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
 }
