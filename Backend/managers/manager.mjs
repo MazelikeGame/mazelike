@@ -3,7 +3,7 @@ import docker from "./manager-docker";
 
 let spawn;
 
-if(process.env.CLUSTER_MANAGER === "docker" ||true) {
+if(process.env.CLUSTER_MANAGER === "docker") {
   spawn = docker;
 } else {
   spawn = child;

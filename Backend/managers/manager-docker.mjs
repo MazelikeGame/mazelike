@@ -1,12 +1,14 @@
 import dockerApi from "node-docker-api";
 import poll from "./manager-connect.mjs";
 
-const IMAGE_NAME = "mazelike/backend:devel";
+const IMAGE_NAME = process.env.IMAGE_NAME || "mazelike/backend:devel";
 const ADDRESS = process.env.EXTERN_ADDRESS || "localhost";
-const STARTING_PORT = 5900;
-const ENDING_PORT = 5999;
-const PREFIX = "";
-let docker = new dockerApi.Docker({ socketPath: "\\\\.\\pipe\\docker_engine" });
+const STARTING_PORT = +process.env.STARTING_PORT || 5900;
+const ENDING_PORT = +process.env.ENDING_PORT || 5999;
+const PREFIX = process.env.CONTAINER_PREFIX || "";
+const PUBLIC_DIR = process.env.PUBLIC_DIR;
+
+let docker = new dockerApi.Docker({ socketPath: "/var/run/docker.dock" });
 let inUsePorts = new Set();
 
 export default async function spawn(gameEnv = {}) {
@@ -33,7 +35,10 @@ export default async function spawn(gameEnv = {}) {
         [`${port}/tcp`]: [{
           HostPort: `${port}`
         }]
-      }
+      },
+      Binds: [
+        `${PUBLIC_DIR}:/app/Frontend/public`
+      ]
     },
     Labels: {
       "edu.iastate.ryanr": `mazelike-${PREFIX}`

@@ -16,10 +16,7 @@ async function main() {
   }
 
   // Load/generate the ground floor
-  let floor = Floor.load(gameEnv.gameId, 0);
-
-  // put the initial game state in the database 
-  await floor.save();
+  let floor = await Floor.load(gameEnv.gameId, 0);
 
   // Create the socket.io server
   let httpd = http.createServer((req, res) => {
