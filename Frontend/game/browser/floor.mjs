@@ -23,7 +23,7 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
 
     floor.map = GameMap.generate(map);
-
+    
     floor.generateMonsters();
 
     floor._initRendering();
@@ -31,8 +31,9 @@ export default class Floor extends FloorCommon {
     return floor;
   }
 
-  /** katie occurs twice, shouldnt cause errors tho
+  /**
    * Puts a monster in half of all "rooms".
+   * Occurs twice upon floor generation, shouldnt cause errors though.
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters() {
@@ -97,7 +98,7 @@ export default class Floor extends FloorCommon {
       this._viewportY + innerHeight
     );
     for(let i = 0; i < this.monsters.length; i++) {
-      this.monsters[i].update(this._viewportX, this._viewportY); // katie
+      this.monsters[i].update(this._viewportX, this._viewportY);
     }
   }
 

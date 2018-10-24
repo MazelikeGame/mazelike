@@ -22,7 +22,7 @@ export default class Floor extends FloorCommon {
     return floor;
   }
 
-  /** katie
+  /**
    * Puts a monster in half of all "rooms".
    * @param {Floor} floor The floor to add monsters to
    */
@@ -43,7 +43,7 @@ export default class Floor extends FloorCommon {
 
     await Promise.all([
       GameMap.load(floor),
-      //floor.loadMonsters(floor) // untested todo
+      //floor.loadMonsters(floor) // untested todo @katie
     ]);
 
     return floor;
@@ -68,7 +68,7 @@ export default class Floor extends FloorCommon {
           floorId: floor.floor.floodId,
           id: i
         }
-      }); //if nothing returned, dont create monster todo
+      }); //if nothing returned, dont create monster todo @katie
       floor.monsters[i] = new Monster('sir spoopy', monsterDB.hp, 10, this, i, monsterDB.type);
       floor.monsters[i].setCoodinates(monsterDB.x, monsterDB.y);
     }
