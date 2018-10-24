@@ -1,7 +1,7 @@
-import PlayerCommon from "../../Frontend/game/common/player.mjs";
+/* jshint node: true */
+import PlayerCommon from '../../Frontend/game/common/player.mjs';
 
-/** @module Player */
-
+/** @module backend/game/player */
 /**
  * TODO: Have Player inherit from class Character. Same goes for Monster class.
  */
@@ -11,19 +11,19 @@ import PlayerCommon from "../../Frontend/game/common/player.mjs";
  */
 export default class Player extends PlayerCommon {
 
-  /**
-   * @param {string} name - The name of the player. Should be the same as user.username
-   * @param {int} hp - The player's hitpoints
-   * @param {object} spawn - Contains the spawn coordinates { x: int, y: int }.
-   */
   constructor(name, hp, spawn) {
     super(name, hp, spawn);
+    this.load = this.load.bind(this);
   }
-
   /**
    * Load a Player
+   * @param {Floor} floor - The floor to load the player for
    */
-  async load() {
-
+  static async load(floor) {
+    if(!floor.players) {
+      floor.players = [];
+    }
+    // TODO: Get the username of the users. Query some table for games
+    floor.players.push(new Player('billy', 100, {x: 0, y: 0}));
   }
 }

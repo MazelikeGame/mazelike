@@ -43,7 +43,7 @@ export default class Floor extends FloorCommon {
       // return a promise for when they complete.  All modifications to
       // floor should be done to the floor variable you pass in like so.
       GameMap.load(floor),
-      Player.load(floor)
+      // Player.load(floor)
     ]);
 
     floor._initRendering();

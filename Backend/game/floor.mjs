@@ -1,7 +1,7 @@
 /** @module backend/game/Floor */
 import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
-import Player from "./player.mjs";
+// import Player from "./player.mjs";
 
 export default class Floor extends FloorCommon {
   /**
@@ -28,7 +28,7 @@ export default class Floor extends FloorCommon {
 
     await Promise.all([
       GameMap.load(floor),
-      Player.load(floor)
+      // Player.load(floor)
     ]);
 
     return floor;
