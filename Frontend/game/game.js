@@ -111,7 +111,6 @@ function startGame(map) {
     if(devMode) {
       fps.update();
     }
-    window.devMode = devMode; //Added for client side testing access.
   });
 }
 
