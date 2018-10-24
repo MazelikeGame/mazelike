@@ -71,7 +71,7 @@ async function setup() {
   }
 
   let playerList = new PlayerList();
-  app.stage.addChild(playerList.sprite);
+  app.stage.addChild(playerList.render());
 
   window.ml.floor = floor;
   addArrowKeyListener(floor);
