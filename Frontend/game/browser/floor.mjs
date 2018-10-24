@@ -8,7 +8,7 @@ import Monster from "./monster.mjs";
 export default class Floor extends FloorCommon {
   constructor(gameId, floorIdx) {
     super(gameId, floorIdx);
-    // the top left corrner of the user's screen
+    // the top left corner of the user's screen
     this._viewportX = 0;
     this._viewportY = 0;
   }
@@ -31,6 +31,17 @@ export default class Floor extends FloorCommon {
     return floor;
   }
 
+  /** katie
+   * Puts a monster in half of all "rooms".
+   * @param {Floor} floor The floor to add monsters to
+   */
+  generateMonsters() {
+    this.monsters = [];
+    for(let i = 0; i < this.map.rooms.length / 2; i++) { 
+      this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
+    }
+  }
+
   /**
    * Load everything in the browser
    * @param gameId The game id for the game we want to load
@@ -44,9 +55,9 @@ export default class Floor extends FloorCommon {
       // return a promise for when they complete.  All modifications to
       // floor should be done to the floor variable you pass in like so.
       GameMap.load(floor),
-      Monster.load(floor)
+      //this.monsters.load(floor) // todo
     ]);
-
+    //todo issue here katie
     floor._initRendering();
 
     return floor;
@@ -68,12 +79,8 @@ export default class Floor extends FloorCommon {
 
     this._mapRenderer = this.map.createRenderer();
     this.sprite.addChild(this._mapRenderer.sprite);
-
-    // Monster.createSprites(this); //todo
-    // for(let i = 0; i < this.monsters.length; i++) {
-    //   this.sprite.addChild(this.monsters[i].sprite);
-    // }
-
+    
+    this.monsters[0].createAllSprites(); // katie
   }
 
   /**
@@ -86,7 +93,7 @@ export default class Floor extends FloorCommon {
       this._viewportX + innerWidth,
       this._viewportY + innerHeight
     );
-    // Monster.update(this._viewportX, this._viewportY); //todo
+    this.monsters[0].update(this._viewportX, this._viewportY); // katie
   }
 
   /**

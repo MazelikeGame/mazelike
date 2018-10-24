@@ -73,17 +73,16 @@ async function setup() {
   window.ml.floor = floor;
   addArrowKeyListener(floor);
 
-  // window.setInterval(function() { todo
-  //   for(let i = 0; i < floor.monsters.length; i++) {
-  //     floor.monsters[i].figureOutWhereToGo();
-  //   }
-  // }, 500);
-  // window.setInterval(function() {
-  //   for(let i = 0; i < floor.monsters.length; i++) {
-  //     floor.monsters[i].move();
-  //   }
-  //   //floor.updateMonsters(pageX, pageY); // katie todo
-  // }, 10);
+  window.setInterval(function() { 
+    for(let i = 0; i < floor.monsters.length; i++) {
+      floor.monsters[i].figureOutWhereToGo();
+    }
+  }, 500);
+  window.setInterval(function() {
+    for(let i = 0; i < floor.monsters.length; i++) {
+      floor.monsters[i].move();
+    }
+  }, 10);
   
   app.ticker.add(() => {
     floor.update();

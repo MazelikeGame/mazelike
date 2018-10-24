@@ -15,9 +15,20 @@ export default class Floor extends FloorCommon {
 
     floor.map = GameMap.generate(map);
     
-    floor.generateMonsters(); //todo
+    floor.generateMonsters(); // katie
 
     return floor;
+  }
+
+  /** katie
+   * Puts a monster in half of all "rooms".
+   * @param {Floor} floor The floor to add monsters to
+   */
+  generateMonsters() {
+    this.monsters = [];
+    for(let i = 0; i < this.map.rooms.length / 2; i++) { 
+      this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
+    }
   }
 
   /**
@@ -30,7 +41,7 @@ export default class Floor extends FloorCommon {
 
     await Promise.all([
       GameMap.load(floor),
-      Monster.load(floor) // todo
+      //this.monsters[0].load() // katie todo
     ]);
 
     return floor;
@@ -42,7 +53,7 @@ export default class Floor extends FloorCommon {
   save() {
     return Promise.all([
       this.map.save(this.id),
-      Monster.save(this) //todo
+      this.monsters[0].save() // katie
     ]);
   }
 
