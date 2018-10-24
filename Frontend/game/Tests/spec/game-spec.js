@@ -1,3 +1,4 @@
+/* global expect, it, describe, PIXI */
 describe("Objects in PIXI Resources", () => {
   it("The dog should be in the PIXI resources.", () => {
     expect(PIXI.loader.resources.dog).not.toBeUndefined();
