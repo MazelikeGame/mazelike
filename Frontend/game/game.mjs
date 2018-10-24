@@ -1,5 +1,6 @@
 /* global PIXI  */
 /* eslint-disable complexity */
+
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
 
@@ -71,6 +72,17 @@ async function setup() {
 
   window.ml.floor = floor;
   addArrowKeyListener(floor);
+
+  window.setInterval(function() { 
+    for(let i = 0; i < floor.monsters.length; i++) {
+      floor.monsters[i].figureOutWhereToGo();
+    }
+  }, 500);
+  window.setInterval(function() {
+    for(let i = 0; i < floor.monsters.length; i++) {
+      floor.monsters[i].move();
+    }
+  }, 10);
   
   app.ticker.add(() => {
     floor.update();
@@ -81,7 +93,11 @@ async function setup() {
   });
 }
 
+
 // load the textures
 PIXI.loader
   .add("floor", "DawnLike/Objects/Floor.json")
+  .add("dog", "DawnLike/Characters/dog.json")
+  .add("demon", "DawnLike/Characters/demon.json")
+  .add("player", "DawnLike/Characters/player.json")
   .load(setup);
