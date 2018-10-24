@@ -49,7 +49,10 @@ export async function spawnGame(gameEnv = {}) {
     }
   });
 
-  await container.start();
+  let addr = await startContainer(container, gameEnv.gameId, gameEnv);
+  if(addr) {
+    return addr;
+  }
 
   let ip = (await container.status()).data.NetworkSettings.IPAddress;
 
@@ -96,4 +99,22 @@ async function waitForClose(container, port, gameId) {
 
 export function getGameAddr(gameId) {
   return `${ADDRESS}:${portMap.get(gameId)}`;
+}
+
+async function startContainer(container, gameId, gameEnv) {
+  try {
+    await container.start();
+  } catch(err) {
+    // check if the port is already being used
+    if(err.message.indexOf("address already in use") !== -1) {
+      portMap.delete(gameId);
+      container.delete();
+
+      return spawnGame(gameEnv);
+    }
+
+    throw err;
+  }
+
+  return undefined;
 }
