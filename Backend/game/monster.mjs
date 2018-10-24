@@ -7,35 +7,31 @@ import sql from "../sequelize";
 
 export default class Monster extends MonsterCommon {
   
-  /** katie
+  /**
    * Puts a monster in half of all "rooms".
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters(floor) {
-    for(let i = 0; i < this.map.rooms.length / 2; i++) { 
+    for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) { 
       floor.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
     }
   }
 
-  async save() { //todo untested
+  /**
+   * Saves monsters to the database.
+   */
+  async save() {
     let monsterModel = new MonsterModel(sql);
     for(let i = 0; i < this.floor.monsters.length; i++) {
       await monsterModel.create({
-        floodId: this.floor.floodId,
+        floorId: this.floor.floorId,
         x: this.x,
         y: this.y,
         hp: this.hp,
         type: this.type
       });
-      console.log("monster saved");
     }
-  }
-
-  async load(floor) { //todo
-    for(let i = 0; i < floor.map.rooms.length / 2; i++) {
-      //get monster stuff from database where floorid = floor.id
-      //monster[i] = new Monster(data from database);
-    }
+    console.log("\nmonsters saved\n");
   }
 
   /**
@@ -44,8 +40,7 @@ export default class Monster extends MonsterCommon {
    * @param max 
    */
   getRandomNumber(min, max) {
-    //todo
+    return Math.floor(Math.random() * max) + min; 
   }
-
   
 }

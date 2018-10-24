@@ -1,11 +1,10 @@
 /* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
 /** @module Monster */
 
-const SPRITE_SIZE = 48;
-
 export default class MonsterCommon {
   
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
+    
     this.name = name_in;
     this.hp = hp_in;
     this.damage = damage_in;
@@ -42,11 +41,11 @@ export default class MonsterCommon {
     let totalCorners = 0;
     for(let i = 0; i < 4; i++) {
       if(i === 1) {
-        cornerx += SPRITE_SIZE; // upper right
+        cornerx += MonsterCommon.SPRITE_SIZE; // upper right
       } else if(i === 2) {
-        cornery += SPRITE_SIZE; // lower right
+        cornery += MonsterCommon.SPRITE_SIZE; // lower right
       } else if(i === 3) {
-        cornerx -= SPRITE_SIZE; // lower left
+        cornerx -= MonsterCommon.SPRITE_SIZE; // lower left
       }
       if(x < cornerx) {
         x1 = x;
@@ -83,7 +82,7 @@ export default class MonsterCommon {
     return true;
   }
 
-  /** todo test properly
+  /**
    * Finds distance between monster and coodinate.
    * @param x 
    * @param y 
@@ -119,13 +118,13 @@ export default class MonsterCommon {
     let prevX = this.x;
     let prevY = this.y;
     if(random === 0)
-      this.x += SPRITE_SIZE;
+      this.x += MonsterCommon.SPRITE_SIZE;
     else if(random === 1)
-      this.x -= SPRITE_SIZE;
+      this.x -= MonsterCommon.SPRITE_SIZE;
     else if(random === 2)
-      this.y += SPRITE_SIZE;
+      this.y += MonsterCommon.SPRITE_SIZE;
     else if(random === 3)
-      this.y -= SPRITE_SIZE;
+      this.y -= MonsterCommon.SPRITE_SIZE;
     if(!this.spriteIsOnMap()) {
       this.x = prevX;
       this.y = prevY;
@@ -198,8 +197,9 @@ export default class MonsterCommon {
    * Monster dies.
    */
   die() {
-    //this.floor.monsters.splice(this.id, 1);
-    //console.log("DEATH: " + this.floor.monsters.length);
+    this.floor.monsters.splice(this.id, 1);
+    console.log("DEATH: " + this.floor.monsters.length);
+    //delete from DB
     // drop item in the future
   }
 
@@ -227,8 +227,8 @@ export default class MonsterCommon {
    * @returns {boolean}
    */
   spriteIsOnMap() {
-    return this.floor.map.isOnMap(this.x, this.y) && this.floor.map.isOnMap(this.x + SPRITE_SIZE, this.y) 
-    && this.floor.map.isOnMap(this.x, this.y + SPRITE_SIZE) && this.floor.map.isOnMap(this.x + SPRITE_SIZE, this.y + SPRITE_SIZE);
+    return this.floor.map.isOnMap(this.x, this.y) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE, this.y) 
+    && this.floor.map.isOnMap(this.x, this.y + MonsterCommon.SPRITE_SIZE) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE, this.y + MonsterCommon.SPRITE_SIZE);
   }
 
   /**
@@ -239,14 +239,22 @@ export default class MonsterCommon {
   spriteCollision() {
     for(let i = 0; i < this.floor.monsters.length; i++) {
       if(this.id !== i) {
-        if(this.floor.monsters[i].x >= this.x && this.floor.monsters[i].x <= this.x + SPRITE_SIZE) { // within x bounds
-          if(this.floor.monsters[i].y >= this.y && this.floor.monsters[i].y <= this.y + SPRITE_SIZE) { // and within y bounds
+        if(this.floor.monsters[i].x >= this.x && this.floor.monsters[i].x <= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
+          if(this.floor.monsters[i].y >= this.y && this.floor.monsters[i].y <= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
             return true;
           }
         }
       }
     }
     return false;
+  }
+
+  /**
+   * Manually set coordinates for a single
+   */
+  setCoodinates(x, y) {
+    this.x = x;
+    this.y = y;
   }
 
   // changes for an actual test case: todo
@@ -337,3 +345,5 @@ export default class MonsterCommon {
   //   console.log("test4: " + test4);
   // } 
 }
+
+MonsterCommon.SPRITE_SIZE = 48;

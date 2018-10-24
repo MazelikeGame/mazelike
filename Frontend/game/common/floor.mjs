@@ -12,6 +12,8 @@ class Floor {
    */
   constructor(gameId, floorIdx) {
     this.id = `${gameId}-${floorIdx}`;
+    // below: ratio of Monsters to Rooms. ex: 0.3333 puts monsters in a third of them rooms, aka 100/3 = 33 monsters on the floor.
+    this.monsterRatio = 0.3333;
     // Initialize players, monsters and the game map in loadBrowser, loadNode,  and generate methods
   }
 
