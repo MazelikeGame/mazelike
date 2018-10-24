@@ -26,6 +26,13 @@ async function main() {
     process.stdout.write(`Game server listening on ${PORT}\n`);
   });
 
+  // tell the manager this port is in use
+  httpd.on("error", (err) => {
+    if(err.errno === "EADDRINUSE") {
+      process.exit(198);
+    }
+  });
+
   let io = socketIO(httpd); 
 
   io.on("connection", (sock) => {

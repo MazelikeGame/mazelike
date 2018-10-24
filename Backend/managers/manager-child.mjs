@@ -10,6 +10,7 @@ let portMap = new Map();
 
 export function spawnGame(gameEnv = {}) {
   let gameId = gameEnv.gameId;
+  let origEnv = Object.assign({}, gameEnv);
   // prefix all mazelike env vars
   for(let key of Object.keys(gameEnv)) {
     gameEnv[`MAZELIKE_${key}`] = gameEnv[key];
@@ -41,7 +42,14 @@ export function spawnGame(gameEnv = {}) {
         reject(new Error(`An error occured when spawning the game server: ${err.message}`));
         inUsePorts.delete(port);
         portMap.delete(gameId);
-      });  
+      });
+
+      child.on("exit", (code) => {
+        if(code === 198) {
+          inUsePorts.add(port);
+          resolve(spawnGame(origEnv));
+        }
+      });
     }),
 
     // wait for the server to start
