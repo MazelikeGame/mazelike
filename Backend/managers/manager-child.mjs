@@ -18,6 +18,7 @@ export function spawnGame(gameEnv = {}) {
 
   let port = pickPort();
   portMap.set(gameId, port);
+  inUsePorts.add(port);
 
   let child = child_process.spawn("node", ["--experimental-modules", CHILD_MAIN, port], {
     env: gameEnv,
