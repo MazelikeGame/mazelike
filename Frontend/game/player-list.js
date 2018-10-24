@@ -6,62 +6,80 @@ export default class PlayerList {
     this.graphics = new PIXI.Graphics();
   }
 
+  /**
+   * Renders the player list.
+   */
   render() {
+    let count = 0;
     this.listOfPlayers.forEach((player) => {
-      this.addPlayer(player, 100);
+      this.drawPlayerInfo(count, player, 100);
+      count++;
     });
 
     return this.graphics;
   }
 
-  addPlayer(playerName, playerHP) {  
-    this._textStyle = new PIXI.TextStyle({
+  /**
+   * Updates the player list with new player information.
+   */
+  update() {
+
+  }
+
+  /**
+   * Draws the player's information to the player list.
+   * @param {string} playerName 
+   * @param {int} playerHP 
+   */
+  drawPlayerInfo(id, playerName, playerHP) {  
+    let offset = 35; //Space between each player information panel.
+
+    var outline = new PIXI.Graphics();
+    outline.beginFill(0x000000);
+    outline.fillAlpha = 0.65;
+    outline.lineStyle(1, 0xFFFFFFF, 1);
+    outline.drawRect(0, 0, 250, 30);
+    outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
+    outline.endFill();
+    this.graphics.addChild(outline);
+
+    this._playerNameStyle = new PIXI.TextStyle({
       fill: "#fff",
-      fontSize: 17
+      fontSize: 16
     });
     
-    //BACKGROUND
-    this.graphics.beginFill(0xFFFFFF);
-    this.graphics.fillAlpha = 0.15;
-    this.graphics.drawRect(0, 0, 250, 200);
-    this.graphics.position.set(10, 10);
-    this.graphics.endFill();
-
-    //TITLE
-    let title = new PIXI.Text("Players", this._textStyle);
-    title.position.set(10, 5);
-    this.graphics.addChild(title);
 
     //PLAYER NAME
-    let player = new PIXI.Text(playerName, this._textStyle);
-    player.position.set(10, 30);
+    let player = new PIXI.Text(playerName, this._playerNameStyle);
+    player.position.set(35, 15 + (id * offset)); //eslint-disable-line
     this.graphics.addChild(player);
 
+    //HP RED
     var health2 = new PIXI.Graphics();
     health2.beginFill(0xFF0000);
     health2.drawRect(0, 0, 100, 10);
-    health2.position.set(140, 37);
+    health2.position.set(150, 15 + (id * offset)); //eslint-disable-line
     health2.endFill();
 
     this.graphics.addChild(health2);
 
-    //HP BOX
+    //HP GREEN
     var health = new PIXI.Graphics();
     health.beginFill(0x7CFC00);
     health.drawRect(0, 0, playerHP, 10);
-    health.position.set(140, 37);
+    health.position.set(150, 15 + (id * offset));//eslint-disable-line
     health.endFill();
 
     this.graphics.addChild(health);
 
     //HP TEXT
     this._hpTextStyle = new PIXI.TextStyle({
-      fill: "#000000",
-      fontSize: 9
+      fill: "#FFFFFF",
+      fontSize: 12
     });
 
-    let HP_TEXT = new PIXI.Text(playerHP, this._hpTextStyle);
-    HP_TEXT.position.set(190, 37);
+    let HP_TEXT = new PIXI.Text("Health: " + playerHP, this._hpTextStyle); //eslint-disable-line
+    HP_TEXT.position.set(170, 25 + (id * offset)); //eslint-disable-line
     this.graphics.addChild(HP_TEXT);
   }
 }
