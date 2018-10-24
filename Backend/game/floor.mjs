@@ -59,7 +59,7 @@ export default class Floor extends FloorCommon {
     ]);
   }
   
-  async loadMonsters(floor) { //todo db deleting~ UNTESTED
+  async loadMonsters(floor) { // wip UNTESTED
     //console.log("\nloading started");
     for(let i = 0; i < floor.map.rooms.length * this.monsterRatio; i++) {
       //console.log(i);
