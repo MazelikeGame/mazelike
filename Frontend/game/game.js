@@ -3,7 +3,6 @@
 import GameMap from "../../shared/game-map.mjs";
 import {KEY_CODES} from "./input.js";
 import FpsCounter from "./fps-counter.js";
-import Monster from "./monster.js";
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
@@ -13,8 +12,6 @@ var devMode = location.hostname === "localhost";
 let app = new PIXI.Application({
   antialias: true
 });
-
-window.app = app;
 
 document.body.appendChild(app.view);
 
@@ -100,11 +97,6 @@ function startGame(map) {
     app.stage.addChild(fps.sprite);
   }
   
-  let spoopy_monster = new Monster('spoopy monster', 100, 10);
-  app.stage.addChild(spoopy_monster.sprite);
-
-  spoopy_monster.attack("the air");
-
   app.ticker.add(() => {
     mapSprite.update(pageX, pageY, innerWidth + pageX, innerHeight + pageY);
     
