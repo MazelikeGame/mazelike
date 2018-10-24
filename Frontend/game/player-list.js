@@ -36,9 +36,9 @@ export default class PlayerList {
 
     var outline = new PIXI.Graphics();
     outline.beginFill(0x000000);
-    outline.fillAlpha = 0.65;
+    outline.fillAlpha = 0.75;
     outline.lineStyle(1, 0xFFFFFFF, 1);
-    outline.drawRect(0, 0, 250, 30);
+    outline.drawRect(0, 0, 300, 30);
     outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
     outline.endFill();
     this.graphics.addChild(outline);
@@ -49,6 +49,10 @@ export default class PlayerList {
     });
     
 
+    if(playerName.length > 18) {
+      playerName = playerName.substring(0, 18) + "..."; //eslint-disable-line
+    }
+
     //PLAYER NAME
     let player = new PIXI.Text(playerName, this._playerNameStyle);
     player.position.set(35, 15 + (id * offset)); //eslint-disable-line
@@ -58,7 +62,7 @@ export default class PlayerList {
     var health2 = new PIXI.Graphics();
     health2.beginFill(0xFF0000);
     health2.drawRect(0, 0, 100, 10);
-    health2.position.set(150, 15 + (id * offset)); //eslint-disable-line
+    health2.position.set(200, 15 + (id * offset)); //eslint-disable-line
     health2.endFill();
 
     this.graphics.addChild(health2);
@@ -67,7 +71,7 @@ export default class PlayerList {
     var health = new PIXI.Graphics();
     health.beginFill(0x7CFC00);
     health.drawRect(0, 0, playerHP, 10);
-    health.position.set(150, 15 + (id * offset));//eslint-disable-line
+    health.position.set(200, 15 + (id * offset));//eslint-disable-line
     health.endFill();
 
     this.graphics.addChild(health);
@@ -79,7 +83,7 @@ export default class PlayerList {
     });
 
     let HP_TEXT = new PIXI.Text("Health: " + playerHP, this._hpTextStyle); //eslint-disable-line
-    HP_TEXT.position.set(170, 25 + (id * offset)); //eslint-disable-line
+    HP_TEXT.position.set(200, 25 + (id * offset)); //eslint-disable-line
     this.graphics.addChild(HP_TEXT);
   }
 }

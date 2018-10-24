@@ -70,7 +70,7 @@ async function setup() {
     app.stage.addChild(fps.sprite);
   }
 
-  let playerList = new PlayerList(["Csurfus", "Testing", "Test"]);
+  let playerList = new PlayerList(["Csurfus", "Testing", "HelloWorldTestTestttt"]);
   app.stage.addChild(playerList.render());
 
   window.ml.floor = floor;
