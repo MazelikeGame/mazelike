@@ -1,5 +1,3 @@
-//NOTES: Will create monster spec once we the Monster class is done.
-
 describe("Objects in PIXI Resources", () => {
   it("The dog should be in the PIXI resources.", () => {
     expect(PIXI.loader.resources.dog).not.toBeUndefined();
