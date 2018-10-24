@@ -2,6 +2,7 @@
 /* eslint-disable complexity */
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
+import PlayerList from "./player-list.js";
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
@@ -68,6 +69,9 @@ async function setup() {
     fps = new FpsCounter();
     app.stage.addChild(fps.sprite);
   }
+
+  let playerList = new PlayerList();
+  app.stage.addChild(playerList.sprite);
 
   window.ml.floor = floor;
   addArrowKeyListener(floor);
