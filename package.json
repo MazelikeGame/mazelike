@@ -6,7 +6,8 @@
     "start": "node --experimental-modules Backend/index.mjs",
     "doc": "jsdoc -r Frontend/game Backend shared -c jsdoc.json -d Documents",
     "eslint": "eslint Frontend Backend shared --ext .js,.mjs",
-    "debug": "node --experimental-modules --inspect Backend/index.mjs"
+    "debug": "node --experimental-modules --inspect Backend/index.mjs",
+    "test-browser": "node browser-ci"
   },
   "license": "ISC",
   "dependencies": {
@@ -21,7 +22,6 @@
     "express-winston": "^3.0.0",
     "multer": "^1.4.0",
     "mysql2": "^1.6.1",
-    "puppeteer": "^1.9.0",
     "sequelize": "^4.38.1",
     "socket.io": "^2.1.1",
     "sqlite": "^3.0.0",
@@ -37,6 +37,7 @@
     "jasmine": "^3.2.0",
     "jasmine-core": "^3.2.1",
     "jsdoc": "^3.5.5",
+    "puppeteer": "^1.9.0",
     "request": "^2.88.0"
   }
 }
