@@ -52,7 +52,6 @@ app.use(expressWinston.logger({
   meta: false
 }));
 
-
 //Routes
 app.use("/game", gameRouter);
 app.get("/j/:id", joinRoute);
