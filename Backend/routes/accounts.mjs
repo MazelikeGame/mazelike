@@ -1,3 +1,4 @@
+// jshint esversion: 6
 import express from "express";
 import Sequelize from 'sequelize';
 import User from '../models/user.mjs';
@@ -5,6 +6,8 @@ import sql from "../sequelize";
 import multer from 'multer';
 import fs from 'fs';
 import qs from "querystring";
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 
 
 var storage = multer.diskStorage({
@@ -218,11 +221,116 @@ accountRouter.get('/view', function(req, res) {
   if(res.loginRedirect()) {
     return;
   }
-  
+
   res.render('view_acct', {
     username: req.session.username,
     email: req.user.email,
     image: req.user.image_name || "../../img/profilepic.jpg"
+  });
+});
+
+accountRouter.get('/forgot-password', function(req, res) {
+  res.render('forgot-password');
+});
+
+accountRouter.post('/forgot-password', async(req, res) => {
+  var userModel = new User(sql);
+  const buf = crypto.randomBytes(20);
+  var token = buf.toString('hex');
+  let user = await userModel.findOne({
+    where: {
+      username: req.body.username
+    }
+  });
+  if(!user) {
+    return res.render('forgot-password', {
+      noUserExists: true
+    });
+  }
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = Date.now() + 3600000;
+  user.save();
+
+  let smtpTransport = nodemailer.createTransport({
+    service: process.env.MAILER_SERVICE_PROVIDER,
+    auth: {
+      user: process.env.MAILER_EMAIL_ID,
+      pass: process.env.MAILER_PASSWORD
+    }
+  });
+  let mailOptions = {
+    from: process.env.MAILER_EMAIL_ID,
+    to: user.email,
+    subject: 'MazeLike Password Reset',
+    // eslint-disable-next-line prefer-template
+    text: 'Greetings ' + req.body.username +
+    ',\n\nPlease click the following link, or paste this into your browser to complete the process.\n\n' +
+    ' http://' + req.headers.host + '/account/reset/' + token + ' \n\n' +
+    'If you did not request this, please ignore this email and your password will remain unchanged.' +
+    '\n\nThank you,\nMazeLike'
+  };
+  try {
+    await smtpTransport.sendMail(mailOptions);
+  } catch (err) {
+    return res.render('forgot-password', {
+      badError: err
+    });
+  }
+  return res.render('forgot-password', {
+    accountFound: true
+  });
+});
+
+accountRouter.get('/reset/:token', async(req, res) => {
+  var userModel = new User(sql);
+  let user = await userModel.findOne({
+    where: {
+      resetPasswordToken: req.params.token
+    }
+  });
+  if(!user) {
+    return res.render('forgot-password', {
+      badError: 'Password reset token is invalid or has expired. '.concat(user)
+    });
+  }
+  return res.render('reset_password', {
+    token: req.params.token,
+    username: user.username
+  });
+});
+
+accountRouter.post('/reset/:token', async(req, res) => {
+  var userModel = new User(sql);
+  let user = await userModel.findOne({
+    where: {
+      resetPasswordToken: req.params.token
+    }
+  });
+  if(!user) {
+    res.render('reset', {
+      tokenError: 'Reset token is invalid'
+    });
+  }
+  userModel.encryptPassword(req.body.password, (err, hash) => {
+    let values = {
+      password: hash
+    };
+    let selector = {
+      where: {
+        username: user.username
+      }
+    };
+    userModel.update(values, selector).then((result) => {
+      if(result) {
+        res.render('reset_password', {
+          successfulReset: 'Password reset was successful for user '.concat(user.username)
+        });
+      } else {
+        res.render('reset/'.concat(req.params.token), {
+          tokenError: 'Could not reset password for '.concat(user.username)
+        });
+      }
+    });
   });
 });
 
