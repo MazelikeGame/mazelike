@@ -1,10 +1,19 @@
 /*---------CLAYTON SURFUS----------*/
-.error {
+.error, .success {
 	font-family: 'Open Sans', sans-serif;
 	font-size: 1em;
-	background: #FFBCBC;
 	border: solid 1px #C80000;
 	padding: 15px;
 	margin: 15px 0px 15px 0px;
 }
+
+.error {
+  background: #FFBCBC;
+  border: solid 1px #C80000;
+}
 /*-------END CLAYTON SURFUS-------*/
+
+.success {
+  background: #33ff33;
+  border: solid 1px #00cc00;
+}

@@ -14,7 +14,7 @@ NOTE: You can run `docker-compose ps` to see if any containers are running and `
 
 Run `npm test`
 
-The server will 
+The server will need to be running in order to run the tests.
 
 ## MySQL auth errors
 
@@ -23,6 +23,13 @@ There may be data left over from a previous mysql instance run `docker-compose d
 ## Generate documentation
 
 Run `npm run doc`
+
+## Migrations
+
+* Run `npm run migration:create "name-of-migration-here"` to generate a skeleton migration
+    * Documentation regarding the creation of migrations can be found here: https://sequelize.readthedocs.io/en/latest/docs/migrations/
+* Run `npm run db:migrate` to migrate changes into the database
+* Run `npm run db:migrate:undo` to undo previous migrations
 
 ## Manual deploy/rollback
 
@@ -43,11 +50,13 @@ Connect to `localhost:5506` and login as root with the password password.
 If mysql is not running run `docker-compose up -d mysql` to start it and `docker-compose down` to stop it.
 
 ## Default .env
-
 ```
 DB_HOST=mysql
 DB_PORT=3306
 DB_USER=root
 DB_PASS=password
 DB_DATABASE=mazelike
+MAILER_EMAIL_ID=noreplymazelike@gmail.com
+MAILER_PASSWORD=sneakybeakylike
+MAILER_SERVICE_PROVIDER=Gmail
 ```
