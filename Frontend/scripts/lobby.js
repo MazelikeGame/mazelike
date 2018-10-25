@@ -108,6 +108,7 @@ let startBtn = document.querySelector("#start");
 
 if(startBtn) {
   startBtn.addEventListener("click", () => {
+    notify("Starting game (this could take a few seconds)");
     fetchAndNotify(`/game/lobby/${hydrate.id}/start`);
   });
 }
