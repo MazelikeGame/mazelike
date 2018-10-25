@@ -347,3 +347,7 @@ gameRouter.get("/addr/:id", (req, res) => {
 gameRouter.get(/[A-Za-z0-9]{12}/, (req, res) => {
   res.sendFile(path.resolve("Frontend/game/index.html"));
 });
+
+gameRouter.get('/test', (req, res) => {
+  res.sendFile(path.resolve("Frontend/game/Tests/index.html"));
+});

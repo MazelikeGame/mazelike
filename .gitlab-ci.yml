@@ -34,17 +34,3 @@ MazeLike_Staging:
       - /bin/push Staging "Deployed version $VERSION"
   only:
     - staging
-
-MazeLike_Ryan:
-  stage: deploy
-  script:
-      # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-      - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
-      - docker build -t "mazelike/backend:ryan" .
-      - docker kill mazelike_ryan || echo "Server not running"
-      - docker container rm mazelike_ryan || echo "Container not found"
-      - docker kill $(docker ps -f label=edu.iastate.ryanr=mazelike-staging- -q) || echo "No Games"
-      - docker run --name mazelike_ryan -d -p 5000:3000 --env-file /etc/mazelike/staging.env -v /var/run/docker.sock:/var/run/docker.sock -v /etc/mazelike/data_staging:/app/Frontend/public "mazelike/backend:ryan"
-      - /bin/push Ryan "Deployed version $VERSION"
-  only:
-    - ryanr-multi-process
