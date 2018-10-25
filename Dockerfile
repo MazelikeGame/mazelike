@@ -12,6 +12,7 @@ COPY config config
 COPY migrations migrations
 COPY seeders seeders
 
+VOLUME /app/Frontend/public
 EXPOSE 3000
 
 CMD ["npm", "start"]
