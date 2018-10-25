@@ -3,6 +3,7 @@
   "version": "3.2.0",
   "scripts": {
     "test": "jasmine",
+    "test-browser": "node browser-ci",
     "start": "sequelize db:migrate && node --experimental-modules Backend/index.mjs",
     "doc": "jsdoc -r Frontend/game Backend -c jsdoc.json -d Documents",
     "eslint": "eslint Frontend Backend --ext .js,.mjs",
@@ -42,6 +43,7 @@
     "jasmine": "^3.2.0",
     "jasmine-core": "^3.2.1",
     "jsdoc": "^3.5.5",
+    "puppeteer": "^1.9.0",
     "request": "^2.88.0"
   }
 }
