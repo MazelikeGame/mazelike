@@ -12,7 +12,7 @@ export default class PlayerList {
   render() {
     let count = 0;
     this.listOfPlayers.forEach((player) => {
-      this.drawPlayerInfo(count, player, 100);
+      this.drawPlayerInfo(count, player, 10);
       count++;
     });
 
@@ -32,12 +32,12 @@ export default class PlayerList {
    * @param {int} playerHP 
    */
   drawPlayerInfo(id, playerName, playerHP) {  
-    let offset = 35; //Space between each player information panel.
+    let offset = 40; //Space between each player information box.
 
     var outline = new PIXI.Graphics();
     outline.beginFill(0x000000);
     outline.fillAlpha = 0.75;
-    outline.lineStyle(1, 0xFFFFFFF, 1);
+    outline.lineStyle(2, 0xFFFFFFF, 1);
     outline.drawRect(0, 0, 300, 30);
     outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
     outline.endFill();
@@ -48,13 +48,8 @@ export default class PlayerList {
       fontSize: 16
     });
     
-
-    if(playerName.length > 18) {
-      playerName = playerName.substring(0, 18) + "..."; //eslint-disable-line
-    }
-
     //PLAYER NAME
-    let player = new PIXI.Text(playerName, this._playerNameStyle);
+    let player = new PIXI.Text(this.checkNameLength(playerName), this._playerNameStyle);
     player.position.set(35, 15 + (id * offset)); //eslint-disable-line
     this.graphics.addChild(player);
 
@@ -85,5 +80,17 @@ export default class PlayerList {
     let HP_TEXT = new PIXI.Text("Health: " + playerHP, this._hpTextStyle); //eslint-disable-line
     HP_TEXT.position.set(200, 25 + (id * offset)); //eslint-disable-line
     this.graphics.addChild(HP_TEXT);
+  }
+
+  /**
+   * Checks the player's name length.
+   * @param {string} playerName 
+   */
+  checkNameLength(playerName) {
+    if(playerName.length > 18) {
+      playerName = playerName.substring(0, 18) + "..."; //eslint-disable-line
+    }
+
+    return playerName;
   }
 }

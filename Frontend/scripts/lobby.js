@@ -101,6 +101,8 @@ sock.on("lobby-start", (id) => {
   if(id === hydrate.id) {
     location.href = `/game/${id}`;
   }
+
+  //call io. here to setup the game with the gameId.
 });
 
 // Start the game
