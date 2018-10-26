@@ -1,11 +1,16 @@
 {
   "name": "mazelike",
-  "version": "2.0.1",
+  "version": "3.2.0",
   "scripts": {
     "test": "jasmine",
-    "start": "node --experimental-modules Backend/index.mjs",
-    "doc": "jsdoc -r Frontend Backend -d Documents",
-    "eslint": "eslint Frontend Backend --ext .js,.mjs"
+    "test-browser": "node browser-ci",
+    "start": "sequelize db:migrate && node --experimental-modules Backend/index.mjs",
+    "doc": "jsdoc -r Frontend/game Backend -c jsdoc.json -d Documents",
+    "eslint": "eslint Frontend Backend --ext .js,.mjs",
+    "debug": "node --experimental-modules --inspect Backend/index.mjs",
+    "db:migrate": "sequelize db:migrate",
+    "db:migrate:undo": "sequelize db:migrate:undo",
+    "migration:create": "sequelize migration:create --name"
   },
   "license": "ISC",
   "dependencies": {
@@ -17,15 +22,28 @@
     "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
+    "express-winston": "^3.0.0",
     "multer": "^1.4.0",
     "mysql2": "^1.6.1",
+    "node-docker-api": "^1.1.22",
+    "nodemailer": "^4.6.8",
     "sequelize": "^4.38.1",
-    "socket.io": "^2.1.1"
+    "sequelize-cli": "^4.1.1",
+    "socket.io": "^2.1.1",
+    "sqlite": "^3.0.0",
+    "winston": "^3.1.0"
   },
   "private": true,
   "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/register": "^7.0.0",
+    "@babel/runtime": "^7.1.2",
     "jasmine": "^3.2.0",
+    "jasmine-core": "^3.2.1",
     "jsdoc": "^3.5.5",
+    "puppeteer": "^1.9.0",
     "request": "^2.88.0"
   }
 }

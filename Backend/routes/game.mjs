@@ -1,17 +1,22 @@
 /* global io */
+/* eslint-disable complexity */
 import express from "express";
 import crypto from "crypto";
 import util from "util";
 import Lobby from "../models/lobby";
 import sql from "../sequelize";
 import path from "path";
+import fs from "fs";
+import {spawnGame, getGameAddr} from "../managers/manager";
+import Floor from "../game/floor";
+
+const mkdir = util.promisify(fs.mkdir);
 
 export let gameRouter = express.Router();
 
 // List all lobbies
 gameRouter.get("/all", async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -19,7 +24,7 @@ gameRouter.get("/all", async(req, res) => {
   let lobbies = await sql.query(`
     SELECT l1.playerId, l1.lobbyId FROM lobbies l1
       WHERE l1.lobbyId IN (SELECT l.lobbyId FROM lobbies l WHERE l.playerId = :userId)
-      && l1.isHost = 1
+      AND l1.isHost = 1
       ORDER BY l1.lobbyId;`, {
     replacements: {
       userId: req.user.username
@@ -97,6 +102,25 @@ gameRouter.get("/lobby/:id", async(req, res) => {
     };
   });
 
+  let usernames = players.map((player) => {
+    return player.id;
+  });
+
+  let playerImages = await sql.query(`SELECT image_name, username FROM users WHERE username IN (:usernames)`, { 
+    replacements: {
+      usernames: usernames
+    }, 
+    type: sql.QueryTypes.SELECT 
+  });
+ 
+  playerImages.forEach((image) => {
+    players.forEach((player) => {
+      if(player.id === image.username) {
+        player.image_name = image.image_name;
+      }
+    });
+  });
+
   let isHost = host.playerId === req.user.username;
 
   res.render("lobby", {
@@ -113,8 +137,7 @@ gameRouter.get("/lobby/:id", async(req, res) => {
 // Join a lobby
 // /j/:id (from the root)
 export const joinRoute = async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -152,7 +175,8 @@ export const joinRoute = async(req, res) => {
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
-    playerId: req.user.username
+    playerId: req.user.username,
+    image_name: req.user.image_name
   });
 
   res.redirect(`/game/lobby/${lobby.lobbyId}`);
@@ -173,8 +197,7 @@ const SECRET_LENGTH = 3;
 
 // Create a new lobby
 gameRouter.get("/new", async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -193,8 +216,7 @@ gameRouter.get("/new", async(req, res) => {
 
 // Delete a lobby
 gameRouter.get("/lobby/:id/delete", async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -212,9 +234,8 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
           lobbyId: req.params.id
         }
       });
-
       io.emit("lobby-delete", req.params.id);
-      res.end("Lobby deleted");
+      res.redirect("/account/dashboard");
     } else {
       res.status(401);
       res.end("Only the host can delete this lobby.");
@@ -228,8 +249,7 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
 
 // Drop a player from the lobby
 gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -270,8 +290,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
 
 // Start the game for this lobby
 gameRouter.get("/lobby/:id/start", async(req, res) => {
-  if(!req.user) {
-    res.redirect("/account/login");
+  if(res.loginRedirect()) {
     return;
   }
 
@@ -288,19 +307,47 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
         lobbyId: req.params.id
       }
     });
+    
+    try {
+      await mkdir("Frontend/public/maps");
+    } catch(err) {
+      // pass
+    }
 
-    // Create game here (TODO)
+    // Generate the game
+    await Floor.generate({
+      gameId: req.params.id,
+      floorIdx: 0
+    }).save();
 
-    io.emit("lobby-start", req.params.id);
+    try {
+      await spawnGame({
+        gameId: req.params.id
+      });
 
-    res.end("Game started");
+      io.emit("lobby-start", req.params.id);
+
+      res.end("Game started");
+    } catch(err) {
+      process.stderr.write(`Error starting game: ${err.message}\n`);
+      res.end("An error occured while starting game");
+    }
     return;
   }
 
   res.end("No such lobby or you are not the host");
 });
 
+// Get the game server address
+gameRouter.get("/addr/:id", (req, res) => {
+  res.end(getGameAddr(req.params.id));
+});
+
 // Serve /game/:id as /game/
 gameRouter.get(/[A-Za-z0-9]{12}/, (req, res) => {
   res.sendFile(path.resolve("Frontend/game/index.html"));
+});
+
+gameRouter.get('/test', (req, res) => {
+  res.sendFile(path.resolve("Frontend/game/Tests/index.html"));
 });

@@ -37,7 +37,7 @@ sock.on("lobby-drop", ({id, player}) => {
 let group = document.querySelector(".list-group");
 
 // Handle adding a new player
-sock.on("lobby-add", ({id, playerId}) => {
+sock.on("lobby-add", ({id, playerId, image_name}) => {
   if(id !== hydrate.id) {
     return;
   }
@@ -46,8 +46,26 @@ sock.on("lobby-add", ({id, playerId}) => {
   let playerItem = document.createElement("div");
   playerItem.setAttribute("class", "list-group-item d-flex justify-content-between align-items-center");
   playerItem.setAttribute("data-player-id", playerId);
-  playerItem.innerText = playerId;
+  
+  let userInfo = document.createElement("div");
+  userInfo.setAttribute("class", "userinfo");
+
+  let playerImage = document.createElement("img");
+  if(image_name !== null) {
+    playerImage.setAttribute("src", `../../public/images/${image_name}`);
+  } else {
+    playerImage.setAttribute("src", `../../img/profilepic.jpg`);
+  }
+  playerImage.setAttribute("class", "avatar rounded float-left");
+
+  let usernameElement = document.createElement("span");
+  usernameElement.setAttribute("class", "username");
+  usernameElement.innerText = playerId;
+
   group.appendChild(playerItem);
+  playerItem.appendChild(userInfo);
+  userInfo.appendChild(playerImage);
+  userInfo.appendChild(usernameElement);
 
   // Create the drop link if we are the host
   if(hydrate.ishost === "true") {
@@ -90,6 +108,7 @@ let startBtn = document.querySelector("#start");
 
 if(startBtn) {
   startBtn.addEventListener("click", () => {
+    notify("Starting game (this could take a few seconds)");
     fetchAndNotify(`/game/lobby/${hydrate.id}/start`);
   });
 }

@@ -11,6 +11,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <meta charset="utf-8">
 <link href="../../css/loginstyle.css" rel='stylesheet' type='text/css' />
 <link href="../../css/custom.css" rel='stylesheet' type='text/css' />
+<link rel="icon" href="/img/m main.png"/>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
@@ -36,7 +37,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 				<!--END ERRORS-->
 
 				<!-----start-main---->
-				<form action="../../account/create" method="POST" enctype="multipart/form-data">
+				<form action="../../account/create{{returnUrl}}" method="POST" enctype="multipart/form-data">
           <div>
 						<span><label>Avatar</label></span>
 						<span><input type="file" name="avatar" id="active"></span>

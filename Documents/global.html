@@ -104,7 +104,7 @@
     
 
     
-    <h4 class="name" id="_calculatePixelDims"><span class="type-signature"></span>_calculatePixelDims<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="callbackify"><span class="type-signature"></span>callbackify<span class="signature">(fn)</span><span class="type-signature"></span></h4>
     
 
     
@@ -112,7 +112,7 @@
 
 
 <div class="description">
-    Calculate the pixel dimensions of the canvas
+    Convert a function that returns a promise into a function thatcalls a callback
 </div>
 
 
@@ -121,6 +121,50 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fn</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -156,7 +200,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2630">line 2630</a>
+        <a href="Backend_session-store.mjs.html">Backend/session-store.mjs</a>, <a href="Backend_session-store.mjs.html#line61">line 61</a>
     </li></ul></dd>
     
 
@@ -190,7 +234,7 @@
     
 
     
-    <h4 class="name" id="_genShape"><span class="type-signature"></span>_genShape<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="destroy"><span class="type-signature">(async) </span>destroy<span class="signature">(sid)</span><span class="type-signature"></span></h4>
     
 
     
@@ -198,7 +242,7 @@
 
 
 <div class="description">
-    Generate a shape object and id for later rendering
+    Destroy a session
 </div>
 
 
@@ -207,6 +251,50 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The session id</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -242,7 +330,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2650">line 2650</a>
+        <a href="Backend_session-store.mjs.html">Backend/session-store.mjs</a>, <a href="Backend_session-store.mjs.html#line48">line 48</a>
     </li></ul></dd>
     
 
@@ -276,7 +364,7 @@
     
 
     
-    <h4 class="name" id="appendShape"><span class="type-signature"></span>appendShape<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="get"><span class="type-signature">(async) </span>get<span class="signature">(sid)</span><span class="type-signature"></span></h4>
     
 
     
@@ -284,7 +372,7 @@
 
 
 <div class="description">
-    Add a shape to the end of the render queue
+    Get a session from the db
 </div>
 
 
@@ -293,6 +381,50 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sid</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The session id</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -328,7 +460,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2659">line 2659</a>
+        <a href="Backend_session-store.mjs.html">Backend/session-store.mjs</a>, <a href="Backend_session-store.mjs.html#line18">line 18</a>
     </li></ul></dd>
     
 
@@ -362,7 +494,7 @@
     
 
     
-    <h4 class="name" id="clearRegionHighlight"><span class="type-signature"></span>clearRegionHighlight<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="isAuthenticated"><span class="type-signature"></span>isAuthenticated<span class="signature">(req, res, next)</span><span class="type-signature"></span></h4>
     
 
     
@@ -370,7 +502,7 @@
 
 
 <div class="description">
-    Reset any currently highlighted item
+    Checks to make sure the user is authenticated.
 </div>
 
 
@@ -379,6 +511,86 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>next</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -414,7 +626,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line1185">line 1185</a>
+        <a href="Backend_routes_accounts.mjs.html">Backend/routes/accounts.mjs</a>, <a href="Backend_routes_accounts.mjs.html#line30">line 30</a>
     </li></ul></dd>
     
 
@@ -448,7 +660,7 @@
     
 
     
-    <h4 class="name" id="getCurrentRegionTooltip"><span class="type-signature"></span>getCurrentRegionTooltip<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="set"><span class="type-signature">(async) </span>set<span class="signature">(sid, session)</span><span class="type-signature"></span></h4>
     
 
     
@@ -456,7 +668,7 @@
 
 
 <div class="description">
-    Fetch the HTML to display as a tooltip
+    Store a session in the db
 </div>
 
 
@@ -467,176 +679,66 @@
 
 
 
-
-
-
-
-<dl class="details">
-
+    <h5>Parameters:</h5>
     
 
-    
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line1207">line 1207</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        <th>Type</th>
 
         
-            
-
-    
-
-    
-    <h4 class="name" id="getLastShapeId"><span class="type-signature"></span>getLastShapeId<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Return the most recently inserted shape id
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2612">line 2612</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sid</code></td>
             
 
-    
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The session id</td>
+        </tr>
 
     
-    <h4 class="name" id="getRegion"><span class="type-signature"></span>getRegion<span class="signature">()</span><span class="type-signature"></span></h4>
-    
+
+        <tr>
+            
+                <td class="name"><code>session</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The session data</td>
+        </tr>
 
     
-
-
-
-<div class="description">
-    Simulate a single region
-</div>
-
-
-
-
-
-
-
+    </tbody>
+</table>
 
 
 
@@ -672,953 +774,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2385">line 2385</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getRegion"><span class="type-signature"></span>getRegion<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Return a region id for a given x/y co-ordinate
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line1155">line 1155</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getShapeAt"><span class="type-signature"></span>getShapeAt<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Find a shape at the specified x/y co-ordinates
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2687">line 2687</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="initTarget"><span class="type-signature"></span>initTarget<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Setup the canvas
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line1131">line 1131</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="insertAfterShape"><span class="type-signature"></span>insertAfterShape<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Insert one shape after another in the render queue
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2673">line 2673</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="removeShapeId"><span class="type-signature"></span>removeShapeId<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Remove a shape from the queue
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2680">line 2680</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="render"><span class="type-signature"></span>render<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Actually render the chart to the canvas
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line1144">line 1144</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="render"><span class="type-signature"></span>render<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Render all queued shapes onto the canvas
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2694">line 2694</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="renderRegion"><span class="type-signature"></span>renderRegion<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Render bar(s) for a region
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line1895">line 1895</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="replaceWithShape"><span class="type-signature"></span>replaceWithShape<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Replace one shape with another
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2666">line 2666</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="reset"><span class="type-signature"></span>reset<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Clear and reset the canvas
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line2619">line 2619</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="setRegionHighlight"><span class="type-signature"></span>setRegionHighlight<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Highlight an item based on the moused-over x,y co-ordinate
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js_jquery.sparkline.js.html">js/jquery.sparkline.js</a>, <a href="js_jquery.sparkline.js.html#line1161">line 1161</a>
+        <a href="Backend_session-store.mjs.html">Backend/session-store.mjs</a>, <a href="Backend_session-store.mjs.html#line29">line 29</a>
     </li></ul></dd>
     
 
@@ -1662,13 +818,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="-_.html">(not really since its object literal)</a></li><li><a href="VelocityMod.html">VelocityMod</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_calculatePixelDims">_calculatePixelDims</a></li><li><a href="global.html#_genShape">_genShape</a></li><li><a href="global.html#appendShape">appendShape</a></li><li><a href="global.html#clearRegionHighlight">clearRegionHighlight</a></li><li><a href="global.html#getCurrentRegionTooltip">getCurrentRegionTooltip</a></li><li><a href="global.html#getLastShapeId">getLastShapeId</a></li><li><a href="global.html#getRegion">getRegion</a></li><li><a href="global.html#getShapeAt">getShapeAt</a></li><li><a href="global.html#initTarget">initTarget</a></li><li><a href="global.html#insertAfterShape">insertAfterShape</a></li><li><a href="global.html#removeShapeId">removeShapeId</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#renderRegion">renderRegion</a></li><li><a href="global.html#replaceWithShape">replaceWithShape</a></li><li><a href="global.html#reset">reset</a></li><li><a href="global.html#setRegionHighlight">setRegionHighlight</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li></ul><h3>Classes</h3><ul><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li></ul><h3>Global</h3><ul><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#set">set</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 24 2018 21:45:58 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 20 2018 18:43:38 GMT-0500 (Central Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
