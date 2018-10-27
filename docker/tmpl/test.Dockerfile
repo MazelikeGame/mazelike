@@ -32,5 +32,5 @@ RUN npm install
 
 COPY . .
 
-RUN chmod +x test-inner.sh
-CMD ["/bin/bash", "/app/test-inner.sh"]
+RUN chmod +x scripts/test-inner.sh
+CMD ["/bin/bash", "/app/scripts/test-inner.sh"]
