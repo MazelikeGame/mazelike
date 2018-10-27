@@ -1,23 +1,32 @@
+cache:
+  paths:
+   - docker-compose.yml
+
+Mazelike_Build:
+  stage: build
+  script:
+   - node scripts/gen-compose -version branch-$CI_COMMIT_REF_NAME -test -suffix -test-$CI_COMMIT_REF_NAME -docker_cluster
+   - docker-compose build
+
 MazeLike_Tests:
   stage: test
   script:
-   - docker-compose -f docker-compose.test.yml build
-   - touch runner-result
-   - docker-compose -f docker-compose.test.yml up -d
-   - node test-stopper.js || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
+   - docker-compose up -d
+   - node test-stopper.js || (docker-compose down --rmi all && exit 1)
 
 MazeLike_Deploy:
   stage: deploy
   script:
       # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
       - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
-      - node version-check.js
-      - docker build -t "mazelike/backend:$VERSION" .
-      - docker tag "mazelike/backend:$VERSION" mazelike/backend:latest
-      - docker kill mazelike || echo "Server not running"
+      - node scripts/version-check.js
+      - docker-compose -f /etc/mazelike/docker-compose.yml down || echo "No compose file"
       - docker kill $(docker ps -f label=edu.iastate.ryanr=mazelike- -q) || echo "No Games"
-      - docker container rm mazelike || echo "Container not found"
-      - docker run --name mazelike -d -p 80:3000 --env-file /etc/mazelike/.env -v /var/run/docker.sock:/var/run/docker.sock -v /etc/mazelike/data:/app/Frontend/public "mazelike/backend:$VERSION"
-      - /bin/push Master "Deployed version $VERSION"
+      - node scripts/gen-compose -version $VERSION -env_file
+      - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
+      - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
+      - cp docker-compose.yml /etc/mazelike
+      - docker-compose up -d
+      - push Master "Deployed version $VERSION"
   only:
     - master
