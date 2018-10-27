@@ -6,15 +6,17 @@ cache:
 Mazelike_Build:
   stage: build
   script:
-   - npm i handlebars
-   - node scripts/gen-compose -version branch-$CI_COMMIT_REF_NAME -test -suffix -test-$CI_COMMIT_REF_NAME -docker_cluster
+   - mv package.json _package.json
+   - npm i handlebars --no-package-lock
+   - mv _package.json package.json
+   - node scripts/gen-compose -version branch-$CI_COMMIT_REF_NAME -test -suffix -test-$CI_COMMIT_REF_NAME
    - docker-compose build
 
 MazeLike_Tests:
   stage: test
   script:
    - docker-compose up -d
-   - node test-stopper.js || (docker-compose down --rmi all && exit 1)
+   - node scripts/test-stopper.js || (docker-compose down --rmi all && exit 1)
 
 MazeLike_Deploy:
   stage: deploy
