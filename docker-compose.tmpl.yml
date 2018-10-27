@@ -1,0 +1,86 @@
+version: "3.2"
+services:
+  backend:
+    container_name: mazelike{{suffix}}
+    image: ryan3r/mazelike:{{version}}
+    build:
+      context: .
+    {{#if env_file}}
+    env_file: {{{env_path}}}backend.env
+    {{/if}}
+    {{#if backend_env}}
+    environment:
+      {{{backend_env}}}
+    {{/if}}
+    expose:
+      - 3000
+    {{#if backend_port}}
+    ports:
+      - {{{backend_port}}}:3000
+    {{/if}}
+    networks:
+      - mazelike{{{suffix}}}
+    {{#if volumes}}
+    volumes:
+    {{/if}}
+      {{#if docker_sock}}
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      {{/if}}
+    {{#if backend_volume}}
+      - type: volume
+        source: backend{{{suffix}}}
+        target: /data
+    {{/if}}
+  {{#if test}}
+
+  tests:
+    container_name: mazelke_test{{{suffix}}}
+    image: ryan3r/mazelike_tests:{{{version}}}
+    build:
+      context: .
+      dockerfile: test.Dockerfile
+    depends_on:
+      - backend
+    networks:
+      - mazelike{{{suffix}}}
+    environment:
+      IS_RUNNING_IN_DOCKER: ok
+    volumes:
+      - type: bind
+        source: ./runner-result
+        target: /app/runner-result
+  {{/if}}
+  {{#if sql}}
+
+  sql:
+    image: mysql:5.7
+    networks:
+     - mazelike{{{suffix}}}
+    {{#if env_file}}
+    env_file: {{{env_path}}}sql.env
+    {{/if}}
+    {{#if sql_env}}
+    environment:
+      {{{sql_env}}}
+    {{/if}}
+    expose:
+     - 3306
+    volumes:
+      - type: "volume"
+        source: sql{{{suffix}}}
+        target: /var/lib/mysql
+  {{/if}}
+
+networks:
+  mazelike{{{suffix}}}:
+{{#if def_vol}}
+volumes:
+{{/if}}
+{{#if backend_volume}}
+  backend{{{suffix}}}:
+{{/if}}
+{{#if sql}}
+  sql{{{suffix}}}:
+{{/if}}

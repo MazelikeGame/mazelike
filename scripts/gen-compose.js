@@ -3,7 +3,7 @@ const Handlebars = require("handlebars");
 const fs = require("fs");
 const path = require("path");
 
-const DOCKER_PATH = path.join(__dirname, "../docker");
+const DOCKER_PATH = path.join(__dirname, "..");
 const TAB = "  ";
 const ENV_TAB_LEVEL = 3;
 
@@ -33,7 +33,6 @@ function makeEnv(env) {
 
 function makeComposeConf(opts) {
   let config = {
-    build_name: opts.build_name,
     suffix: opts.suffix || "",
     version: opts.version,
     env_file: opts.env_file,
@@ -42,13 +41,20 @@ function makeComposeConf(opts) {
     backend_volume: !opts.test,
     test: opts.test,
     sql: opts.sql,
-    def_vol: !opts.test || opts.sql
+    def_vol: !opts.test || opts.sql,
+    docker_sock: opts.docker_cluster
   };
 
-  let backend_env = {};
+  config.volumes = config.backend_volume || config.docker_sock;
+
+  let backend_env = opts.backend_env;
   let sql_env = {
     MYSQL_DATABASE: "mazelike"
   };
+
+  if(config.docker_sock) {
+    backend_env.CLUSTER_MANAGER = "docker";
+  }
 
   // use sql as the database
   if(opts.sql) {
@@ -80,29 +86,34 @@ function makeComposeConf(opts) {
 }
 
 // parse command line args
-let opts = {};
+let opts = {
+  backend_env: {}
+};
+
 for(let i = 2; i < process.argv.length; ++i) {
   if(process.argv[i][0] === "-") {
     if(!process.argv[i + 1] || process.argv[i + 1][0] === "-") {
       opts[process.argv[i].substr(1)] = true;
+    } else if(process.argv[i].substr(0, 2) == "-e") {
+      opts.backend_env[process.argv[i].substr(2)] = process.argv[i + 1];
     } else {
       opts[process.argv[i].substr(1)] = process.argv[++i];
     }
-  } else {
-    opts.build_name = process.argv[i];
   }
 }
 
 if(opts.help) {
   console.log(`Usage: gen-compose [options] <build_name>
 
-suffix           The suffix to add to all containers, volumes, and networks
-version          The version for the images
-env_file         Use env files (also can be the path for the env files)
-backend_port     The external port for the backend
-test             Include the test container
-sql              Include and use a mysql container`);
+suffix             The suffix to add to all containers, volumes, and networks
+version            The version for the images
+env_file           Use env files (also can be the path for the env files)
+backend_port       The external port for the backend
+test               Include the test container
+sql                Include and use a mysql container
+docker_cluster     Use the docker cluster manager
+-e*                Custom backend env config`);
   process.exit(0);
 }
 
-build("tmpl/docker-compose.yml", `../docker-compose.yml`, makeComposeConf(opts));
+build("docker-compose.tmpl.yml", "docker-compose.yml", makeComposeConf(opts));
