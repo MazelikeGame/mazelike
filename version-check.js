@@ -2,7 +2,7 @@
 /* eslint-disable */
 const {execSync} = require("child_process");
 
-let image = execSync("docker inspect mazelike --format \"{{.Config.Image}}\"");
+let image = execSync("docker inspect mazelike --format \"{{.Config.Image}}\"").toString();
 let oldVersion = image.match(/(\d+)\.(\d+)\.(\d+)/);
 let version = require("./package.json").version.match(/(\d+)\.(\d+)\.(\d+)/);
 
