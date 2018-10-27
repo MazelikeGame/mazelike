@@ -1,10 +1,12 @@
 cache:
   paths:
    - docker-compose.yml
+   - node_modules
 
 Mazelike_Build:
   stage: build
   script:
+   - npm i handlebars
    - node scripts/gen-compose -version branch-$CI_COMMIT_REF_NAME -test -suffix -test-$CI_COMMIT_REF_NAME -docker_cluster
    - docker-compose build
 
