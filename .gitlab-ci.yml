@@ -32,7 +32,7 @@ MazeLike_Deploy:
       - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
       - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
       - cp docker-compose.yml /etc/mazelike
-      - docker-compose up -f /etc/mazelike/docker-compose.yml -d
+      - docker-compose -f /etc/mazelike/docker-compose.yml up -d
       - push Master "Deployed version $VERSION"
   only:
     - master
