@@ -15,6 +15,7 @@ Mazelike_Build:
 MazeLike_Tests:
   stage: test
   script:
+   - mkdir runner-result
    - docker-compose up -d
    - node scripts/test-stopper.js || (docker-compose down --rmi all && exit 1)
 
