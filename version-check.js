@@ -8,6 +8,7 @@ try {
   image = execSync("docker inspect mazelike --format \"{{.Config.Image}}\"").toString();
 } catch(err) {
   console.log(`Docker error: ${err.message}`);
+  process.exit(0);
 }
 
 let oldVersion = image.match(/(\d+)\.(\d+)\.(\d+)/);
