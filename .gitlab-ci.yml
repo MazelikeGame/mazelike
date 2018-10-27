@@ -24,7 +24,7 @@ MazeLike_Deploy:
   script:
       # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
       - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
-      - node scripts/version-check.js
+      # - node scripts/version-check.js
       - docker-compose -f /etc/mazelike/docker-compose.yml down || echo "No compose file"
       - docker kill $(docker ps -f label=edu.iastate.ryanr=mazelike- -q) || echo "No Games"
       - node scripts/gen-compose -version $VERSION -env_file -backend_port 80 -docker_cluster
