@@ -1,7 +1,6 @@
 cache:
   paths:
    - docker-compose.yml
-   - node_modules
 
 Mazelike_Build:
   stage: build
@@ -27,11 +26,13 @@ MazeLike_Deploy:
       # - node scripts/version-check.js
       - docker-compose -f /etc/mazelike/docker-compose.yml down || echo "No compose file"
       - docker kill $(docker ps -f label=edu.iastate.ryanr=mazelike- -q) || echo "No Games"
+      - rm package.json
+      - npm i handlebars --no-package-lock
       - node scripts/gen-compose -version $VERSION -env_file -backend_port 80 -docker_cluster
       - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
       - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
       - cp docker-compose.yml /etc/mazelike
-      - docker-compose up -d
+      - docker-compose up -f /etc/mazelike/docker-compose.yml -d
       - push Master "Deployed version $VERSION"
   only:
     - master
