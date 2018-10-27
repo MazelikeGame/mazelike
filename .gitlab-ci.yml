@@ -9,7 +9,7 @@ Mazelike_Build:
    - mv package.json _package.json
    - npm i handlebars --no-package-lock
    - mv _package.json package.json
-   - node scripts/gen-compose -version branch-$CI_COMMIT_REF_NAME -test -suffix -test-$CI_COMMIT_REF_NAME
+   - node scripts/gen-compose -version branch-$CI_COMMIT_REF_NAME -test -suffix _test_$CI_COMMIT_REF_NAME
    - docker-compose build
 
 MazeLike_Tests:
@@ -27,7 +27,7 @@ MazeLike_Deploy:
       - node scripts/version-check.js
       - docker-compose -f /etc/mazelike/docker-compose.yml down || echo "No compose file"
       - docker kill $(docker ps -f label=edu.iastate.ryanr=mazelike- -q) || echo "No Games"
-      - node scripts/gen-compose -version $VERSION -env_file
+      - node scripts/gen-compose -version $VERSION -env_file -backend_port 80 -docker_cluster
       - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
       - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
       - cp docker-compose.yml /etc/mazelike
