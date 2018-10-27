@@ -79,7 +79,7 @@ function makeComposeConf(opts) {
     }
   } else if(opts.test) {
     backend_env.DB_STORAGE = ":memory:";
-  } else if(opts.extern_db) {
+  } else if(!opts.extern_db) {
     backend_env.DB_STORAGE = "/data/mazelike.sqlite";
   }
 
