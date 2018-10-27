@@ -79,7 +79,7 @@ function makeComposeConf(opts) {
     }
   } else if(opts.test) {
     backend_env.DB_STORAGE = ":memory:";
-  } else {
+  } else if(opts.extern_db) {
     backend_env.DB_STORAGE = "/data/mazelike.sqlite";
   }
 
@@ -117,7 +117,8 @@ backend_port       The external port for the backend
 test               Include the test container
 sql                Include and use a mysql container
 docker_cluster     Use the docker cluster manager
--e*                Custom backend env config`);
+-e*                Custom backend env config
+extern_db          Don't fallback on sqlite`);
   process.exit(0);
 }
 
