@@ -47,10 +47,14 @@ function makeComposeConf(opts) {
 
   config.volumes = config.backend_volume || config.docker_sock;
 
-  let backend_env = opts.backend_env;
+  let backend_env = {};
   let sql_env = {
     MYSQL_DATABASE: "mazelike"
   };
+
+  if(config.prefix) {
+    backend_env.CONTAINER_PREFIX = config.prefix;
+  }
 
   if(config.docker_sock) {
     backend_env.CLUSTER_MANAGER = "docker";
@@ -79,6 +83,7 @@ function makeComposeConf(opts) {
     backend_env.DB_STORAGE = "/data/mazelike.sqlite";
   }
 
+  Object.assign(backend_env, opts.backend_env);
   config.backend_env = makeEnv(backend_env);
   config.sql_env = makeEnv(sql_env);
 
