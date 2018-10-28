@@ -1,4 +1,5 @@
 /* global PIXI  */
+/* global io */
 /* eslint-disable complexity */
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
@@ -10,6 +11,11 @@ let gameId = gameIdMatch && gameIdMatch[1];
 let app = new PIXI.Application({
   antialias: true
 });
+
+let sock = io(location.origin);
+
+sock.emit("hello");
+
 
 document.body.appendChild(app.view);
 

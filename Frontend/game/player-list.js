@@ -10,7 +10,7 @@ export default class PlayerList {
    * Renders the player list.
    */
   render() {
-    let count = 0;
+    let count = 0; //Fix this and just get index from foreach
     this.listOfPlayers.forEach((player) => {
       this.drawPlayerInfo(count, player, 10);
       count++;
@@ -34,7 +34,8 @@ export default class PlayerList {
   drawPlayerInfo(id, playerName, playerHP) {  
     let offset = 40; //Space between each player information box.
 
-    var outline = new PIXI.Graphics();
+    //Black background
+    let outline = new PIXI.Graphics();
     outline.beginFill(0x000000);
     outline.fillAlpha = 0.75;
     outline.lineStyle(2, 0xFFFFFFF, 1);
@@ -48,38 +49,38 @@ export default class PlayerList {
       fontSize: 16
     });
     
-    //PLAYER NAME
+    //Player name
     let player = new PIXI.Text(this.checkNameLength(playerName), this._playerNameStyle);
     player.position.set(35, 15 + (id * offset)); //eslint-disable-line
     this.graphics.addChild(player);
 
-    //HP RED
-    var health2 = new PIXI.Graphics();
-    health2.beginFill(0xFF0000);
-    health2.drawRect(0, 0, 100, 10);
-    health2.position.set(200, 15 + (id * offset)); //eslint-disable-line
-    health2.endFill();
+    //Health bar red
+    let healthRedBar = new PIXI.Graphics();
+    healthRedBar.beginFill(0xFF0000);
+    healthRedBar.drawRect(0, 0, 100, 10);
+    healthRedBar.position.set(200, 15 + (id * offset)); //eslint-disable-line
+    healthRedBar.endFill();
 
-    this.graphics.addChild(health2);
+    this.graphics.addChild(healthRedBar);
 
-    //HP GREEN
-    var health = new PIXI.Graphics();
-    health.beginFill(0x7CFC00);
-    health.drawRect(0, 0, playerHP, 10);
-    health.position.set(200, 15 + (id * offset));//eslint-disable-line
-    health.endFill();
+    //Health bar green
+    let healthGreenBar = new PIXI.Graphics();
+    healthGreenBar.beginFill(0x7CFC00);
+    healthGreenBar.drawRect(0, 0, playerHP, 10);
+    healthGreenBar.position.set(200, 15 + (id * offset));//eslint-disable-line
+    healthGreenBar.endFill();
 
-    this.graphics.addChild(health);
+    this.graphics.addChild(healthGreenBar);
 
-    //HP TEXT
+    //Health Text (Health: 100)
     this._hpTextStyle = new PIXI.TextStyle({
       fill: "#FFFFFF",
       fontSize: 12
     });
 
-    let HP_TEXT = new PIXI.Text("Health: " + playerHP, this._hpTextStyle); //eslint-disable-line
-    HP_TEXT.position.set(200, 25 + (id * offset)); //eslint-disable-line
-    this.graphics.addChild(HP_TEXT);
+    let healthText = new PIXI.Text("Health: " + playerHP, this._hpTextStyle); //eslint-disable-line
+    healthText.position.set(200, 25 + (id * offset)); //eslint-disable-line
+    this.graphics.addChild(healthText);
   }
 
   /**
@@ -87,7 +88,7 @@ export default class PlayerList {
    * @param {string} playerName 
    */
   checkNameLength(playerName) {
-    if(playerName.length > 18) {
+    if(playerName.length >= 18) {
       playerName = playerName.substring(0, 18) + "..."; //eslint-disable-line
     }
 

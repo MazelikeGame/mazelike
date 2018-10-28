@@ -80,10 +80,14 @@ let nextId = 0;
 io.on("connection", (client) => {
   const id = ++nextId;
   let gameId;
-
+  console.log("CONNECTED");
   client.once("ready", (_gameId) => {
     gameId = _gameId;
     client.emit("id", id);
+  });
+
+  client.on("hello", (test) => {
+    console.log("Hello World");
   });
 
   client.on("position", (pos) => {
