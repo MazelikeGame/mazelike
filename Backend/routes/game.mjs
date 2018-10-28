@@ -104,13 +104,13 @@ gameRouter.get("/lobby/:id", async(req, res) => {
     return player.id;
   });
 
-  let playerImages = await sql.query(`SELECT image_name, username FROM users WHERE username IN (:usernames)`, { 
+  let playerImages = await sql.query(`SELECT image_name, username FROM users WHERE username IN (:usernames)`, {
     replacements: {
       usernames: usernames
-    }, 
-    type: sql.QueryTypes.SELECT 
+    },
+    type: sql.QueryTypes.SELECT
   });
- 
+
   playerImages.forEach((image) => {
     players.forEach((player) => {
       if(player.id === image.username) {
@@ -278,7 +278,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
       id: req.params.id,
       player: req.params.player
     });
-
+    // TODO: Modify Player table here
     res.end("Player removed");
   }
 
@@ -300,18 +300,20 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
   });
 
   if(lobby && lobby.isHost) {
-    await Lobby.destroy({
-      where: {
-        lobbyId: req.params.id
-      }
-    });
 
     // Create game here (TODO)
     let floor = Floor.generate({
       gameId: req.params.id,
       floorIdx: 0
     });
-    
+
+    // Could destroy lobby affter floor is generated
+    await Lobby.destroy({ // don't destroy if using for player table
+      where: {
+        lobbyId: req.params.id
+      }
+    });
+
     try {
       await mkdir("Frontend/public/maps");
     } catch(err) {
