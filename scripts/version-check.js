@@ -12,10 +12,11 @@ try {
 }
 
 let oldVersion = image.match(/(\d+)\.(\d+)\.(\d+)/);
-let version = require("../package.json").version.match(/(\d+)\.(\d+)\.(\d+)/);
+let versionStr = require("../package.json").version;
+let version = versionStr.match(/(\d+)\.(\d+)\.(\d+)/);
 
 if(!oldVersion || !version) {
-  throw new Error("Failed to parse version");
+  throw new Error(`Failed to parse version (${oldVersion ? versionStr : image})`);
 }
 
 let isNewer = 
