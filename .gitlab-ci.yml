@@ -1,3 +1,4 @@
+# Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
 cache:
   paths:
    - docker-compose.yml
@@ -5,30 +6,22 @@ cache:
 Mazelike_Build:
   stage: build
   script:
-   - mv package.json _package.json
-   - npm i handlebars --no-package-lock
-   - mv _package.json package.json
-   - node scripts/gen-compose -version branch-$CI_COMMIT_REF_NAME -test -suffix _test_$CI_COMMIT_REF_NAME
+   - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
    - docker-compose build
 
 MazeLike_Tests:
   stage: test
   script:
-   - mkdir runner-result
+   - touch runner-result
    - docker-compose up -d
    - node scripts/test-stopper.js || (docker-compose down --rmi all && exit 1)
 
 MazeLike_Deploy:
   stage: deploy
   script:
-      # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
       - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
       # - node scripts/version-check.js
-      - rm package.json
-      - npm i handlebars --no-package-lock
-      - node scripts/gen-compose -version $VERSION -env_file -backend_port 80 -docker_cluster -extern_db
       - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
-      - cp docker-compose.yml /etc/mazelike/versions/docker-compose.$VERSION.yml
       - deploy $VERSION
       - push Master "Deployed version $VERSION"
   only:
