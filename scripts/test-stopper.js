@@ -16,7 +16,7 @@ if(process.argv.length > 2) {
   logArgs.push(process.argv[2]);
 }
 
-child_process.spawn("docker-compose", logArgs, {
+let logs = child_process.spawn("docker-compose", logArgs, {
   stdio: ["ignore", "inherit", "inherit"]
 });
 
@@ -27,21 +27,12 @@ let timer;
 fs.watch("runner-result", () => {
   clearTimeout(timer);
   timer = setTimeout(() => {
-    quit();
+    let status = +fs.readFileSync("runner-result", "utf8");
+
+    logs.kill();
+    dockerComposeDown();
+    fs.unlinkSync("runner-result");
+
+    process.exit(status);
   }, 500);
 });
-
-quit();
-
-function quit() {
-  let status = +fs.readFileSync("runner-result", "utf8");
-
-  if(isNaN(status)) {
-    return;
-  }
-
-  dockerComposeDown();
-  fs.unlinkSync("runner-result");
-
-  process.exit(status);
-}
