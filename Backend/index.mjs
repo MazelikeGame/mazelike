@@ -86,7 +86,7 @@ io.on("connection", (client) => {
   client.once("ready", (_gameId) => {
     gameId = _gameId;
     client.emit("id", id);
-    console.log("TESTING:" + gameId);
+    client.emit("player-list", playerList.get(gameId));
   });
 
   client.on("setup-playerlist", (gameId, username) => {

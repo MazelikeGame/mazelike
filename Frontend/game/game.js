@@ -14,9 +14,6 @@ let app = new PIXI.Application({
 
 let sock = io(location.origin);
 
-sock.emit("ready", gameId);
-
-
 document.body.appendChild(app.view);
 
 // make the game fill the window
@@ -56,8 +53,9 @@ const addArrowKeyListener = (floor) => {
 };
 
 async function setup() {
+  sock.emit("ready", gameId);
+  
   let floor;
-
   if(gameId) {
     floor = await Floor.load(gameId, 0);
   } else {
@@ -76,8 +74,11 @@ async function setup() {
     app.stage.addChild(fps.sprite);
   }
 
-  let playerList = new PlayerList(["Csurfus", "Testing", "HelloWorldTestTestttt", "fgdgdgdgf"]);
-  app.stage.addChild(playerList.render());
+  sock.on("player-list", (players) => {
+    console.log(players);
+    let playerList = new PlayerList([players]);
+    app.stage.addChild(playerList.render());
+  });
 
   window.ml.floor = floor;
   addArrowKeyListener(floor);
