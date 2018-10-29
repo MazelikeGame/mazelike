@@ -2,6 +2,7 @@ import socketIO from "socket.io";
 import http from "http";
 import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
+import initAuth from "./game-auth.mjs";
 
 async function main() {
   // Parse the env vars
@@ -33,9 +34,13 @@ async function main() {
     }
   });
 
-  let io = socketIO(httpd); 
+  let io = socketIO(httpd);
+
+  initAuth(io);
 
   io.on("connection", (sock) => {
+    sock.emit("set-username", sock.user.username);
+
     saveHandler(sock, floor);
   });
 }
