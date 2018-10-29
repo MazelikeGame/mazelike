@@ -36,11 +36,9 @@ function makeComposeConf(opts) {
     suffix: opts.suffix || "",
     version: opts.version,
     env_file: opts.env_file,
-    env_path: opts.env_file === true ? "" : opts.env_file,
     backend_port: opts.backend_port,
     backend_volume: !opts.test,
     test: opts.test,
-    sql: opts.sql,
     def_vol: !opts.test || opts.sql,
     docker_sock: opts.docker_cluster
   };
@@ -60,24 +58,7 @@ function makeComposeConf(opts) {
     backend_env.CLUSTER_MANAGER = "docker";
   }
 
-  // use sql as the database
-  if(opts.sql) {
-    backend_env = {
-      DB_HOST: "sql",
-      DB_PORT: 3306,
-      DB_USER: "root",
-      DB_DATABASE: "mazelike"
-    };
-
-    // configure a random password if no env file is given
-    if(!opts.env_file) {
-      // NOTE: Password is weak it will only slightly deter/slow down hackers
-      // use an env file for security critical applications
-      let password = Math.floor(Math.random() * 10 ** 10).toString(16);
-      backend_env.DB_PASS = password;
-      sql_env.MYSQL_ROOT_PASSWORD = password;
-    }
-  } else if(opts.test) {
+  if(opts.test) {
     backend_env.DB_STORAGE = ":memory:";
   } else if(!opts.extern_db) {
     backend_env.DB_STORAGE = "/data/mazelike.sqlite";
@@ -112,10 +93,9 @@ if(opts.help) {
 
 suffix             The suffix to add to all containers, volumes, and networks
 version            The version for the images
-env_file           Use env files (also can be the path for the env files)
+env_file           Use env file
 backend_port       The external port for the backend
 test               Include the test container
-sql                Include and use a mysql container
 docker_cluster     Use the docker cluster manager
 -e*                Custom backend env config
 extern_db          Don't fallback on sqlite`);

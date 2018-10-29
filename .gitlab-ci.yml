@@ -28,7 +28,7 @@ MazeLike_Deploy:
       - npm i handlebars --no-package-lock
       - node scripts/gen-compose -version $VERSION -env_file -backend_port 80 -docker_cluster -extern_db
       - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
-      - cp docker-compose.yml /etc/mazelike/docker-compose.$VERSION.yml
+      - cp docker-compose.yml /etc/mazelike/versions/docker-compose.$VERSION.yml
       - deploy $VERSION
       - push Master "Deployed version $VERSION"
   only:

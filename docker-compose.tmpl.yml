@@ -6,7 +6,7 @@ services:
     build:
       context: .
     {{#if env_file}}
-    env_file: {{{env_path}}}backend.env
+    env_file: .env
     {{/if}}
     {{#if backend_env}}
     environment:
@@ -52,26 +52,6 @@ services:
         source: ./runner-result
         target: /app/runner-result
   {{/if}}
-  {{#if sql}}
-
-  sql:
-    image: mysql:5.7
-    networks:
-     - mazelike{{{suffix}}}
-    {{#if env_file}}
-    env_file: {{{env_path}}}sql.env
-    {{/if}}
-    {{#if sql_env}}
-    environment:
-      {{{sql_env}}}
-    {{/if}}
-    expose:
-     - 3306
-    volumes:
-      - type: "volume"
-        source: sql{{{suffix}}}
-        target: /var/lib/mysql
-  {{/if}}
 
 networks:
   mazelike{{{suffix}}}:
@@ -80,7 +60,4 @@ volumes:
 {{/if}}
 {{#if backend_volume}}
   backend{{{suffix}}}:
-{{/if}}
-{{#if sql}}
-  sql{{{suffix}}}:
 {{/if}}
