@@ -5,7 +5,7 @@ const {execSync} = require("child_process");
 let image;
 
 try {
-  image = execSync("docker inspect mazelike --format \"{{.Config.Image}}\"").toString();
+  image = execSync(`docker exec mazelike node -e 'console.log(require("./package.json").version)'`).toString();
 } catch(err) {
   console.log(`Docker error: ${err.message}`);
   process.exit(0);
