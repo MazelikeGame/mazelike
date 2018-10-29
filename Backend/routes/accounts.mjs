@@ -55,19 +55,20 @@ accountRouter.get('/create', function(req, res) {
   }
 });
 
-accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), function(req, res) {
-  var userModel = new User(sql);
+accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), async(req, res) => {
 
-  userModel.username = req.body.username;
-  userModel.email = req.body.email;
+  let image_name = null;
   try {
-    userModel.image_name = req.files.avatar[0].filename;
+    image_name = req.files.avatar[0].filename;
   } catch(e) {
-    userModel.image_name = null;
+    image_name = null;
   }
 
-  userModel.sync().then(() => {
-    userModel.findOne({
+  let username = req.body.username;
+  let email = req.body.email;
+
+  User.sync().then(() => {
+    User.findOne({
       where: {
         [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
       }
@@ -80,12 +81,12 @@ accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), f
             ""
         });
       } else {
-        userModel.encryptPassword(req.body.password, (err, hash) => {
-          userModel.create({
-            username: userModel.username,
-            email: userModel.email,
+        User.encryptPassword(req.body.password, (err, hash) => {
+          User.create({
+            username: username,
+            email: email,
             password: hash,
-            image_name: userModel.image_name
+            image_name: image_name
           });
           res.loginRedirect(req.query.returnUrl || "");
         });
@@ -111,8 +112,6 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
     return;
   }
 
-  var userModel = new User(sql);
-
   var argument, file_name;
   var changing_avatar = false;
   try {
@@ -124,7 +123,7 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
   }
 
   if (argument && req.session.username !== undefined) {
-    userModel.encryptPassword(req.body.password, (err, hash) => {
+    User.encryptPassword(req.body.password, (err, hash) => {
       let values = {};
       req.body.email && (values.email = req.body.email); // eslint-disable-line
       req.body.password && (values.password = hash); // eslint-disable-line
@@ -136,7 +135,7 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
       let selector = {
         where: { username: req.session.username }
       };
-      userModel.update(values, selector).then(function(result) {
+      User.update(values, selector).then(function(result) {
         if(result) {
           res.redirect('dashboard');
         } else {
@@ -179,15 +178,13 @@ accountRouter.get('/login', function(req, res) {
 });
 
 accountRouter.post('/login', function(req, res) {
-  var userModel = new User(sql); //make username, email, password properties in the user model.
-
-  userModel.findOne({
+  User.findOne({
     where: {
       username: req.body.username
     }
   }).then(function(user) {
     if(user) {
-      userModel.comparePassword(req.body.password, user.password, (err, result) => {
+      User.comparePassword(req.body.password, user.password, (err, result) => {
         if(result) {
           req.session.authenticated = true;
           req.session.username = user.username;
@@ -234,10 +231,9 @@ accountRouter.get('/forgot-password', function(req, res) {
 });
 
 accountRouter.post('/forgot-password', async(req, res) => {
-  var userModel = new User(sql);
   const buf = crypto.randomBytes(20);
   var token = buf.toString('hex');
-  let user = await userModel.findOne({
+  let user = await User.findOne({
     where: {
       username: req.body.username
     }
@@ -282,8 +278,7 @@ accountRouter.post('/forgot-password', async(req, res) => {
 });
 
 accountRouter.get('/reset/:token', async(req, res) => {
-  var userModel = new User(sql);
-  let user = await userModel.findOne({
+  let user = await User.findOne({
     where: {
       resetPasswordToken: req.params.token
     }
@@ -300,8 +295,7 @@ accountRouter.get('/reset/:token', async(req, res) => {
 });
 
 accountRouter.post('/reset/:token', async(req, res) => {
-  var userModel = new User(sql);
-  let user = await userModel.findOne({
+  let user = await User.findOne({
     where: {
       resetPasswordToken: req.params.token
     }
@@ -311,7 +305,7 @@ accountRouter.post('/reset/:token', async(req, res) => {
       tokenError: 'Reset token is invalid'
     });
   }
-  userModel.encryptPassword(req.body.password, (err, hash) => {
+  User.encryptPassword(req.body.password, (err, hash) => {
     let values = {
       password: hash
     };
@@ -320,7 +314,7 @@ accountRouter.post('/reset/:token', async(req, res) => {
         username: user.username
       }
     };
-    userModel.update(values, selector).then((result) => {
+    User.update(values, selector).then((result) => {
       if(result) {
         res.render('reset_password', {
           successfulReset: 'Password reset was successful for user '.concat(user.username)

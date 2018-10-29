@@ -1,5 +1,6 @@
 import Sequelize from "sequelize";
 import sql from "../sequelize";
+import Player from './player';
 
 let Lobby = sql.define("lobbies", {
   lobbyId: {
@@ -12,7 +13,6 @@ let Lobby = sql.define("lobbies", {
   },
   playerId: {
     type: Sequelize.STRING,
-    allowNull: false
   },
   secret: {
     type: Sequelize.STRING,
@@ -21,7 +21,10 @@ let Lobby = sql.define("lobbies", {
   inProgress: {
     type: Sequelize.BOOLEAN,
     defaultValue: false
-  }
+  },
 });
+
+Lobby.hasOne(Player, { foreignKey: 'player' });
+
 
 export default Lobby;

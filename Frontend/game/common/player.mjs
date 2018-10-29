@@ -14,13 +14,14 @@ export default class Player {
    * @param {int} hp - The player's hitpoints
    * @param {object} spawn - Contains the spawn coordinates { x: int, y: int }.
    */
-  constructor(name, hp, spawn) {
+  constructor(name, hp, spawn, sprite) {
     this.name = name;
     this.hp = hp;
     this.xPos = spawn.x;
     this.yPos = spawn.y;
     this.vx = 0;
     this.vy = 0;
+    this.sprite = sprite;
   }
 
   /**
@@ -56,7 +57,7 @@ export default class Player {
   }
 
   /**
-   * Modify the player's velocity.
+   * Update the player's velocity from key input.
    * @param {int(s)} User's keyboard input
    */
   keyPress(input) {

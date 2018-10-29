@@ -4,6 +4,8 @@ import express from "express";
 import crypto from "crypto";
 import util from "util";
 import Lobby from "../models/lobby";
+import Player from '../models/player';
+import User from '../models/user';
 import sql from "../sequelize";
 import path from "path";
 import fs from "fs";
@@ -167,11 +169,21 @@ export const joinRoute = async(req, res) => {
     return;
   }
 
-  await Lobby.create({
+  let newPlayer = await Player.create({
+    spriteName: 'test'
+  });
+  let user = await User.findOne({
+    where: {
+      username: req.user.username
+    }
+  });
+  await newPlayer.setUser(user);
+  let newLobby = await Lobby.create({
     lobbyId: lobby.lobbyId,
     secret: lobby.secret,
     playerId: req.user.username
   });
+  await newLobby.setPlayer(newPlayer);
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
@@ -204,12 +216,22 @@ gameRouter.get("/new", async(req, res) => {
   let id = await genId(ID_LENGTH);
   let secret = await genId(SECRET_LENGTH);
 
-  await Lobby.create({
+  let newPlayer = await Player.create({
+    spriteName: 'test'
+  });
+  let user = await User.findOne({
+    where: {
+      username: req.user.username
+    }
+  });
+  newPlayer.setUser(user);
+  let newLobby = await Lobby.create({
     secret,
     lobbyId: id,
     playerId: req.user.username,
     isHost: true
   });
+  await newLobby.setPlayer(newPlayer);
 
   res.redirect(`/game/lobby/${id}`);
 });
@@ -280,7 +302,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
       id: req.params.id,
       player: req.params.player
     });
-    // TODO: Modify Player table here
+    // TODO: Modify Lobby table here
     res.end("Player removed");
   }
 
@@ -302,26 +324,11 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
   });
 
   if(lobby && lobby.isHost) {
-
-    // Create game here (TODO)
-    let floor = Floor.generate({
-      gameId: req.params.id,
-      floorIdx: 0
-    });
-
-    // Could destroy lobby affter floor is generated
-    await Lobby.destroy({ // don't destroy if using for player table
-      where: {
-        lobbyId: req.params.id
-      }
-    });
-
     try {
       await mkdir("Frontend/public/maps");
     } catch(err) {
       // pass
     }
-
     // Generate the game
     await Floor.generate({
       gameId: req.params.id,
@@ -332,9 +339,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       await spawnGame({
         gameId: req.params.id
       });
-
       io.emit("lobby-start", req.params.id);
-
       res.end("Game started");
     } catch(err) {
       process.stderr.write(`Error starting game: ${err.message}\n`);

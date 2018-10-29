@@ -1,8 +1,6 @@
-import userFn from "../models/user";
-import sql from "../sequelize";
+import User from "../models/user";
 import qs from "querystring";
 
-let User = userFn(sql);
 
 // Get the user model for the current user
 export default async function userMiddleware(req, res, next) {
@@ -16,7 +14,7 @@ export default async function userMiddleware(req, res, next) {
 
   /**
    * Redirect the user to /account/login if they are not logged in
-   * 
+   *
    * Usage:
    * if(res.loginRedirect()) {
    *  return;
@@ -33,6 +31,6 @@ export default async function userMiddleware(req, res, next) {
 
     return false;
   };
-  
+
   next();
 }
