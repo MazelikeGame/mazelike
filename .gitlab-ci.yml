@@ -1,20 +1,17 @@
 # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-cache:
-  paths:
-   - docker-compose.yml
-
 Mazelike_Build:
   stage: build
   script:
-   - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-   - docker-compose build
+    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - docker-compose build
 
 MazeLike_Tests:
   stage: test
   script:
-   - touch runner-result
-   - docker-compose up -d
-   - node scripts/test-stopper.js || (docker-compose down --rmi all && exit 1)
+    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - touch runner-result
+    - docker-compose up -d
+    - node scripts/test-stopper.js || (docker-compose down --rmi all && exit 1)
 
 MazeLike_Deploy:
   stage: deploy
