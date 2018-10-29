@@ -8,9 +8,6 @@ Mazelike_Build:
 Mazelike_Eslint:
   stage: test
   script:
-    - mv package.json _package.json
-    - npm install eslint@^5.5.0
-    - mv _package.json package.json
     - npm run eslint
 
 MazeLike_Backend_Tests:
