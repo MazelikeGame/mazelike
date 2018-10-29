@@ -10,20 +10,11 @@ export default class PlayerList {
    * Renders the player list.
    */
   render() {
-    let count = 0; //Fix this and just get index from foreach
-    this.listOfPlayers.forEach((player) => {
-      this.drawPlayerInfo(count, player, 10);
-      count++;
+    this.listOfPlayers.forEach((player, index) => {
+      this.drawPlayerInfo(index, player, 75);
     });
 
     return this.graphics;
-  }
-
-  /**
-   * Updates the player list with new player information.
-   */
-  update() {
-
   }
 
   /**
