@@ -1,9 +1,16 @@
-# Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
+stages:
+  - build
+  - test
+  - cleanup
+  - deploy
+
+
 Mazelike_Build:
   stage: build
   script:
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - docker-compose build
+    - docker-compose up -d backend
 
 Mazelike_Eslint:
   stage: test
@@ -16,15 +23,22 @@ MazeLike_Backend_Tests:
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - touch runner-result
     - docker-compose up -d
-    - node scripts/test-stopper.js || (docker-compose down --rmi all && exit 1)
+    - node scripts/test-stopper.js
 
 MazeLike_Browser_Tests:
   stage: test
   script:
+    # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
     - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests/ -i docker-compose.yml
     - touch runner-result
     - docker-compose up -d
-    - node scripts/test-stopper.js || (docker-compose down --rmi all && exit 1)
+    - node scripts/test-stopper.js
+
+Mazelike_Cleanup:
+  stage: cleanup
+  when: always
+  script:
+    - docker-compose down
 
 MazeLike_Deploy:
   stage: deploy
@@ -36,3 +50,4 @@ MazeLike_Deploy:
       - push Master "Deployed version $VERSION"
   only:
     - master
+    - ryanr_docker

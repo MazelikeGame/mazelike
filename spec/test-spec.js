@@ -17,7 +17,7 @@ describe('Create route tests', () => {
   it('Can visit /create', (done) => {
     request.get(create_url, function(err, response, body) {
       try {
-        assert.equal(response.statusCode, 200);
+        assert.equal(response.statusCode, 20);
       } catch(e) {
         done(e);
       }
