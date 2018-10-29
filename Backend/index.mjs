@@ -89,9 +89,8 @@ io.on("connection", (client) => {
     client.emit("player-list", playerList.get(gameId));
   });
 
-  client.on("setup-playerlist", (gameId, username) => {
-    playerList.set(gameId, username);
-    console.log(gameId + ": " + username);
+  client.on("setup-playerlist", (_gameId, usernames) => {
+    playerList.set(_gameId, usernames);
   });
 
   client.on("position", (pos) => {

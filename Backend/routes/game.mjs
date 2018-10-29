@@ -300,6 +300,24 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
   });
 
   if(lobby && lobby.isHost) {
+
+    let lobbyResults = await Lobby.findAll({
+      where: {
+        lobbyId: req.params.id
+      }
+    });
+
+    let players = lobbyResults.map((row) => {
+      return {
+        id: row.playerId,
+        isHost: row.isHost
+      };
+    });
+  
+    let usernames = players.map((player) => {
+      return player.id;
+    });
+
     await Lobby.destroy({
       where: {
         lobbyId: req.params.id
@@ -320,7 +338,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
 
     await floor.save();
 
-    io.emit("lobby-start", req.params.id, req.user.username);
+    io.emit("lobby-start", req.params.id, usernames);
 
     res.end("Game started");
     return;

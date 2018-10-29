@@ -54,7 +54,7 @@ const addArrowKeyListener = (floor) => {
 
 async function setup() {
   sock.emit("ready", gameId);
-  
+
   let floor;
   if(gameId) {
     floor = await Floor.load(gameId, 0);
@@ -76,7 +76,7 @@ async function setup() {
 
   sock.on("player-list", (players) => {
     console.log(players);
-    let playerList = new PlayerList([players]);
+    let playerList = new PlayerList(players);
     app.stage.addChild(playerList.render());
   });
 

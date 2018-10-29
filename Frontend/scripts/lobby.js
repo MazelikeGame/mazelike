@@ -97,9 +97,9 @@ sock.on("lobby-delete", (id) => {
 });
 
 // Go to the game page
-sock.on("lobby-start", (id, username) => {
+sock.on("lobby-start", (id, usernames) => {
 
-  sock.emit("setup-playerlist", id, username);
+  sock.emit("setup-playerlist", id, usernames);
 
   if(id === hydrate.id) {
     location.href = `/game/${id}`;
