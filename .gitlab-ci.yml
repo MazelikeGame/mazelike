@@ -4,7 +4,6 @@ stages:
   - cleanup
   - deploy
 
-
 Mazelike_Build:
   stage: build
   script:
@@ -46,7 +45,8 @@ MazeLike_Deploy:
       - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
       - node scripts/version-check.js
       - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
-      - deploy $VERSION
+      - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
+      - deploy latest
       - push Master "Deployed version $VERSION"
   only:
     - master
