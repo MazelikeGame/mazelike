@@ -86,6 +86,7 @@ io.on("connection", (client) => {
   client.once("ready", (_gameId) => {
     gameId = _gameId;
     client.emit("id", id);
+    console.log("TESTING:" + gameId);
   });
 
   client.on("setup-playerlist", (gameId, username) => {
@@ -102,8 +103,6 @@ io.on("connection", (client) => {
       io.emit("remove", {id, gameId});
     }
   });
-
-  console.log(playerList);
 });
 
 const sleep = (ms) => {
