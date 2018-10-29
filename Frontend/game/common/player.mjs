@@ -19,6 +19,8 @@ export default class Player {
     this.hp = hp;
     this.xPos = spawn.x;
     this.yPos = spawn.y;
+    this.vx = 0;
+    this.vy = 0;
   }
 
   /**
@@ -43,5 +45,55 @@ export default class Player {
    */
   getHp() {
     return this.hp;
+  }
+
+  /**
+   * Get the velocity of the player
+   * @return {object} { vx: int, vy: int }
+   */
+  getVelocity() {
+    return { vx: this.vx, vy: this.vy };
+  }
+
+  /**
+   * Modify the player's velocity.
+   * @param {int(s)} User's keyboard input
+   */
+  keyPress(input) {
+    let keyCodes = {
+      up: ['38', '87'], // up and 'w'
+      right: ['39', '68'], // right and 'd'
+      down: ['40', '83'], // down and 's'
+      left: ['37', '65'] // left and 'a'
+    };
+    switch(input) {
+    case keyCodes.up:
+      this.vx = 0;
+      this.vy = -5;
+      break;
+    case keyCodes.right:
+      this.vx = 5;
+      this.vy = 0;
+      break;
+    case keyCodes.down:
+      this.vx = 0;
+      this.vy = 5;
+      break;
+    case keyCodes.left:
+      this.vx = -5;
+      this.vy = 0;
+      break;
+    default:
+      break;
+    }
+  }
+
+  /**
+   * Modify player's velocity on key release
+   * @param {String} The name of the key released
+   */
+  keyRelease() {
+    this.vx = 0;
+    this.vy = 0;
   }
 }
