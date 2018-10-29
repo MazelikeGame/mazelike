@@ -27,6 +27,9 @@ services:
       - type: bind
         source: ./runner-result
         target: /app/runner-result
+      - type: bind
+        source: ./scripts
+        target: /app/scripts
 
 networks:
   mazelike_testing:

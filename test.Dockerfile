@@ -28,9 +28,8 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
-RUN npm install
+RUN npm install puppeteer@^1.9.0
 
 COPY . .
 
-RUN chmod +x scripts/test-inner.sh
-CMD ["/bin/bash", "/app/scripts/test-inner.sh"]
+CMD ["/bin/bash", "-c", "node scripts/browser-ci; echo $? > /app/runner-result"]
