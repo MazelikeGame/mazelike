@@ -4,19 +4,19 @@ stages:
   - cleanup
   - deploy
 
-Mazelike_Build:
+Build:
   stage: build
   script:
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - docker-compose build
     - docker-compose up -d backend
 
-Mazelike_Eslint:
+Eslint:
   stage: test
   script:
     - npm run eslint
 
-MazeLike_Backend_Tests:
+Backend_Tests:
   stage: test
   script:
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
@@ -24,7 +24,7 @@ MazeLike_Backend_Tests:
     - docker-compose up -d
     - node scripts/test-stopper.js
 
-MazeLike_Browser_Tests:
+Browser_Tests:
   stage: test
   script:
     # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
@@ -33,19 +33,19 @@ MazeLike_Browser_Tests:
     - docker-compose up -d
     - node scripts/test-stopper.js
 
-Mazelike_Version_Change:
+Version_Change:
   stage: test
   allow_failure: true
   script:
     - node scripts/version-check.js
 
-Mazelike_Cleanup:
+Cleanup:
   stage: cleanup
   when: always
   script:
     - docker-compose down
 
-MazeLike_Deploy:
+Deploy:
   stage: deploy
   script:
       - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
