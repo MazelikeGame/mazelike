@@ -320,10 +320,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
 
     await floor.save();
 
-    io.emit("lobby-start", req.params.id);
-
-    //Send player information here
-    //Store the gameID and players in a hashmap on the index.mjs socket server.
+    io.emit("lobby-start", req.params.id, req.user.username);
 
     res.end("Game started");
     return;

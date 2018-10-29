@@ -14,7 +14,7 @@ let app = new PIXI.Application({
 
 let sock = io(location.origin);
 
-sock.emit("hello");
+//sock.emit("setup-game", gameId);
 
 
 document.body.appendChild(app.view);

@@ -77,17 +77,20 @@ app.use(expressWinston.errorLogger({
 
 let nextId = 0;
 
+let playerList = new Map(); //Lists of players
+
 io.on("connection", (client) => {
   const id = ++nextId;
   let gameId;
-  console.log("CONNECTED");
+
   client.once("ready", (_gameId) => {
     gameId = _gameId;
     client.emit("id", id);
   });
 
-  client.on("hello", (test) => {
-    console.log("Hello World");
+  client.on("setup-playerlist", (gameId, username) => {
+    playerList.set(gameId, username);
+    console.log(gameId + ": " + username);
   });
 
   client.on("position", (pos) => {
@@ -99,6 +102,8 @@ io.on("connection", (client) => {
       io.emit("remove", {id, gameId});
     }
   });
+
+  console.log(playerList);
 });
 
 const sleep = (ms) => {
