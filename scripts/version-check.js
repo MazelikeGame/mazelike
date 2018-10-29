@@ -24,6 +24,6 @@ let isNewer =
   (+oldVersion[2] === +version[2] && +oldVersion[2] === +version[2] && +oldVersion[3] < +version[3]); // new patch
 
 if(!isNewer) {
-  console.log(`Version ${oldVersion[0]} is not newer than ${version[0]}`);
+  console.log(`Version ${version[0]} is not newer than ${oldVersion[0]}`);
   process.exit(1);
 }
