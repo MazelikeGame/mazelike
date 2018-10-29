@@ -3,7 +3,7 @@ const fs = require("fs");
 
 function dockerComposeDown() {
   try {
-    child_process.execSync("docker-compose down tests");
+    child_process.execSync("docker-compose stop tests");
   } catch(err) {
     // Do nothing
   }
