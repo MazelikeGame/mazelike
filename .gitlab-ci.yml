@@ -33,6 +33,12 @@ MazeLike_Browser_Tests:
     - docker-compose up -d
     - node scripts/test-stopper.js
 
+Mazelike_Version_Change:
+  stage: test
+  allow_failure: true
+  script:
+    - node scripts/version-check.js
+
 Mazelike_Cleanup:
   stage: cleanup
   when: always
