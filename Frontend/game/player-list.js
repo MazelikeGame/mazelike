@@ -11,7 +11,7 @@ export default class PlayerList {
    */
   render() {
     this.listOfPlayers.forEach((player, index) => {
-      this.drawPlayerInfo(index, player, 75);
+      this.drawPlayerInfo(index, player, 100); //In the future change the health here.
     });
 
     return this.graphics;
