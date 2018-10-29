@@ -4,6 +4,7 @@ stages:
   - cleanup
   - deploy
 
+
 Mazelike_Build:
   stage: build
   script:
@@ -28,9 +29,9 @@ MazeLike_Browser_Tests:
   stage: test
   script:
     # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-    - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests/ > docker-compose.tmp.yml
+    - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests/ -i docker-compose.yml
     - touch runner-result
-    - docker-compose -f docker-compose.tmp.yml up -d
+    - docker-compose up -d
     - node scripts/test-stopper.js
 
 Mazelike_Cleanup:

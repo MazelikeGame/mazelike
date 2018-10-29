@@ -32,4 +32,4 @@ RUN npm install puppeteer@^1.9.0
 
 COPY . .
 
-CMD ["/bin/bash", "-c", "node scripts/browser-ci; echo $? > /app/runner-result"]
+CMD ["/bin/bash", "-c", "./node_modules/.bin/jasmine; echo $? > /app/runner-result"]
