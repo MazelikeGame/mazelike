@@ -23,4 +23,3 @@ MazeLike_Deploy:
       - push Master "Deployed version $VERSION"
   only:
     - master
-    - ryanr_docker
