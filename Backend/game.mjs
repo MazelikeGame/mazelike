@@ -4,6 +4,7 @@ import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
 import initAuth from "./game-auth.mjs";
 
+// then interval at which we update the game state (if this is too short the server will break)
 const UPDATE_INTERVAL = 250;
 
 async function main() {
@@ -55,27 +56,21 @@ async function main() {
   triggerTick(floor, io, Date.now());
 }
 
-let coolDown = 10;
-
 async function triggerTick(floor, io, lastUpdate) {
   let now = Date.now();
 
   // save and quit if we loose all the clients
   if(io.engine.clientsCount === 0) {
-    if(--coolDown === 0) {
-      await floor.save();
-      process.exit(0);
-    }
-  } else {
-    coolDown = 10;
+    await floor.save();
+    process.exit(0);
+  }
 
-    // move monsters and check for collisions
-    try {
-      await floor.tick(now - lastUpdate);
-      await floor.sendState(io);
-    } catch(err) {
-      process.stderr.write(`${err.stack}\n`);
-    }
+  // move monsters and check for collisions
+  try {
+    await floor.tick(now - lastUpdate);
+    await floor.sendState(io);
+  } catch(err) {
+    process.stderr.write(`${err.stack}\n`);
   }
 
   setTimeout(triggerTick.bind(undefined, floor, io, now), UPDATE_INTERVAL);
