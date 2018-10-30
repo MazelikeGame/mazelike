@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 import sql from '../sequelize';
 import bcrypt from 'bcrypt';
+import Player from './player';
 
 // You can call this with or without new it should work either way
 let User = sql.define('users', {
@@ -19,6 +20,8 @@ let User = sql.define('users', {
     defaultValue: null
   }
 });
+
+User.hasOne(Player, { foreignKey: 'player' });
 
 
 // add methods here as user.method = function() {};

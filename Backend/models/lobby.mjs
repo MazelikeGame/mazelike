@@ -1,6 +1,5 @@
 import Sequelize from "sequelize";
 import sql from "../sequelize";
-import Player from './player';
 
 let Lobby = sql.define("lobbies", {
   lobbyId: {
@@ -23,8 +22,5 @@ let Lobby = sql.define("lobbies", {
     defaultValue: false
   },
 });
-
-Lobby.hasOne(Player, { foreignKey: 'player' });
-
 
 export default Lobby;

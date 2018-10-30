@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import sql from '../sequelize';
-import User from './user';
+import Lobby from './lobby';
 
 let Player = sql.define('players', {
   spriteName: {
@@ -9,11 +9,7 @@ let Player = sql.define('players', {
   },
 });
 
-
-// Player.associate = function(models) {
-//   models.Player.belongsTo(models.User, { foreignKey: 'name' });
-// };
-Player.hasOne(User, { foreignKey: 'player' });
+Player.hasOne(Lobby, { foreignKey: 'lobby' });
 
 /**
  * The player model. Has one to many relationship with the User model.
