@@ -8,7 +8,8 @@ import sql from "../sequelize";
 export default class Monster extends MonsterCommon {
   
   /**
-   * Puts a monster in half of all "rooms".
+   * Puts 
+   *  monster in half of all "rooms".
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters(floor) {

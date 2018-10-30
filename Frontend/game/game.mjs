@@ -86,14 +86,32 @@ async function setup() {
 
   window.setInterval(function() { 
     for(let i = 0; i < floor.monsters.length; i++) {
-      floor.monsters[i].figureOutWhereToGo();
+      if(floor.monsters[i].type !== "blue") { // not a blue monster
+        floor.monsters[i].figureOutWhereToGo();
+      }
     }
   }, 500);
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
-      floor.monsters[i].move();
+      if(floor.monsters[i].type !== "blue") { // not a blue monster
+        floor.monsters[i].move();
+      }
     }
   }, 10);
+  window.setInterval(function() {
+    for(let i = 0; i < floor.monsters.length; i++) {
+      if(floor.monsters[i].type === "blue") { // is a blue monster
+        floor.monsters[i].figureOutWhereToGo();
+      }
+    }
+  }, 1000);
+  window.setInterval(function() {
+    for(let i = 0; i < floor.monsters.length; i++) {
+      if(floor.monsters[i].type === "blue") { // is a blue monster
+        floor.monsters[i].move();
+      }
+    }
+  }, 20);
   
   app.ticker.add(() => {
     floor.update();

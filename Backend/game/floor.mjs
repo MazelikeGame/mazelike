@@ -22,14 +22,22 @@ export default class Floor extends FloorCommon {
     return floor;
   }
 
-  /** katie
+  /**
    * Puts a monster in half of all "rooms".
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters() {
     this.monsters = [];
+    let random = 0;
     for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) { 
-      this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
+      random = Math.floor(Math.random() * 100); 
+      if(random < 15) { // 15% chance for blue demon
+        this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
+      } else if(random < 50) { // 35% chance for red demon, where 15+35 = 50
+        this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
+      } else if(random < 100) { // 50% chance for green demon, where 15+35+50 = 100
+        this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
+      }
     }
   }
 
@@ -43,7 +51,7 @@ export default class Floor extends FloorCommon {
 
     await Promise.all([
       GameMap.load(floor),
-      //floor.loadMonsters(floor) // untested todo
+      //floor.loadMonsters(floor) // untested todo @katie
     ]);
 
     return floor;
@@ -68,7 +76,7 @@ export default class Floor extends FloorCommon {
           floorId: floor.floor.floodId,
           id: i
         }
-      }); //if nothing returned, dont create monster todo
+      }); //if nothing returned, dont create monster todo @katie
       floor.monsters[i] = new Monster('sir spoopy', monsterDB.hp, 10, this, i, monsterDB.type);
       floor.monsters[i].setCoodinates(monsterDB.x, monsterDB.y);
     }

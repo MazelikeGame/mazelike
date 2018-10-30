@@ -32,14 +32,24 @@ export default class Floor extends FloorCommon {
     return floor;
   }
 
-  /** katie occurs twice, shouldnt cause errors tho
+  /**
    * Puts a monster in half of all "rooms".
+   * Occurs twice upon floor generation, shouldnt cause errors though.
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters() {
+    this.monsterSprites = new PIXI.Container();
     this.monsters = [];
+    let random = 0;
     for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) { 
-      this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
+      random = Math.floor(Math.random() * 100); 
+      if(random < 5) { // 5% chance for blue demon
+        this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
+      } else if(random < 45) { // 40% chance for red demon, where 5+40 = 45
+        this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
+      } else if(random < 100) { // 55% chance for green demon, where 5+40+55 = 100
+        this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
+      }
     }
   }
 
@@ -89,6 +99,7 @@ export default class Floor extends FloorCommon {
     for(let i = 0; i < this.monsters.length; i++) {
       this.monsters[i].createSprite();
     }
+    this.sprite.addChild(this.monsterSprites);
   }
 
   /**
@@ -102,7 +113,7 @@ export default class Floor extends FloorCommon {
       this._viewportY + innerHeight
     );
     for(let i = 0; i < this.monsters.length; i++) {
-      this.monsters[i].update(this._viewportX, this._viewportY); // katie
+      this.monsters[i].update(this._viewportX, this._viewportY);
     }
   }
 
