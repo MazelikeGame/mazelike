@@ -29,6 +29,9 @@
             <pre class="prettyprint source linenums"><code>/** @module backend/game/Floor */
 import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
+import Monster from "./monster.mjs";
+
+const MONSTER_MOVES_PER_MS = 10;
 
 export default class Floor extends FloorCommon {
   /**
@@ -41,8 +44,21 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
 
     floor.map = GameMap.generate(map);
+    
+    floor.generateMonsters();
 
     return floor;
+  }
+
+  /** katie
+   * Puts a monster in half of all "rooms".
+   * @param {Floor} floor The floor to add monsters to
+   */
+  generateMonsters() {
+    this.monsters = [];
+    for(let i = 0; i &lt; this.map.rooms.length * this.monsterRatio; i++) { 
+      this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
+    }
   }
 
   /**
@@ -54,7 +70,8 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
 
     await Promise.all([
-      GameMap.load(floor)
+      GameMap.load(floor),
+      Monster.load(floor)
     ]);
 
     return floor;
@@ -62,11 +79,40 @@ export default class Floor extends FloorCommon {
 
   /**
    * Save the floor (server side)
+   * @param {boolean} create Create new rows (first save only)
    */
-  save() {
+  save(create) {
     return Promise.all([
-      this.map.save(this.id)
+      this.map.save(this.id),
+      this.monsters[0].save(create) // NOTE: saves all monsters
     ]);
+  }
+
+  /**
+   * Moves all monsters and checks for collisions (also anything else that happens every turn)
+   * @param {number} deltaTime The time that has ellasped since the last tick
+   */
+  tick(deltaTime) {
+    let moves = Math.floor(deltaTime / MONSTER_MOVES_PER_MS);
+
+    for(let monster of this.monsters) {
+      // HACK: Monsters should move based on deltaTime
+      for(let i = 0; i &lt; moves; ++i) {
+        monster.move();
+      }
+
+      monster.figureOutWhereToGo();
+    }
+  }
+
+  /**
+   * Send the current state of the floor to the client
+   * @param {} io The socket io instance (not a sock)
+   */
+  sendState(io) {
+    io.emit("state", {
+      monsters: this.monsters
+    });
   }
 }</code></pre>
         </article>
@@ -78,13 +124,13 @@ export default class Floor extends FloorCommon {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li></ul><h3>Classes</h3><ul><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li></ul><h3>Global</h3><ul><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#set">set</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#ping">ping</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 20 2018 18:43:38 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 30 2018 14:31:47 GMT-0500 (Central Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
