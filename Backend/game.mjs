@@ -49,7 +49,7 @@ async function main() {
 
   // In the future we should wait for all players to join here
 
-  // start the game
+  // start the count down
   for(let i = 5; i > 0; --i) {
     await new Promise((resolve) => {
       setTimeout(resolve, 1000);
@@ -58,6 +58,7 @@ async function main() {
     io.emit("countdown", i);
   }
 
+  // start the game
   await floor.sendState(io);
   io.emit("start-game");
 
