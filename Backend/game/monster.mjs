@@ -66,10 +66,12 @@ export default class Monster extends MonsterCommon {
   toJSON() {
     return {
       id: this.id,
-      x: this.x,
-      y: this.y,
+      targetx: this.targetx,
+      targety: this.targety,
       hp: this.hp,
-      type: this.type
+      type: this.type,
+      x: this.x,
+      y: this.y
     };
   }
   

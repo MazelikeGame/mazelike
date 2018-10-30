@@ -84,19 +84,20 @@ async function setup() {
   window.ml.floor = floor;
   addArrowKeyListener(floor);
 
-  // don't move monsters in a multiplayer game (for now)
+  // don't run monster logic multiplayer game (for now)
   if(!gameId) {
     window.setInterval(function() { 
       for(let i = 0; i < floor.monsters.length; i++) {
         floor.monsters[i].figureOutWhereToGo();
       }
     }, 500);
-    window.setInterval(function() {
-      for(let i = 0; i < floor.monsters.length; i++) {
-        floor.monsters[i].move();
-      }
-    }, 10);
   }
+
+  window.setInterval(function() {
+    for(let i = 0; i < floor.monsters.length; i++) {
+      floor.monsters[i].move();
+    }
+  }, 10);
 
   sock.on("state", (state) => {
     floor.handleState(state);
