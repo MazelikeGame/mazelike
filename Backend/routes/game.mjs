@@ -177,13 +177,13 @@ export const joinRoute = async(req, res) => {
       username: req.user.username
     }
   });
-  await newPlayer.setUser(user);
+  await user.setPlayer(newPlayer);
   let newLobby = await Lobby.create({
     lobbyId: lobby.lobbyId,
     secret: lobby.secret,
     playerId: req.user.username
   });
-  await newLobby.setPlayer(newPlayer);
+  await newPlayer.setLobby(newLobby);
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
@@ -224,14 +224,14 @@ gameRouter.get("/new", async(req, res) => {
       username: req.user.username
     }
   });
-  newPlayer.setUser(user);
+  await user.setPlayer(newPlayer);
   let newLobby = await Lobby.create({
     secret,
     lobbyId: id,
     playerId: req.user.username,
     isHost: true
   });
-  await newLobby.setPlayer(newPlayer);
+  await newPlayer.setLobby(newLobby);
 
   res.redirect(`/game/lobby/${id}`);
 });
