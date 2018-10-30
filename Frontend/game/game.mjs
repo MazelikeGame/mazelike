@@ -88,20 +88,39 @@ async function setup() {
   if(!gameId) {
     window.setInterval(function() { 
       for(let i = 0; i < floor.monsters.length; i++) {
-        floor.monsters[i].figureOutWhereToGo();
+        if(floor.monsters[i].type !== 2) { // not a blue monster
+          floor.monsters[i].figureOutWhereToGo();
+        }
       }
     }, 500);
   }
-
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
-      floor.monsters[i].move();
+      if(floor.monsters[i].type !== 2) { // not a blue monster
+        floor.monsters[i].move();
+      }
     }
   }, 10);
 
   sock.on("state", (state) => {
     floor.handleState(state);
   });
+  if(!gameId) {
+    window.setInterval(function() {
+      for(let i = 0; i < floor.monsters.length; i++) {
+        if(floor.monsters[i].type === 2) { // is a blue monster
+          floor.monsters[i].figureOutWhereToGo();
+        }
+      }
+    }, 1000);
+  }
+  window.setInterval(function() {
+    for(let i = 0; i < floor.monsters.length; i++) {
+      if(floor.monsters[i].type === 2) { // is a blue monster
+        floor.monsters[i].move();
+      }
+    }
+  }, 20);
   
   app.ticker.add(() => {
     floor.update();

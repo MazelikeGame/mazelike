@@ -20,12 +20,11 @@ export default class MonsterCommon {
     this.PCx = -1; // (-1,-1) if not seen yet or previously seen location explored
     this.PCy = -1;
     this.maneuver = false;
+    this.alive = true;
 
     this.placeInRandomRoom();
 
     this.figureOutWhereToGo();
-
-    //this.die();
   }
 
   /** 
@@ -125,10 +124,9 @@ export default class MonsterCommon {
       this.y += MonsterCommon.SPRITE_SIZE;
     else if(random === 3)
       this.y -= MonsterCommon.SPRITE_SIZE;
-    if(!this.spriteIsOnMap()) {
+    if(!this.spriteIsOnMap()) { // if trying to wander off map, doesn't move at all (until it wanders again)
       this.x = prevX;
       this.y = prevY;
-      // this.wander(); Stack overflow causes clients to disconnect
     }
     this.targetx = this.x;
     this.x = prevX;
@@ -140,14 +138,16 @@ export default class MonsterCommon {
    * Sets the position closer to the target position.
    */
   move() {
-    if(this.targetx < this.x)
-      this.x--;
-    else this.x++;
-    if(this.targety < this.y)
-      this.y--;
-    else this.y++;
-    if(this.spriteCollision())
-      this.wander();
+    if(this.alive) {
+      if(this.targetx < this.x)
+        this.x--;
+      else this.x++;
+      if(this.targety < this.y)
+        this.y--;
+      else this.y++;
+      if(this.spriteCollision())
+        this.wander();
+    }
   }
 
   /**
@@ -159,11 +159,13 @@ export default class MonsterCommon {
    */
   figureOutWhereToGo() {
     //this.canSeePC();
-    if(!this.targetAquired) {
-      this.wander();
-    } else {
-      //move strategically, to be implemented later when PC is on map WIP
-      console.log("omw bro");
+    if(this.alive) {
+      if(!this.targetAquired) {
+        this.wander();
+      } else {
+        //move strategically, to be implemented later when PC is on map WIP
+        console.log("omw bro");
+      }
     }
   }
 
@@ -189,18 +191,6 @@ export default class MonsterCommon {
     this.hp -= hp;
     if(this.hp <= 0)
       this.die();
-  }
-
-  /** todo test
-   * ~WIP drop items down the road
-   * 
-   * Monster dies.
-   */
-  die() {
-    this.floor.monsters.splice(this.id, 1);
-    console.log("DEATH: " + this.floor.monsters.length);
-    //delete from DB
-    // drop item in the future
   }
 
   /** 
@@ -256,94 +246,6 @@ export default class MonsterCommon {
     this.x = x;
     this.y = y;
   }
-
-  // changes for an actual test case: todo
-  // remove any monsters in room one
-  // place monster in room one
-  // manually placing pc
-  // replace this.x with this.floor.monsters[0].x
-  // outputs: all true
-  // pursue_test() {
-  //   // TEST 1: directly left/right/up/down
-  //   let pcx = this.x;
-  //   let pcy = this.y;
-  //   let cantplacepc = false;
-    
-  //   pcx += 1.5 * SPRITE_SIZE; // right
-  //   if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //     pcx -= 2 * SPRITE_SIZE; // left
-  //     if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //       pcx = this.x;
-  //       pcy += 1.5 * SPRITE_SIZE; // down
-  //       if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //         pcy -= 2 * SPRITE_SIZE; // up
-  //         if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //           cantplacepc = true;
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   let test1 = false;
-  //   if(!cantplacepc) {
-  //     test1 = this.canSee(pcx, pcy);
-  //     console.log("test1: " + test1);
-  //   } else {
-  //     console.log("Could not place pc for test1."); // should not occur
-  //   }
-
-  //   // TEST 2: diagonal 
-  //   pcx = this.x;
-  //   pcy = this.y;
-  //   cantplacepc = false;
-    
-  //   pcx += 1.5 * SPRITE_SIZE; // lower right
-  //   pcy += 1.5 * SPRITE_SIZE;
-  //   if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //     pcx -= 2 * SPRITE_SIZE; // lower left
-  //     if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //       pcy -= 2 * SPRITE_SIZE; // upper left
-  //       if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //         pcx += 2 * SPRITE_SIZE; // upper right
-  //         if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //           cantplacepc = true;
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   let test2 = false;
-  //   if(!cantplacepc) {
-  //     test2 = this.canSee(pcx, pcy);
-  //     console.log("test2: " + test2);
-  //     if(!test2)
-  //       console.log(pcx, pcy, "monster:", this.x, this.y);
-  //   } else {
-  //     console.log("Could not place pc for test2. Run test on new map, as room 0 was generated as a corridor.");
-  //   }
-
-  //   // TEST 3: pc off map
-  //   pcx = 0;
-  //   pcy = 0;
-
-  //   let test3 = false;
-  //   test3 = !this.canSee(pcx, pcy);
-  //   console.log("test3: " + test3);
-
-  //   // TEST 4: place in far away room
-  //   pcx = 0;
-  //   pcy = 0;
-
-  //   let pcRoom = this.floor.map.rooms.length - 1; // a room far away from the testing monster
-  //   let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[pcRoom].width); 
-  //   pcx = this.floor.map.rooms[pcRoom].x + randomDiffX;
-  //   let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[pcRoom].height); 
-  //   pcy = this.floor.map.rooms[pcRoom].y + randomDiffY;
-
-  //   let test4 = false;
-  //   test4 = !this.canSee(pcx, pcy);
-  //   console.log("test4: " + test4);
-  // } 
 }
 
 MonsterCommon.SPRITE_SIZE = 48;
