@@ -61,7 +61,7 @@ export default class Floor extends FloorCommon {
    * Moves all monsters and checks for collisions (also anything else that happens every turn)
    * @param {number} deltaTime The time that has ellasped since the last tick
    */
-  tick() {
+  tick(deltaTime) {
     for(let monster of this.monsters) {
       monster.figureOutWhereToGo();
       monster.move();

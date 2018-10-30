@@ -84,16 +84,19 @@ async function setup() {
   window.ml.floor = floor;
   addArrowKeyListener(floor);
 
-  window.setInterval(function() { 
-    for(let i = 0; i < floor.monsters.length; i++) {
-      floor.monsters[i].figureOutWhereToGo();
-    }
-  }, 500);
-  window.setInterval(function() {
-    for(let i = 0; i < floor.monsters.length; i++) {
-      floor.monsters[i].move();
-    }
-  }, 10);
+  // don't move monsters in a multiplayer game (for now)
+  if(!gameId) {
+    window.setInterval(function() { 
+      for(let i = 0; i < floor.monsters.length; i++) {
+        floor.monsters[i].figureOutWhereToGo();
+      }
+    }, 500);
+    window.setInterval(function() {
+      for(let i = 0; i < floor.monsters.length; i++) {
+        floor.monsters[i].move();
+      }
+    }, 10);
+  }
   
   app.ticker.add(() => {
     floor.update();

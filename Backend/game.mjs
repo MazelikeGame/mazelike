@@ -50,10 +50,10 @@ async function main() {
   });
 
   // start the game
-  triggerTick(floor, io);
+  triggerTick(floor, io, Date.now());
 }
 
-async function triggerTick(floor, io) {
+async function triggerTick(floor, io, lastUpdate) {  
   // save and quit if we loose all the clients
   if(io.engine.clientsCount === 0) {
     await floor.save();
@@ -61,8 +61,9 @@ async function triggerTick(floor, io) {
   }
 
   // move monsters and check for collisions
-  await floor.tick();
-  setTimeout(triggerTick.bind(undefined, floor, io), 1000);
+  let now = Date.now();
+  await floor.tick(now - lastUpdate);
+  setTimeout(triggerTick.bind(undefined, floor, io, now), 1000);
 }
 
 main();
