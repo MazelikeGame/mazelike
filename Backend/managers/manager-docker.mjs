@@ -1,6 +1,5 @@
 /* eslint-disable complexity */
 import dockerApi from "node-docker-api";
-import poll from "./manager-connect";
 
 const ENV_NAMES = [
   "DB_HOST",
@@ -68,24 +67,6 @@ export async function spawnGame(gameEnv = {}) {
   let addr = await startContainer(container, gameEnv.gameId, gameEnv);
   if(addr) {
     return addr;
-  }
-
-  let ip = (await container.status()).data.NetworkSettings.IPAddress;
-
-  // wait for the server to start
-  try {
-    await poll(`${ip}:${port}`);
-  } catch(err) {
-    try {
-      await container.kill();
-    } catch(err2) {
-      // pass
-    }
-
-    inUsePorts.delete(port);
-    portMap.delete(gameEnv.gameId);
-
-    throw err;
   }
 
   waitForClose(container, port, gameEnv.gameId); // DO NOT AWAIT THIS

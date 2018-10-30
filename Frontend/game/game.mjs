@@ -93,17 +93,18 @@ async function setup() {
     floor.handleState(state);
   });
 
-  // wait for the game to start
-  msgEl.innerText = "Waiting for all players to join";
-
+  // display the countdown when it starts
   sock.on("countdown", (count) => {
     msgEl.innerText = `The game will start in ${count}`;
   });
 
+  // wait for the game to start
+  msgEl.innerText = "Waiting for all players to join";
+
   await new Promise((resolve) => {
     sock.once("start-game", resolve);
   });
-
+  
   msgParentEl.remove();
 
   // don't run monster logic multiplayer game (for now)
