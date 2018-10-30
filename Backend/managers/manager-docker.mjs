@@ -1,5 +1,16 @@
+/* eslint-disable complexity */
 import dockerApi from "node-docker-api";
 import poll from "./manager-connect";
+
+const ENV_NAMES = [
+  "DB_HOST",
+  "DB_PORT",
+  "DB_USER",
+  "DB_PASS",
+  "DB_DATABASE",
+  "NODE_ENV",
+  "DB_STORAGE"
+];
 
 const IMAGE_NAME = process.env.IMAGE_NAME || "mazelike/backend:devel";
 const ADDRESS = process.env.EXTERN_ADDRESS;
@@ -17,6 +28,11 @@ export async function spawnGame(gameEnv = {}) {
   let envArray = [];
   for(let key of Object.keys(gameEnv)) {
     envArray.push(`MAZELIKE_${key}=${gameEnv[key]}`);
+  }
+
+  // copy our env to the child
+  for(let envName of ENV_NAMES) {
+    envArray.push(`${envName}=${ENV_NAMES[envName]}`);
   }
 
   let hostname = `mazelike-${PREFIX}${gameEnv.gameId}`;
