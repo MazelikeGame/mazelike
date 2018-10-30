@@ -40,12 +40,14 @@ export default class Monster extends MonsterCommon {
   async save() {
     let monsterModel = new MonsterModel(sql);
     for(let i = 0; i < this.floor.monsters.length; i++) {
+      let monster = this.floor.monsters[i];
       await monsterModel.create({
-        floorId: this.floor.id,
-        x: this.x,
-        y: this.y,
-        hp: this.hp,
-        type: this.type
+        id: `${monster.floor.id}-${monster.id}`,
+        floorId: monster.floor.id,
+        x: monster.x,
+        y: monster.y,
+        hp: monster.hp,
+        type: monster.type
       });
     }
     console.log("\nmonsters saved\n");

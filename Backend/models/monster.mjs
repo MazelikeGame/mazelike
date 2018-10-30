@@ -7,9 +7,12 @@ export default function MonsterModel(sequelize) {
     x: Sequelize.INTEGER,
     y: Sequelize.INTEGER,
     hp: Sequelize.INTEGER,
-    type: Sequelize.INTEGER
+    type: Sequelize.INTEGER,
+    id: {
+      primaryKey: true,
+      type: Sequelize.STRING
+    }
   });
   monster.sync();
   return monster;
 }
- 
