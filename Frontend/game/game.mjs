@@ -1,4 +1,4 @@
-/* global PIXI  */
+/* global PIXI io  */
 /* eslint-disable complexity */
 
 import Floor from "./browser/floor.mjs";
@@ -49,15 +49,26 @@ const addArrowKeyListener = (floor) => {
   });
 };
 
+function getUsername(sock) {
+  return new Promise((resolve) => {
+    sock.once("set-username", resolve);
+  });
+}
+
 async function setup() {
+  let sock = io(`http://${await (await fetch(`/game/addr/${gameId}`)).text()}`);
+  let username = await getUsername(sock);
   let floor;
 
+  console.log(`User: ${username}`); // eslint-disable-line
+
   if(gameId) {
-    floor = await Floor.load(gameId, 0);
+    floor = await Floor.load(gameId, 0, sock);
   } else {
     floor = Floor.generate({
       gameId,
-      floorIdx: 0
+      floorIdx: 0,
+      sock
     });
   }
 
@@ -110,7 +121,6 @@ async function setup() {
     }
   });
 }
-
 
 // load the textures
 PIXI.loader

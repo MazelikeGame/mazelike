@@ -3,20 +3,20 @@ const fs = require("fs");
 
 function dockerComposeDown() {
   try {
-    child_process.execSync("docker-compose -f docker-compose.test.yml down");
+    child_process.execSync("docker-compose stop tests");
   } catch(err) {
     // Do nothing
   }
 }
 
 // Display the logs
-let logArgs = ["-f", "docker-compose.test.yml", "logs", "-f"];
+let logArgs = ["logs", "-f"];
 
 if(process.argv.length > 2) {
   logArgs.push(process.argv[2]);
 }
 
-child_process.spawn("docker-compose", logArgs, {
+let logs = child_process.spawn("docker-compose", logArgs, {
   stdio: ["ignore", "inherit", "inherit"]
 });
 
@@ -29,6 +29,7 @@ fs.watch("runner-result", () => {
   timer = setTimeout(() => {
     let status = +fs.readFileSync("runner-result", "utf8");
 
+    logs.kill();
     dockerComposeDown();
     fs.unlinkSync("runner-result");
 
