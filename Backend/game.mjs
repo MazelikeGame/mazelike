@@ -47,12 +47,20 @@ async function main() {
     saveHandler(sock, floor);
   });
 
-  // In the future we should wait for all players to join
-  await new Promise((resolve) => {
-    setTimeout(resolve, 3000);
-  });
+  // In the future we should wait for all players to join here
 
   // start the game
+  for(let i = 5; i > 0; --i) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+
+    io.emit("countdown", i);
+  }
+
+  await floor.sendState(io);
+  io.emit("start-game");
+
   triggerTick(floor, io, Date.now());
 }
 

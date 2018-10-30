@@ -4,6 +4,9 @@
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
 
+let msgEl = document.querySelector(".msg");
+let msgParentEl = document.querySelector(".msg-parent");
+
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
 
@@ -56,8 +59,10 @@ function getUsername(sock) {
 }
 
 async function setup() {
+  msgEl.innerText = "Connecting to the game server";
   let sock = io(`http://${await (await fetch(`/game/addr/${gameId}`)).text()}`);
   let username = await getUsername(sock);
+  msgEl.innerText = "Loading game";
   let floor;
 
   console.log(`User: ${username}`); // eslint-disable-line
@@ -84,6 +89,23 @@ async function setup() {
   window.ml.floor = floor;
   addArrowKeyListener(floor);
 
+  sock.on("state", (state) => {
+    floor.handleState(state);
+  });
+
+  // wait for the game to start
+  msgEl.innerText = "Waiting for all players to join";
+
+  sock.on("countdown", (count) => {
+    msgEl.innerText = `The game will start in ${count}`;
+  });
+
+  await new Promise((resolve) => {
+    sock.once("start-game", resolve);
+  });
+
+  msgParentEl.remove();
+
   // don't run monster logic multiplayer game (for now)
   if(!gameId) {
     window.setInterval(function() { 
@@ -102,9 +124,6 @@ async function setup() {
     }
   }, 10);
 
-  sock.on("state", (state) => {
-    floor.handleState(state);
-  });
   if(!gameId) {
     window.setInterval(function() {
       for(let i = 0; i < floor.monsters.length; i++) {
