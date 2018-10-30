@@ -2,8 +2,6 @@
 import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
 import Monster from "./monster.mjs";
-import MonsterModel from "../models/monster";
-
 
 export default class Floor extends FloorCommon {
   /**
@@ -43,7 +41,7 @@ export default class Floor extends FloorCommon {
 
     await Promise.all([
       GameMap.load(floor),
-      //floor.loadMonsters(floor) // untested todo
+      Monster.load(floor)
     ]);
 
     return floor;
@@ -55,24 +53,7 @@ export default class Floor extends FloorCommon {
   save() {
     return Promise.all([
       this.map.save(this.id),
-      this.monsters[0].save()
+      this.monsters[0].save() // NOTE: saves all monsters
     ]);
   }
-  
-  async loadMonsters(floor) { // wip UNTESTED
-    //console.log("\nloading started");
-    for(let i = 0; i < floor.map.rooms.length * this.monsterRatio; i++) {
-      //console.log(i);
-      let monsterDB = await MonsterModel.find({
-        where: {
-          floorId: floor.floor.floodId,
-          id: i
-        }
-      }); //if nothing returned, dont create monster todo
-      floor.monsters[i] = new Monster('sir spoopy', monsterDB.hp, 10, this, i, monsterDB.type);
-      floor.monsters[i].setCoodinates(monsterDB.x, monsterDB.y);
-    }
-    //console.log("monsters loaded\n");
-  }
-
 }

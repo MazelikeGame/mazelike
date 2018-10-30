@@ -17,6 +17,23 @@ export default class Monster extends MonsterCommon {
     }
   }
 
+  static async load(floor) {
+    let monsterModel = new MonsterModel(sql);
+    let rawMonsters = await monsterModel.findAll({
+      where: {
+        floorId: floor.id
+      }
+    });
+
+    floor.monsters = [];
+    
+    rawMonsters.forEach((raw, i) => {
+      let monster = new MonsterCommon("sir snoopy", raw.hp, 10, floor, i, raw.type);
+      monster.setCoodinates(raw.x, raw.y);
+      floor.monsters.push(monster);
+    });
+  }
+
   /**
    * Saves monsters to the database.
    */
@@ -24,7 +41,7 @@ export default class Monster extends MonsterCommon {
     let monsterModel = new MonsterModel(sql);
     for(let i = 0; i < this.floor.monsters.length; i++) {
       await monsterModel.create({
-        floorId: this.floor.floorId,
+        floorId: this.floor.id,
         x: this.x,
         y: this.y,
         hp: this.hp,
