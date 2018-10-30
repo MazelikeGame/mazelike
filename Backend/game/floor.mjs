@@ -51,11 +51,12 @@ export default class Floor extends FloorCommon {
 
   /**
    * Save the floor (server side)
+   * @param {boolean} create Create new rows (first save only)
    */
-  save() {
+  save(create) {
     return Promise.all([
       this.map.save(this.id),
-      this.monsters[0].save() // NOTE: saves all monsters
+      this.monsters[0].save(create) // NOTE: saves all monsters
     ]);
   }
 
@@ -67,12 +68,12 @@ export default class Floor extends FloorCommon {
     let moves = Math.floor(deltaTime / MONSTER_MOVES_PER_MS);
 
     for(let monster of this.monsters) {
-      monster.figureOutWhereToGo();
-
       // HACK: Monsters should move based on deltaTime
       for(let i = 0; i < moves; ++i) {
         monster.move();
       }
+
+      monster.figureOutWhereToGo();
     }
   }
 

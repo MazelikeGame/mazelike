@@ -36,12 +36,29 @@ export default class Monster extends MonsterCommon {
 
   /**
    * Saves monsters to the database.
+   * @param {boolean} create Create new monster rows (first save only)
    */
-  async save() {
+  async save(create) {
     let monsterModel = new MonsterModel(sql);
+    let monsters = []; // collect monsters for bulkCreate
+
+    // create or update the data
+    let save = (data) => {
+      if(create) {
+        monsters.push(data);
+      } else {
+        return monsterModel.update(data, {
+          where: {
+            id: data.id
+          }
+        });
+      }
+      return undefined; // make eslint happy
+    };
+
     for(let i = 0; i < this.floor.monsters.length; i++) {
       let monster = this.floor.monsters[i];
-      await monsterModel.create({
+      await save({
         id: `${monster.floor.id}-${monster.id}`,
         floorId: monster.floor.id,
         x: monster.x,
@@ -50,6 +67,12 @@ export default class Monster extends MonsterCommon {
         type: monster.type
       });
     }
+
+    // use bulk create
+    if(create) {
+      await monsterModel.bulkCreate(monsters);
+    }
+
     console.log("\nmonsters saved\n");
   }
 

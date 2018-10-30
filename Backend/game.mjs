@@ -4,6 +4,8 @@ import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
 import initAuth from "./game-auth.mjs";
 
+const UPDATE_INTERVAL = 250;
+
 async function main() {
   // Parse the env vars
   const PORT = +process.argv[2];
@@ -76,7 +78,7 @@ async function triggerTick(floor, io, lastUpdate) {
     }
   }
 
-  setTimeout(triggerTick.bind(undefined, floor, io, now), 500);
+  setTimeout(triggerTick.bind(undefined, floor, io, now), UPDATE_INTERVAL);
 }
 
 main();
