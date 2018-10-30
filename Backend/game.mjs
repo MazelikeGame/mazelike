@@ -43,11 +43,26 @@ async function main() {
 
     saveHandler(sock, floor);
   });
+
+  // In the future we should wait for all players to join
+  await new Promise((resolve) => {
+    setTimeout(resolve, 10000);
+  });
+
+  // start the game
+  triggerTick(floor, io);
+}
+
+async function triggerTick(floor, io) {
+  // save and quit if we loose all the clients
+  if(io.engine.clientsCount === 0) {
+    await floor.save();
+    process.exit(0);
+  }
+
+  // move monsters and check for collisions
+  await floor.tick();
+  setTimeout(triggerTick.bind(undefined, floor, io), 1000);
 }
 
 main();
-
-// don't run forever (keep until ganes exit on their own)
-setTimeout(() => {
-  process.exit(0);
-}, 60000);

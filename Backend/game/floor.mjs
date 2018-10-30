@@ -56,4 +56,17 @@ export default class Floor extends FloorCommon {
       this.monsters[0].save() // NOTE: saves all monsters
     ]);
   }
+
+  /**
+   * Moves all monsters and checks for collisions (also anything else that happens every turn)
+   * @param {number} deltaTime The time that has ellasped since the last tick
+   */
+  tick() {
+    for(let monster of this.monsters) {
+      monster.figureOutWhereToGo();
+      monster.move();
+    }
+
+    console.log("Tick", this.monsters[0].x, this.monsters[0].y);
+  }
 }

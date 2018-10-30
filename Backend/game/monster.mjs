@@ -28,7 +28,7 @@ export default class Monster extends MonsterCommon {
     floor.monsters = [];
     
     rawMonsters.forEach((raw, i) => {
-      let monster = new MonsterCommon("sir snoopy", raw.hp, 10, floor, i, raw.type);
+      let monster = new Monster("sir snoopy", raw.hp, 10, floor, i, raw.type);
       monster.setCoodinates(raw.x, raw.y);
       floor.monsters.push(monster);
     });
