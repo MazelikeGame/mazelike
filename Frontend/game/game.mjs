@@ -111,7 +111,7 @@ async function setup() {
   if(!gameId) {
     window.setInterval(function() { 
       for(let i = 0; i < floor.monsters.length; i++) {
-        if(floor.monsters[i].type !== 2) { // not a blue monster
+        if(floor.monsters[i].type !== "blue") { // not a blue monster
           floor.monsters[i].figureOutWhereToGo();
         }
       }
@@ -119,7 +119,7 @@ async function setup() {
   }
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type !== 2) { // not a blue monster
+      if(floor.monsters[i].type !== "blue") { // not a blue monster
         floor.monsters[i].move();
       }
     }
@@ -128,7 +128,7 @@ async function setup() {
   if(!gameId) {
     window.setInterval(function() {
       for(let i = 0; i < floor.monsters.length; i++) {
-        if(floor.monsters[i].type === 2) { // is a blue monster
+        if(floor.monsters[i].type === "blue") { // is a blue monster
           floor.monsters[i].figureOutWhereToGo();
         }
       }
@@ -136,7 +136,7 @@ async function setup() {
   }
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type === 2) { // is a blue monster
+      if(floor.monsters[i].type === "blue") { // is a blue monster
         floor.monsters[i].move();
       }
     }

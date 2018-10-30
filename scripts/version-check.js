@@ -21,8 +21,8 @@ if(!oldVersion || !version) {
 
 let isNewer = 
   (+oldVersion[1] < +version[1]) || // new major
-  (+oldVersion[2] === +version[2] && +oldVersion[2] < +version[2]) || // new minor
-  (+oldVersion[2] === +version[2] && +oldVersion[2] === +version[2] && +oldVersion[3] < +version[3]); // new patch
+  (+oldVersion[1] === +version[1] && +oldVersion[2] < +version[2]) || // new minor
+  (+oldVersion[1] === +version[1] && +oldVersion[2] === +version[2] && +oldVersion[3] < +version[3]); // new patch
 
 if(!isNewer) {
   console.log(`Version ${version[0]} is not newer than ${oldVersion[0]}`);
