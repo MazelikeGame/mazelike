@@ -3,8 +3,6 @@ import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
 import Monster from "./monster.mjs";
 
-const MONSTER_MOVES_PER_MS = 10;
-
 export default class Floor extends FloorCommon {
   /**
    * Generate a new floor (runs on the server and the browser)
@@ -73,9 +71,9 @@ export default class Floor extends FloorCommon {
    * @param {number} deltaTime The time that has ellasped since the last tick
    */
   tick(deltaTime) {
-    let moves = Math.floor(deltaTime / MONSTER_MOVES_PER_MS);
-
     for(let monster of this.monsters) {
+      let moves = Math.floor(deltaTime / (monster.type === "blue" ? 20 : 10));
+
       // HACK: Monsters should move based on deltaTime
       for(let i = 0; i < moves; ++i) {
         monster.move();
