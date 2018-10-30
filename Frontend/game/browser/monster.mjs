@@ -30,7 +30,14 @@ export default class Monster extends MonsterCommon {
    * Handle state updates from the server
    */
   handleState(state) {
-    console.log(state);
     Object.assign(this, state);
+  }
+
+  /**
+   * Remove a monster from a PIXI.Container
+   * @param {PIXI.Container} container
+   */
+  remove(container) {
+    container.removeChild(this.sprite);
   }
 }

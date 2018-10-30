@@ -172,6 +172,7 @@ export default class Floor extends FloorCommon {
         // unwanted instance (delete)
         current.splice(i, 1);
         --i;
+        obj.remove(this.sprite);
       }
     }
 

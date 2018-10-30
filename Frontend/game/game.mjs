@@ -99,7 +99,6 @@ async function setup() {
   }
 
   sock.on("state", (state) => {
-    console.log("Got state", state);
     floor.handleState(state);
   });
   
