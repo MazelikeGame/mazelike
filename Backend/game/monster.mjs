@@ -5,6 +5,9 @@ import MonsterCommon from "../../Frontend/game/common/monster.mjs";
 import MonsterModel from "../models/monster";
 import sql from "../sequelize";
 
+// a list of all dead monsters (improves the performance of save)
+let deadMonsterIds = [];
+
 export default class Monster extends MonsterCommon {
   
   /**
@@ -39,7 +42,7 @@ export default class Monster extends MonsterCommon {
    * Saves monsters to the database.
    * @param {boolean} create Create new monster rows (first save only)
    */
-  async save(create) {
+  static async saveAll(floor, create) {
     let monsterModel = new MonsterModel(sql);
     let monsters = []; // collect monsters for bulkCreate
 
@@ -57,8 +60,8 @@ export default class Monster extends MonsterCommon {
       return undefined; // make eslint happy
     };
 
-    for(let i = 0; i < this.floor.monsters.length; i++) {
-      let monster = this.floor.monsters[i];
+    for(let i = 0; i < floor.monsters.length; i++) {
+      let monster = floor.monsters[i];
       await save({
         id: `${monster.floor.id}-${monster.id}`,
         floorId: monster.floor.id,
@@ -74,7 +77,12 @@ export default class Monster extends MonsterCommon {
       await monsterModel.bulkCreate(monsters);
     }
 
-    console.log("\nmonsters saved\n");
+    // delete dead monsters
+    await monsterModel.destroy({
+      where: {
+        id: deadMonsterIds
+      }
+    });
   }
 
   /**
@@ -101,4 +109,21 @@ export default class Monster extends MonsterCommon {
     };
   }
   
+  /**
+   * ~WIP drop items down the road
+   * 
+   * Monster dies.
+   */
+  die() {
+    this.x = -1; // (-1, -1) coordinate tells us that the monster is dead
+    this.y = -1;
+    this.alive = false;
+
+    // remove from the monsters array
+    let thisIdx = this.floor.monsters.indexOf(this);
+    this.floor.monsters.splice(thisIdx, 1);
+
+    // add to the list of monsters for save to delete
+    deadMonsterIds.push(`${this.floor.id}-${this.id}`);
+  }
 }

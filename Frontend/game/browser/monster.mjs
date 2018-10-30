@@ -37,8 +37,8 @@ export default class Monster extends MonsterCommon {
    * Remove a monster from a PIXI.Container
    * @param {PIXI.Container} container
    */
-  remove(container) {
-    container.removeChild(this.sprite);
+  remove() {
+    this.floor.monsterSprites.removeChild(this.sprite);
   }
   
   /**
