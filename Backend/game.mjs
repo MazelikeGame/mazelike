@@ -46,24 +46,37 @@ async function main() {
 
   // In the future we should wait for all players to join
   await new Promise((resolve) => {
-    setTimeout(resolve, 10000);
+    setTimeout(resolve, 3000);
   });
 
   // start the game
   triggerTick(floor, io, Date.now());
 }
 
-async function triggerTick(floor, io, lastUpdate) {  
+let coolDown = 10;
+
+async function triggerTick(floor, io, lastUpdate) {
+  let now = Date.now();
+
   // save and quit if we loose all the clients
   if(io.engine.clientsCount === 0) {
-    await floor.save();
-    process.exit(0);
+    if(--coolDown === 0) {
+      await floor.save();
+      process.exit(0);
+    }
+  } else {
+    coolDown = 10;
+
+    // move monsters and check for collisions
+    try {
+      await floor.tick(now - lastUpdate);
+      await floor.sendState(io);
+    } catch(err) {
+      process.stderr.write(`${err.stack}\n`);
+    }
   }
 
-  // move monsters and check for collisions
-  let now = Date.now();
-  await floor.tick(now - lastUpdate);
-  setTimeout(triggerTick.bind(undefined, floor, io, now), 1000);
+  setTimeout(triggerTick.bind(undefined, floor, io, now), 500);
 }
 
 main();

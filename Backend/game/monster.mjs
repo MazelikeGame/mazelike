@@ -59,5 +59,18 @@ export default class Monster extends MonsterCommon {
   getRandomNumber(min, max) {
     return Math.floor(Math.random() * max) + min; 
   }
+
+  /**
+   * Select only the propertys we need for sending monsters to the client
+   */
+  toJSON() {
+    return {
+      id: this.id,
+      x: this.x,
+      y: this.y,
+      hp: this.hp,
+      type: this.type
+    };
+  }
   
 }

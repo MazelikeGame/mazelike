@@ -128,7 +128,7 @@ export default class MonsterCommon {
     if(!this.spriteIsOnMap()) {
       this.x = prevX;
       this.y = prevY;
-      this.wander();
+      // this.wander();
     }
     this.targetx = this.x;
     this.x = prevX;

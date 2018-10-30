@@ -25,4 +25,12 @@ export default class Monster extends MonsterCommon {
   update(viewX, viewY) {
     this.sprite.position.set(this.x - viewX, this.y - viewY);
   }
+
+  /**
+   * Handle state updates from the server
+   */
+  handleState(state) {
+    console.log(state);
+    Object.assign(this, state);
+  }
 }

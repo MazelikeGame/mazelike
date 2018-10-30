@@ -97,6 +97,11 @@ async function setup() {
       }
     }, 10);
   }
+
+  sock.on("state", (state) => {
+    console.log("Got state", state);
+    floor.handleState(state);
+  });
   
   app.ticker.add(() => {
     floor.update();

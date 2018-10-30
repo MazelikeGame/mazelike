@@ -12,6 +12,8 @@ export default class Floor extends FloorCommon {
     // the top left corrner of the user's screen
     this._viewportX = 0;
     this._viewportY = 0;
+
+    this.monsters = [];
   }
 
   /**
@@ -131,5 +133,51 @@ export default class Floor extends FloorCommon {
       x: this._viewportX + halfWidth,
       y: this._viewportY + halfHeight
     };
+  }
+
+  /**
+   * Update our state to match the server's state
+   */
+  handleState(state) {
+    this._diffState("id", this.monsters, state.monsters, (raw) => {
+      let monster = new Monster("sir snoopy", raw.hp, 10, this, raw.id, raw.type);
+      monster.setCoodinates(raw.x, raw.y);
+      return monster;
+    });
+  }
+
+  /**
+   * Take an array of objects and update it to match another array (keeps objects with matching ids)
+   * @param {string} idKey The property to use as a key
+   * @param {object[]} current The current array of objects
+   * @param {object[]} wanted The array of objects we want
+   * @param {function} create A function that creates an instance of a current object
+   *                          from an instance of a wanted object
+   */
+  _diffState(idKey, current, wanted, create) {
+    // add ids to a map for quick lookups
+    let wantedIds = new Map();
+    for(let obj of wanted) {
+      wantedIds.set(obj[idKey], obj);
+    }
+
+    for(let i = 0; i < current.length; ++i) {
+      let obj = current[i];
+
+      // already have an instance update it
+      if(wantedIds.has(obj[idKey])) {
+        obj.handleState(wantedIds.get(obj[idKey]));
+        wantedIds.delete(obj[idKey]);
+      } else {
+        // unwanted instance (delete)
+        current.splice(i, 1);
+        --i;
+      }
+    }
+
+    // create missing objects
+    for(let wantedObj of wantedIds) {
+      current.push(create(wantedObj));
+    }
   }
 }
