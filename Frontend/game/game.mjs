@@ -86,28 +86,28 @@ async function setup() {
 
   window.setInterval(function() { 
     for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type !== 2) { // not a blue monster
+      if(floor.monsters[i].type !== "blue") { // not a blue monster
         floor.monsters[i].figureOutWhereToGo();
       }
     }
   }, 500);
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type !== 2) { // not a blue monster
+      if(floor.monsters[i].type !== "blue") { // not a blue monster
         floor.monsters[i].move();
       }
     }
   }, 10);
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type === 2) { // is a blue monster
+      if(floor.monsters[i].type === "blue") { // is a blue monster
         floor.monsters[i].figureOutWhereToGo();
       }
     }
   }, 1000);
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type === 2) { // is a blue monster
+      if(floor.monsters[i].type === "blue") { // is a blue monster
         floor.monsters[i].move();
       }
     }

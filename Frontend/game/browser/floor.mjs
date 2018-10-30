@@ -44,11 +44,11 @@ export default class Floor extends FloorCommon {
     for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) { 
       random = Math.floor(Math.random() * 100); 
       if(random < 5) { // 5% chance for blue demon
-        this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 2);
+        this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
       } else if(random < 45) { // 40% chance for red demon, where 5+40 = 45
-        this.monsters[i] = new Monster('red demon', 100, 5, this, i, 1);
+        this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
       } else if(random < 100) { // 55% chance for green demon, where 5+40+55 = 100
-        this.monsters[i] = new Monster('green demon', 50, 5, this, i, 0);
+        this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
       }
     }
   }
