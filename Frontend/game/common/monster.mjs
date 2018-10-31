@@ -200,7 +200,7 @@ export default class MonsterCommon {
     let numRooms = this.floor.map.rooms.length;
     this.initialRoom = Math.floor(Math.random() * numRooms);
     for(let i = 0; i < this.floor.monsters.length; i++) {
-      if(this.id !== i && this.floor.monsters[i].initialRoom === this.initialRoom) {
+      if(this.id !== this.floor.monsters[i].id && this.floor.monsters[i].initialRoom === this.initialRoom) {
         this.placeInRandomRoom();
       }
     }
@@ -228,7 +228,7 @@ export default class MonsterCommon {
    */
   spriteCollision() {
     for(let i = 0; i < this.floor.monsters.length; i++) {
-      if(this.id !== i) {
+      if(this.id !== this.floor.monsters[i].id) {
         if(this.floor.monsters[i].x >= this.x && this.floor.monsters[i].x <= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
           if(this.floor.monsters[i].y >= this.y && this.floor.monsters[i].y <= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
             return true;

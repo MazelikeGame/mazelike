@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Backend/game/game-map.mjs</title>
+    <title>JSDoc: Source: Frontend/game/browser/monster.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Backend/game/game-map.mjs</h1>
+    <h1 class="page-title">Source: Frontend/game/browser/monster.mjs</h1>
 
     
 
@@ -26,43 +26,47 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @module backend/game/GameMap */
-import GameMapCommon from "../../Frontend/game/common/game-map/game-map.mjs";
-import fs from "fs";
-import util from "util";
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
+/* global PIXI */
+/** @module Monster */
 
-const readFile = util.promisify(fs.readFile);
-const writeFile = util.promisify(fs.writeFile);
+import MonsterCommon from "../common/monster.mjs";
 
-export default class GameMap extends GameMapCommon {
+export default class Monster extends MonsterCommon {
+
   /**
-   * Geneate a game map
-   * @returns {GameMap}
+   * Generates sprite for a specific monster and adds it to the floor.
    */
-  static generate(params) {
-    return GameMapCommon.generate(new GameMap(), params);
+  createSprite() {
+    this.sprite = new PIXI.Sprite(PIXI.loader.resources.demon.textures["red demon"]);
+    this.sprite.position.set(this.x, this.y);
+    this.sprite.width = MonsterCommon.SPRITE_SIZE;
+    this.sprite.height = MonsterCommon.SPRITE_SIZE;
+    this.floor.sprite.addChild(this.sprite);
   }
 
   /**
-   * Load the game map in nodejs
-   * @param {Floor} floor The floor to load the map for
+   * Updates the sprite's position for all monsters on the floor.
+   * @param viewX 
+   * @param viewY 
    */
-  static async load(floor) {
-    // for backwards compatability the map for floorIdx == 0 is just the gameId
-    let mapId = floor.id.replace("-0", "");
-
-    floor.map = GameMap.parse(await readFile(`Frontend/public/maps/${mapId}.json`, "utf8"), new GameMap());
+  update(viewX, viewY) {
+    this.sprite.position.set(this.x - viewX, this.y - viewY);
   }
 
   /**
-   * Save the game map in nodejs
-   * @param {string} id The floor id to save the map for
+   * Handle state updates from the server
    */
-  save(floorId) {
-    // for backwards compatability the map for floorIdx == 0 is just the gameId
-    let mapId = floorId.replace("-0", "");
+  handleState(state) {
+    Object.assign(this, state);
+  }
 
-    return writeFile(`Frontend/public/maps/${mapId}.json`, this.serialize());
+  /**
+   * Remove a monster from a PIXI.Container
+   * @param {PIXI.Container} container
+   */
+  remove(container) {
+    container.removeChild(this.sprite);
   }
 }</code></pre>
         </article>
