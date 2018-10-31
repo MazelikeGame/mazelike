@@ -1,7 +1,7 @@
 stages:
   - build
-  # - test
-  # - cleanup
+  - test
+  - cleanup
   - deploy
 
 Build:
@@ -9,41 +9,41 @@ Build:
   script:
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - docker-compose build
-    # - docker-compose up -d backend
+    - docker-compose up -d backend
 
-# Eslint:
-#   stage: test
-#   script:
-#     - npm run eslint
+Eslint:
+  stage: test
+  script:
+    - npm run eslint
 
-# Backend_Tests:
-#   stage: test
-#   script:
-#     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-#     - touch runner-result
-#     - docker-compose up -d
-#     - node scripts/test-stopper.js
+Backend_Tests:
+  stage: test
+  script:
+    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - touch runner-result
+    - docker-compose up -d
+    - node scripts/test-stopper.js
 
-# Browser_Tests:
-#   stage: test
-#   script:
-#     # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-#     - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests/ -i docker-compose.yml
-#     - touch runner-result
-#     - docker-compose up -d
-#     - node scripts/test-stopper.js
+Browser_Tests:
+  stage: test
+  script:
+    # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
+    - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests/ -i docker-compose.yml
+    - touch runner-result
+    - docker-compose up -d
+    - node scripts/test-stopper.js
 
-# Version_Change:
-#   stage: test
-#   allow_failure: true
-#   script:
-#     - node scripts/version-check.js
+Version_Change:
+  stage: test
+  allow_failure: true
+  script:
+    - node scripts/version-check.js
 
-# Cleanup:
-#   stage: cleanup
-#   when: always
-#   script:
-#     - docker-compose down
+Cleanup:
+  stage: cleanup
+  when: always
+  script:
+    - docker-compose down
 
 Deploy:
   stage: deploy
@@ -55,9 +55,3 @@ Deploy:
       - deploy latest
   only:
     - master
-
-
-Deploy:
-  stage: deploy
-  script:
-      - deploy branch-$CI_COMMIT_REF_NAME
