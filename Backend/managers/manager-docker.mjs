@@ -31,7 +31,7 @@ export async function spawnGame(gameEnv = {}) {
 
   // copy our env to the child
   for(let envName of ENV_NAMES) {
-    envArray.push(`${envName}=${ENV_NAMES[envName]}`);
+    envArray.push(`${envName}=${process.env[envName]}`);
   }
 
   let hostname = `mazelike-${PREFIX}${gameEnv.gameId}`;
