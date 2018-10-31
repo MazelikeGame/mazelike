@@ -170,7 +170,7 @@ export const joinRoute = async(req, res) => {
   }
 
   let newPlayer = await Player.create({
-    spriteName: 'test'
+    spriteName: Player.getRandomSprite()
   });
   let user = await User.findOne({
     where: {
@@ -217,7 +217,7 @@ gameRouter.get("/new", async(req, res) => {
   let secret = await genId(SECRET_LENGTH);
 
   let newPlayer = await Player.create({
-    spriteName: 'test'
+    spriteName: Player.getRandomSprite()
   });
   let user = await User.findOne({
     where: {
@@ -385,3 +385,4 @@ gameRouter.get(/[A-Za-z0-9]{12}/, (req, res) => {
 gameRouter.get('/test', (req, res) => {
   res.sendFile(path.resolve("Frontend/game/Tests/index.html"));
 });
+
