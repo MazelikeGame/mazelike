@@ -35,7 +35,7 @@ export default function initAuth(io) {
     //     return;
     //   }
 
-      next();
+    next();
     // });
   });
 }
