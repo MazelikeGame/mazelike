@@ -12,12 +12,15 @@ let Lobby = sql.define("lobbies", {
   },
   playerId: {
     type: Sequelize.STRING,
-    allowNull: false
   },
   secret: {
     type: Sequelize.STRING,
     allowNull: false
-  }
+  },
+  inProgress: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
+  },
 });
 
 export default Lobby;

@@ -4,6 +4,8 @@ import express from "express";
 import crypto from "crypto";
 import util from "util";
 import Lobby from "../models/lobby";
+import Player from '../models/player';
+import User from '../models/user';
 import sql from "../sequelize";
 import path from "path";
 import fs from "fs";
@@ -106,13 +108,13 @@ gameRouter.get("/lobby/:id", async(req, res) => {
     return player.id;
   });
 
-  let playerImages = await sql.query(`SELECT image_name, username FROM users WHERE username IN (:usernames)`, { 
+  let playerImages = await sql.query(`SELECT image_name, username FROM users WHERE username IN (:usernames)`, {
     replacements: {
       usernames: usernames
-    }, 
-    type: sql.QueryTypes.SELECT 
+    },
+    type: sql.QueryTypes.SELECT
   });
- 
+
   playerImages.forEach((image) => {
     players.forEach((player) => {
       if(player.id === image.username) {
@@ -167,11 +169,21 @@ export const joinRoute = async(req, res) => {
     return;
   }
 
-  await Lobby.create({
+  let newPlayer = await Player.create({
+    spriteName: Player.getRandomSprite()
+  });
+  let user = await User.findOne({
+    where: {
+      username: req.user.username
+    }
+  });
+  await user.addPlayer(newPlayer);
+  let newLobby = await Lobby.create({
     lobbyId: lobby.lobbyId,
     secret: lobby.secret,
     playerId: req.user.username
   });
+  await newPlayer.setLobby(newLobby);
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
@@ -204,12 +216,22 @@ gameRouter.get("/new", async(req, res) => {
   let id = await genId(ID_LENGTH);
   let secret = await genId(SECRET_LENGTH);
 
-  await Lobby.create({
+  let newPlayer = await Player.create({
+    spriteName: Player.getRandomSprite()
+  });
+  let user = await User.findOne({
+    where: {
+      username: req.user.username
+    }
+  });
+  await user.addPlayer(newPlayer);
+  let newLobby = await Lobby.create({
     secret,
     lobbyId: id,
     playerId: req.user.username,
     isHost: true
   });
+  await newPlayer.setLobby(newLobby);
 
   res.redirect(`/game/lobby/${id}`);
 });
@@ -226,6 +248,11 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
       playerId: req.user.username
     }
   });
+  let allLobbies = await Lobby.findAll({
+    where: {
+      lobbyId: req.params.id
+    }
+  });
 
   if(lobby) {
     if(lobby.isHost) {
@@ -233,6 +260,15 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
         where: {
           lobbyId: req.params.id
         }
+      });
+      /* This will need to refactored once the following has occured:
+       * Users 1 -> * Lobbies -> * Players */
+      allLobbies.forEach(async(singleLobby) => {
+        await Player.destroy({
+          where: {
+            id: singleLobby.player
+          }
+        });
       });
       io.emit("lobby-delete", req.params.id);
       res.redirect("/account/dashboard");
@@ -273,14 +309,21 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
     }
   });
 
-  if(lobby) {
+  let player = await Player.find({
+    where: {
+      id: lobby.player
+    }
+  });
+
+  if(lobby && player) {
+    await player.destroy();
     await lobby.destroy();
 
     io.emit("lobby-drop", {
       id: req.params.id,
       player: req.params.player
     });
-
+    // Modify Lobby table here
     res.end("Player removed");
   }
 
@@ -302,18 +345,11 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
   });
 
   if(lobby && lobby.isHost) {
-    await Lobby.destroy({
-      where: {
-        lobbyId: req.params.id
-      }
-    });
-    
     try {
       await mkdir("Frontend/public/maps");
     } catch(err) {
       // pass
     }
-
     // Generate the game
     await Floor.generate({
       gameId: req.params.id,
@@ -324,9 +360,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       await spawnGame({
         gameId: req.params.id
       });
-
       io.emit("lobby-start", req.params.id);
-
       res.end("Game started");
     } catch(err) {
       process.stderr.write(`Error starting game: ${err.message}\n`);
@@ -351,3 +385,4 @@ gameRouter.get(/[A-Za-z0-9]{12}/, (req, res) => {
 gameRouter.get('/test', (req, res) => {
   res.sendFile(path.resolve("Frontend/game/Tests/index.html"));
 });
+
