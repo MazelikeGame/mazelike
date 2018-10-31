@@ -25,6 +25,6 @@ Player.getRandomSprite = () => {
  * The player model. Has one to many relationship with the User model.
  * Has one to one relationship with the Lobby model.
  * @param {String} spriteName - Name of the sprite used for this player.
- * @param {Integer} numFloor - The floorId the player is on. This id also includes the gameId.
+ * @param {Integer} numFloor - The floorId the player is on.
  */
 export default Player;
