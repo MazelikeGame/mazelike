@@ -11,7 +11,8 @@ const sql = new Sequelize({
   port: process.env.DB_PORT,
   dialect: process.env.DB_STORAGE ? "sqlite" : 'mysql',
   operatorsAliases: false,
-  storage: process.env.DB_STORAGE
+  storage: process.env.DB_STORAGE,
+  logging: false
 }); //logging: false - to turn logging off.
 
 export default sql;

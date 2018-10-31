@@ -102,6 +102,7 @@ async function startContainer(container, gameId, gameEnv) {
   try {
     await container.start();
   } catch(err) {
+    console.log(err.message);
     // check if the port is already being used
     if(err.message.indexOf("address already in use") !== -1) {
       portMap.delete(gameId);
