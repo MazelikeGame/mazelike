@@ -7,8 +7,7 @@ const ENV_NAMES = [
   "DB_USER",
   "DB_PASS",
   "DB_DATABASE",
-  "NODE_ENV",
-  "DB_STORAGE"
+  "NODE_ENV"
 ];
 
 const IMAGE_NAME = process.env.IMAGE_NAME || "mazelike/backend:devel";
