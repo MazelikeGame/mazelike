@@ -25,8 +25,13 @@ COPY Backend Backend
 COPY config config
 COPY migrations migrations
 COPY seeders seeders
+COPY scripts scripts
+
+COPY VERSION .
+RUN node scripts/fixup.js
 
 VOLUME /app/Frontend/public
 EXPOSE 3000
+
 
 CMD ["npm", "start"]

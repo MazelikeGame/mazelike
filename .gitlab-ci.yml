@@ -7,7 +7,10 @@ stages:
 Build:
   stage: build
   script:
+    - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - sed s/$VERSION/0.0.0/ -i package*.json
+    - echo $VERSION > VERSION
     - docker-compose build backend
     # - docker-compose up -d backend
 
