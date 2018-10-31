@@ -67,8 +67,8 @@ async function setup() {
   let floor;
   sock.emit("ready", gameId);
 
-  let sock2 = io(location.origin);
-  sock2.emit("ready", gameId);
+  let sock2 = io(location.origin); //Get rid of this
+  sock2.emit("ready", gameId); //Put this on the game server.
   console.log(`User: ${username}`); // eslint-disable-line
 
   if(gameId) {
