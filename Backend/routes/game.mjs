@@ -256,6 +256,11 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
           lobbyId: req.params.id
         }
       });
+      await Player.destroy({
+        where: {
+          player: lobby.lobby
+        }
+      });
       io.emit("lobby-delete", req.params.id);
       res.redirect("/account/dashboard");
     } else {
