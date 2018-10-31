@@ -10,9 +10,51 @@
         margin: 0px;
         padding: 0px;
       }
+
+      .backdrop {
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        opacity: 0.5;
+        background: #000;
+        z-index: 98;
+      }
+
+      .lightbox {
+        top: 0px;
+        left: 0px;
+        width:100%;
+        height: 100%;
+        position: fixed;
+        z-index: 99;
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 15px;
+      }
+
+      .popup {
+        background: #fff;
+        width: 500px;
+        padding: 10px;
+        margin: 20px auto;
+        border-radius: 7px;
+      }
     </style>
   </head>
   <body>
+    <div class="msg-parent">
+      <div class="backdrop"></div>
+      <div class="lightbox">
+        <div class="popup">
+          <h2>Waiting for game to start</h2>
+          <p class="msg">Loading assets</p>
+        </div>
+      </div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.dev.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js"></script>
     <script type="module" src="game.mjs"></script>

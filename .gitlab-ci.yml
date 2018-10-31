@@ -28,8 +28,9 @@ Browser_Tests:
   stage: test
   script:
     # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-    - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests/ -i docker-compose.yml
+    - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests:alpine/ -i docker-compose.yml
     - touch runner-result
+    - chmod 666 runner-result
     - docker-compose up -d
     - node scripts/test-stopper.js
 
@@ -53,6 +54,5 @@ Deploy:
       - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
       - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
       - deploy latest
-      - push Master "Deployed version $VERSION"
   only:
     - master

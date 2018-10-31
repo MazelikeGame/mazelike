@@ -3,7 +3,10 @@
 
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
-import PlayerList from "./player-list.js";
+import PlayerList from "./browser/player-list.js";
+
+let msgEl = document.querySelector(".msg");
+let msgParentEl = document.querySelector(".msg-parent");
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
@@ -50,10 +53,23 @@ const addArrowKeyListener = (floor) => {
   });
 };
 
+function getUsername(sock) {
+  return new Promise((resolve) => {
+    sock.once("set-username", resolve);
+  });
+}
+
 async function setup() {
+  msgEl.innerText = "Connecting to the game server";
   let sock = io(`http://${await (await fetch(`/game/addr/${gameId}`)).text()}`);
+  let username = await getUsername(sock);
+  msgEl.innerText = "Loading game";
   let floor;
   sock.emit("ready", gameId);
+
+  let sock2 = io(location.origin);
+  sock2.emit("ready", gameId);
+  console.log(`User: ${username}`); // eslint-disable-line
 
   if(gameId) {
     floor = await Floor.load(gameId, 0, sock);
@@ -73,7 +89,7 @@ async function setup() {
     fps = new FpsCounter();
     app.stage.addChild(fps.sprite);
   }
-  let sock2 = io(location.origin);
+
   sock2.on("player-list", (players) => {
     let playerList = new PlayerList(players);
     app.stage.addChild(playerList.render());
@@ -82,16 +98,58 @@ async function setup() {
   window.ml.floor = floor;
   addArrowKeyListener(floor);
 
-  window.setInterval(function() { 
-    for(let i = 0; i < floor.monsters.length; i++) {
-      floor.monsters[i].figureOutWhereToGo();
-    }
-  }, 500);
+  sock.on("state", (state) => {
+    floor.handleState(state);
+  });
+
+  // display the countdown when it starts
+  sock.on("countdown", (count) => {
+    msgEl.innerText = `The game will start in ${count}`;
+  });
+
+  // wait for the game to start
+  msgEl.innerText = "Waiting for all players to join";
+
+  await new Promise((resolve) => {
+    sock.once("start-game", resolve);
+  });
+  
+  msgParentEl.remove();
+
+  // don't run monster logic multiplayer game (for now)
+  if(!gameId) {
+    window.setInterval(function() { 
+      for(let i = 0; i < floor.monsters.length; i++) {
+        if(floor.monsters[i].type !== "blue") { // not a blue monster
+          floor.monsters[i].figureOutWhereToGo();
+        }
+      }
+    }, 500);
+  }
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
-      floor.monsters[i].move();
+      if(floor.monsters[i].type !== "blue") { // not a blue monster
+        floor.monsters[i].move();
+      }
     }
   }, 10);
+
+  if(!gameId) {
+    window.setInterval(function() {
+      for(let i = 0; i < floor.monsters.length; i++) {
+        if(floor.monsters[i].type === "blue") { // is a blue monster
+          floor.monsters[i].figureOutWhereToGo();
+        }
+      }
+    }, 1000);
+  }
+  window.setInterval(function() {
+    for(let i = 0; i < floor.monsters.length; i++) {
+      if(floor.monsters[i].type === "blue") { // is a blue monster
+        floor.monsters[i].move();
+      }
+    }
+  }, 20);
   
   app.ticker.add(() => {
     floor.update();
@@ -101,7 +159,6 @@ async function setup() {
     }
   });
 }
-
 
 // load the textures
 PIXI.loader

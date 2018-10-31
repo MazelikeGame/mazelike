@@ -7,6 +7,7 @@ services:
       context: .
     environment:
       DB_STORAGE: ":memory:"
+      CLUSTER_MANAGER: none
     expose:
       - 3000
     networks:
@@ -26,10 +27,10 @@ services:
     volumes:
       - type: bind
         source: ./runner-result
-        target: /app/runner-result
+        target: /usr/src/app/runner-result
       - type: bind
         source: ./scripts
-        target: /app/scripts
+        target: /usr/src/app/scripts
 
 networks:
   mazelike_testing:

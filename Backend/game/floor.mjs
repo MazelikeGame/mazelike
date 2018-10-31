@@ -2,8 +2,6 @@
 import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
 import Monster from "./monster.mjs";
-import MonsterModel from "../models/monster";
-
 
 export default class Floor extends FloorCommon {
   /**
@@ -22,14 +20,22 @@ export default class Floor extends FloorCommon {
     return floor;
   }
 
-  /** katie
+  /**
    * Puts a monster in half of all "rooms".
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters() {
     this.monsters = [];
+    let random = 0;
     for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) { 
-      this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
+      random = Math.floor(Math.random() * 100); 
+      if(random < 15) { // 15% chance for blue demon
+        this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
+      } else if(random < 50) { // 35% chance for red demon, where 15+35 = 50
+        this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
+      } else if(random < 100) { // 50% chance for green demon, where 15+35+50 = 100
+        this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
+      }
     }
   }
 
@@ -43,7 +49,7 @@ export default class Floor extends FloorCommon {
 
     await Promise.all([
       GameMap.load(floor),
-      //floor.loadMonsters(floor) // untested todo
+      Monster.load(floor)
     ]);
 
     return floor;
@@ -51,28 +57,39 @@ export default class Floor extends FloorCommon {
 
   /**
    * Save the floor (server side)
+   * @param {boolean} create Create new rows (first save only)
    */
-  save() {
+  save(create) {
     return Promise.all([
       this.map.save(this.id),
-      this.monsters[0].save()
+      Monster.saveAll(this, create)
     ]);
   }
-  
-  async loadMonsters(floor) { // wip UNTESTED
-    //console.log("\nloading started");
-    for(let i = 0; i < floor.map.rooms.length * this.monsterRatio; i++) {
-      //console.log(i);
-      let monsterDB = await MonsterModel.find({
-        where: {
-          floorId: floor.floor.floodId,
-          id: i
-        }
-      }); //if nothing returned, dont create monster todo
-      floor.monsters[i] = new Monster('sir spoopy', monsterDB.hp, 10, this, i, monsterDB.type);
-      floor.monsters[i].setCoodinates(monsterDB.x, monsterDB.y);
+
+  /**
+   * Moves all monsters and checks for collisions (also anything else that happens every turn)
+   * @param {number} deltaTime The time that has ellasped since the last tick
+   */
+  tick(deltaTime) {
+    for(let monster of this.monsters) {
+      let moves = Math.floor(deltaTime / (monster.type === "blue" ? 20 : 10));
+
+      // HACK: Monsters should move based on deltaTime
+      for(let i = 0; i < moves; ++i) {
+        monster.move();
+      }
+
+      monster.figureOutWhereToGo();
     }
-    //console.log("monsters loaded\n");
   }
 
+  /**
+   * Send the current state of the floor to the client
+   * @param {} io The socket io instance (not a sock)
+   */
+  sendState(io) {
+    io.emit("state", {
+      monsters: this.monsters
+    });
+  }
 }

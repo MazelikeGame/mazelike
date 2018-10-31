@@ -1,5 +1,4 @@
 import child_process from "child_process";
-import poll from "./manager-connect.mjs";
 
 const CHILD_MAIN = "Backend/game.mjs";
 const ADDRESS = process.env.EXTERN_ADDRESS || "localhost";
@@ -31,33 +30,22 @@ export function spawnGame(gameEnv = {}) {
       process.stderr.write(`Child exited with non-zero status code ${code}\n`);
     }
 
+    if(code === 198) {
+      inUsePorts.add(port);
+      spawnGame(origEnv);
+    }
+
     inUsePorts.delete(port);
     portMap.delete(gameId);
   });
 
-  return Promise.race([
-    // listen for spawn errors
-    new Promise((resolve, reject) => {
-      child.on("error", (err) => {
-        reject(new Error(`An error occured when spawning the game server: ${err.message}`));
-        inUsePorts.delete(port);
-        portMap.delete(gameId);
-      });
+  child.on("error", (err) => {
+    process.stderr.write(`An error occured when spawning the game server: ${err.message}`);
+    inUsePorts.delete(port);
+    portMap.delete(gameId);
+  });
 
-      child.on("exit", (code) => {
-        if(code === 198) {
-          inUsePorts.add(port);
-          resolve(spawnGame(origEnv));
-        }
-      });
-    }),
-
-    // wait for the server to start
-    poll(`${ADDRESS}:${port}`)
-      .then(() => {
-        return `${ADDRESS}:${port}`;
-      })
-  ]);
+  return `${ADDRESS}:${port}`;
 }
 
 function pickPort() {
