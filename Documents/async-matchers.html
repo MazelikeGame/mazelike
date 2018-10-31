@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: backend/game/GameMap</title>
+    <title>JSDoc: Namespace: async-matchers</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: backend/game/GameMap</h1>
+    <h1 class="page-title">Namespace: async-matchers</h1>
 
     
 
@@ -28,6 +28,7 @@
 
 <header>
     
+        <h2>async-matchers</h2>
         
     
 </header>
@@ -36,6 +37,52 @@
     <div class="container-overview">
     
         
+            <div class="description">Asynchronous matchers.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line2030">line 2030</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
 
         
     
@@ -64,7 +111,7 @@
     
 
     
-    <h4 class="name" id=".generate"><span class="type-signature">(static) </span>generate<span class="signature">()</span><span class="type-signature"> &rarr; {GameMap}</span></h4>
+    <h4 class="name" id="toBeRejected"><span class="type-signature">(async) </span>toBeRejected<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -72,7 +119,7 @@
 
 
 <div class="description">
-    Geneate a game map
+    Expect a promise to be rejected.
 </div>
 
 
@@ -116,7 +163,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_game-map.mjs.html">Backend/game/game-map.mjs</a>, <a href="Backend_game_game-map.mjs.html#line14">line 14</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line2104">line 2104</a>
     </li></ul></dd>
     
 
@@ -139,26 +186,15 @@
 
 
 
-<h5>Returns:</h5>
-
-        
 
 
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">GameMap</span>
 
 
-    </dd>
-</dl>
-
+    <h5>Examples</h5>
     
+    <pre class="prettyprint"><code>await expectAsync(aPromise).toBeRejected();</code></pre>
 
-
+    <pre class="prettyprint"><code>return expectAsync(aPromise).toBeRejected();</code></pre>
 
 
 
@@ -168,7 +204,7 @@
     
 
     
-    <h4 class="name" id=".load"><span class="type-signature">(async, static) </span>load<span class="signature">(floor)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="toBeResolved"><span class="type-signature">(async) </span>toBeResolved<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -176,7 +212,100 @@
 
 
 <div class="description">
-    Load the game map in nodejs
+    Expect a promise to be resolved.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line2087">line 2087</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>await expectAsync(aPromise).toBeResolved();</code></pre>
+
+    <pre class="prettyprint"><code>return expectAsync(aPromise).toBeResolved();</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="toBeResolvedTo"><span class="type-signature">(async) </span>toBeResolvedTo<span class="signature">(expected)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Expect a promise to be resolved to a value equal to the expected, using deep equality comparison.
 </div>
 
 
@@ -212,13 +341,13 @@
 
         <tr>
             
-                <td class="name"><code>floor</code></td>
+                <td class="name"><code>expected</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Floor</span>
+<span class="param-type">Object</span>
 
 
             
@@ -228,7 +357,7 @@
 
             
 
-            <td class="description last">The floor to load the map for</td>
+            <td class="description last">Value that the promise is expected to resolve to</td>
         </tr>
 
     
@@ -269,7 +398,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_game-map.mjs.html">Backend/game/game-map.mjs</a>, <a href="Backend_game_game-map.mjs.html#line22">line 22</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line2121">line 2121</a>
     </li></ul></dd>
     
 
@@ -296,139 +425,11 @@
 
 
 
-
-        
-            
-
+    <h5>Examples</h5>
     
+    <pre class="prettyprint"><code>await expectAsync(aPromise).toBeResolvedTo({prop: 'value'});</code></pre>
 
-    
-    <h4 class="name" id="save"><span class="type-signature"></span>save<span class="signature">(id)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Save the game map in nodejs
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>id</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The floor id to save the map for</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_game-map.mjs.html">Backend/game/game-map.mjs</a>, <a href="Backend_game_game-map.mjs.html#line33">line 33</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    <pre class="prettyprint"><code>return expectAsync(aPromise).toBeResolvedTo({prop: 'value'});</code></pre>
 
 
 

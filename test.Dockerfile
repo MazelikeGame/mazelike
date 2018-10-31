@@ -1,36 +1,10 @@
-FROM node:8.11
+FROM node:8.11-alpine
 
-WORKDIR /app
-
-# Chrome dependencies copied from https://hub.docker.com/r/geekykaran/headless-chrome-node-docker/~/dockerfile/
-RUN apt-get update -y && \
-    apt-get install ca-certificates \
-      gconf-service \
-      libasound2 \
-      libatk1.0-0 \
-      libatk1.0-0 \
-      libdbus-1-3 \
-      libgconf-2-4 \
-      libgtk-3-0 \
-      libnspr4 \
-      libnss3 \
-      libx11-xcb1 \
-      libxss1 \
-      libxtst6 \
-      fonts-liberation \
-      libappindicator1 \
-      xdg-utils \
-      lsb-release \
-      wget \
-      curl \
-      xz-utils -y --no-install-recommends && \
-    apt-get clean autoclean && \
-    rm -rf /var/lib/apt/lists/*
+WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm install
+RUN sed 's/"bcrypt": "^3.0.0",//' -i package.json && npm install
 
 COPY . .
 
-RUN chmod +x test-inner.sh
-CMD ["/bin/bash", "/app/test-inner.sh"]
+CMD ["/bin/ash", "-c", "./node_modules/.bin/jasmine; echo $? > /usr/src/app/runner-result"]

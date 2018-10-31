@@ -13,6 +13,8 @@ export default class Floor extends FloorCommon {
     // the top left corrner of the user's screen
     this._viewportX = 0;
     this._viewportY = 0;
+
+    this.monsters = [];
   }
 
   /**
@@ -23,7 +25,7 @@ export default class Floor extends FloorCommon {
    */
   static generate({gameId, floorIdx, map, sock}) {
     let floor = new Floor(gameId, floorIdx, sock);
-    let players = [];
+    // let players = [];
     // players.push(new Player('billy bob', 100, map, 0, map.getSpawnPoint()));
 
     floor.map = GameMap.generate(map);
@@ -35,14 +37,24 @@ export default class Floor extends FloorCommon {
     return floor;
   }
 
-  /** katie occurs twice, shouldnt cause errors tho
+  /**
    * Puts a monster in half of all "rooms".
+   * Occurs twice upon floor generation, shouldnt cause errors though.
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters() {
+    this.monsterSprites = new PIXI.Container();
     this.monsters = [];
+    let random = 0;
     for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) {
-      this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
+      random = Math.floor(Math.random() * 100);
+      if(random < 5) { // 5% chance for blue demon
+        this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
+      } else if(random < 45) { // 40% chance for red demon, where 5+40 = 45
+        this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
+      } else if(random < 100) { // 55% chance for green demon, where 5+40+55 = 100
+        this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
+      }
     }
   }
 
@@ -93,6 +105,7 @@ export default class Floor extends FloorCommon {
     for(let i = 0; i < this.monsters.length; i++) {
       this.monsters[i].createSprite();
     }
+    this.sprite.addChild(this.monsterSprites);
   }
 
   /**
@@ -106,7 +119,7 @@ export default class Floor extends FloorCommon {
       this._viewportY + innerHeight
     );
     for(let i = 0; i < this.monsters.length; i++) {
-      this.monsters[i].update(this._viewportX, this._viewportY); // katie
+      this.monsters[i].update(this._viewportX, this._viewportY);
     }
   }
 
@@ -135,5 +148,52 @@ export default class Floor extends FloorCommon {
       x: this._viewportX + halfWidth,
       y: this._viewportY + halfHeight
     };
+  }
+
+  /**
+   * Update our state to match the server's state
+   */
+  handleState(state) {
+    this._diffState("id", this.monsters, state.monsters, (raw) => {
+      let monster = new Monster(raw.name, raw.hp, 10, this, raw.id, raw.type);
+      monster.setCoodinates(raw.x, raw.y);
+      return monster;
+    });
+  }
+
+  /**
+   * Take an array of objects and update it to match another array (keeps objects with matching ids)
+   * @param {string} idKey The property to use as a key
+   * @param {object[]} current The current array of objects
+   * @param {object[]} wanted The array of objects we want
+   * @param {function} create A function that creates an instance of a current object
+   *                          from an instance of a wanted object
+   */
+  _diffState(idKey, current, wanted, create) {
+    // add ids to a map for quick lookups
+    let wantedIds = new Map();
+    for(let obj of wanted) {
+      wantedIds.set(obj[idKey], obj);
+    }
+
+    for(let i = 0; i < current.length; ++i) {
+      let obj = current[i];
+
+      // already have an instance update it
+      if(wantedIds.has(obj[idKey])) {
+        obj.handleState(wantedIds.get(obj[idKey]));
+        wantedIds.delete(obj[idKey]);
+      } else {
+        // unwanted instance (delete)
+        current.splice(i, 1);
+        --i;
+        obj.remove();
+      }
+    }
+
+    // create missing objects
+    for(let wantedObj of wantedIds) {
+      current.push(create(wantedObj));
+    }
   }
 }

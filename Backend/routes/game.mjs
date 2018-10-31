@@ -354,7 +354,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     await Floor.generate({
       gameId: req.params.id,
       floorIdx: 0
-    }).save();
+    }).save(true);
 
     try {
       await spawnGame({

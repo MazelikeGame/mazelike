@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: backend/game/Floor</title>
+    <title>JSDoc: Class: jsApiReporter</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: backend/game/Floor</h1>
+    <h1 class="page-title">Class: jsApiReporter</h1>
 
     
 
@@ -28,6 +28,9 @@
 
 <header>
     
+        <h2><span class="attribs"><span class="type-signature"></span></span>jsApiReporter</h2>
+        
+            <div class="class-description"><a href="Reporter.html">Reporter</a> added by default in `boot.js` to record results for retrieval in javascript code. An instance is made available as `jsApiReporter` on the global object.</div>
         
     
 </header>
@@ -37,7 +40,77 @@
     
         
 
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line1623">line 1623</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     </div>
 
@@ -64,7 +137,7 @@
     
 
     
-    <h4 class="name" id=".generate"><span class="type-signature">(static) </span>generate<span class="signature">(gameId, floorIdx, opts)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="executionTime"><span class="type-signature"></span>executionTime<span class="signature">()</span><span class="type-signature"> &rarr; {Number}</span></h4>
     
 
     
@@ -72,7 +145,113 @@
 
 
 <div class="description">
-    Generate a new floor (runs on the server and the browser)
+    Get the number of milliseconds it took for the full Jasmine suite to run.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line1732">line 1732</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="specResults"><span class="type-signature"></span>specResults<span class="signature">(index, length)</span><span class="type-signature"> &rarr; {Array.&lt;<a href="global.html#SpecResult">SpecResult</a>>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get the results for a set of specs.
+
+Retrievable in slices for easier serialization.
 </div>
 
 
@@ -108,49 +287,13 @@
 
         <tr>
             
-                <td class="name"><code>gameId</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The game id for the game we want to generate</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>floorIdx</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The index of floor we want to generate</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>opts</code></td>
+                <td class="name"><code>index</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Number</span>
 
 
             
@@ -160,280 +303,20 @@
 
             
 
-            <td class="description last">The options of the specific generators</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line13">line 13</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".load"><span class="type-signature">(async, static) </span>load<span class="signature">(gameId, floorIdx)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Load everything on the server
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>gameId</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The game id for the game we want to load</td>
+            <td class="description last">The position in the specs list to start from.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>floorIdx</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The index of floor we want to load</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line47">line 47</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="generateMonsters"><span class="type-signature"></span>generateMonsters<span class="signature">(floor)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Puts a monster in half of all "rooms".
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>floor</code></td>
+                <td class="name"><code>length</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Floor</span>
+<span class="param-type">Number</span>
 
 
             
@@ -443,7 +326,7 @@
 
             
 
-            <td class="description last">The floor to add monsters to</td>
+            <td class="description last">Maximum number of specs results to return.</td>
         </tr>
 
     
@@ -484,7 +367,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line27">line 27</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line1708">line 1708</a>
     </li></ul></dd>
     
 
@@ -507,6 +390,24 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;<a href="global.html#SpecResult">SpecResult</a>></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -518,7 +419,7 @@
     
 
     
-    <h4 class="name" id="save"><span class="type-signature"></span>save<span class="signature">(create)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="specs"><span class="type-signature"></span>specs<span class="signature">()</span><span class="type-signature"> &rarr; {Array.&lt;<a href="global.html#SpecResult">SpecResult</a>>}</span></h4>
     
 
     
@@ -526,7 +427,221 @@
 
 
 <div class="description">
-    Save the floor (server side)
+    Get all spec results.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line1722">line 1722</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;<a href="global.html#SpecResult">SpecResult</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="status"><span class="type-signature"></span>status<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get the current status for the Jasmine environment.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line1652">line 1652</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - One of `loaded`, `started`, or `done`
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="suiteResults"><span class="type-signature"></span>suiteResults<span class="signature">(index, length)</span><span class="type-signature"> &rarr; {Array.&lt;<a href="global.html#SuiteResult">SuiteResult</a>>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get the results for a set of suites.
+
+Retrievable in slices for easier serialization.
 </div>
 
 
@@ -562,13 +677,13 @@
 
         <tr>
             
-                <td class="name"><code>create</code></td>
+                <td class="name"><code>index</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">boolean</span>
+<span class="param-type">Number</span>
 
 
             
@@ -578,262 +693,20 @@
 
             
 
-            <td class="description last">Create new rows (first save only)</td>
+            <td class="description last">The position in the suites list to start from.</td>
         </tr>
 
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line62">line 62</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="sendState"><span class="type-signature"></span>sendState<span class="signature">(io)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Send the current state of the floor to the client
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>io</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The socket io instance (not a sock)</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line90">line 90</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="tick"><span class="type-signature"></span>tick<span class="signature">(deltaTime)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Moves all monsters and checks for collisions (also anything else that happens every turn)
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>deltaTime</code></td>
+                <td class="name"><code>length</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">Number</span>
 
 
             
@@ -843,7 +716,7 @@
 
             
 
-            <td class="description last">The time that has ellasped since the last tick</td>
+            <td class="description last">Maximum number of suite results to return.</td>
         </tr>
 
     
@@ -884,7 +757,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line73">line 73</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line1673">line 1673</a>
     </li></ul></dd>
     
 
@@ -907,6 +780,132 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;<a href="global.html#SuiteResult">SuiteResult</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="suites"><span class="type-signature"></span>suites<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get all of the suites in a single object, with their `id` as the key.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line1692">line 1692</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    - Map of suite id to <a href="global.html#SuiteResult">SuiteResult</a>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
