@@ -9,7 +9,7 @@ Build:
   script:
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - docker-compose build backend
-    - docker-compose up -d backend
+    - docker-compose up -d
 
 Eslint:
   stage: test
