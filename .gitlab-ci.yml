@@ -11,7 +11,6 @@ Build:
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - sed s/$VERSION/0.0.0/ -i package*.json
     - echo $VERSION > VERSION
-    - cat package.json
     - docker-compose build backend
     # - docker-compose up -d backend
 

@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-let version = fs.readFileSync("VERSION", "utf8");
+let version = fs.readFileSync("VERSION", "utf8").trim();
 
 if(version.indexOf("--- DO NOT MODIFY ---") !== -1) {
   process.exit(0);
