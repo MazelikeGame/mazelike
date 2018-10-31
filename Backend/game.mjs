@@ -3,6 +3,7 @@ import http from "http";
 import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
 import initAuth from "./game-auth.mjs";
+/* eslint-disable */
 
 // then interval at which we update the game state (if this is too short the server will break)
 const UPDATE_INTERVAL = 250;
@@ -42,6 +43,7 @@ async function main() {
   initAuth(io);
 
   io.on("connection", (sock) => {
+    console.log("Hoy");
     sock.emit("set-username", sock.user.username);
 
     saveHandler(sock, floor);
@@ -53,6 +55,8 @@ async function main() {
   await new Promise((resolve) => {
     setTimeout(resolve, 5000);
   });
+
+  console.log("Here");
 
   // start the count down
   for(let i = 5; i > 0; --i) {
