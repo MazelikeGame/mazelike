@@ -136,7 +136,7 @@ describe("Lobby", function() {
     });
 
     chai.should().equal(res.statusCode, 200);
-    
+
     let {res: res2, body} = await requestAsync({
       url: `${SERVER_URL}/game/lobby/${lobbyId}`,
       followRedirect: false,
@@ -160,7 +160,7 @@ describe("Lobby", function() {
       jar: true
     });
 
-    chai.should().equal(res.statusCode, 404);    
+    chai.should().equal(res.statusCode, 404);
   });
 
   itAsync("can start a game", async() => {
@@ -187,6 +187,6 @@ describe("Lobby", function() {
       jar: true
     });
 
-    chai.should().equal(res2.statusCode, 404);
+    chai.should().equal(res2.statusCode, 200);
   });
 });
