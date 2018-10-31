@@ -1,39 +1,38 @@
 stages:
   - build
   - test
-  # - cleanup
+  - cleanup
   - deploy
 
 Build:
   stage: build
   script:
-    - VERSION=$(cat VERSION)
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - docker-compose build backend
-    # - docker-compose up -d backend
+    - docker-compose up -d backend
 
 Eslint:
   stage: test
   script:
     - npm run eslint
 
-# Backend_Tests:
-#   stage: test
-#   script:
-#     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-#     - touch runner-result
-#     - docker-compose up -d
-#     - node scripts/test-stopper.js
+Backend_Tests:
+  stage: test
+  script:
+    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - touch runner-result
+    - docker-compose up -d
+    - node scripts/test-stopper.js
 
-# Browser_Tests:
-#   stage: test
-#   script:
-#     # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-#     - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests:alpine/ -i docker-compose.yml
-#     - touch runner-result
-#     - chmod 666 runner-result
-#     - docker-compose up -d
-#     - node scripts/test-stopper.js
+Browser_Tests:
+  stage: test
+  script:
+    # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
+    - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests:alpine/ -i docker-compose.yml
+    - touch runner-result
+    - chmod 666 runner-result
+    - docker-compose up -d
+    - node scripts/test-stopper.js
 
 Version_Change:
   stage: test
@@ -41,11 +40,11 @@ Version_Change:
   script:
     - node scripts/version-check.js
 
-# Cleanup:
-#   stage: cleanup
-#   when: always
-#   script:
-#     - docker-compose down
+Cleanup:
+  stage: cleanup
+  when: always
+  script:
+    - docker-compose down
 
 Deploy:
   stage: deploy
