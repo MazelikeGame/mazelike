@@ -21,9 +21,9 @@ export function spawnGame(gameEnv = {}) {
   portMap.set(gameId, port);
   inUsePorts.add(port);
 
-  let child = child_process.spawn("node", ["--experimental-modules", CHILD_MAIN, port], {
+  let child = child_process.spawn(process.argv[0], ['--experimental-modules', CHILD_MAIN, port], {
     env: gameEnv,
-    stdio: ["ignore", "inherit", "inherit"]
+    stdio: ['ignore', 'inherit', 'inherit']
   });
 
   child.on("exit", (code) => {
