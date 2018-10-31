@@ -49,11 +49,6 @@ async function main() {
 
   // In the future we should wait for all players to join here
 
-  // HACK: Wait for 5 seconds otherwise players miss the window to join
-  await new Promise((resolve) => {
-    setTimeout(resolve, 5000);
-  });
-
   // start the count down
   for(let i = 5; i > 0; --i) {
     await new Promise((resolve) => {
