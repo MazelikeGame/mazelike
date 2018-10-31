@@ -4,6 +4,7 @@
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
 import PlayerList from "./browser/player-list.js";
+import DisconnectMessage from "./browser/disconnect-msg.js"
 
 let msgEl = document.querySelector(".msg");
 let msgParentEl = document.querySelector(".msg-parent");
@@ -150,6 +151,11 @@ async function setup() {
       }
     }
   }, 20);
+
+  sock.on("disconnect", () => {
+    let disconnectMessage = new DisconnectMessage("Disconnected!");
+    app.stage.addChild(disconnectMessage.render());
+  });
   
   app.ticker.add(() => {
     floor.update();
