@@ -5,7 +5,7 @@ import PlayerCommon from "../common/player.mjs";
 const SPRITE_SIZE = 48;
 
 /**
- * TODO: Have Player inherit from class Character. Same goes for Monster class.
+ * Have Player inherit from class Character. Same goes for Monster class.
  */
 export default class Player extends PlayerCommon {
 
@@ -22,7 +22,7 @@ export default class Player extends PlayerCommon {
   /**
    * Load a Player
    */
-  static async load(floor) {
+  // static async load(floor) {
 
-  }
+  // }
 }

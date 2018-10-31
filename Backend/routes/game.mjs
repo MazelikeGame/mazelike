@@ -323,7 +323,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
       id: req.params.id,
       player: req.params.player
     });
-    // TODO: Modify Lobby table here
+    // Modify Lobby table here
     res.end("Player removed");
   }
 

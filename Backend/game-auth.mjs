@@ -1,7 +1,6 @@
 import sessionStore from "./session-store";
 import session from 'express-session';
 import User from "./models/user";
-import sql from "./sequelize";
 
 
 export default function initAuth(io) {

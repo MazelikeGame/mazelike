@@ -3,7 +3,7 @@ import PlayerCommon from '../../Frontend/game/common/player.mjs';
 
 /** @module backend/game/player */
 /**
- * TODO: Have Player inherit from class Character. Same goes for Monster class.
+ * Have Player inherit from class Character. Same goes for Monster class.
  */
 
 /**
@@ -23,7 +23,7 @@ export default class Player extends PlayerCommon {
     if(!floor.players) {
       floor.players = [];
     }
-    // TODO: Get the username of the users. Query some table for games
+    // Get the username of the users. Query some table for games
     floor.players.push(new Player('billy', 100, {x: 0, y: 0}));
   }
 }
