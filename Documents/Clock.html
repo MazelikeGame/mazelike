@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: backend/game/GameMap</title>
+    <title>JSDoc: Class: Clock</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: backend/game/GameMap</h1>
+    <h1 class="page-title">Class: Clock</h1>
 
     
 
@@ -28,6 +28,9 @@
 
 <header>
     
+        <h2><span class="attribs"><span class="type-signature"></span></span>Clock<span class="signature">()</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Jasmine's mock clock is used when testing time dependent code.</div>
         
     
 </header>
@@ -37,34 +40,12 @@
     
         
 
-        
     
-    </div>
-
+    <h2>Constructor</h2>
     
 
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".generate"><span class="type-signature">(static) </span>generate<span class="signature">()</span><span class="type-signature"> &rarr; {GameMap}</span></h4>
+    <h4 class="name" id="Clock"><span class="type-signature"></span>new Clock<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -72,7 +53,7 @@
 
 
 <div class="description">
-    Geneate a game map
+    _Note:_ Do not construct this directly, Jasmine will make one during booting. You can get the current clock with <a href="jasmine.html#.clock">jasmine.clock</a>.
 </div>
 
 
@@ -116,7 +97,113 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_game-map.mjs.html">Backend/game/game-map.mjs</a>, <a href="Backend_game_game-map.mjs.html#line14">line 14</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line2370">line 2370</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="install"><span class="type-signature"></span>install<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Clock.html">Clock</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Install the mock clock over the built-in methods.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line2395">line 2395</a>
     </li></ul></dd>
     
 
@@ -150,7 +237,7 @@
     </dt>
     <dd>
         
-<span class="param-type">GameMap</span>
+<span class="param-type"><a href="Clock.html">Clock</a></span>
 
 
     </dd>
@@ -168,7 +255,7 @@
     
 
     
-    <h4 class="name" id=".load"><span class="type-signature">(async, static) </span>load<span class="signature">(floor)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="mockDate"><span class="type-signature"></span>mockDate<span class="signature">(initialDate<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
     
 
     
@@ -176,7 +263,7 @@
 
 
 <div class="description">
-    Load the game map in nodejs
+    Instruct the installed Clock to also mock the date returned by `new Date()`
 </div>
 
 
@@ -200,7 +287,11 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -212,23 +303,39 @@
 
         <tr>
             
-                <td class="name"><code>floor</code></td>
+                <td class="name"><code>initialDate</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Floor</span>
+<span class="param-type">Date</span>
 
 
             
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
             
 
-            <td class="description last">The floor to load the map for</td>
+            
+                <td class="default">
+                
+                    now
+                
+                </td>
+            
+
+            <td class="description last">The `Date` to provide.</td>
         </tr>
 
     
@@ -269,7 +376,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_game-map.mjs.html">Backend/game/game-map.mjs</a>, <a href="Backend_game_game-map.mjs.html#line22">line 22</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line2444">line 2444</a>
     </li></ul></dd>
     
 
@@ -303,7 +410,7 @@
     
 
     
-    <h4 class="name" id="save"><span class="type-signature"></span>save<span class="signature">(id)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="tick"><span class="type-signature"></span>tick<span class="signature">(millis)</span><span class="type-signature"></span></h4>
     
 
     
@@ -311,7 +418,7 @@
 
 
 <div class="description">
-    Save the game map in nodejs
+    Tick the Clock forward, running any enqueued timeouts along the way
 </div>
 
 
@@ -347,13 +454,13 @@
 
         <tr>
             
-                <td class="name"><code>id</code></td>
+                <td class="name"><code>millis</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">int</span>
 
 
             
@@ -363,7 +470,7 @@
 
             
 
-            <td class="description last">The floor id to save the map for</td>
+            <td class="description last">The number of milliseconds to tick.</td>
         </tr>
 
     
@@ -404,7 +511,230 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_game-map.mjs.html">Backend/game/game-map.mjs</a>, <a href="Backend_game_game-map.mjs.html#line33">line 33</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line2470">line 2470</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="uninstall"><span class="type-signature"></span>uninstall<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Uninstall the mock clock, returning the built-in methods to their places.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line2413">line 2413</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="withMock"><span class="type-signature"></span>withMock<span class="signature">(Function)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Execute a function with a mocked Clock
+
+The clock will be <a href="Clock.html#install">install</a>ed before the function is called and <a href="Clock.html#uninstall">uninstall</a>ed in a `finally` after the function completes.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>Function</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">closure</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The function to be called.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line2427">line 2427</a>
     </li></ul></dd>
     
 

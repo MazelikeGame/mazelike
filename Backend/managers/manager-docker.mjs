@@ -1,5 +1,14 @@
+/* eslint-disable complexity */
 import dockerApi from "node-docker-api";
-import poll from "./manager-connect";
+
+const ENV_NAMES = [
+  "DB_HOST",
+  "DB_PORT",
+  "DB_USER",
+  "DB_PASS",
+  "DB_DATABASE",
+  "NODE_ENV"
+];
 
 const IMAGE_NAME = process.env.IMAGE_NAME || "mazelike/backend:devel";
 const ADDRESS = process.env.EXTERN_ADDRESS;
@@ -17,6 +26,11 @@ export async function spawnGame(gameEnv = {}) {
   let envArray = [];
   for(let key of Object.keys(gameEnv)) {
     envArray.push(`MAZELIKE_${key}=${gameEnv[key]}`);
+  }
+
+  // copy our env to the child
+  for(let envName of ENV_NAMES) {
+    envArray.push(`${envName}=${process.env[envName]}`);
   }
 
   let hostname = `mazelike-${PREFIX}${gameEnv.gameId}`;
@@ -52,24 +66,6 @@ export async function spawnGame(gameEnv = {}) {
   let addr = await startContainer(container, gameEnv.gameId, gameEnv);
   if(addr) {
     return addr;
-  }
-
-  let ip = (await container.status()).data.NetworkSettings.IPAddress;
-
-  // wait for the server to start
-  try {
-    await poll(`${ip}:${port}`);
-  } catch(err) {
-    try {
-      await container.kill();
-    } catch(err2) {
-      // pass
-    }
-
-    inUsePorts.delete(port);
-    portMap.delete(gameEnv.gameId);
-
-    throw err;
   }
 
   waitForClose(container, port, gameEnv.gameId); // DO NOT AWAIT THIS

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: backend/game/Floor</title>
+    <title>JSDoc: Interface: SpyStrategy</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: backend/game/Floor</h1>
+    <h1 class="page-title">Interface: SpyStrategy</h1>
 
     
 
@@ -28,6 +28,7 @@
 
 <header>
     
+        <h2>SpyStrategy</h2>
         
     
 </header>
@@ -36,6 +37,50 @@
     <div class="container-overview">
     
         
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line5945">line 5945</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
 
         
     
@@ -54,6 +99,82 @@
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="identity"><span class="type-signature"></span>identity<span class="type-signature"> :String</span></h4>
+
+
+
+
+<div class="description">
+    Get the identifying information for the spy.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">String</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line5951">line 5951</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -64,7 +185,7 @@
     
 
     
-    <h4 class="name" id=".generate"><span class="type-signature">(static) </span>generate<span class="signature">(gameId, floorIdx, opts)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="callFake"><span class="type-signature"></span>callFake<span class="signature">(fn)</span><span class="type-signature"></span></h4>
     
 
     
@@ -72,7 +193,7 @@
 
 
 <div class="description">
-    Generate a new floor (runs on the server and the browser)
+    Tell the spy to call a fake implementation when invoked.
 </div>
 
 
@@ -108,49 +229,13 @@
 
         <tr>
             
-                <td class="name"><code>gameId</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The game id for the game we want to generate</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>floorIdx</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The index of floor we want to generate</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>opts</code></td>
+                <td class="name"><code>fn</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">function</span>
 
 
             
@@ -160,7 +245,7 @@
 
             
 
-            <td class="description last">The options of the specific generators</td>
+            <td class="description last">The function to invoke with the passed parameters.</td>
         </tr>
 
     
@@ -201,7 +286,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line13">line 13</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line6043">line 6043</a>
     </li></ul></dd>
     
 
@@ -235,7 +320,7 @@
     
 
     
-    <h4 class="name" id=".load"><span class="type-signature">(async, static) </span>load<span class="signature">(gameId, floorIdx)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="callThrough"><span class="type-signature"></span>callThrough<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -243,7 +328,7 @@
 
 
 <div class="description">
-    Load everything on the server
+    Tell the spy to call through to the real implementation when invoked.
 </div>
 
 
@@ -252,68 +337,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>gameId</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The game id for the game we want to load</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>floorIdx</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The index of floor we want to load</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -349,7 +372,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line47">line 47</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line5992">line 5992</a>
     </li></ul></dd>
     
 
@@ -383,7 +406,7 @@
     
 
     
-    <h4 class="name" id="generateMonsters"><span class="type-signature"></span>generateMonsters<span class="signature">(floor)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="exec"><span class="type-signature"></span>exec<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -391,7 +414,93 @@
 
 
 <div class="description">
-    Puts a monster in half of all "rooms".
+    Execute the current spy strategy.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line5983">line 5983</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="returnValue"><span class="type-signature"></span>returnValue<span class="signature">(value)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Tell the spy to return the value when invoked.
 </div>
 
 
@@ -427,13 +536,13 @@
 
         <tr>
             
-                <td class="name"><code>floor</code></td>
+                <td class="name"><code>value</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Floor</span>
+<span class="param-type">*</span>
 
 
             
@@ -443,7 +552,7 @@
 
             
 
-            <td class="description last">The floor to add monsters to</td>
+            <td class="description last">The value to return.</td>
         </tr>
 
     
@@ -484,7 +593,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line27">line 27</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line6002">line 6002</a>
     </li></ul></dd>
     
 
@@ -518,7 +627,7 @@
     
 
     
-    <h4 class="name" id="save"><span class="type-signature"></span>save<span class="signature">(create)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="returnValues"><span class="type-signature"></span>returnValues<span class="signature">(&hellip;values)</span><span class="type-signature"></span></h4>
     
 
     
@@ -526,7 +635,7 @@
 
 
 <div class="description">
-    Save the floor (server side)
+    Tell the spy to return one of the specified values (sequentially) each time the spy is invoked.
 </div>
 
 
@@ -550,6 +659,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -562,23 +673,33 @@
 
         <tr>
             
-                <td class="name"><code>create</code></td>
+                <td class="name"><code>values</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">boolean</span>
+<span class="param-type">*</span>
 
 
             
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
 
             
 
-            <td class="description last">Create new rows (first save only)</td>
+            <td class="description last">Values to be returned on subsequent calls to the spy.</td>
         </tr>
 
     
@@ -619,7 +740,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line62">line 62</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line6015">line 6015</a>
     </li></ul></dd>
     
 
@@ -653,7 +774,7 @@
     
 
     
-    <h4 class="name" id="sendState"><span class="type-signature"></span>sendState<span class="signature">(io)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="stub"><span class="type-signature"></span>stub<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -661,7 +782,7 @@
 
 
 <div class="description">
-    Send the current state of the floor to the client
+    Tell the spy to do nothing when invoked. This is the default.
 </div>
 
 
@@ -670,50 +791,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>io</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The socket io instance (not a sock)</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -749,7 +826,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line90">line 90</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line6057">line 6057</a>
     </li></ul></dd>
     
 
@@ -783,7 +860,7 @@
     
 
     
-    <h4 class="name" id="tick"><span class="type-signature"></span>tick<span class="signature">(deltaTime)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="throwError"><span class="type-signature"></span>throwError<span class="signature">(something)</span><span class="type-signature"></span></h4>
     
 
     
@@ -791,7 +868,7 @@
 
 
 <div class="description">
-    Moves all monsters and checks for collisions (also anything else that happens every turn)
+    Tell the spy to throw an error when invoked.
 </div>
 
 
@@ -827,13 +904,16 @@
 
         <tr>
             
-                <td class="name"><code>deltaTime</code></td>
+                <td class="name"><code>something</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">Error</span>
+|
+
+<span class="param-type">String</span>
 
 
             
@@ -843,7 +923,7 @@
 
             
 
-            <td class="description last">The time that has ellasped since the last tick</td>
+            <td class="description last">Thing to throw</td>
         </tr>
 
     
@@ -884,7 +964,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_floor.mjs.html">Backend/game/floor.mjs</a>, <a href="Backend_game_floor.mjs.html#line73">line 73</a>
+        <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html">Frontend/game/Tests/jasmine-3.2.0/jasmine.js</a>, <a href="Frontend_game_Tests_jasmine-3.2.0_jasmine.js.html#line6029">line 6029</a>
     </li></ul></dd>
     
 

@@ -4,6 +4,9 @@ import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
 import initAuth from "./game-auth.mjs";
 
+// then interval at which we update the game state (if this is too short the server will break)
+const UPDATE_INTERVAL = 250;
+
 async function main() {
   // Parse the env vars
   const PORT = +process.argv[2];
@@ -43,11 +46,43 @@ async function main() {
 
     saveHandler(sock, floor);
   });
+
+  // In the future we should wait for all players to join here
+
+  // start the count down
+  for(let i = 5; i > 0; --i) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+
+    io.emit("countdown", i);
+  }
+
+  // start the game
+  await floor.sendState(io);
+  io.emit("start-game");
+
+  triggerTick(floor, io, Date.now());
+}
+
+async function triggerTick(floor, io, lastUpdate) {
+  let now = Date.now();
+
+  // save and quit if we loose all the clients
+  if(io.engine.clientsCount === 0) {
+    await floor.save();
+    process.exit(0);
+  }
+
+  // move monsters and check for collisions
+  try {
+    await floor.tick(now - lastUpdate);
+    await floor.sendState(io);
+  } catch(err) {
+    process.stderr.write(`${err.stack}\n`);
+  }
+
+  setTimeout(triggerTick.bind(undefined, floor, io, now), UPDATE_INTERVAL);
 }
 
 main();
-
-// don't run forever (keep until ganes exit on their own)
-setTimeout(() => {
-  process.exit(0);
-}, 60000);

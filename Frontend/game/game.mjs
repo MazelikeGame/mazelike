@@ -4,6 +4,9 @@
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
 
+let msgEl = document.querySelector(".msg");
+let msgParentEl = document.querySelector(".msg-parent");
+
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
 
@@ -56,8 +59,10 @@ function getUsername(sock) {
 }
 
 async function setup() {
+  msgEl.innerText = "Connecting to the game server";
   let sock = io(`http://${await (await fetch(`/game/addr/${gameId}`)).text()}`);
   let username = await getUsername(sock);
+  msgEl.innerText = "Loading game";
   let floor;
 
   console.log(`User: ${username}`); // eslint-disable-line
@@ -84,13 +89,34 @@ async function setup() {
   window.ml.floor = floor;
   addArrowKeyListener(floor);
 
-  window.setInterval(function() { 
-    for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type !== "blue") { // not a blue monster
-        floor.monsters[i].figureOutWhereToGo();
+  sock.on("state", (state) => {
+    floor.handleState(state);
+  });
+
+  // display the countdown when it starts
+  sock.on("countdown", (count) => {
+    msgEl.innerText = `The game will start in ${count}`;
+  });
+
+  // wait for the game to start
+  msgEl.innerText = "Waiting for all players to join";
+
+  await new Promise((resolve) => {
+    sock.once("start-game", resolve);
+  });
+  
+  msgParentEl.remove();
+
+  // don't run monster logic multiplayer game (for now)
+  if(!gameId) {
+    window.setInterval(function() { 
+      for(let i = 0; i < floor.monsters.length; i++) {
+        if(floor.monsters[i].type !== "blue") { // not a blue monster
+          floor.monsters[i].figureOutWhereToGo();
+        }
       }
-    }
-  }, 500);
+    }, 500);
+  }
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
       if(floor.monsters[i].type !== "blue") { // not a blue monster
@@ -98,13 +124,16 @@ async function setup() {
       }
     }
   }, 10);
-  window.setInterval(function() {
-    for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type === "blue") { // is a blue monster
-        floor.monsters[i].figureOutWhereToGo();
+
+  if(!gameId) {
+    window.setInterval(function() {
+      for(let i = 0; i < floor.monsters.length; i++) {
+        if(floor.monsters[i].type === "blue") { // is a blue monster
+          floor.monsters[i].figureOutWhereToGo();
+        }
       }
-    }
-  }, 1000);
+    }, 1000);
+  }
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
       if(floor.monsters[i].type === "blue") { // is a blue monster
