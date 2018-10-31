@@ -26,6 +26,7 @@
     "node-docker-api": "^1.1.22",
     "nodemailer": "^4.6.8",
     "sequelize": "^4.38.1",
+    "sequelize-cli": "^4.1.1",
     "socket.io": "^2.1.1",
     "sqlite": "^3.0.0",
     "winston": "^3.1.0"
@@ -42,7 +43,6 @@
     "jasmine-core": "^3.2.1",
     "jsdoc": "^3.5.5",
     "eslint": "^5.5.0",
-    "sequelize-cli": "^4.1.1",
     "request": "^2.88.0"
   }
 }

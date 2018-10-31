@@ -4,6 +4,13 @@ import * as docker from "./manager-docker";
 let exp;
 
 switch(process.env.CLUSTER_MANAGER) {
+case "none":
+  exp = {
+    getGameAddr: () => {},
+    spawnGame: () => {}
+  };
+  break;
+
 case "docker":
   exp = docker;
   break;
