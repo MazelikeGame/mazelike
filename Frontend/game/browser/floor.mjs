@@ -70,8 +70,6 @@ export default class Floor extends FloorCommon {
       GameMap.load(floor)
     ]);
 
-    floor.generateMonsters();
-
     floor._initRendering();
 
     return floor;
