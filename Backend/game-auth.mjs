@@ -1,9 +1,8 @@
 import sessionStore from "./session-store";
 import session from 'express-session';
-import userFn from "./models/user";
+import User from "./models/user";
 import sql from "./sequelize";
 
-let User = userFn(sql);
 
 export default function initAuth(io) {
   // setup sessions with socket io
