@@ -68,7 +68,8 @@ export default class Monster extends MonsterCommon {
         x: monster.x,
         y: monster.y,
         hp: monster.hp,
-        type: monster.type
+        type: monster.type,
+        name: monster.name
       });
     }
 
@@ -105,7 +106,8 @@ export default class Monster extends MonsterCommon {
       hp: this.hp,
       type: this.type,
       x: this.x,
-      y: this.y
+      y: this.y,
+      name: this.name
     };
   }
   

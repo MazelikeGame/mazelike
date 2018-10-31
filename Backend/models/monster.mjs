@@ -8,6 +8,7 @@ export default function MonsterModel(sequelize) {
     y: Sequelize.INTEGER,
     hp: Sequelize.INTEGER,
     type: Sequelize.STRING,
+    name: Sequelize.STRING,
     id: {
       primaryKey: true,
       type: Sequelize.STRING
