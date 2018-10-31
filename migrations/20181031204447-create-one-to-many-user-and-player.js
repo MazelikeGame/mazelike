@@ -6,7 +6,7 @@ module.exports = {
       'players', // name of target model
       'username', // name of the key we are adding
       {
-        type: Sequelize.UUID,
+        type: Sequelize.INTEGER,
         references: {
           model: 'users', // name of source model
           key: 'id' // key in source model that is being referenced
