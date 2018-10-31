@@ -30,7 +30,13 @@ export default class Monster extends MonsterCommon {
    * Handle state updates from the server
    */
   handleState(state) {
+    let oldName = this.name;
     Object.assign(this, state);
+
+    // update the sprite
+    if(oldName !== this.name) {
+      this.sprite.texture = PIXI.loader.resources.demon.textures[this.name];
+    }
   }
 
   /**
