@@ -1,10 +1,10 @@
-FROM node:8.11
+FROM node:8.11-alpine
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm install
+RUN sed 's/"bcrypt": "^3.0.0",//' -i package.json && npm install
 
 COPY . .
 
-CMD ["/bin/bash", "-c", "./node_modules/.bin/jasmine; echo $? > /app/runner-result"]
+CMD ["/bin/ash", "-c", "./node_modules/.bin/jasmine; echo $? > /app/runner-result"]
