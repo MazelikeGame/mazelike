@@ -22,7 +22,6 @@ let inUsePorts = new Set();
 let portMap = new Map();
 
 export async function spawnGame(gameEnv = {}) {
-  console.log("Spawn");
   // prefix all mazelike env vars
   let envArray = [];
   for(let key of Object.keys(gameEnv)) {
@@ -36,7 +35,6 @@ export async function spawnGame(gameEnv = {}) {
 
   let hostname = `mazelike-${PREFIX}${gameEnv.gameId}`;
   let port = pickPort();
-  console.log("Picked", port);
 
   inUsePorts.add(port);
   portMap.set(gameEnv.gameId, port);
@@ -65,15 +63,10 @@ export async function spawnGame(gameEnv = {}) {
     }
   });
 
-  console.log(IMAGE_NAME);
-
   let addr = await startContainer(container, gameEnv.gameId, gameEnv);
   if(addr) {
-    console.log("Exited");
     return addr;
   }
-
-  console.log("Started");
 
   waitForClose(container, port, gameEnv.gameId); // DO NOT AWAIT THIS
 
@@ -95,7 +88,6 @@ function pickPort() {
 
 async function waitForClose(container, port, gameId) {
   await container.wait();
-  console.log("Closed");
   // await container.delete({ force: true });
   inUsePorts.delete(port);
   portMap.delete(gameId);
@@ -109,7 +101,6 @@ async function startContainer(container, gameId, gameEnv) {
   try {
     await container.start();
   } catch(err) {
-    console.log(err.message);
     // check if the port is already being used
     if(err.message.indexOf("address already in use") !== -1) {
       portMap.delete(gameId);
