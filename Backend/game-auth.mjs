@@ -18,24 +18,24 @@ export default function initAuth(io) {
   });
 
   io.use(function(socket, next) {
-    sessionMiddleware(socket.request, socket.request.res, async() => {
-      if(!socket.request.session) {
-        next(new Error("Not authenitcated"));
-        return;
-      }
+    // sessionMiddleware(socket.request, socket.request.res, async() => {
+    //   if(!socket.request.session) {
+    //     next(new Error("Not authenitcated"));
+    //     return;
+    //   }
 
-      socket.user = await User.findOne({
-        where: {
-          username: socket.request.session.username
-        }
-      });
+    //   socket.user = await User.findOne({
+    //     where: {
+    //       username: socket.request.session.username
+    //     }
+    //   });
 
-      if(!socket.user) {
-        next(new Error("Not authenitcated"));
-        return;
-      }
+    //   if(!socket.user) {
+    //     next(new Error("Not authenitcated"));
+    //     return;
+    //   }
 
       next();
-    });
+    // });
   });
 }
