@@ -1,8 +1,8 @@
+# NOTE: This is file is for testing
 version: "3.2"
 services:
   backend:
-    container_name: testing_backend
-    image: mazelike/backend:devel
+    image: ryan3r/mazelike:latest
     build:
       context: .
     environment:
@@ -10,25 +10,17 @@ services:
     expose:
       - 3000
     networks:
-      - testing
-    volumes:
-      - type: bind
-        source: ./Frontend
-        target: /app/Frontend
-      - type: bind
-        source: ./Backend
-        target: /app/Backend
+      - mazelike_testing
 
   tests:
-    container_name: testing_tests
-    image: mazelike/tests
+    image: ryan3r/mazelike_tests:latest
     build:
       context: .
       dockerfile: test.Dockerfile
     depends_on:
       - backend
     networks:
-      - testing
+      - mazelike_testing
     environment:
       IS_RUNNING_IN_DOCKER: ok
     volumes:
@@ -36,20 +28,8 @@ services:
         source: ./runner-result
         target: /app/runner-result
       - type: bind
-        source: ./spec
-        target: /app/spec
-      - type: bind
-        source: ./Frontend
-        target: /app/Frontend
-      - type: bind
-        source: ./Backend
-        target: /app/Backend
-      - type: bind
-        source: ./.eslintrc.js
-        target: /app/.eslintrc.js
-      - type: bind
-        source: ./.eslintignore
-        target: /app/.eslintignore
+        source: ./scripts
+        target: /app/scripts
 
 networks:
-  testing:
+  mazelike_testing:

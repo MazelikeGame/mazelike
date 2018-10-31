@@ -1,6 +1,9 @@
 /** @module backend/game/Floor */
 import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
+import Monster from "./monster.mjs";
+import MonsterModel from "../models/monster";
+
 
 export default class Floor extends FloorCommon {
   /**
@@ -13,8 +16,21 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
 
     floor.map = GameMap.generate(map);
+    
+    floor.generateMonsters();
 
     return floor;
+  }
+
+  /** katie
+   * Puts a monster in half of all "rooms".
+   * @param {Floor} floor The floor to add monsters to
+   */
+  generateMonsters() {
+    this.monsters = [];
+    for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) { 
+      this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
+    }
   }
 
   /**
@@ -26,7 +42,8 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
 
     await Promise.all([
-      GameMap.load(floor)
+      GameMap.load(floor),
+      //floor.loadMonsters(floor) // untested todo
     ]);
 
     return floor;
@@ -37,7 +54,25 @@ export default class Floor extends FloorCommon {
    */
   save() {
     return Promise.all([
-      this.map.save(this.id)
+      this.map.save(this.id),
+      this.monsters[0].save()
     ]);
   }
+  
+  async loadMonsters(floor) { // wip UNTESTED
+    //console.log("\nloading started");
+    for(let i = 0; i < floor.map.rooms.length * this.monsterRatio; i++) {
+      //console.log(i);
+      let monsterDB = await MonsterModel.find({
+        where: {
+          floorId: floor.floor.floodId,
+          id: i
+        }
+      }); //if nothing returned, dont create monster todo
+      floor.monsters[i] = new Monster('sir spoopy', monsterDB.hp, 10, this, i, monsterDB.type);
+      floor.monsters[i].setCoodinates(monsterDB.x, monsterDB.y);
+    }
+    //console.log("monsters loaded\n");
+  }
+
 }

@@ -1,11 +1,14 @@
+/* eslint-disable complexity */
 /* global PIXI */
 /** @module browser/Floor */
 import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
+import Monster from "./monster.mjs";
 
 export default class Floor extends FloorCommon {
-  constructor(gameId, floorIdx) {
+  constructor(gameId, floorIdx, sock) {
     super(gameId, floorIdx);
+    this.sock = sock;
     // the top left corrner of the user's screen
     this._viewportX = 0;
     this._viewportY = 0;
@@ -17,14 +20,27 @@ export default class Floor extends FloorCommon {
    * @param floorIdx The index of floor we want to generate
    * @param {object} opts The options of the specific generators
    */
-  static generate({gameId, floorIdx, map}) {
-    let floor = new Floor(gameId, floorIdx);
+  static generate({gameId, floorIdx, map, sock}) {
+    let floor = new Floor(gameId, floorIdx, sock);
 
     floor.map = GameMap.generate(map);
+
+    floor.generateMonsters();
 
     floor._initRendering();
 
     return floor;
+  }
+
+  /** katie occurs twice, shouldnt cause errors tho
+   * Puts a monster in half of all "rooms".
+   * @param {Floor} floor The floor to add monsters to
+   */
+  generateMonsters() {
+    this.monsters = [];
+    for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) { 
+      this.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
+    }
   }
 
   /**
@@ -32,15 +48,17 @@ export default class Floor extends FloorCommon {
    * @param gameId The game id for the game we want to load
    * @param floorIdx The index of floor we want to load
    */
-  static async load(gameId, floorIdx) {
-    let floor = new Floor(gameId, floorIdx);
+  static async load(gameId, floorIdx, sock) {
+    let floor = new Floor(gameId, floorIdx, sock);
 
     await Promise.all([
       // NOTE: You should define your functions here and they should
-      // return a promise for when they complete.  All modifications to
+      // return a promise for when they compl2ete.  All modifications to
       // floor should be done to the floor variable you pass in like so.
       GameMap.load(floor)
     ]);
+
+    floor.generateMonsters();
 
     floor._initRendering();
 
@@ -48,7 +66,11 @@ export default class Floor extends FloorCommon {
   }
 
   save() {
-    // stub: no use for this yet
+    this.sock.emit("save");
+
+    return new Promise((resolve) => {
+      this.sock.once("save-complete", resolve);
+    });
   }
 
   /**
@@ -63,6 +85,10 @@ export default class Floor extends FloorCommon {
 
     this._mapRenderer = this.map.createRenderer();
     this.sprite.addChild(this._mapRenderer.sprite);
+    
+    for(let i = 0; i < this.monsters.length; i++) {
+      this.monsters[i].createSprite();
+    }
   }
 
   /**
@@ -75,6 +101,9 @@ export default class Floor extends FloorCommon {
       this._viewportX + innerWidth,
       this._viewportY + innerHeight
     );
+    for(let i = 0; i < this.monsters.length; i++) {
+      this.monsters[i].update(this._viewportX, this._viewportY); // katie
+    }
   }
 
   /**

@@ -1,34 +1,58 @@
-MazeLike_Tests:
+stages:
+  - build
+  - test
+  - cleanup
+  - deploy
+
+Build:
+  stage: build
+  script:
+    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - docker-compose build
+    - docker-compose up -d backend
+
+Eslint:
   stage: test
   script:
-   - docker-compose -f docker-compose.test.yml build
-   - touch runner-result
-   - docker-compose -f docker-compose.test.yml up -d
-   - node test-stopper.js || (docker-compose -f docker-compose.test.yml down --rmi all && exit 1)
+    - npm run eslint
 
-MazeLike_Deploy:
+Backend_Tests:
+  stage: test
+  script:
+    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - touch runner-result
+    - docker-compose up -d
+    - node scripts/test-stopper.js
+
+Browser_Tests:
+  stage: test
+  script:
+    # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
+    - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests/ -i docker-compose.yml
+    - touch runner-result
+    - docker-compose up -d
+    - node scripts/test-stopper.js
+
+Version_Change:
+  stage: test
+  allow_failure: true
+  script:
+    - node scripts/version-check.js
+
+Cleanup:
+  stage: cleanup
+  when: always
+  script:
+    - docker-compose down
+
+Deploy:
   stage: deploy
   script:
-      # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
       - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
-      - docker build -t "mazelike/backend:$VERSION" .
-      - docker tag "mazelike/backend:$VERSION" mazelike/backend:latest
-      - docker kill mazelike || echo "Server not running"
-      - docker container rm mazelike || echo "Container not found"
-      - docker run --name mazelike -d -p 80:3000 --env-file /etc/mazelike/.env -v /etc/mazelike/data:/app/Frontend/public "mazelike/backend:$VERSION"
-      - /bin/push Master "Deployed version $VERSION"
+      - node scripts/version-check.js
+      - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
+      - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
+      - deploy latest
+      - push Master "Deployed version $VERSION"
   only:
     - master
-
-MazeLike_Staging:
-  stage: deploy
-  script:
-      # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-      - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
-      - docker build -t "mazelike/backend:staging" .
-      - docker kill mazelike_staging || echo "Server not running"
-      - docker container rm mazelike_staging || echo "Container not found"
-      - docker run --name mazelike_staging -d -p 8080:3000 --env-file /etc/mazelike/staging.env -v /etc/mazelike/data_staging:/app/Frontend/public "mazelike/backend:staging"
-      - /bin/push Staging "Deployed version $VERSION"
-  only:
-    - staging

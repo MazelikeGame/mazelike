@@ -98,7 +98,6 @@ sock.on("lobby-delete", (id) => {
 
 // Go to the game page
 sock.on("lobby-start", (id, usernames) => {
-
   sock.emit("setup-playerlist", id, usernames);
 
   if(id === hydrate.id) {
@@ -111,6 +110,7 @@ let startBtn = document.querySelector("#start");
 
 if(startBtn) {
   startBtn.addEventListener("click", () => {
+    notify("Starting game (this could take a few seconds)");
     fetchAndNotify(`/game/lobby/${hydrate.id}/start`);
   });
 }

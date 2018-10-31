@@ -19,7 +19,7 @@ export default class GameMap extends GameMapCommon {
    * Load the game map in nodejs
    * @param {Floor} floor The floor to load the map for
    */
-  async load(floor) {
+  static async load(floor) {
     // for backwards compatability the map for floorIdx == 0 is just the gameId
     let mapId = floor.id.replace("-0", "");
 

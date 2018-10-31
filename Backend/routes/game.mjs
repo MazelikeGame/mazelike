@@ -1,12 +1,14 @@
 /* global io */
+/* eslint-disable complexity */
 import express from "express";
 import crypto from "crypto";
 import util from "util";
 import Lobby from "../models/lobby";
 import sql from "../sequelize";
 import path from "path";
-import Floor from "../game/floor";
 import fs from "fs";
+import {spawnGame, getGameAddr} from "../managers/manager";
+import Floor from "../game/floor";
 
 const mkdir = util.promisify(fs.mkdir);
 
@@ -323,12 +325,6 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
         lobbyId: req.params.id
       }
     });
-
-    // Create game here (TODO)
-    let floor = Floor.generate({
-      gameId: req.params.id,
-      floorIdx: 0
-    });
     
     try {
       await mkdir("Frontend/public/maps");
@@ -336,18 +332,40 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       // pass
     }
 
-    await floor.save();
+    // Generate the game
+    await Floor.generate({
+      gameId: req.params.id,
+      floorIdx: 0
+    }).save();
 
-    io.emit("lobby-start", req.params.id, usernames);
+    try {
+      await spawnGame({
+        gameId: req.params.id
+      });
 
-    res.end("Game started");
+      io.emit("lobby-start", req.params.id, usernames);
+
+      res.end("Game started");
+    } catch(err) {
+      process.stderr.write(`Error starting game: ${err.message}\n`);
+      res.end("An error occured while starting game");
+    }
     return;
   }
 
   res.end("No such lobby or you are not the host");
 });
 
+// Get the game server address
+gameRouter.get("/addr/:id", (req, res) => {
+  res.end(getGameAddr(req.params.id));
+});
+
 // Serve /game/:id as /game/
 gameRouter.get(/[A-Za-z0-9]{12}/, (req, res) => {
   res.sendFile(path.resolve("Frontend/game/index.html"));
+});
+
+gameRouter.get('/test', (req, res) => {
+  res.sendFile(path.resolve("Frontend/game/Tests/index.html"));
 });

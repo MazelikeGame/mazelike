@@ -1,4 +1,4 @@
-FROM mazelike/backend:devel
+FROM node:8.11
 
 WORKDIR /app
 
@@ -7,5 +7,4 @@ RUN npm install
 
 COPY . .
 
-RUN chmod +x test-inner.sh
-CMD ["/bin/bash", "/app/test-inner.sh"]
+CMD ["/bin/bash", "-c", "./node_modules/.bin/jasmine; echo $? > /app/runner-result"]
