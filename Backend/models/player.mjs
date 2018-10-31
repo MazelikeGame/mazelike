@@ -7,15 +7,19 @@ let Player = sql.define('players', {
     type: Sequelize.STRING,
     allowNull: false
   },
+  numFloor: {
+    type: Sequelize.STRING,
+    defaultValue: 0,
+    allowNull: false
+  }
 });
 
 Player.hasOne(Lobby, { foreignKey: 'player', targetKey: 'lobbyId' });
 
 /**
  * The player model. Has one to many relationship with the User model.
- * @param {String} name - Foreign key to the field 'username' in the user model. One to Many relationship
- * // not entirely sure on this one, will have to check
- * @param {String} items - Foreign key to item model. Many to Many relationship
- * @param {Integer} floorId - The floorId the player is on. This id also includes the gameId.
+ * Has one to one relationship with the Lobby model.
+ * @param {String} spriteName - Name of the sprite used for this player.
+ * @param {Integer} numFloor - The floorId the player is on. This id also includes the gameId.
  */
 export default Player;
