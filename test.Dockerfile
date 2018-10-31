@@ -7,4 +7,4 @@ RUN sed 's/"bcrypt": "^3.0.0",//' -i package.json && npm install
 
 COPY . .
 
-CMD ["/bin/ash", "-c", "./node_modules/.bin/jasmine; echo $? > /app/runner-result"]
+CMD ["/bin/ash", "-c", "./node_modules/.bin/jasmine; echo $? > /usr/src/app/runner-result"]
