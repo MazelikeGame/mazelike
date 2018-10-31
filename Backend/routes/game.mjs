@@ -177,7 +177,7 @@ export const joinRoute = async(req, res) => {
       username: req.user.username
     }
   });
-  await user.setPlayer(newPlayer);
+  await user.addPlayer(newPlayer);
   let newLobby = await Lobby.create({
     lobbyId: lobby.lobbyId,
     secret: lobby.secret,
@@ -224,7 +224,7 @@ gameRouter.get("/new", async(req, res) => {
       username: req.user.username
     }
   });
-  await user.setPlayer(newPlayer);
+  await user.addPlayer(newPlayer);
   let newLobby = await Lobby.create({
     secret,
     lobbyId: id,
@@ -248,6 +248,11 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
       playerId: req.user.username
     }
   });
+  let allLobbies = await Lobby.findAll({
+    where: {
+      lobbyId: req.params.id
+    }
+  });
 
   if(lobby) {
     if(lobby.isHost) {
@@ -256,10 +261,14 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
           lobbyId: req.params.id
         }
       });
-      await Player.destroy({
-        where: {
-          player: lobby.lobby
-        }
+      /* This will need to refactored once the following has occured:
+       * Users 1 -> * Lobbies -> * Players */
+      allLobbies.forEach(async(singleLobby) => {
+        await Player.destroy({
+          where: {
+            id: singleLobby.player
+          }
+        });
       });
       io.emit("lobby-delete", req.params.id);
       res.redirect("/account/dashboard");
@@ -300,7 +309,14 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
     }
   });
 
-  if(lobby) {
+  let player = await Player.find({
+    where: {
+      id: lobby.id
+    }
+  });
+
+  if(lobby && player) {
+    await player.destroy();
     await lobby.destroy();
 
     io.emit("lobby-drop", {

@@ -21,7 +21,7 @@ let User = sql.define('users', {
   }
 });
 
-User.hasOne(Player, { foreignKey: 'player' });
+User.hasMany(Player, { foreignKey: 'username' });
 
 
 // add methods here as user.method = function() {};

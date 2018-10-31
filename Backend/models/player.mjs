@@ -9,7 +9,7 @@ let Player = sql.define('players', {
   },
 });
 
-Player.hasOne(Lobby, { foreignKey: 'lobby' });
+Player.hasOne(Lobby, { foreignKey: 'player', targetKey: 'lobbyId' });
 
 /**
  * The player model. Has one to many relationship with the User model.
