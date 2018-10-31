@@ -311,7 +311,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
 
   let player = await Player.find({
     where: {
-      id: lobby.id
+      id: lobby.player
     }
   });
 
