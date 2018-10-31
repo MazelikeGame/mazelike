@@ -97,7 +97,7 @@ function pickPort() {
 async function waitForClose(container, port, gameId) {
   await container.wait();
   console.log("Closed");
-  await container.delete({ force: true });
+  // await container.delete({ force: true });
   inUsePorts.delete(port);
   portMap.delete(gameId);
 }
