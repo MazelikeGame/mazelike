@@ -25,6 +25,7 @@ COPY Backend Backend
 COPY config config
 COPY migrations migrations
 COPY seeders seeders
+COPY VERSION VERSION
 
 VOLUME /app/Frontend/public
 EXPOSE 3000
