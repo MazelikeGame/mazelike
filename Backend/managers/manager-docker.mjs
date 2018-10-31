@@ -7,8 +7,7 @@ const ENV_NAMES = [
   "DB_USER",
   "DB_PASS",
   "DB_DATABASE",
-  "NODE_ENV",
-  "DB_STORAGE"
+  "NODE_ENV"
 ];
 
 const IMAGE_NAME = process.env.IMAGE_NAME || "mazelike/backend:devel";
@@ -31,7 +30,7 @@ export async function spawnGame(gameEnv = {}) {
 
   // copy our env to the child
   for(let envName of ENV_NAMES) {
-    envArray.push(`${envName}=${ENV_NAMES[envName]}`);
+    envArray.push(`${envName}=${process.env[envName]}`);
   }
 
   let hostname = `mazelike-${PREFIX}${gameEnv.gameId}`;

@@ -33,10 +33,14 @@ import MonsterCommon from "../../Frontend/game/common/monster.mjs";
 import MonsterModel from "../models/monster";
 import sql from "../sequelize";
 
+// a list of all dead monsters (improves the performance of save)
+let deadMonsterIds = [];
+
 export default class Monster extends MonsterCommon {
   
   /**
-   * Puts a monster in half of all "rooms".
+   * Puts 
+   *  monster in half of all "rooms".
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters(floor) {
@@ -56,7 +60,7 @@ export default class Monster extends MonsterCommon {
     floor.monsters = [];
     
     rawMonsters.forEach((raw, i) => {
-      let monster = new Monster("sir snoopy", raw.hp, 10, floor, i, raw.type);
+      let monster = new Monster(raw.name, raw.hp, 10, floor, i, raw.type);
       monster.setCoodinates(raw.x, raw.y);
       floor.monsters.push(monster);
     });
@@ -66,7 +70,7 @@ export default class Monster extends MonsterCommon {
    * Saves monsters to the database.
    * @param {boolean} create Create new monster rows (first save only)
    */
-  async save(create) {
+  static async saveAll(floor, create) {
     let monsterModel = new MonsterModel(sql);
     let monsters = []; // collect monsters for bulkCreate
 
@@ -84,15 +88,16 @@ export default class Monster extends MonsterCommon {
       return undefined; // make eslint happy
     };
 
-    for(let i = 0; i &lt; this.floor.monsters.length; i++) {
-      let monster = this.floor.monsters[i];
+    for(let i = 0; i &lt; floor.monsters.length; i++) {
+      let monster = floor.monsters[i];
       await save({
         id: `${monster.floor.id}-${monster.id}`,
         floorId: monster.floor.id,
         x: monster.x,
         y: monster.y,
         hp: monster.hp,
-        type: monster.type
+        type: monster.type,
+        name: monster.name
       });
     }
 
@@ -101,7 +106,12 @@ export default class Monster extends MonsterCommon {
       await monsterModel.bulkCreate(monsters);
     }
 
-    console.log("\nmonsters saved\n");
+    // delete dead monsters
+    await monsterModel.destroy({
+      where: {
+        id: deadMonsterIds
+      }
+    });
   }
 
   /**
@@ -124,10 +134,28 @@ export default class Monster extends MonsterCommon {
       hp: this.hp,
       type: this.type,
       x: this.x,
-      y: this.y
+      y: this.y,
+      name: this.name
     };
   }
   
+  /**
+   * ~WIP drop items down the road
+   * 
+   * Monster dies.
+   */
+  die() {
+    this.x = -1; // (-1, -1) coordinate tells us that the monster is dead
+    this.y = -1;
+    this.alive = false;
+
+    // remove from the monsters array
+    let thisIdx = this.floor.monsters.indexOf(this);
+    this.floor.monsters.splice(thisIdx, 1);
+
+    // add to the list of monsters for save to delete
+    deadMonsterIds.push(`${this.floor.id}-${this.id}`);
+  }
 }</code></pre>
         </article>
     </section>
@@ -138,13 +166,13 @@ export default class Monster extends MonsterCommon {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#ping">ping</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 30 2018 14:31:47 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 30 2018 23:50:00 GMT-0500 (Central Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

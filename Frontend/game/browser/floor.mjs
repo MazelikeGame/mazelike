@@ -151,7 +151,7 @@ export default class Floor extends FloorCommon {
    */
   handleState(state) {
     this._diffState("id", this.monsters, state.monsters, (raw) => {
-      let monster = new Monster("sir snoopy", raw.hp, 10, this, raw.id, raw.type);
+      let monster = new Monster(raw.name, raw.hp, 10, this, raw.id, raw.type);
       monster.setCoodinates(raw.x, raw.y);
       return monster;
     });

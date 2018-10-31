@@ -48,12 +48,11 @@ export default class MonsterCommon {
     this.PCx = -1; // (-1,-1) if not seen yet or previously seen location explored
     this.PCy = -1;
     this.maneuver = false;
+    this.alive = true;
 
     this.placeInRandomRoom();
 
     this.figureOutWhereToGo();
-
-    //this.die();
   }
 
   /** 
@@ -153,10 +152,9 @@ export default class MonsterCommon {
       this.y += MonsterCommon.SPRITE_SIZE;
     else if(random === 3)
       this.y -= MonsterCommon.SPRITE_SIZE;
-    if(!this.spriteIsOnMap()) {
+    if(!this.spriteIsOnMap()) { // if trying to wander off map, doesn't move at all (until it wanders again)
       this.x = prevX;
       this.y = prevY;
-      // this.wander(); Stack overflow causes clients to disconnect
     }
     this.targetx = this.x;
     this.x = prevX;
@@ -168,14 +166,16 @@ export default class MonsterCommon {
    * Sets the position closer to the target position.
    */
   move() {
-    if(this.targetx &lt; this.x)
-      this.x--;
-    else this.x++;
-    if(this.targety &lt; this.y)
-      this.y--;
-    else this.y++;
-    if(this.spriteCollision())
-      this.wander();
+    if(this.alive) {
+      if(this.targetx &lt; this.x)
+        this.x--;
+      else this.x++;
+      if(this.targety &lt; this.y)
+        this.y--;
+      else this.y++;
+      if(this.spriteCollision())
+        this.wander();
+    }
   }
 
   /**
@@ -187,11 +187,13 @@ export default class MonsterCommon {
    */
   figureOutWhereToGo() {
     //this.canSeePC();
-    if(!this.targetAquired) {
-      this.wander();
-    } else {
-      //move strategically, to be implemented later when PC is on map WIP
-      console.log("omw bro");
+    if(this.alive) {
+      if(!this.targetAquired) {
+        this.wander();
+      } else {
+        //move strategically, to be implemented later when PC is on map WIP
+        console.log("omw bro");
+      }
     }
   }
 
@@ -219,18 +221,6 @@ export default class MonsterCommon {
       this.die();
   }
 
-  /** todo test
-   * ~WIP drop items down the road
-   * 
-   * Monster dies.
-   */
-  die() {
-    this.floor.monsters.splice(this.id, 1);
-    console.log("DEATH: " + this.floor.monsters.length);
-    //delete from DB
-    // drop item in the future
-  }
-
   /** 
    * Places monster in a random "room" with no other monsters.
    */
@@ -238,7 +228,7 @@ export default class MonsterCommon {
     let numRooms = this.floor.map.rooms.length;
     this.initialRoom = Math.floor(Math.random() * numRooms);
     for(let i = 0; i &lt; this.floor.monsters.length; i++) {
-      if(this.id !== i &amp;&amp; this.floor.monsters[i].initialRoom === this.initialRoom) {
+      if(this.id !== this.floor.monsters[i].id &amp;&amp; this.floor.monsters[i].initialRoom === this.initialRoom) {
         this.placeInRandomRoom();
       }
     }
@@ -266,7 +256,7 @@ export default class MonsterCommon {
    */
   spriteCollision() {
     for(let i = 0; i &lt; this.floor.monsters.length; i++) {
-      if(this.id !== i) {
+      if(this.id !== this.floor.monsters[i].id) {
         if(this.floor.monsters[i].x >= this.x &amp;&amp; this.floor.monsters[i].x &lt;= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
           if(this.floor.monsters[i].y >= this.y &amp;&amp; this.floor.monsters[i].y &lt;= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
             return true;
@@ -284,94 +274,6 @@ export default class MonsterCommon {
     this.x = x;
     this.y = y;
   }
-
-  // changes for an actual test case: todo
-  // remove any monsters in room one
-  // place monster in room one
-  // manually placing pc
-  // replace this.x with this.floor.monsters[0].x
-  // outputs: all true
-  // pursue_test() {
-  //   // TEST 1: directly left/right/up/down
-  //   let pcx = this.x;
-  //   let pcy = this.y;
-  //   let cantplacepc = false;
-    
-  //   pcx += 1.5 * SPRITE_SIZE; // right
-  //   if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //     pcx -= 2 * SPRITE_SIZE; // left
-  //     if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //       pcx = this.x;
-  //       pcy += 1.5 * SPRITE_SIZE; // down
-  //       if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //         pcy -= 2 * SPRITE_SIZE; // up
-  //         if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //           cantplacepc = true;
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   let test1 = false;
-  //   if(!cantplacepc) {
-  //     test1 = this.canSee(pcx, pcy);
-  //     console.log("test1: " + test1);
-  //   } else {
-  //     console.log("Could not place pc for test1."); // should not occur
-  //   }
-
-  //   // TEST 2: diagonal 
-  //   pcx = this.x;
-  //   pcy = this.y;
-  //   cantplacepc = false;
-    
-  //   pcx += 1.5 * SPRITE_SIZE; // lower right
-  //   pcy += 1.5 * SPRITE_SIZE;
-  //   if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //     pcx -= 2 * SPRITE_SIZE; // lower left
-  //     if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //       pcy -= 2 * SPRITE_SIZE; // upper left
-  //       if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //         pcx += 2 * SPRITE_SIZE; // upper right
-  //         if(!this.floor.map.isOnMap(pcx, pcy)) { 
-  //           cantplacepc = true;
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   let test2 = false;
-  //   if(!cantplacepc) {
-  //     test2 = this.canSee(pcx, pcy);
-  //     console.log("test2: " + test2);
-  //     if(!test2)
-  //       console.log(pcx, pcy, "monster:", this.x, this.y);
-  //   } else {
-  //     console.log("Could not place pc for test2. Run test on new map, as room 0 was generated as a corridor.");
-  //   }
-
-  //   // TEST 3: pc off map
-  //   pcx = 0;
-  //   pcy = 0;
-
-  //   let test3 = false;
-  //   test3 = !this.canSee(pcx, pcy);
-  //   console.log("test3: " + test3);
-
-  //   // TEST 4: place in far away room
-  //   pcx = 0;
-  //   pcy = 0;
-
-  //   let pcRoom = this.floor.map.rooms.length - 1; // a room far away from the testing monster
-  //   let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[pcRoom].width); 
-  //   pcx = this.floor.map.rooms[pcRoom].x + randomDiffX;
-  //   let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[pcRoom].height); 
-  //   pcy = this.floor.map.rooms[pcRoom].y + randomDiffY;
-
-  //   let test4 = false;
-  //   test4 = !this.canSee(pcx, pcy);
-  //   console.log("test4: " + test4);
-  // } 
 }
 
 MonsterCommon.SPRITE_SIZE = 48;</code></pre>
@@ -384,13 +286,13 @@ MonsterCommon.SPRITE_SIZE = 48;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#ping">ping</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 30 2018 14:31:47 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 30 2018 23:50:00 GMT-0500 (Central Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
