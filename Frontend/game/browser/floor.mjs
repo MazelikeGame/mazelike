@@ -31,8 +31,6 @@ export default class Floor extends FloorCommon {
 
     floor.map = GameMap.generate(map);
 
-    floor.generateMonsters();
-
     floor._initRendering();
 
     return floor;
@@ -192,7 +190,7 @@ export default class Floor extends FloorCommon {
 
     // create missing objects
     for(let wantedObj of wantedIds) {
-      current.push(create(wantedObj));
+      current.push(create(wantedObj[1]));
     }
   }
 }
