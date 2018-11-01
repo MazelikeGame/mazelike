@@ -4,7 +4,7 @@
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
 import PlayerList from "./browser/player-list.js";
-import DisconnectMessage from "./browser/disconnect-msg.js"
+import DisconnectMessage from "./browser/disconnect-msg.js";
 
 let msgEl = document.querySelector(".msg");
 let msgParentEl = document.querySelector(".msg-parent");
