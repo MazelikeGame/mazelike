@@ -8,7 +8,7 @@ let Player = sql.define('players', {
     allowNull: false
   },
   numFloor: {
-    type: Sequelize.STRING,
+    type: Sequelize.INTEGER,
     defaultValue: 0,
     allowNull: false
   }

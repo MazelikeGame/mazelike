@@ -12,6 +12,7 @@ let Lobby = sql.define("lobbies", {
   },
   playerId: {
     type: Sequelize.STRING,
+    allowNull: false
   },
   secret: {
     type: Sequelize.STRING,
