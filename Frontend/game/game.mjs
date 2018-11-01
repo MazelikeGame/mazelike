@@ -78,6 +78,7 @@ async function setup() {
   }
 
   app.stage.addChild(floor.sprite);
+  floor.update();
 
   // Show the fps counter on dev machines
   let fps;
