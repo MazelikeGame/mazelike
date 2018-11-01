@@ -14,7 +14,7 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
 
     floor.map = GameMap.generate(map);
-    
+
     floor.generateMonsters();
 
     return floor;
@@ -27,8 +27,8 @@ export default class Floor extends FloorCommon {
   generateMonsters() {
     this.monsters = [];
     let random = 0;
-    for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) { 
-      random = Math.floor(Math.random() * 100); 
+    for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) {
+      random = Math.floor(Math.random() * 100);
       if(random < 15) { // 15% chance for blue demon
         this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
       } else if(random < 50) { // 35% chance for red demon, where 15+35 = 50

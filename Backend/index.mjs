@@ -13,6 +13,9 @@ import userMiddleware from "./middleware/accounts";
 import sessionStore from "./session-store";
 import winston from 'winston';
 import expressWinston from 'express-winston';
+import fs from "fs";
+
+const PACKAGE_VERSION = fs.readFileSync("VERSION", "utf8").trim();
 
 let app = express();
 let server = http.Server(app);
@@ -61,7 +64,7 @@ app.get('/', function(req, res) {
   if(req.session.authenticated) {
     res.redirect('/account/dashboard');
   } else {
-    res.render('index', { version: process.env.npm_package_version });
+    res.render('index', { version: PACKAGE_VERSION });
   }
 });
 

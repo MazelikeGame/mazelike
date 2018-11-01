@@ -17,7 +17,11 @@ let Lobby = sql.define("lobbies", {
   secret: {
     type: Sequelize.STRING,
     allowNull: false
-  }
+  },
+  inProgress: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
+  },
 });
 
 export default Lobby;

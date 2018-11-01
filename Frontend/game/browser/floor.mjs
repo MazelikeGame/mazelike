@@ -3,6 +3,7 @@
 /** @module browser/Floor */
 import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
+// import Player from "./player.mjs";
 import Monster from "./monster.mjs";
 
 export default class Floor extends FloorCommon {
@@ -14,6 +15,7 @@ export default class Floor extends FloorCommon {
     this._viewportY = 0;
 
     this.monsters = [];
+    this.monsterSprites = new PIXI.Container();
   }
 
   /**
@@ -24,10 +26,10 @@ export default class Floor extends FloorCommon {
    */
   static generate({gameId, floorIdx, map, sock}) {
     let floor = new Floor(gameId, floorIdx, sock);
+    // let players = [];
+    // players.push(new Player('billy bob', 100, map, 0, map.getSpawnPoint()));
 
     floor.map = GameMap.generate(map);
-
-    floor.generateMonsters();
 
     floor._initRendering();
 
@@ -40,11 +42,10 @@ export default class Floor extends FloorCommon {
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters() {
-    this.monsterSprites = new PIXI.Container();
     this.monsters = [];
     let random = 0;
-    for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) { 
-      random = Math.floor(Math.random() * 100); 
+    for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) {
+      random = Math.floor(Math.random() * 100);
       if(random < 5) { // 5% chance for blue demon
         this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
       } else if(random < 45) { // 40% chance for red demon, where 5+40 = 45
@@ -67,7 +68,8 @@ export default class Floor extends FloorCommon {
       // NOTE: You should define your functions here and they should
       // return a promise for when they compl2ete.  All modifications to
       // floor should be done to the floor variable you pass in like so.
-      GameMap.load(floor)
+      GameMap.load(floor),
+      // Player.load(floor)
     ]);
 
     floor.generateMonsters();
@@ -97,7 +99,7 @@ export default class Floor extends FloorCommon {
 
     this._mapRenderer = this.map.createRenderer();
     this.sprite.addChild(this._mapRenderer.sprite);
-    
+
     for(let i = 0; i < this.monsters.length; i++) {
       this.monsters[i].createSprite();
     }
@@ -153,6 +155,7 @@ export default class Floor extends FloorCommon {
     this._diffState("id", this.monsters, state.monsters, (raw) => {
       let monster = new Monster(raw.name, raw.hp, 10, this, raw.id, raw.type);
       monster.setCoodinates(raw.x, raw.y);
+      monster.createSprite();
       return monster;
     });
   }
@@ -189,7 +192,7 @@ export default class Floor extends FloorCommon {
 
     // create missing objects
     for(let wantedObj of wantedIds) {
-      current.push(create(wantedObj));
+      current.push(create(wantedObj[1]));
     }
   }
 }

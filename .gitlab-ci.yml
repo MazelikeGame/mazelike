@@ -49,7 +49,7 @@ Cleanup:
 Deploy:
   stage: deploy
   script:
-      - "VERSION=$(cat package.json | grep version | head -1  | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
+      - VERSION=$(cat VERSION)
       - node scripts/version-check.js
       - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
       - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
