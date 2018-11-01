@@ -5,7 +5,7 @@ import saveHandler from "./handlers/save";
 import initAuth from "./game-auth.mjs";
 
 // then interval at which we update the game state (if this is too short the server will break)
-const UPDATE_INTERVAL = 250;
+const UPDATE_INTERVAL = 1000;
 
 async function main() {
   // Parse the env vars
@@ -76,6 +76,7 @@ async function triggerTick(floor, io, lastUpdate) {
 
   // move monsters and check for collisions
   try {
+    console.log(`Delta t: ${now - lastUpdate - UPDATE_INTERVAL}`); //eslint-disable-line
     await floor.tick(now - lastUpdate);
     await floor.sendState(io);
   } catch(err) {
