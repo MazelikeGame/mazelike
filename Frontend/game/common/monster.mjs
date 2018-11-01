@@ -4,8 +4,6 @@
 export default class MonsterCommon {
   
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
-    //console.log("monster created");
-
     this.name = name_in;
     this.hp = hp_in;
     this.damage = damage_in;
@@ -145,15 +143,13 @@ export default class MonsterCommon {
    * Sets the position closer to the target position.
    */
   move() {
-    if(this.alive) {
+    if(this.alive && this.collisionMonsters() === false) {
       if(this.targetx < this.x)
         this.x--;
       else this.x++;
       if(this.targety < this.y)
         this.y--;
       else this.y++;
-      if(this.spriteCollision())
-        this.wander();
     }
   }
 
@@ -233,7 +229,7 @@ export default class MonsterCommon {
    * Compares corners of each sprite to do so.
    * @returns {boolean}
    */
-  spriteCollision() {
+  collisionMonsters() {
     for(let i = 0; i < this.floor.monsters.length; i++) {
       if(this.id !== this.floor.monsters[i].id) {
         if(this.floor.monsters[i].x >= this.x && this.floor.monsters[i].x <= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds

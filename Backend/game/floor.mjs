@@ -76,12 +76,10 @@ export default class Floor extends FloorCommon {
 
       // HACK: Monsters should move based on deltaTime
       for(let i = 0; i < moves; ++i) {
-        monster.move();
+        monster.move(); // monster-monster collision check happens here
       }
 
       monster.figureOutWhereToGo();
-
-      //todo monster.collision check
     }
   }
 
