@@ -25,6 +25,9 @@ module.exports = {
             type: Sequelize.STRING,
             defaultValue: 0,
             allowNull: false
+          },
+          username: {
+            type: Sequelize.STRING
           }
         }
       ),
