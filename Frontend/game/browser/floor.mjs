@@ -15,6 +15,7 @@ export default class Floor extends FloorCommon {
     this._viewportY = 0;
 
     this.monsters = [];
+    this.monsterSprites = new PIXI.Container();
   }
 
   /**
@@ -43,7 +44,6 @@ export default class Floor extends FloorCommon {
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters() {
-    this.monsterSprites = new PIXI.Container();
     this.monsters = [];
     let random = 0;
     for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) {
@@ -155,6 +155,7 @@ export default class Floor extends FloorCommon {
     this._diffState("id", this.monsters, state.monsters, (raw) => {
       let monster = new Monster(raw.name, raw.hp, 10, this, raw.id, raw.type);
       monster.setCoodinates(raw.x, raw.y);
+      monster.createSprite();
       return monster;
     });
   }
