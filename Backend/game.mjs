@@ -5,7 +5,7 @@ import saveHandler from "./handlers/save";
 import initAuth from "./game-auth.mjs";
 
 // then interval at which we update the game state (if this is too short the server will break)
-const UPDATE_INTERVAL = 1000;
+const UPDATE_INTERVAL = 100;
 
 async function main() {
   // Parse the env vars
