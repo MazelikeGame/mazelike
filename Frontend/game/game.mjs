@@ -109,7 +109,7 @@ async function setup() {
 
   // don't run monster logic multiplayer game (for now)
   if(!gameId) {
-    window.setInterval(function() { 
+    window.setInterval(function() {
       for(let i = 0; i < floor.monsters.length; i++) {
         if(floor.monsters[i].type !== "blue") { // not a blue monster
           floor.monsters[i].figureOutWhereToGo();

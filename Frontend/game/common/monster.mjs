@@ -4,7 +4,8 @@
 export default class MonsterCommon {
   
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
-    
+    //console.log("monster created");
+
     this.name = name_in;
     this.hp = hp_in;
     this.damage = damage_in;
@@ -21,6 +22,12 @@ export default class MonsterCommon {
     this.PCy = -1;
     this.maneuver = false;
     this.alive = true;
+
+    // SPEED: 10 = regular, 20 = slow
+    this.speed = 10;
+    if(this.type === "blue") { // slow monsters
+      this.speed = 20;
+    }
 
     this.placeInRandomRoom();
 
