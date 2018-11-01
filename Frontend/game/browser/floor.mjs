@@ -74,6 +74,8 @@ export default class Floor extends FloorCommon {
       // Player.load(floor)
     ]);
 
+    floor.generateMonsters();
+
     floor._initRendering();
 
     return floor;
