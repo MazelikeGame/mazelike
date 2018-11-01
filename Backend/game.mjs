@@ -42,7 +42,7 @@ async function main() {
   initAuth(io);
 
   io.on("connection", (sock) => {
-    sock.emit("set-username", sock.user.username);
+    sock.emit("set-username", sock.user.username); //Sends the username
 
     saveHandler(sock, floor);
   });

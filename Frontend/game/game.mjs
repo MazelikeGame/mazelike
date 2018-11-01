@@ -68,8 +68,9 @@ async function setup() {
   let floor;
   sock.emit("ready", gameId);
 
-  let sock2 = io(location.origin); //Get rid of this
-  sock2.emit("ready", gameId); //Put this on the game server.
+  let masterSock = io(location.origin); //Transition this to the game server
+  masterSock.emit("ready", gameId);
+
   console.log(`User: ${username}`); // eslint-disable-line
 
   if(gameId) {
@@ -91,9 +92,8 @@ async function setup() {
     app.stage.addChild(fps.sprite);
   }
 
-  sock2.on("player-list", (players) => {
-    let playerList = new PlayerList(players);
-    app.stage.addChild(playerList.render());
+  masterSock.on("player-list", (players) => {
+    app.stage.addChild(new PlayerList(players).render());
   });
 
   window.ml.floor = floor;
@@ -153,8 +153,8 @@ async function setup() {
   }, 20);
 
   sock.on("disconnect", () => {
-    let disconnectMessage = new DisconnectMessage("Disconnected!");
-    app.stage.addChild(disconnectMessage.render());
+    new DisconnectMessage("Disconnected!");
+    app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
   });
   
   app.ticker.add(() => {
