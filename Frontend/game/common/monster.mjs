@@ -22,9 +22,9 @@ export default class MonsterCommon {
     this.alive = true;
 
     // SPEED: 10 = regular, 20 = slow
-    this.speed = 10;
+    this.speed = 100;
     if(this.type === "blue") { // slow monsters
-      this.speed = 20;
+      this.speed = 200;
     }
 
     this.placeInRandomRoom();
@@ -153,15 +153,15 @@ export default class MonsterCommon {
       let yPerc = 1 - xPerc;
       // Use pythagorean theorem to distrubute 
       let root = Math.sqrt(this.speed * (deltaTime / 1000));
-      let xMove = (root * xPerc) ** 2;
-      let yMove = (root * yPerc) ** 2;
-      
+      let xMove = Math.round((root * xPerc) ** 2);
+      let yMove = Math.round((root * yPerc) ** 2);
+
       if(!isNaN(xMove)) {
-        this.x = xMove * (xDist < 0 ? -1 : 1);
+        this.x += Math.min(xMove, xDist) * (this.targetx < this.x ? -1 : 1);
       }
 
       if(!isNaN(yMove)) {
-        this.y += yMove * (yDist < 0 ? -1 : 1);
+        this.y += Math.min(yMove, yDist) * (this.targety < this.y ? -1 : 1);
       }
     }
   }

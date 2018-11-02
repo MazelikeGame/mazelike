@@ -72,7 +72,7 @@ export default class Floor extends FloorCommon {
    */
   tick(deltaTime) {
     for(let monster of this.monsters) {
-      // monster.move(deltaTime); // monster-monster collision check happens here
+      monster.move(deltaTime); // monster-monster collision check happens here
 
       monster.figureOutWhereToGo();
     }

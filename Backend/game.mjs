@@ -76,7 +76,6 @@ async function triggerTick(floor, io, lastUpdate) {
 
   // move monsters and check for collisions
   try {
-    console.log(`Delta t: ${now - lastUpdate - UPDATE_INTERVAL}`); //eslint-disable-line
     await floor.tick(now - lastUpdate);
     await floor.sendState(io);
   } catch(err) {
