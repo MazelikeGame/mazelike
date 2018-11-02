@@ -141,15 +141,28 @@ export default class MonsterCommon {
 
   /**
    * Sets the position closer to the target position.
+   * @param {number} deltaTime The number of ms since the last move
    */
-  move() {
+  move(deltaTime) {
     if(this.alive && this.collisionMonsters() === false) {
-      if(this.targetx < this.x)
-        this.x--;
-      else this.x++;
-      if(this.targety < this.y)
-        this.y--;
-      else this.y++;
+      // Get the distance in the x and y direction we have to move
+      let xDist = Math.abs(this.targetx - this.x);
+      let yDist = Math.abs(this.targety - this.y);
+      // Figure out what percentage of our next turn should be in each direction
+      let xPerc = xDist / (xDist + yDist);
+      let yPerc = 1 - xPerc;
+      // Use pythagorean theorem to distrubute 
+      let root = Math.sqrt(this.speed * (deltaTime / 1000));
+      let xMove = (root * xPerc) ** 2;
+      let yMove = (root * yPerc) ** 2;
+      
+      if(!isNaN(xMove)) {
+        this.x = xMove * (xDist < 0 ? -1 : 1);
+      }
+
+      if(!isNaN(yMove)) {
+        this.y += yMove * (yDist < 0 ? -1 : 1);
+      }
     }
   }
 

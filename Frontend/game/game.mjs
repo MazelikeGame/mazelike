@@ -112,36 +112,15 @@ async function setup() {
   if(!gameId) {
     window.setInterval(function() {
       for(let i = 0; i < floor.monsters.length; i++) {
-        if(floor.monsters[i].type !== "blue") { // not a blue monster
-          floor.monsters[i].figureOutWhereToGo();
-        }
+        floor.monsters[i].figureOutWhereToGo();
       }
     }, 500);
   }
   window.setInterval(function() {
     for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type !== "blue") { // not a blue monster
-        floor.monsters[i].move();
-      }
+      floor.monsters[i].move(10);
     }
   }, 10);
-
-  if(!gameId) {
-    window.setInterval(function() {
-      for(let i = 0; i < floor.monsters.length; i++) {
-        if(floor.monsters[i].type === "blue") { // is a blue monster
-          floor.monsters[i].figureOutWhereToGo();
-        }
-      }
-    }, 1000);
-  }
-  window.setInterval(function() {
-    for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type === "blue") { // is a blue monster
-        floor.monsters[i].move();
-      }
-    }
-  }, 20);
   
   app.ticker.add(() => {
     floor.update();
