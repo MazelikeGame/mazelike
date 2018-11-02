@@ -72,11 +72,11 @@ export default class Floor extends FloorCommon {
    */
   tick(deltaTime) {
     for(let monster of this.monsters) {
-      let moves = Math.floor(deltaTime / (monster.type === "blue" ? 20 : 10));
+      let moves = Math.floor(deltaTime / monster.speed);
 
       // HACK: Monsters should move based on deltaTime
       for(let i = 0; i < moves; ++i) {
-        monster.move();
+        monster.move(); // monster-monster collision check happens here
       }
 
       monster.figureOutWhereToGo();
