@@ -116,13 +116,15 @@ async function setup() {
       }
     }, 500);
   }
-  window.setInterval(function() {
-    for(let i = 0; i < floor.monsters.length; i++) {
-      floor.monsters[i].move(10);
-    }
-  }, 10);
   
+  let lastMove = Date.now();
   app.ticker.add(() => {
+    let now = Date.now();
+    for(let i = 0; i < floor.monsters.length; i++) {
+      floor.monsters[i].move(lastMove - now);
+    }
+    lastMove = now;
+
     floor.update();
 
     if(fps) {

@@ -1,6 +1,9 @@
 /* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
 /** @module Monster */
 
+// The maximum amount of ms we want a monster to walk for
+const MAX_WALK_TIME = 1500;
+
 export default class MonsterCommon {
   
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
@@ -113,16 +116,19 @@ export default class MonsterCommon {
    * 
    * Monster moves to an adjacent, unoccupied location.
    */
-  wander(deltaTimeGuess = 1500) {
+  wander() {
     let prev = {x: this.x, y: this.y};
     let dist;
-    let targetDist = this.speed * (deltaTimeGuess / 1000);
+    // the distance we want to travel
+    let targetDist = this.speed * (MAX_WALK_TIME / 1000);
     let count = 1000;
 
+    // the angle of the direction we want to travel in
     // eslint-disable-next-line
     let theta = Math.floor(Math.random() * 360) * (Math.PI / 180) - Math.PI;
     Object.assign(this, prev);
 
+    // start moving in that direction until we reach our target or a wall
     do {
       this.x += Math.cos(theta);
       this.y += Math.sin(theta);
@@ -130,6 +136,7 @@ export default class MonsterCommon {
       dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
     } while(this.spriteIsOnMap() && dist < targetDist && --count > 0);
     
+    // Back up until we are back on the map
     do {
       this.x -= Math.cos(theta);
       this.y -= Math.sin(theta);
@@ -137,10 +144,11 @@ export default class MonsterCommon {
       dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
     } while(!this.spriteIsOnMap() && dist > 0 && --count > 0);
 
-    this.targetx = this.x;
-    this.targety = this.y;
+    this.targetx = Math.floor(this.x);
+    this.targety = Math.floor(this.y);
     Object.assign(this, prev);
 
+    // Don't go anywhere if we ran for too long
     if(count === 0) {
       this.targetx = this.x;
       this.targety = this.y;
@@ -161,8 +169,8 @@ export default class MonsterCommon {
       let yPerc = 1 - xPerc;
       // Use pythagorean theorem to distrubute 
       let root = Math.sqrt(this.speed * (deltaTime / 1000));
-      let xMove = Math.round((root * xPerc) ** 2);
-      let yMove = Math.round((root * yPerc) ** 2);
+      let xMove = Math.floor((root * xPerc) ** 2);
+      let yMove = Math.floor((root * yPerc) ** 2);
 
       if(!isNaN(xMove)) {
         this.x += Math.min(xMove, xDist) * (this.targetx < this.x ? -1 : 1);
