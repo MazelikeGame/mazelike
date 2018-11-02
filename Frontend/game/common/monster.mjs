@@ -24,12 +24,8 @@ export default class MonsterCommon {
     // SPEED: 10 = regular, 20 = slow
     this.speed = 100;
     if(this.type === "blue") { // slow monsters
-      this.speed = 200;
+      this.speed = 50;
     }
-
-    this.placeInRandomRoom();
-
-    this.figureOutWhereToGo();
   }
 
   /** 
@@ -117,26 +113,38 @@ export default class MonsterCommon {
    * 
    * Monster moves to an adjacent, unoccupied location.
    */
-  wander() {
-    let random = Math.floor(Math.random() * 4); 
-    let prevX = this.x;
-    let prevY = this.y;
-    if(random === 0)
-      this.x += MonsterCommon.SPRITE_SIZE;
-    else if(random === 1)
-      this.x -= MonsterCommon.SPRITE_SIZE;
-    else if(random === 2)
-      this.y += MonsterCommon.SPRITE_SIZE;
-    else if(random === 3)
-      this.y -= MonsterCommon.SPRITE_SIZE;
-    if(!this.spriteIsOnMap()) { // if trying to wander off map, doesn't move at all (until it wanders again)
-      this.x = prevX;
-      this.y = prevY;
-    }
+  wander(deltaTimeGuess = 1500) {
+    let prev = {x: this.x, y: this.y};
+    let dist;
+    let targetDist = this.speed * (deltaTimeGuess / 1000);
+    let count = 1000;
+
+    // eslint-disable-next-line
+    let theta = Math.floor(Math.random() * 360) * (Math.PI / 180) - Math.PI;
+    Object.assign(this, prev);
+
+    do {
+      this.x += Math.cos(theta);
+      this.y += Math.sin(theta);
+      // eslint-disable-next-line
+      dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
+    } while(this.spriteIsOnMap() && dist < targetDist && --count > 0);
+    
+    do {
+      this.x -= Math.cos(theta);
+      this.y -= Math.sin(theta);
+      // eslint-disable-next-line
+      dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
+    } while(!this.spriteIsOnMap() && dist > 0 && --count > 0);
+
     this.targetx = this.x;
-    this.x = prevX;
     this.targety = this.y;
-    this.y = prevY;
+    Object.assign(this, prev);
+
+    if(count === 0) {
+      this.targetx = this.x;
+      this.targety = this.y;
+    }
   }
 
   /**
@@ -177,7 +185,14 @@ export default class MonsterCommon {
     //this.canSeePC();
     if(this.alive) {
       if(!this.targetAquired) {
-        this.wander();
+        if(this.targetx === -1 || this.targety === -1) {
+          this.targetx = this.x;
+          this.targety = this.y;
+        }
+
+        if(Math.abs(this.x - this.targetx) < 2 && Math.abs(this.y - this.targety) < 2) {
+          this.wander();
+        }
       } else {
         //move strategically, to be implemented later when PC is on map WIP
         console.log("omw bro");

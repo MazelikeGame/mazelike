@@ -9,6 +9,13 @@ import sql from "../sequelize";
 let deadMonsterIds = [];
 
 export default class Monster extends MonsterCommon {
+  constructor(...args) {
+    super(...args);
+
+    this.placeInRandomRoom();
+    this.targetx = -1;
+    this.targety = -1;
+  }
   
   /**
    * Puts 
