@@ -3,6 +3,9 @@
 
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
+import PlayerList from "./browser/player-list.js";
+import DisconnectMessage from "./browser/disconnect-msg.js";
+
 
 let msgEl = document.querySelector(".msg");
 let msgParentEl = document.querySelector(".msg-parent");
@@ -65,6 +68,10 @@ async function setup() {
   msgEl.innerText = "Loading game";
   let floor;
 
+  let masterSock = io(location.origin); //Transition this to the game server
+  masterSock.emit("ready", gameId);
+
+
   console.log(`User: ${username}`); // eslint-disable-line
 
   if(gameId) {
@@ -86,6 +93,10 @@ async function setup() {
     fps = new FpsCounter();
     app.stage.addChild(fps.sprite);
   }
+
+  masterSock.on("player-list", (players) => {
+    app.stage.addChild(new PlayerList(players).render());
+  });
 
   window.ml.floor = floor;
   addArrowKeyListener(floor);
@@ -142,6 +153,11 @@ async function setup() {
       }
     }
   }, 20);
+
+  sock.on("disconnect", () => {
+    new DisconnectMessage("Disconnected!");
+    app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
+  });
   
   app.ticker.add(() => {
     floor.update();
