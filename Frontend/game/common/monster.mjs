@@ -143,8 +143,6 @@ export default class MonsterCommon {
    * Sets the position closer to the target position.
    */
   move() {
-    let prevX = this.x;
-    let prevY = this.y;
     if(this.alive) {
       if(this.targetx < this.x)
         this.x--;
@@ -155,9 +153,7 @@ export default class MonsterCommon {
     }
     let collision = this.collisionMonsters();
     if(collision !== -1) {
-      this.x = prevX;
-      this.y = prevY;
-      console.log(this.id);
+      this.die();
     }
   }
 
