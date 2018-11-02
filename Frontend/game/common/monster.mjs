@@ -143,13 +143,21 @@ export default class MonsterCommon {
    * Sets the position closer to the target position.
    */
   move() {
-    if(this.alive && this.collisionMonsters() === false) {
+    let prevX = this.x;
+    let prevY = this.y;
+    if(this.alive) {
       if(this.targetx < this.x)
         this.x--;
       else this.x++;
       if(this.targety < this.y)
         this.y--;
       else this.y++;
+    }
+    let collision = this.collisionMonsters();
+    if(collision !== -1) {
+      this.x = prevX;
+      this.y = prevY;
+      console.log(this.id);
     }
   }
 
@@ -230,16 +238,33 @@ export default class MonsterCommon {
    * @returns {boolean}
    */
   collisionMonsters() {
+    let x = -1;
+    let y = -1;
     for(let i = 0; i < this.floor.monsters.length; i++) {
       if(this.id !== this.floor.monsters[i].id) {
-        if(this.floor.monsters[i].x >= this.x && this.floor.monsters[i].x <= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
-          if(this.floor.monsters[i].y >= this.y && this.floor.monsters[i].y <= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
-            return true;
+        for(let j = 0; j < 4; j++) { // four corners to check for each sprite
+          if(j === 0) { // upper left corner
+            x = this.floor.monsters[i].x;
+            y = this.floor.monsters[i].y;
+          } else if(j === 1) { // upper right corner
+            x = this.floor.monsters[i].x + MonsterCommon.SPRITE_SIZE;
+            y = this.floor.monsters[i].y;
+          } else if(j === 1) { // lower right corner
+            x = this.floor.monsters[i].x + MonsterCommon.SPRITE_SIZE;
+            y = this.floor.monsters[i].y + MonsterCommon.SPRITE_SIZE;
+          } else if(j === 1) { // lower left corner
+            x = this.floor.monsters[i].x;
+            y = this.floor.monsters[i].y + MonsterCommon.SPRITE_SIZE;
+          }
+          if(x >= this.x && x <= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
+            if(y >= this.y && y <= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
+              return i;
+            }
           }
         }
       }
     }
-    return false;
+    return -1; // indicate no collision
   }
 
   /**
