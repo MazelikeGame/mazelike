@@ -13,6 +13,7 @@ import {spawnGame, getGameAddr} from "../managers/manager";
 import Floor from "../game/floor";
 
 const mkdir = util.promisify(fs.mkdir);
+const exists = util.promisify(fs.exists);
 
 export let gameRouter = express.Router();
 
@@ -367,11 +368,14 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     } catch(err) {
       // pass
     }
+    
     // Generate the game
-    await Floor.generate({
-      gameId: req.params.id,
-      floorIdx: 0
-    }).save(true);
+    if(!await exists(`Frontend/public/maps/${req.params.id}.json`)) {
+      await Floor.generate({
+        gameId: req.params.id,
+        floorIdx: 0
+      }).save(true);
+    }
 
     try {
       await spawnGame({
