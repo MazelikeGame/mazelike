@@ -206,8 +206,8 @@ export default class MonsterCommon {
   placeInRandomRoom() {
     let numRooms = this.floor.map.rooms.length;
     this.initialRoom = Math.floor(Math.random() * numRooms);
-    for(let i = 0; i < this.floor.monsters.length; i++) {
-      if(this.id !== this.floor.monsters[i].id && this.floor.monsters[i].initialRoom === this.initialRoom) {
+    for(let monster of this.floor.monsters) {
+      if(this.id !== monster.id && monster.initialRoom === this.initialRoom) {
         this.placeInRandomRoom();
       }
     }
@@ -236,25 +236,25 @@ export default class MonsterCommon {
   collisionMonsters() {
     let x = -1;
     let y = -1;
-    for(let i = 0; i < this.floor.monsters.length; i++) {
-      if(this.id !== this.floor.monsters[i].id) {
+    for(let monster of this.floor.monsters) {
+      if(this.id !== monster.id) {
         for(let j = 0; j < 4; j++) { // four corners to check for each sprite
           if(j === 0) { // upper left corner
-            x = this.floor.monsters[i].x;
-            y = this.floor.monsters[i].y;
+            x = monster.x;
+            y = monster.y;
           } else if(j === 1) { // upper right corner
-            x = this.floor.monsters[i].x + MonsterCommon.SPRITE_SIZE;
-            y = this.floor.monsters[i].y;
+            x = monster.x + MonsterCommon.SPRITE_SIZE;
+            y = monster.y;
           } else if(j === 1) { // lower right corner
-            x = this.floor.monsters[i].x + MonsterCommon.SPRITE_SIZE;
-            y = this.floor.monsters[i].y + MonsterCommon.SPRITE_SIZE;
+            x = monster.x + MonsterCommon.SPRITE_SIZE;
+            y = monster.y + MonsterCommon.SPRITE_SIZE;
           } else if(j === 1) { // lower left corner
-            x = this.floor.monsters[i].x;
-            y = this.floor.monsters[i].y + MonsterCommon.SPRITE_SIZE;
+            x = monster.x;
+            y = monster.y + MonsterCommon.SPRITE_SIZE;
           }
           if(x >= this.x && x <= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
             if(y >= this.y && y <= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
-              return i;
+              return monster.id;
             }
           }
         }
