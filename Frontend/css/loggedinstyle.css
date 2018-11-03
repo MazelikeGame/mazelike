@@ -1111,11 +1111,23 @@ PANELS CONFIGURATIONS
 /*White Panel */
 .white-panel {
     display: flex;
-    min-height: 100vh;
     flex-direction: column;
     text-align: center;
 	background: #ffffff;
 	color: #7a7d81;
+}
+
+@media all and (min-width: 768px) {
+    .white-panel {
+        min-height: 80vh;
+    }
+}
+
+.white-panel .row {
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
 .white-panel p {
@@ -1131,7 +1143,6 @@ PANELS CONFIGURATIONS
 .white-panel .white-header {
 	background: rgba(97, 150, 255, 0.39);
 	padding: 3px;
-	margin-bottom: 15px;
 	color: rgb(43, 65, 109);
 }
 .white-panel .small {
