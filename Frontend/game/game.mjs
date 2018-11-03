@@ -123,19 +123,10 @@ async function setup() {
   if(!gameId) {
     window.setInterval(function() {
       for(let i = 0; i < floor.monsters.length; i++) {
-        if(floor.monsters[i].type !== "blue") { // not a blue monster
-          floor.monsters[i].figureOutWhereToGo();
-        }
+        floor.monsters[i].figureOutWhereToGo();
       }
     }, 500);
   }
-  window.setInterval(function() {
-    for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type !== "blue") { // not a blue monster
-        floor.monsters[i].move();
-      }
-    }
-  }, 10);
 
   if(!gameId) {
     window.setInterval(function() {

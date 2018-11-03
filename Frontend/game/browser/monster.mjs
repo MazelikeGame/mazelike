@@ -5,6 +5,10 @@
 import MonsterCommon from "../common/monster.mjs";
 
 export default class Monster extends MonsterCommon {
+  constructor(...args) {
+    super(...args);
+    this._lastMove = Date.now();
+  }
 
   /**
    * Generates sprite for a specific monster and adds it to the floor.
@@ -23,6 +27,10 @@ export default class Monster extends MonsterCommon {
    * @param viewY 
    */
   update(viewX, viewY) {
+    let now = Date.now();
+    this.move(this._lastMove - now);
+    this._lastMove = now;
+
     this.sprite.position.set(this.x - viewX, this.y - viewY);
   }
 
@@ -53,7 +61,7 @@ export default class Monster extends MonsterCommon {
    * Monster dies.
    */
   die() {
-    this.monsterSprites.removeChild(this.sprite);
+    this.floor.monsterSprites.removeChild(this.sprite);
     this.x = -1; // (-1, -1) coordinate tells us that the monster is dead
     this.y = -1;
     this.alive = false;

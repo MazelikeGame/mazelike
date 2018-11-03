@@ -1,6 +1,9 @@
 /* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
 /** @module Monster */
 
+// The maximum amount of ms we want a monster to walk for
+const MAX_WALK_TIME = 1500;
+
 export default class MonsterCommon {
   
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
@@ -22,14 +25,10 @@ export default class MonsterCommon {
     this.alive = true;
 
     // SPEED: 10 = regular, 20 = slow
-    this.speed = 10;
+    this.speed = 100;
     if(this.type === "blue") { // slow monsters
-      this.speed = 20;
+      this.speed = 50;
     }
-
-    this.placeInRandomRoom();
-
-    this.figureOutWhereToGo();
   }
 
   /** 
@@ -118,38 +117,68 @@ export default class MonsterCommon {
    * Monster moves to an adjacent, unoccupied location.
    */
   wander() {
-    let random = Math.floor(Math.random() * 4); 
-    let prevX = this.x;
-    let prevY = this.y;
-    if(random === 0)
-      this.x += MonsterCommon.SPRITE_SIZE;
-    else if(random === 1)
-      this.x -= MonsterCommon.SPRITE_SIZE;
-    else if(random === 2)
-      this.y += MonsterCommon.SPRITE_SIZE;
-    else if(random === 3)
-      this.y -= MonsterCommon.SPRITE_SIZE;
-    if(!this.spriteIsOnMap()) { // if trying to wander off map, doesn't move at all (until it wanders again)
-      this.x = prevX;
-      this.y = prevY;
+    let prev = {x: this.x, y: this.y};
+    let dist;
+    // the distance we want to travel
+    let targetDist = this.speed * (MAX_WALK_TIME / 1000);
+    let count = 1000;
+
+    // the angle of the direction we want to travel in
+    // eslint-disable-next-line
+    let theta = Math.floor(Math.random() * 360) * (Math.PI / 180) - Math.PI;
+    Object.assign(this, prev);
+
+    // start moving in that direction until we reach our target or a wall
+    do {
+      this.x += Math.cos(theta);
+      this.y += Math.sin(theta);
+      // eslint-disable-next-line
+      dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
+    } while(this.spriteIsOnMap() && dist < targetDist && --count > 0);
+    
+    // Back up until we are back on the map
+    do {
+      this.x -= Math.cos(theta);
+      this.y -= Math.sin(theta);
+      // eslint-disable-next-line
+      dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
+    } while(!this.spriteIsOnMap() && dist > 0 && --count > 0);
+
+    this.targetx = Math.floor(this.x);
+    this.targety = Math.floor(this.y);
+    Object.assign(this, prev);
+
+    // Don't go anywhere if we ran for too long
+    if(count === 0) {
+      this.targetx = this.x;
+      this.targety = this.y;
     }
-    this.targetx = this.x;
-    this.x = prevX;
-    this.targety = this.y;
-    this.y = prevY;
   }
 
   /**
    * Sets the position closer to the target position.
+   * @param {number} deltaTime The number of ms since the last move
    */
-  move() {
+  move(deltaTime) {
     if(this.alive) {
-      if(this.targetx < this.x)
-        this.x--;
-      else this.x++;
-      if(this.targety < this.y)
-        this.y--;
-      else this.y++;
+      // Get the distance in the x and y direction we have to move
+      let xDist = Math.abs(this.targetx - this.x);
+      let yDist = Math.abs(this.targety - this.y);
+      // Figure out what percentage of our next turn should be in each direction
+      let xPerc = xDist / (xDist + yDist);
+      let yPerc = 1 - xPerc;
+      // Use pythagorean theorem to distrubute 
+      let root = Math.sqrt(this.speed * (deltaTime / 1000));
+      let xMove = Math.floor((root * xPerc) ** 2);
+      let yMove = Math.floor((root * yPerc) ** 2);
+
+      if(!isNaN(xMove)) {
+        this.x += Math.min(xMove, xDist) * (this.targetx < this.x ? -1 : 1);
+      }
+
+      if(!isNaN(yMove)) {
+        this.y += Math.min(yMove, yDist) * (this.targety < this.y ? -1 : 1);
+      }
     }
     let collision = this.collisionMonsters();
     if(collision !== -1) {
@@ -168,7 +197,14 @@ export default class MonsterCommon {
     //this.canSeePC();
     if(this.alive) {
       if(!this.targetAquired) {
-        this.wander();
+        if(this.targetx === -1 || this.targety === -1) {
+          this.targetx = this.x;
+          this.targety = this.y;
+        }
+
+        if(Math.abs(this.x - this.targetx) < 2 && Math.abs(this.y - this.targety) < 2) {
+          this.wander();
+        }
       } else {
         //move strategically, to be implemented later when PC is on map WIP
         console.log("omw bro");
