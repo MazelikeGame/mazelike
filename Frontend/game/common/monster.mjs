@@ -143,13 +143,17 @@ export default class MonsterCommon {
    * Sets the position closer to the target position.
    */
   move() {
-    if(this.alive && this.collisionMonsters() === false) {
+    if(this.alive) {
       if(this.targetx < this.x)
         this.x--;
       else this.x++;
       if(this.targety < this.y)
         this.y--;
       else this.y++;
+    }
+    let collision = this.collisionMonsters();
+    if(collision !== -1) {
+      this.die();
     }
   }
 
@@ -202,8 +206,8 @@ export default class MonsterCommon {
   placeInRandomRoom() {
     let numRooms = this.floor.map.rooms.length;
     this.initialRoom = Math.floor(Math.random() * numRooms);
-    for(let i = 0; i < this.floor.monsters.length; i++) {
-      if(this.id !== this.floor.monsters[i].id && this.floor.monsters[i].initialRoom === this.initialRoom) {
+    for(let monster of this.floor.monsters) {
+      if(this.id !== monster.id && monster.initialRoom === this.initialRoom) {
         this.placeInRandomRoom();
       }
     }
@@ -230,16 +234,33 @@ export default class MonsterCommon {
    * @returns {boolean}
    */
   collisionMonsters() {
-    for(let i = 0; i < this.floor.monsters.length; i++) {
-      if(this.id !== this.floor.monsters[i].id) {
-        if(this.floor.monsters[i].x >= this.x && this.floor.monsters[i].x <= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
-          if(this.floor.monsters[i].y >= this.y && this.floor.monsters[i].y <= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
-            return true;
+    let x = -1;
+    let y = -1;
+    for(let monster of this.floor.monsters) {
+      if(this.id !== monster.id) {
+        for(let j = 0; j < 4; j++) { // four corners to check for each sprite
+          if(j === 0) { // upper left corner
+            x = monster.x;
+            y = monster.y;
+          } else if(j === 1) { // upper right corner
+            x = monster.x + MonsterCommon.SPRITE_SIZE;
+            y = monster.y;
+          } else if(j === 1) { // lower right corner
+            x = monster.x + MonsterCommon.SPRITE_SIZE;
+            y = monster.y + MonsterCommon.SPRITE_SIZE;
+          } else if(j === 1) { // lower left corner
+            x = monster.x;
+            y = monster.y + MonsterCommon.SPRITE_SIZE;
+          }
+          if(x >= this.x && x <= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
+            if(y >= this.y && y <= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
+              return monster.id;
+            }
           }
         }
       }
     }
-    return false;
+    return -1; // indicate no collision
   }
 
   /**
