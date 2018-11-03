@@ -150,14 +150,7 @@ async function setup() {
     app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
   });
   
-  let lastMove = Date.now();
   app.ticker.add(() => {
-    let now = Date.now();
-    for(let i = 0; i < floor.monsters.length; i++) {
-      floor.monsters[i].move(lastMove - now);
-    }
-    lastMove = now;
-    
     floor.update();
 
     if(fps) {
