@@ -61,7 +61,7 @@ export default class Monster extends MonsterCommon {
    * Monster dies.
    */
   die() {
-    this.monsterSprites.removeChild(this.sprite);
+    this.floor.monsterSprites.removeChild(this.sprite);
     this.x = -1; // (-1, -1) coordinate tells us that the monster is dead
     this.y = -1;
     this.alive = false;
