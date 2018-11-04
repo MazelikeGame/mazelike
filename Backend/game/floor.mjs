@@ -2,6 +2,7 @@
 import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
 import Monster from "./monster.mjs";
+import Player from './player';
 
 export default class Floor extends FloorCommon {
   /**
@@ -49,7 +50,8 @@ export default class Floor extends FloorCommon {
 
     await Promise.all([
       GameMap.load(floor),
-      Monster.load(floor)
+      Monster.load(floor),
+      Player.load(floor)
     ]);
 
     return floor;
@@ -83,7 +85,8 @@ export default class Floor extends FloorCommon {
    */
   sendState(io) {
     io.emit("state", {
-      monsters: this.monsters
+      monsters: this.monsters,
+      players: this.players
     });
   }
 }

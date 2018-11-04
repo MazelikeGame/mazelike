@@ -3,9 +3,8 @@
 /** @module browser/Floor */
 import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
-// import Player from "./player.mjs";
-import Monster from "./monster.mjs";
 import Player from "./Player.mjs";
+import Monster from "./monster.mjs";
 
 export default class Floor extends FloorCommon {
   constructor(gameId, floorIdx, sock, players) {
@@ -19,6 +18,7 @@ export default class Floor extends FloorCommon {
     this.monsterSprites = new PIXI.Container();
 
     this.players = players;
+    this.playerSprites = new PIXI.Container();
   }
 
   /**
@@ -29,8 +29,6 @@ export default class Floor extends FloorCommon {
    */
   static generate({gameId, floorIdx, map, sock}) {
     let floor = new Floor(gameId, floorIdx, sock);
-    // let players = [];
-    // players.push(new Player('billy bob', 100, map, 0, map.getSpawnPoint()));
     floor.map = GameMap.generate(map);
 
     floor._initRendering();
@@ -103,15 +101,12 @@ export default class Floor extends FloorCommon {
     for(let i = 0; i < this.monsters.length; i++) {
       this.monsters[i].createSprite();
     }
-    this.sprite.addChild(this.monsterSprites);
-
-    //for all players create a player object.
+    /*
     this.players.forEach((player) => {
-      let me = new Player(player, 100, {x: 50, y: 50});
-      me.createSprite();
-      this.sprite.addChild(me.sprite);
-      console.log("Added " + player);
-    });
+      player.createSprite();
+    });*/
+    this.sprite.addChild(this.playerSprites);
+    this.sprite.addChild(this.monsterSprites);
   }
 
   /**
