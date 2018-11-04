@@ -106,9 +106,12 @@ export default class Floor extends FloorCommon {
     this.sprite.addChild(this.monsterSprites);
 
     //for all players create a player object.
-    let me = new Player("Test", 100, {x: 50, y: 50});
-    me.createSprite();
-    this.sprite.addChild(me.sprite);
+    this.players.forEach((player) => {
+      let me = new Player(player, 100, {x: 50, y: 50});
+      me.createSprite();
+      this.sprite.addChild(me.sprite);
+      console.log("Added " + player);
+    });
   }
 
   /**
