@@ -16,6 +16,9 @@ export default class Floor extends FloorCommon {
 
     this.monsters = [];
     this.monsterSprites = new PIXI.Container();
+
+    this.players = [];
+    this.playerSprites = new PIXI.Container();
   }
 
   /**
@@ -26,9 +29,6 @@ export default class Floor extends FloorCommon {
    */
   static generate({gameId, floorIdx, map, sock}) {
     let floor = new Floor(gameId, floorIdx, sock);
-    // let players = [];
-    // players.push(new Player('billy bob', 100, map, 0, map.getSpawnPoint()));
-
     floor.map = GameMap.generate(map);
 
     floor._initRendering();
