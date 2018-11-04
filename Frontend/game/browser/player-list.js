@@ -18,6 +18,13 @@ export default class PlayerList {
   }
 
   /**
+   * Returns an array of players.
+   */
+  getPlayers() {
+    return this.listOfPlayers;
+  }
+
+  /**
    * Draws the player's information to the player list.
    * @param {string} playerName 
    * @param {int} playerHP 
