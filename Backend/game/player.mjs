@@ -30,14 +30,14 @@ export default class Player extends PlayerCommon {
     /* Load every player in this lobby that is inGame */
     floor.players = [];
     lobbies.forEach(async(lobby) => {
-      let user = await UserModel.find({
-        where: {
-          id: lobby.id
-        }
-      });
       let rawPlayer = await PlayerModel.find({
         where: {
           id: lobby.player,
+        }
+      });
+      let user = await UserModel.find({
+        where: {
+          id: rawPlayer.username
         }
       });
       if(rawPlayer.inGame) {
