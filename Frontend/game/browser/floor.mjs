@@ -101,6 +101,10 @@ export default class Floor extends FloorCommon {
     for(let i = 0; i < this.monsters.length; i++) {
       this.monsters[i].createSprite();
     }
+    this.players.forEach((player) => {
+      player.createSprite();
+    });
+    this.sprite.addChild(this.playerSprites);
     this.sprite.addChild(this.monsterSprites);
   }
 
