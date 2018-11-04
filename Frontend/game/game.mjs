@@ -78,9 +78,9 @@ async function setup() {
   masterSock.emit("ready", gameId);
   let players = await getPlayers(masterSock);
   console.log(`User: ${username}`); // eslint-disable-line
-
+  console.log("Players: " + players);
   if(gameId) {
-    floor = await Floor.load(gameId, 0, sock);
+    floor = await Floor.load(gameId, 0, sock, players);
   } else {
     floor = Floor.generate({
       gameId,
@@ -89,8 +89,6 @@ async function setup() {
       players
     });
   }
-
-  app.stage.addChild(new PlayerList(players).render()); //Draw the player list
 
   app.stage.addChild(floor.sprite);
   floor.update();
@@ -101,6 +99,8 @@ async function setup() {
     fps = new FpsCounter();
     app.stage.addChild(fps.sprite);
   }
+
+  app.stage.addChild(new PlayerList(players).render()); //Draw the player list
 
   window.ml.floor = floor;
   addArrowKeyListener(floor);

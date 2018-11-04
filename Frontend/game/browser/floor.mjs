@@ -8,7 +8,7 @@ import Monster from "./monster.mjs";
 import Player from "./Player.mjs";
 
 export default class Floor extends FloorCommon {
-  constructor(gameId, floorIdx, sock) {
+  constructor(gameId, floorIdx, sock, players) {
     super(gameId, floorIdx);
     this.sock = sock;
     // the top left corrner of the user's screen
@@ -18,7 +18,7 @@ export default class Floor extends FloorCommon {
     this.monsters = [];
     this.monsterSprites = new PIXI.Container();
 
-    this.players = [];
+    this.players = players;
   }
 
   /**
@@ -27,11 +27,10 @@ export default class Floor extends FloorCommon {
    * @param floorIdx The index of floor we want to generate
    * @param {object} opts The options of the specific generators
    */
-  static generate({gameId, floorIdx, map, sock, players}) {
+  static generate({gameId, floorIdx, map, sock}) {
     let floor = new Floor(gameId, floorIdx, sock);
     // let players = [];
     // players.push(new Player('billy bob', 100, map, 0, map.getSpawnPoint()));
-    this.players = players;
     floor.map = GameMap.generate(map);
 
     floor._initRendering();
@@ -64,8 +63,8 @@ export default class Floor extends FloorCommon {
    * @param gameId The game id for the game we want to load
    * @param floorIdx The index of floor we want to load
    */
-  static async load(gameId, floorIdx, sock) {
-    let floor = new Floor(gameId, floorIdx, sock);
+  static async load(gameId, floorIdx, sock, players) {
+    let floor = new Floor(gameId, floorIdx, sock, players);
 
     await Promise.all([
       // NOTE: You should define your functions here and they should
