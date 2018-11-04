@@ -5,6 +5,7 @@ import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
 // import Player from "./player.mjs";
 import Monster from "./monster.mjs";
+import Player from "./Player.mjs";
 
 export default class Floor extends FloorCommon {
   constructor(gameId, floorIdx, sock) {
@@ -16,6 +17,8 @@ export default class Floor extends FloorCommon {
 
     this.monsters = [];
     this.monsterSprites = new PIXI.Container();
+
+    this.players = [];
   }
 
   /**
@@ -24,11 +27,11 @@ export default class Floor extends FloorCommon {
    * @param floorIdx The index of floor we want to generate
    * @param {object} opts The options of the specific generators
    */
-  static generate({gameId, floorIdx, map, sock}) {
+  static generate({gameId, floorIdx, map, sock, players}) {
     let floor = new Floor(gameId, floorIdx, sock);
     // let players = [];
     // players.push(new Player('billy bob', 100, map, 0, map.getSpawnPoint()));
-
+    this.players = players;
     floor.map = GameMap.generate(map);
 
     floor._initRendering();
@@ -102,6 +105,11 @@ export default class Floor extends FloorCommon {
       this.monsters[i].createSprite();
     }
     this.sprite.addChild(this.monsterSprites);
+
+    //for all players create a player object.
+    let me = new Player("Test", 100, {x: 50, y: 50});
+    me.createSprite();
+    this.sprite.addChild(me.sprite);
   }
 
   /**

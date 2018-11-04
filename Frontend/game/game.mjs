@@ -61,6 +61,12 @@ function getUsername(sock) {
   });
 }
 
+function getPlayers(sock) {
+  return new Promise((resolve) => {
+    sock.once("player-list", resolve);
+  });
+}
+
 async function setup() {
   msgEl.innerText = "Connecting to the game server";
   let sock = io(`http://${await (await fetch(`/game/addr/${gameId}`)).text()}`);
@@ -70,8 +76,7 @@ async function setup() {
 
   let masterSock = io(location.origin); //Transition this to the game server
   masterSock.emit("ready", gameId);
-
-
+  let players = await getPlayers(masterSock);
   console.log(`User: ${username}`); // eslint-disable-line
 
   if(gameId) {
@@ -80,9 +85,12 @@ async function setup() {
     floor = Floor.generate({
       gameId,
       floorIdx: 0,
-      sock
+      sock,
+      players
     });
   }
+
+  app.stage.addChild(new PlayerList(players).render()); //Draw the player list
 
   app.stage.addChild(floor.sprite);
   floor.update();
@@ -93,10 +101,6 @@ async function setup() {
     fps = new FpsCounter();
     app.stage.addChild(fps.sprite);
   }
-
-  masterSock.on("player-list", (players) => {
-    app.stage.addChild(new PlayerList(players).render());
-  });
 
   window.ml.floor = floor;
   addArrowKeyListener(floor);
