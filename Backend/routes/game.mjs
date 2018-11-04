@@ -387,9 +387,21 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       await spawnGame({
         gameId: req.params.id
       });
+      await Lobby.update({ inProgress: true },
+        {
+          where: {
+            lobbyId: req.params.id,
+          }
+        });
       io.emit("lobby-start", req.params.id, usernames);
       res.end("Game started");
     } catch(err) {
+      await Lobby.update({ inProgress: false },
+        {
+          where: {
+            lobbyId: req.params.id,
+          }
+        });
       process.stderr.write(`Error starting game: ${err.message}\n`);
       res.end("An error occured while starting game");
     }
