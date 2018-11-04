@@ -23,6 +23,13 @@ export default class Player extends PlayerCommon {
     this.floor.playerSprites.addChild(this.spriteName);
   }
 
+  /**
+   * Update the player sprite's position for all players on the floor.
+   */
+  update(viewX, viewY) {
+    // let now = Date.now();
+    this.sprite.position.set(this.x - viewX, this.y - viewY);
+  }
 
   /**
    * Remove a player from a PIXI.container
