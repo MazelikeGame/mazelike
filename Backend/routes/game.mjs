@@ -143,48 +143,55 @@ export const joinRoute = async(req, res) => {
   if(res.loginRedirect()) {
     return;
   }
-
   let lobby = await Lobby.find({
     where: {
       secret: req.params.id
     }
   });
 
-  // check if the lobby exists
+  /* Check if the lobby exists. If it doesn't, inform user the join link is invalid. */
   if(!lobby) {
     res.status(404);
     res.end("Join code is invalid");
     return;
   }
-
-  // Check if the user is in the lobby
-  let userExists = await Lobby.find({
-    where: {
-      secret: req.params.id,
-      playerId: req.user.username
-    }
-  });
-
-  if(userExists) {
-    res.redirect(`/game/lobby/${lobby.lobbyId}`);
-    return;
-  }
-
-  let newPlayer = await Player.create({
-    spriteName: Player.getRandomSprite()
-  });
   let user = await User.findOne({
     where: {
       username: req.user.username
     }
   });
-  await user.addPlayer(newPlayer);
-  let newLobby = await Lobby.create({
-    lobbyId: lobby.lobbyId,
-    secret: lobby.secret,
-    playerId: req.user.username
+
+  /* Check to see if there is a player already for this user and lobby */
+  let lobbyExists = await Lobby.findOne({
+    where: {
+      secret: req.params.id,
+      playerId: req.user.username
+    }
   });
-  await newPlayer.setLobby(newLobby);
+  /* If there is a lobby for this user, update the `inGame` attribute to true for the player
+   * record associated for this lobby */
+  if(lobbyExists) {
+    let continuePlayer = await Player.findOne({
+      where: {
+        id: lobbyExists.player
+      }
+    });
+    await continuePlayer.update({
+      inGame: true
+    });
+  } else {
+    /* Create a new player and lobby for this user */
+    let newPlayer = await Player.create({
+      spriteName: Player.getRandomSprite()
+    });
+    await user.addPlayer(newPlayer);
+    let newLobby = await Lobby.create({
+      lobbyId: lobby.lobbyId,
+      secret: lobby.secret,
+      playerId: req.user.username
+    });
+    await newPlayer.setLobby(newLobby);
+  }
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
@@ -317,14 +324,13 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
   });
 
   if(lobby && player) {
-    await player.destroy();
-    await lobby.destroy();
-
+    await player.update({
+      inGame: false
+    });
     io.emit("lobby-drop", {
       id: req.params.id,
       player: req.params.player
     });
-    // Modify Lobby table here
     res.end("Player removed");
   }
 
@@ -358,7 +364,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
         isHost: row.isHost
       };
     });
-  
+
     let usernames = players.map((player) => {
       return player.id;
     });
@@ -368,7 +374,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     } catch(err) {
       // pass
     }
-    
+
     // Generate the game
     if(!await exists(`Frontend/public/maps/${req.params.id}.json`)) {
       await Floor.generate({
