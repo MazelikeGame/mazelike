@@ -11,6 +11,10 @@ let Player = sql.define('players', {
     type: Sequelize.INTEGER,
     defaultValue: 0,
     allowNull: false
+  },
+  inGame: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: true
   }
 });
 
