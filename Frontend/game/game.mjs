@@ -78,7 +78,7 @@ async function setup() {
   masterSock.emit("ready", gameId);
   let players = await getPlayers(masterSock);
   console.log(`User: ${username}`); // eslint-disable-line
-  console.log("Players: " + players);
+  console.log("Players: " + players); //eslint-disable-line
   if(gameId) {
     floor = await Floor.load(gameId, 0, sock, players);
   } else {
