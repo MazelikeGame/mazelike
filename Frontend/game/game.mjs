@@ -31,26 +31,31 @@ window.onresize = () => {
 window.onresize();
 
 // This should be removed once player controls the viewport
-const addArrowKeyListener = (floor) => {
+const addArrowKeyListener = (floor, username, sock) => {
   window.addEventListener("keydown", (e) => {
     let viewport = floor.getViewport();
+    let player = getPlayer(floor, username);
 
     if(e.keyCode === 38 /* UP_ARROW */) {
       viewport.y -= 10;
-    }
-    
-    if(e.keyCode === 40 /* DOWN_ARROW */) {
-      viewport.y += 10;
-    }
-    
-    if(e.keyCode === 37 /* LEFT_ARROW */) {
-      viewport.x -= 10;
-    }
-    
-    if(e.keyCode === 39 /* RIGHT_ARROW */) {
-      viewport.x += 10;
+      player.y -= 10;
     }
 
+    if(e.keyCode === 40 /* DOWN_ARROW */) {
+      viewport.y += 10;
+      player.y += 10;
+    }
+
+    if(e.keyCode === 37 /* LEFT_ARROW */) {
+      viewport.x -= 10;
+      player.x -= 10;
+    }
+
+    if(e.keyCode === 39 /* RIGHT_ARROW */) {
+      viewport.x += 10;
+      player.x += 10;
+    }
+    sock.emit('player-movement', player.x, player.y, username);
     floor.setViewport(viewport.x, viewport.y);
   });
 };
@@ -59,6 +64,17 @@ function getUsername(sock) {
   return new Promise((resolve) => {
     sock.once("set-username", resolve);
   });
+}
+
+function getPlayer(floor, username) {
+  let foundPlayer;
+  floor.players.forEach((player) => {
+    let name = player.name;
+    if(name === username) {
+      foundPlayer = player;
+    }
+  });
+  return foundPlayer;
 }
 
 async function setup() {
@@ -99,7 +115,7 @@ async function setup() {
   });
 
   window.ml.floor = floor;
-  addArrowKeyListener(floor);
+  addArrowKeyListener(floor, username, sock);
 
   sock.on("state", (state) => {
     floor.handleState(state);
@@ -116,7 +132,7 @@ async function setup() {
   await new Promise((resolve) => {
     sock.once("start-game", resolve);
   });
-  
+
   msgParentEl.remove();
 
   // don't run monster logic multiplayer game (for now)
@@ -149,7 +165,7 @@ async function setup() {
     new DisconnectMessage("Disconnected!");
     app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
   });
-  
+
   app.ticker.add(() => {
     floor.update();
 

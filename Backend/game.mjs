@@ -42,8 +42,16 @@ async function main() {
   initAuth(io);
 
   io.on("connection", (sock) => {
-    sock.emit("set-username", sock.user.username);
+    sock.on('player-movement', (x, y, username) => {
+      floor.players.forEach((player) => {
+        if(player.name === username) {
+          player.x = x;
+          player.y = y;
+        }
+      });
+    });
 
+    sock.emit("set-username", sock.user.username);
     saveHandler(sock, floor);
   });
 
