@@ -37,9 +37,8 @@ const addArrowKeyListener = (floor, username, sock) => {
     let player = getPlayer(floor, username);
     player.keyPress(e, speed);
 
-    let newCords = player.getPosition();
     sock.emit('player-movement', player.x, player.y, username);
-    floor.setViewport(newCords.x, newCords.y);
+    floor.setViewport(player.x, player.y);
   });
 };
 
