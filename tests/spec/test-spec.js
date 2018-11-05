@@ -92,8 +92,8 @@ describe('Login route tests', () => {
       jar: true,
       form: {
         username: "bazinga",
-        email: "bazinga@bazinga.com",
-        password: "bazinga"
+        email: "bazzinga@bazzinga.com",
+        password: "bazzinga"
       }
     });
 
@@ -106,8 +106,8 @@ describe('Login route tests', () => {
       followRedirect: false,
       jar: true,
       form: {
-        username: "bazinga",
-        password: "bazinga"
+        username: "bazzinga",
+        password: "bazzinga"
       }
     });
 
