@@ -7,8 +7,8 @@ stages:
 Build:
   stage: build
   script:
-    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - docker-compose build
     - docker-compose up -d backend
 
@@ -20,8 +20,8 @@ Eslint:
 Backend_Tests:
   stage: test
   script:
-    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - touch runner-result
     - docker-compose up -d
     - node scripts/test-stopper.js
