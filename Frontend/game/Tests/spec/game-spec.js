@@ -27,16 +27,16 @@ describe("Floor in PIXI Resources", () => {
   });
 });
 
-describe('Player in PIXI Resources', () => {
-  it('The player should be in PIXI resources.', () => {
-    expect(PIXI.loader.resources.player).not.toBeUndefined();
-  });
+// describe('Player in PIXI Resources', () => {
+//   it('The player should be in PIXI resources.', () => {
+//     expect(PIXI.loader.resources.player).not.toBeUndefined();
+//   });
 
-  it("The player's resource name should be player.", () => {
-    expect(PIXI.loader.resources.player.name).toBe('player');
-  });
+//   it("The player's resource name should be player.", () => {
+//     expect(PIXI.loader.resources.player.name).toBe('player');
+//   });
 
-  it("The player's resource URL should match the games.", () => {
-    expect(PIXI.loader.resources.player.url).toBe("DawnLike/Characters/player.json");
-  });
-});
+//   it("The player's resource URL should match the games.", () => {
+//     expect(PIXI.loader.resources.player.url).toBe("DawnLike/Characters/player.json");
+//   });
+// });
