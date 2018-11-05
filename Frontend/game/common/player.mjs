@@ -55,12 +55,6 @@ export default class PlayerCommon {
   }
 
   /**
-   * Prototype move function
-   */
-  move(deltaTime) {
-  }
-
-  /**
    * Update the player's velocity from key input.
    * @param {int(s)} User's keyboard input
    */
