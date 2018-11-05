@@ -35,7 +35,7 @@ const addArrowKeyListener = (floor, username, sock) => {
   window.addEventListener("keydown", (e) => {
     let speed = 15;
     let player = getPlayer(floor, username);
-    player.keyPress(e.keyCode, speed);
+    player.keyPress(e, speed);
 
     let newCords = player.getPosition();
     sock.emit('player-movement', player.x, player.y, username);

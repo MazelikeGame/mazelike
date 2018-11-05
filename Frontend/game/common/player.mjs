@@ -59,7 +59,7 @@ export default class PlayerCommon {
    * @param {int(s)} User's keyboard input
    */
   // eslint-disable-next-line complexity
-  keyPress(input, speed) {
+  keyPress(e, speed) {
     let keys = {
       upArrow: 38,
       w: 87,
@@ -70,7 +70,7 @@ export default class PlayerCommon {
       leftArrow: 37,
       a: 65
     };
-    switch(input) {
+    switch(e.keyCode) {
     case keys.upArrow:
     case keys.w:
       this.y -= speed;
