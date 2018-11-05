@@ -85,6 +85,13 @@ describe('Login route tests', () => {
       jar: true
     });
 
+    await requestAsync({
+      method: "get",
+      url: `${SERVER_URL}/account/logout`,
+      followRedirect: false,
+      jar: true
+    });
+
     let {res} = await requestAsync({
       method: "post",
       url: `${SERVER_URL}/account/create?returnUrl=%2Fgame%2Fnew`,
