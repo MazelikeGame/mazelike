@@ -24,7 +24,7 @@ Backend_Tests:
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - touch runner-result
     - docker-compose up -d tests_backend
-    - node scripts/test-stopper.js
+    - node scripts/test-stopper.js tests_backend
 
 Browser_Tests:
   stage: test
@@ -35,7 +35,7 @@ Browser_Tests:
     - touch runner-result
     - chmod 666 runner-result
     - docker-compose up -d tests_browser
-    - node scripts/test-stopper.js
+    - node scripts/test-stopper.js tests_browser
 
 Version_Change:
   stage: test
