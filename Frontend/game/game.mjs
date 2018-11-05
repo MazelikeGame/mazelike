@@ -33,9 +33,8 @@ window.onresize();
 // This should be removed once player controls the viewport
 const addArrowKeyListener = (floor, username, sock) => {
   window.addEventListener("keydown", (e) => {
-    let speed = 15;
     let player = getPlayer(floor, username);
-    player.keyPress(e, speed);
+    player.keyPress(e);
 
     sock.emit('player-movement', player.x, player.y, username);
     floor.setViewport(player.x, player.y);

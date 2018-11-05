@@ -20,6 +20,7 @@ export default class PlayerCommon {
     this.vy = 0;
     this.spriteName = spriteName;
     this.floor = floor;
+    this.speed = 15;
   }
 
   /**
@@ -60,7 +61,7 @@ export default class PlayerCommon {
    * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
   // eslint-disable-next-line complexity
-  keyPress(e, speed) {
+  keyPress(e) {
     let keys = {
       upArrow: 38,
       w: 87,
@@ -74,19 +75,19 @@ export default class PlayerCommon {
     switch(e.keyCode) {
     case keys.upArrow:
     case keys.w:
-      this.y -= speed;
+      this.y -= this.speed;
       break;
     case keys.downArrow:
     case keys.s:
-      this.y += speed;
+      this.y += this.speed;
       break;
     case keys.leftArrow:
     case keys.a:
-      this.x -= speed;
+      this.x -= this.speed;
       break;
     case keys.rightArrow:
     case keys.d:
-      this.x += speed;
+      this.x += this.speed;
       break;
     default:
       break;
