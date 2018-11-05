@@ -14,8 +14,8 @@ services:
     networks:
       - mazelike_testing_branch
 
-  tests:
-    container_name: tests_branch
+  tests_backend:
+    container_name: tests_branch_backend
     image: ryan3r/mazelike_tests:latest
     build:
       context: tests
@@ -32,6 +32,22 @@ services:
       - type: bind
         source: ./spec
         target: /usr/src/app/spec
+  
+  tests_browser:
+    container_name: tests_branch_browser
+    image: ryan3r/mazelike_tests:latest
+    build:
+      context: tests
+    command: browser
+    networks:
+      - mazelike_testing_branch
+    environment:
+      IS_RUNNING_IN_DOCKER: ok
+      BACKEND: backend_branch
+    volumes:
+      - type: bind
+        source: ./runner-result
+        target: /usr/src/app/runner-result
       
 networks:
   mazelike_testing_branch:

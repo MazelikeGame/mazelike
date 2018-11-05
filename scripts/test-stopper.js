@@ -3,7 +3,7 @@ const fs = require("fs");
 
 function dockerComposeDown() {
   try {
-    child_process.execSync("docker-compose stop tests");
+    child_process.execSync(`docker-compose stop ${process.argv[2]}`);
   } catch(err) {
     // Do nothing
   }
@@ -11,10 +11,6 @@ function dockerComposeDown() {
 
 // Display the logs
 let logArgs = ["logs", "-f"];
-
-if(process.argv.length > 2) {
-  logArgs.push(process.argv[2]);
-}
 
 let logs = child_process.spawn("docker-compose", logArgs, {
   stdio: ["ignore", "inherit", "inherit"]
