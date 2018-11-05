@@ -23,6 +23,7 @@ Backend_Tests:
     - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - touch runner-result
+    - chmod 666 runner-result
     - docker-compose up -d tests_backend
     - node scripts/test-stopper.js tests_backend
 
