@@ -20,8 +20,6 @@ services:
     build:
       context: .
       dockerfile: test.Dockerfile
-    depends_on:
-      - backend
     networks:
       - mazelike_testing_branch
     environment:
