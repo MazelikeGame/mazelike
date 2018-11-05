@@ -3,7 +3,7 @@
 /** @module browser/Floor */
 import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
-// import Player from "./player.mjs";
+import Player from "./player.mjs";
 import Monster from "./monster.mjs";
 
 export default class Floor extends FloorCommon {
@@ -16,6 +16,9 @@ export default class Floor extends FloorCommon {
 
     this.monsters = [];
     this.monsterSprites = new PIXI.Container();
+
+    this.players = [];
+    this.playerSprites = new PIXI.Container();
   }
 
   /**
@@ -26,9 +29,6 @@ export default class Floor extends FloorCommon {
    */
   static generate({gameId, floorIdx, map, sock}) {
     let floor = new Floor(gameId, floorIdx, sock);
-    // let players = [];
-    // players.push(new Player('billy bob', 100, map, 0, map.getSpawnPoint()));
-
     floor.map = GameMap.generate(map);
 
     floor._initRendering();
@@ -69,7 +69,6 @@ export default class Floor extends FloorCommon {
       // return a promise for when they compl2ete.  All modifications to
       // floor should be done to the floor variable you pass in like so.
       GameMap.load(floor),
-      // Player.load(floor)
     ]);
 
     floor._initRendering();
@@ -101,6 +100,10 @@ export default class Floor extends FloorCommon {
     for(let i = 0; i < this.monsters.length; i++) {
       this.monsters[i].createSprite();
     }
+    for(let i = 0; i < this.players.length; ++i) {
+      this.players[i].createSprite();
+    }
+    this.sprite.addChild(this.playerSprites);
     this.sprite.addChild(this.monsterSprites);
   }
 
@@ -116,6 +119,9 @@ export default class Floor extends FloorCommon {
     );
     for(let i = 0; i < this.monsters.length; i++) {
       this.monsters[i].update(this._viewportX, this._viewportY);
+    }
+    for(let i = 0; i < this.players.length; ++i) {
+      this.players[i].update(this._viewportX, this._viewportY);
     }
   }
 
@@ -155,6 +161,12 @@ export default class Floor extends FloorCommon {
       monster.setCoodinates(raw.x, raw.y);
       monster.createSprite();
       return monster;
+    });
+    this._diffState('username', this.players, state.players, (raw) => {
+      let player = new Player(raw.username, raw.hp, raw.spriteName, this);
+      player.setCoordinates(raw.x, raw.y);
+      player.createSprite();
+      return player;
     });
   }
 
