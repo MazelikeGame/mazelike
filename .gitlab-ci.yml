@@ -8,6 +8,7 @@ Build:
   stage: build
   script:
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - docker-compose build
     - docker-compose up -d backend
 
@@ -20,6 +21,7 @@ Backend_Tests:
   stage: test
   script:
     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - touch runner-result
     - docker-compose up -d
     - node scripts/test-stopper.js
@@ -29,6 +31,7 @@ Browser_Tests:
   script:
     # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
     - sed s/ryan3r\\/mazelike_tests:latest/ryan3r\\/mazelike_browser_tests:alpine/ -i docker-compose.yml
+    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - touch runner-result
     - chmod 666 runner-result
     - docker-compose up -d
@@ -44,6 +47,7 @@ Cleanup:
   stage: cleanup
   when: always
   script:
+    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - docker-compose down
 
 Deploy:
