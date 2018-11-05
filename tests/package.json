@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "test": "jasmine",
-    "test-browser": "node browser-ci",
-    "eslint": "eslint Frontend Backend --ext .js,.mjs"
+    "test-browser": "node browser-ci"
   },
   "license": "ISC",
   "dependencies": {},

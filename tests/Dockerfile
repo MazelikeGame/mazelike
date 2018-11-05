@@ -6,7 +6,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD 1
 COPY package*.json ./
 RUN npm install
 
-COPY . .
+COPY browser-ci.js .
+COPY runner.sh .
 
 ENTRYPOINT ["/bin/ash", "/usr/src/app/runner.sh"]
 CMD ["backend"]

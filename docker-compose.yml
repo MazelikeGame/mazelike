@@ -30,7 +30,7 @@ services:
         source: ./runner-result
         target: /usr/src/app/runner-result
       - type: bind
-        source: ./spec
+        source: ./tests/spec
         target: /usr/src/app/spec
   
   tests_browser:
