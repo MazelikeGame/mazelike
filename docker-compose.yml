@@ -2,6 +2,7 @@
 version: "3.2"
 services:
   backend:
+    container_name: backend_branch
     image: ryan3r/mazelike:latest
     build:
       context: .
@@ -11,19 +12,19 @@ services:
     expose:
       - 3000
     networks:
-      - mazelike_testing
+      - mazelike_testing_branch
 
   tests:
+    container_name: tests_branch
     image: ryan3r/mazelike_tests:latest
     build:
       context: .
       dockerfile: test.Dockerfile
-    depends_on:
-      - backend
     networks:
-      - mazelike_testing
+      - mazelike_testing_branch
     environment:
       IS_RUNNING_IN_DOCKER: ok
+      BACKEND: backend_branch
     volumes:
       - type: bind
         source: ./runner-result
@@ -33,4 +34,4 @@ services:
         target: /usr/src/app/scripts
 
 networks:
-  mazelike_testing:
+  mazelike_testing_branch:

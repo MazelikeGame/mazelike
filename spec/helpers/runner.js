@@ -2,7 +2,7 @@
 const http = require("http");
 
 global.SERVER_URL = process.env.IS_RUNNING_IN_DOCKER ?
-  "http://backend:3000" : "http://localhost:3000";
+  `http://${process.env.BACKEND}:3000` : "http://localhost:3000";
 
 let retries = 0;
 const MAX_RETRIES = 50;
