@@ -27,7 +27,7 @@ export default class PlayerCommon {
    * @return {object}
    */
   getPosition() {
-    return { x: this.xPos, y: this.yPos };
+    return { x: this.x, y: this.y };
   }
 
   /**
@@ -138,5 +138,6 @@ export default class PlayerCommon {
     this.x = x;
     this.y = y;
   }
+
 }
 PlayerCommon.SPRITE_SIZE = 48;

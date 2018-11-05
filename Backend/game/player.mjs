@@ -13,7 +13,9 @@ export default class Player extends PlayerCommon {
 
   constructor(...args) {
     super(...args);
-    this.placeInRandomRoom();
+    let spawn = this.floor.map.getSpawnPoint();
+    this.x = spawn.x;
+    this.y = spawn.y;
   }
 
   /**
