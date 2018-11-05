@@ -15,7 +15,7 @@ services:
       - mazelike_testing_branch
 
   tests:
-    container_name: backend_branch
+    container_name: tests_branch
     image: ryan3r/mazelike_tests:latest
     build:
       context: .
