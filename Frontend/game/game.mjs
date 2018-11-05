@@ -35,25 +35,40 @@ const addArrowKeyListener = (floor, username, sock) => {
   window.addEventListener("keydown", (e) => {
     let viewport = floor.getViewport();
     let player = getPlayer(floor, username);
-
-    if(e.keyCode === 38 /* UP_ARROW */) {
-      viewport.y -= 10;
-      player.y -= 10;
-    }
-
-    if(e.keyCode === 40 /* DOWN_ARROW */) {
-      viewport.y += 10;
-      player.y += 10;
-    }
-
-    if(e.keyCode === 37 /* LEFT_ARROW */) {
-      viewport.x -= 10;
-      player.x -= 10;
-    }
-
-    if(e.keyCode === 39 /* RIGHT_ARROW */) {
-      viewport.x += 10;
-      player.x += 10;
+    let keys = {
+      upArrow: 38,
+      w: 87,
+      rightArrow: 39,
+      d: 68,
+      downArrow: 40,
+      s: 83,
+      leftArrow: 37,
+      a: 65
+    };
+    let speed = 15;
+    switch(e.keyCode) {
+    case keys.upArrow:
+    case keys.w:
+      viewport.y -= speed;
+      player.y -= speed;
+      break;
+    case keys.downArrow:
+    case keys.s:
+      viewport.y += speed;
+      player.y += speed;
+      break;
+    case keys.leftArrow:
+    case keys.a:
+      viewport.x -= speed;
+      player.x -= speed;
+      break;
+    case keys.rightArrow:
+    case keys.d:
+      viewport.x += speed;
+      player.x += speed;
+      break;
+    default:
+      break;
     }
     sock.emit('player-movement', player.x, player.y, username);
     floor.setViewport(viewport.x, viewport.y);
@@ -69,8 +84,7 @@ function getUsername(sock) {
 function getPlayer(floor, username) {
   let foundPlayer;
   floor.players.forEach((player) => {
-    let name = player.name;
-    if(name === username) {
+    if(player.name === username) {
       foundPlayer = player;
     }
   });

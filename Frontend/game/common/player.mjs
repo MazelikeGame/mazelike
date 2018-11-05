@@ -103,22 +103,6 @@ export default class PlayerCommon {
   }
 
   /**
-   * Places player in a random "room"
-   */
-  placeInRandomRoom() {
-    let isOnMap = false;
-    while(!isOnMap) {
-      let numRooms = this.floor.map.rooms.length;
-      let randomRoom = Math.floor(Math.random() * numRooms);
-      let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[randomRoom].width);
-      this.x = this.floor.map.rooms[randomRoom].x + randomDiffX;
-      let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[randomRoom].height);
-      this.y = this.floor.map.rooms[randomRoom].x + randomDiffY;
-      isOnMap = this.spriteIsOnMap();
-    }
-  }
-
-  /**
    * Checks to see if whole sprite is on the map. (Same as monster class)
    * @returns {boolean}
    */
