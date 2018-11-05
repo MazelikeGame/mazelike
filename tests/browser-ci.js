@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 
-const BASE_URL = process.env.IS_RUNNING_IN_DOCKER ? "http://backend:3000" : "http://localhost:3000";
+const BASE_URL = process.env.IS_RUNNING_IN_DOCKER ? `http://${process.env.BACKEND}:3000` : "http://localhost:3000";
 
 (async() => {
   let browser = await puppeteer.launch({

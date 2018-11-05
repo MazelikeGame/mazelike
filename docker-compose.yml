@@ -16,10 +16,7 @@ services:
   tests:
     image: ryan3r/mazelike_tests:latest
     build:
-      context: .
-      dockerfile: test.Dockerfile
-    depends_on:
-      - backend
+      context: tests
     networks:
       - mazelike_testing
     environment:
@@ -29,8 +26,8 @@ services:
         source: ./runner-result
         target: /usr/src/app/runner-result
       - type: bind
-        source: ./scripts
-        target: /usr/src/app/scripts
-
+        source: ./spec
+        target: /usr/src/app/spec
+      
 networks:
   mazelike_testing:
