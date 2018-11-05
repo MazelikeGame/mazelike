@@ -13,6 +13,7 @@ import {spawnGame, getGameAddr} from "../managers/manager";
 import Floor from "../game/floor";
 
 const mkdir = util.promisify(fs.mkdir);
+const exists = util.promisify(fs.exists);
 
 export let gameRouter = express.Router();
 
@@ -142,48 +143,55 @@ export const joinRoute = async(req, res) => {
   if(res.loginRedirect()) {
     return;
   }
-
   let lobby = await Lobby.find({
     where: {
       secret: req.params.id
     }
   });
 
-  // check if the lobby exists
+  /* Check if the lobby exists. If it doesn't, inform user the join link is invalid. */
   if(!lobby) {
     res.status(404);
     res.end("Join code is invalid");
     return;
   }
-
-  // Check if the user is in the lobby
-  let userExists = await Lobby.find({
-    where: {
-      secret: req.params.id,
-      playerId: req.user.username
-    }
-  });
-
-  if(userExists) {
-    res.redirect(`/game/lobby/${lobby.lobbyId}`);
-    return;
-  }
-
-  let newPlayer = await Player.create({
-    spriteName: Player.getRandomSprite()
-  });
   let user = await User.findOne({
     where: {
       username: req.user.username
     }
   });
-  await user.addPlayer(newPlayer);
-  let newLobby = await Lobby.create({
-    lobbyId: lobby.lobbyId,
-    secret: lobby.secret,
-    playerId: req.user.username
+
+  /* Check to see if there is a player already for this user and lobby */
+  let lobbyExists = await Lobby.findOne({
+    where: {
+      secret: req.params.id,
+      playerId: req.user.username
+    }
   });
-  await newPlayer.setLobby(newLobby);
+  /* If there is a lobby for this user, update the `inGame` attribute to true for the player
+   * record associated for this lobby */
+  if(lobbyExists) {
+    let continuePlayer = await Player.findOne({
+      where: {
+        id: lobbyExists.player
+      }
+    });
+    await continuePlayer.update({
+      inGame: true
+    });
+  } else {
+    /* Create a new player and lobby for this user */
+    let newPlayer = await Player.create({
+      spriteName: Player.getRandomSprite()
+    });
+    await user.addPlayer(newPlayer);
+    let newLobby = await Lobby.create({
+      lobbyId: lobby.lobbyId,
+      secret: lobby.secret,
+      playerId: req.user.username
+    });
+    await newPlayer.setLobby(newLobby);
+  }
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
@@ -316,14 +324,13 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
   });
 
   if(lobby && player) {
-    await player.destroy();
-    await lobby.destroy();
-
+    await player.update({
+      inGame: false
+    });
     io.emit("lobby-drop", {
       id: req.params.id,
       player: req.params.player
     });
-    // Modify Lobby table here
     res.end("Player removed");
   }
 
@@ -345,24 +352,56 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
   });
 
   if(lobby && lobby.isHost) {
+    let lobbyResults = await Lobby.findAll({
+      where: {
+        lobbyId: req.params.id
+      }
+    });
+
+    let players = lobbyResults.map((row) => {
+      return {
+        id: row.playerId,
+        isHost: row.isHost
+      };
+    });
+
+    let usernames = players.map((player) => {
+      return player.id;
+    });
+
     try {
       await mkdir("Frontend/public/maps");
     } catch(err) {
       // pass
     }
+
     // Generate the game
-    await Floor.generate({
-      gameId: req.params.id,
-      floorIdx: 0
-    }).save(true);
+    if(!await exists(`Frontend/public/maps/${req.params.id}.json`)) {
+      await Floor.generate({
+        gameId: req.params.id,
+        floorIdx: 0
+      }).save(true);
+    }
 
     try {
       await spawnGame({
         gameId: req.params.id
       });
-      io.emit("lobby-start", req.params.id);
+      await Lobby.update({ inProgress: true },
+        {
+          where: {
+            lobbyId: req.params.id,
+          }
+        });
+      io.emit("lobby-start", req.params.id, usernames);
       res.end("Game started");
     } catch(err) {
+      await Lobby.update({ inProgress: false },
+        {
+          where: {
+            lobbyId: req.params.id,
+          }
+        });
       process.stderr.write(`Error starting game: ${err.message}\n`);
       res.end("An error occured while starting game");
     }

@@ -3,6 +3,9 @@
 
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
+import PlayerList from "./browser/player-list.js";
+import DisconnectMessage from "./browser/disconnect-msg.js";
+
 
 let msgEl = document.querySelector(".msg");
 let msgParentEl = document.querySelector(".msg-parent");
@@ -28,27 +31,14 @@ window.onresize = () => {
 window.onresize();
 
 // This should be removed once player controls the viewport
-const addArrowKeyListener = (floor) => {
+const addArrowKeyListener = (floor, username, sock) => {
   window.addEventListener("keydown", (e) => {
-    let viewport = floor.getViewport();
+    let speed = 15;
+    let player = getPlayer(floor, username);
+    player.keyPress(e, speed);
 
-    if(e.keyCode === 38 /* UP_ARROW */) {
-      viewport.y -= 10;
-    }
-    
-    if(e.keyCode === 40 /* DOWN_ARROW */) {
-      viewport.y += 10;
-    }
-    
-    if(e.keyCode === 37 /* LEFT_ARROW */) {
-      viewport.x -= 10;
-    }
-    
-    if(e.keyCode === 39 /* RIGHT_ARROW */) {
-      viewport.x += 10;
-    }
-
-    floor.setViewport(viewport.x, viewport.y);
+    sock.emit('player-movement', player.x, player.y, username);
+    floor.setViewport(player.x, player.y);
   });
 };
 
@@ -58,12 +48,26 @@ function getUsername(sock) {
   });
 }
 
+function getPlayer(floor, username) {
+  let foundPlayer;
+  floor.players.forEach((player) => {
+    if(player.name === username) {
+      foundPlayer = player;
+    }
+  });
+  return foundPlayer;
+}
+
 async function setup() {
   msgEl.innerText = "Connecting to the game server";
   let sock = io(`http://${await (await fetch(`/game/addr/${gameId}`)).text()}`);
   let username = await getUsername(sock);
   msgEl.innerText = "Loading game";
   let floor;
+
+  let masterSock = io(location.origin); //Transition this to the game server
+  masterSock.emit("ready", gameId);
+
 
   console.log(`User: ${username}`); // eslint-disable-line
 
@@ -78,6 +82,7 @@ async function setup() {
   }
 
   app.stage.addChild(floor.sprite);
+  floor.update();
 
   // Show the fps counter on dev machines
   let fps;
@@ -86,8 +91,12 @@ async function setup() {
     app.stage.addChild(fps.sprite);
   }
 
+  masterSock.on("player-list", (players) => {
+    app.stage.addChild(new PlayerList(players).render());
+  });
+
   window.ml.floor = floor;
-  addArrowKeyListener(floor);
+  addArrowKeyListener(floor, username, sock);
 
   sock.on("state", (state) => {
     floor.handleState(state);
@@ -104,26 +113,17 @@ async function setup() {
   await new Promise((resolve) => {
     sock.once("start-game", resolve);
   });
-  
+
   msgParentEl.remove();
 
   // don't run monster logic multiplayer game (for now)
   if(!gameId) {
-    window.setInterval(function() { 
+    window.setInterval(function() {
       for(let i = 0; i < floor.monsters.length; i++) {
-        if(floor.monsters[i].type !== "blue") { // not a blue monster
-          floor.monsters[i].figureOutWhereToGo();
-        }
+        floor.monsters[i].figureOutWhereToGo();
       }
     }, 500);
   }
-  window.setInterval(function() {
-    for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type !== "blue") { // not a blue monster
-        floor.monsters[i].move();
-      }
-    }
-  }, 10);
 
   if(!gameId) {
     window.setInterval(function() {
@@ -141,7 +141,12 @@ async function setup() {
       }
     }
   }, 20);
-  
+
+  sock.on("disconnect", () => {
+    new DisconnectMessage("Disconnected!");
+    app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
+  });
+
   app.ticker.add(() => {
     floor.update();
 

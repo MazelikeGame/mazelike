@@ -5,7 +5,7 @@ import saveHandler from "./handlers/save";
 import initAuth from "./game-auth.mjs";
 
 // then interval at which we update the game state (if this is too short the server will break)
-const UPDATE_INTERVAL = 250;
+const UPDATE_INTERVAL = 100;
 
 async function main() {
   // Parse the env vars
@@ -42,8 +42,16 @@ async function main() {
   initAuth(io);
 
   io.on("connection", (sock) => {
-    sock.emit("set-username", sock.user.username);
+    sock.on('player-movement', (x, y, username) => {
+      floor.players.forEach((player) => {
+        if(player.name === username) {
+          player.x = x;
+          player.y = y;
+        }
+      });
+    });
 
+    sock.emit("set-username", sock.user.username);
     saveHandler(sock, floor);
   });
 

@@ -1,27 +1,25 @@
-/** @module Player */
-
-/**
- * TODO: Have Player inherit from class Character. Same goes for Monster class.
- */
-
+/** @module PlayerCommon */
 /**
  * The player class.
  */
-export default class Player {
+export default class PlayerCommon {
 
   /**
    * @param {string} name - The name of the player. Should be the same as user.username
    * @param {int} hp - The player's hitpoints
-   * @param {object} spawn - Contains the spawn coordinates { x: int, y: int }.
+   * @param {string} spriteName - The name of the sprite for this player.
+   * @param {floor} floor - The floor this player is on.
    */
-  constructor(name, hp, spawn, sprite) {
+  constructor(name, hp, spriteName, floor) {
     this.name = name;
     this.hp = hp;
-    this.xPos = spawn.x;
-    this.yPos = spawn.y;
+    this.alive = true;
+    this.x = 0;
+    this.y = 0;
     this.vx = 0;
     this.vy = 0;
-    this.sprite = sprite;
+    this.spriteName = spriteName;
+    this.floor = floor;
   }
 
   /**
@@ -29,7 +27,7 @@ export default class Player {
    * @return {object}
    */
   getPosition() {
-    return { x: this.xPos, y: this.yPos };
+    return { x: this.x, y: this.y };
   }
 
   /**
@@ -58,31 +56,37 @@ export default class Player {
 
   /**
    * Update the player's velocity from key input.
-   * @param {int(s)} User's keyboard input
+   * @param {event} e - User's keyboard input,
+   * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
-  keyPress(input) {
-    let keyCodes = {
-      up: ['38', '87'], // up and 'w'
-      right: ['39', '68'], // right and 'd'
-      down: ['40', '83'], // down and 's'
-      left: ['37', '65'] // left and 'a'
+  // eslint-disable-next-line complexity
+  keyPress(e, speed) {
+    let keys = {
+      upArrow: 38,
+      w: 87,
+      rightArrow: 39,
+      d: 68,
+      downArrow: 40,
+      s: 83,
+      leftArrow: 37,
+      a: 65
     };
-    switch(input) {
-    case keyCodes.up:
-      this.vx = 0;
-      this.vy = -5;
+    switch(e.keyCode) {
+    case keys.upArrow:
+    case keys.w:
+      this.y -= speed;
       break;
-    case keyCodes.right:
-      this.vx = 5;
-      this.vy = 0;
+    case keys.downArrow:
+    case keys.s:
+      this.y += speed;
       break;
-    case keyCodes.down:
-      this.vx = 0;
-      this.vy = 5;
+    case keys.leftArrow:
+    case keys.a:
+      this.x -= speed;
       break;
-    case keyCodes.left:
-      this.vx = -5;
-      this.vy = 0;
+    case keys.rightArrow:
+    case keys.d:
+      this.x += speed;
       break;
     default:
       break;
@@ -97,4 +101,27 @@ export default class Player {
     this.vx = 0;
     this.vy = 0;
   }
+
+  /**
+   * Checks to see if whole sprite is on the map. (Same as monster class)
+   * @returns {boolean}
+   */
+  spriteIsOnMap() {
+    return this.floor.map.isOnMap(this.x, this.y) &&
+      this.floor.map.isOnMap(this.x + PlayerCommon.SPRITE_SIZE, this.y) &&
+      this.floor.map.isOnMap(this.x, this.y + PlayerCommon.SPRITE_SIZE) &&
+      this.floor.map.isOnMap(this.x + PlayerCommon.SPRITE_SIZE, this.y + PlayerCommon.SPRITE_SIZE);
+  }
+
+  /**
+   * Set coordinates for this player
+   * @param {int} x - new x-coordinate,
+   * @param {int} y - new y-coordinate
+   */
+  setCoordinates(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
 }
+PlayerCommon.SPRITE_SIZE = 48;
