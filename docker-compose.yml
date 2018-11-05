@@ -12,7 +12,7 @@ services:
     expose:
       - 3000
     networks:
-      - mazelike_testing
+      - mazelike_testing_branch
 
   tests:
     container_name: backend_branch
@@ -23,7 +23,7 @@ services:
     depends_on:
       - backend
     networks:
-      - mazelike_testing
+      - mazelike_testing_branch
     environment:
       IS_RUNNING_IN_DOCKER: ok
       BACKEND: backend_branch
