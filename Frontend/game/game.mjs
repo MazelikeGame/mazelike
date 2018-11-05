@@ -33,45 +33,13 @@ window.onresize();
 // This should be removed once player controls the viewport
 const addArrowKeyListener = (floor, username, sock) => {
   window.addEventListener("keydown", (e) => {
-    let viewport = floor.getViewport();
-    let player = getPlayer(floor, username);
-    let keys = {
-      upArrow: 38,
-      w: 87,
-      rightArrow: 39,
-      d: 68,
-      downArrow: 40,
-      s: 83,
-      leftArrow: 37,
-      a: 65
-    };
     let speed = 15;
-    switch(e.keyCode) {
-    case keys.upArrow:
-    case keys.w:
-      viewport.y -= speed;
-      player.y -= speed;
-      break;
-    case keys.downArrow:
-    case keys.s:
-      viewport.y += speed;
-      player.y += speed;
-      break;
-    case keys.leftArrow:
-    case keys.a:
-      viewport.x -= speed;
-      player.x -= speed;
-      break;
-    case keys.rightArrow:
-    case keys.d:
-      viewport.x += speed;
-      player.x += speed;
-      break;
-    default:
-      break;
-    }
+    let player = getPlayer(floor, username);
+    player.keyPress(e.keyCode, speed);
+
+    let newCords = player.getPosition();
     sock.emit('player-movement', player.x, player.y, username);
-    floor.setViewport(viewport.x, viewport.y);
+    floor.setViewport(newCords.x, newCords.y);
   });
 };
 

@@ -58,29 +58,34 @@ export default class PlayerCommon {
    * Update the player's velocity from key input.
    * @param {int(s)} User's keyboard input
    */
-  keyPress(input) {
-    let keyCodes = {
-      up: ['38', '87'], // up and 'w'
-      right: ['39', '68'], // right and 'd'
-      down: ['40', '83'], // down and 's'
-      left: ['37', '65'] // left and 'a'
+  // eslint-disable-next-line complexity
+  keyPress(input, speed) {
+    let keys = {
+      upArrow: 38,
+      w: 87,
+      rightArrow: 39,
+      d: 68,
+      downArrow: 40,
+      s: 83,
+      leftArrow: 37,
+      a: 65
     };
     switch(input) {
-    case keyCodes.up:
-      this.vx = 0;
-      this.vy = -5;
+    case keys.upArrow:
+    case keys.w:
+      this.y -= speed;
       break;
-    case keyCodes.right:
-      this.vx = 5;
-      this.vy = 0;
+    case keys.downArrow:
+    case keys.s:
+      this.y += speed;
       break;
-    case keyCodes.down:
-      this.vx = 0;
-      this.vy = 5;
+    case keys.leftArrow:
+    case keys.a:
+      this.x -= speed;
       break;
-    case keyCodes.left:
-      this.vx = -5;
-      this.vy = 0;
+    case keys.rightArrow:
+    case keys.d:
+      this.x += speed;
       break;
     default:
       break;
