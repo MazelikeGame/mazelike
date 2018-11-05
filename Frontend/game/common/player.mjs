@@ -7,7 +7,7 @@ export default class PlayerCommon {
   /**
    * @param {string} name - The name of the player. Should be the same as user.username
    * @param {int} hp - The player's hitpoints
-   * @param {string} sprite - The name of the sprite for this player.
+   * @param {string} spriteName - The name of the sprite for this player.
    * @param {floor} floor - The floor this player is on.
    */
   constructor(name, hp, spriteName, floor) {
@@ -56,7 +56,8 @@ export default class PlayerCommon {
 
   /**
    * Update the player's velocity from key input.
-   * @param {int(s)} User's keyboard input
+   * @param {event} e - User's keyboard input,
+   * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
   // eslint-disable-next-line complexity
   keyPress(e, speed) {

@@ -25,6 +25,8 @@ export default class Player extends PlayerCommon {
 
   /**
    * Update the player sprite's position for all players on the floor.
+   * @param {int} viewX,
+   * @param {int} viewY
    */
   update(viewX, viewY) {
     // let now = Date.now();
