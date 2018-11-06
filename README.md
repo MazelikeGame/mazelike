@@ -2,7 +2,8 @@
 
 ## Testing
 
-Run `npm test`
+Run `npm test` in the tests directory.  You will also have to run npm install in the tests directory.  
+If you don't want to download chrome for the browser tests define `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1` (powershell `$env:PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1`)
 
 The server will need to be running in order to run the tests.
 
