@@ -279,6 +279,9 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
         });
       });
       io.emit("lobby-delete", req.params.id);
+      fs.unlink(`./Frontend/public/maps/${req.params.id}.json`, () => {
+        //pass
+      });
       res.redirect("/account/dashboard");
     } else {
       res.status(401);
