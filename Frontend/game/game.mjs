@@ -17,6 +17,8 @@ let app = new PIXI.Application({
   antialias: true
 });
 
+let disconnected = new DisconnectMessage("Disconnected from server!");
+
 document.body.appendChild(app.view);
 
 // make the game fill the window
@@ -26,6 +28,7 @@ app.renderer.autoResize = true;
 
 window.onresize = () => {
   app.renderer.resize(innerWidth - 1, innerHeight - 1);
+  disconnected.resize();
 };
 
 window.onresize();
@@ -143,8 +146,7 @@ async function setup() {
   }, 20);
 
   sock.on("disconnect", () => {
-    new DisconnectMessage("Disconnected!");
-    app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
+    app.stage.addChild(disconnected.render());
   });
 
   app.ticker.add(() => {

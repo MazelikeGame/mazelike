@@ -8,6 +8,7 @@ export default class PlayerList {
   constructor(listOfPlayers) {
     this.listOfPlayers = listOfPlayers;
     this.graphics = new PIXI.Graphics();
+    this.playerBoxes = new Map();
   }
 
   /**
@@ -81,6 +82,7 @@ export default class PlayerList {
     playerBox.addChild(healthText);
 
     this.graphics.addChild(playerBox);
+    this.playerBoxes.set(playerName, playerBox); //Stores the playerBox for future access accessible by username.
   }
 
   /**
