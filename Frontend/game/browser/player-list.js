@@ -19,10 +19,13 @@ export default class PlayerList {
 
   /**
    * Draws the player's information to the player list.
+   * @param {int} id
    * @param {string} playerName 
    * @param {int} playerHP 
    */
   drawPlayerInfo(id, playerName, playerHP) {  
+    let playerBox = new PIXI.Graphics();
+
     let offset = 40; //Space between each player information box.
 
     //Black background
@@ -33,7 +36,7 @@ export default class PlayerList {
     outline.drawRect(0, 0, 300, 30);
     outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
     outline.endFill();
-    this.graphics.addChild(outline);
+    playerBox.addChild(outline);
 
     this._playerNameStyle = new PIXI.TextStyle({
       fill: "#fff",
@@ -43,7 +46,7 @@ export default class PlayerList {
     //Player name
     let player = new PIXI.Text(this.checkNameLength(playerName), this._playerNameStyle);
     player.position.set(35, 15 + (id * offset)); //eslint-disable-line
-    this.graphics.addChild(player);
+    playerBox.addChild(player);
 
     //Health bar red
     let healthRedBar = new PIXI.Graphics();
@@ -52,7 +55,7 @@ export default class PlayerList {
     healthRedBar.position.set(200, 15 + (id * offset)); //eslint-disable-line
     healthRedBar.endFill();
 
-    this.graphics.addChild(healthRedBar);
+    playerBox.addChild(healthRedBar);
 
     //Health bar green
     let healthGreenBar = new PIXI.Graphics();
@@ -61,7 +64,7 @@ export default class PlayerList {
     healthGreenBar.position.set(200, 15 + (id * offset));//eslint-disable-line
     healthGreenBar.endFill();
 
-    this.graphics.addChild(healthGreenBar);
+    playerBox.addChild(healthGreenBar);
 
     //Health Text (Health: 100)
     this._hpTextStyle = new PIXI.TextStyle({
@@ -71,7 +74,9 @@ export default class PlayerList {
 
     let healthText = new PIXI.Text("Health: " + playerHP, this._hpTextStyle); //eslint-disable-line
     healthText.position.set(200, 25 + (id * offset)); //eslint-disable-line
-    this.graphics.addChild(healthText);
+    playerBox.addChild(healthText);
+
+    this.graphics.addChild(playerBox);
   }
 
   /**
