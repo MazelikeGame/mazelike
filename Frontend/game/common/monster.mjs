@@ -1,5 +1,3 @@
-import { timingSafeEqual } from "crypto";
-
 /* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
 /** @module Monster */
 
@@ -39,11 +37,8 @@ export default class MonsterCommon {
    * @param y 
    */
   canSee(x, y) {
-    this.maneuver = false;
     let x1 = -1, x2 = -1, y1 = -1, y2 = -1;
     let cornerx = this.x, cornery = this.y; // upper left
-    let clear = true;
-    let totalCorners = 0;
     for(let i = 0; i < 4; i++) {
       if(i === 1) {
         cornerx += MonsterCommon.SPRITE_SIZE; // upper right
@@ -66,24 +61,14 @@ export default class MonsterCommon {
         y1 = cornery;
         y2 = y;
       }
-      clear = true;
-      for(let j = x1; j <= x2; j++) {
-        for(let k = y1; k <= y2; k++) {
+      for(let j = x1; j <= x2; j += 20) { // checking every 20th pixel to improve runtime
+        for(let k = y1; k <= y2; k += 20) {
           if(!this.floor.map.isOnMap(j, k)) {
-            clear = false;
-            break;
-          }
-          if(!clear)
-            break;
+            return false;
+          }  
         }
       }
-      if(clear)
-        totalCorners++;
     }
-    if(totalCorners === 0)
-      return false;
-    if(totalCorners < 4)
-      this.maneuver = true;
     return true;
   }
 
@@ -100,56 +85,24 @@ export default class MonsterCommon {
     return c;
   }
 
-  /** ~WIP, UNFINISHED (need PC implementation)
+  /**
    * Finds closest PC that can be seen and targets it.
    */
   canSeePC() {
     this.targetAquired = false;
+    let minDist = -1;
     for(let player of this.floor.players) {
       if(this.canSee(player.x, player.y) && this.canSee(player.x + player.SPRITE_SIZE, player.y + player.SPRITE_SIZE) &&
          this.canSee(player.x + player.SPRITE_SIZE, player.y) && this.canSee(player.x, player.y + player.SPRITE_SIZE)) {
         this.targetAquired = true;
-        this.targetx = player.x;
-        this.targety = player.y;
-        return true;
+        if(this.findDistance(player.x, player.y) < minDist || minDist === -1) {
+          this.targetx = player.x;
+          this.targety = player.y;
+          minDist = this.findDistance(player.x, player.y);
+        }
       }
     }
-    return false;
-    // this.targetAquired = false;
-    // let visiblePCs = [];
-    // let maneuverArray = [];
-    // for(let player of this.floor.players) {
-    //   if(this.canSee(player.x, player.y) && this.canSee(player.x, player.y) &&
-    //      this.canSee(player.x, player.y) && this.canSee(player.x, player.y)) {
-    //     visiblePCs.push(player);
-    //     maneuverArray.push(false);
-    //   } else if(this.canSee(player.x, player.y) || this.canSee(player.x, player.y) ||
-    //      this.canSee(player.x, player.y) || this.canSee(player.x, player.y)) {
-    //     visiblePCs.push(player);
-    //     maneuverArray.push(true);
-    //   }
-    // }
-    // if(visiblePCs.length !== 0) {
-    //   let closestPlayer = visiblePCs[0];
-    //   let minDist = this.findDistance(closestPlayer.x, closestPlayer.y);
-    //   let maneuver = maneuverArray[0];
-    //   let i = 0;
-    //   for(let player of visiblePCs) {
-    //     if(this.findDistance(player.x, player.y) < minDist) {
-    //       minDist = this.findDistance(player.x, player.y);
-    //       closestPlayer = player;
-    //       maneuver = maneuverArray[i];
-    //       i++;
-    //     }
-    //   }
-    //   this.maneuver = maneuver;
-    //   this.targetAquired = true;
-    //   this.targetx = closestPlayer.x;
-    //   this.targety = closestPlayer.y;
-    // }
-    // return false;
-    // find closest PC that can be seen: use this.findDistance(pcx, pcy) and find minimum to find closest pc of PCs of indexArray
-    // assign targetx and targety to closest pc that can be seen
+    return minDist !== -1;
   }
 
   /** 
@@ -222,22 +175,19 @@ export default class MonsterCommon {
       }
     }
     let collision = this.collisionMonsters();
-    if(collision !== -1) {
-      this.die();
+    if(collision !== -1) { // todo halt
+      this.targetx = this.x;
+      this.targety = this.y;
     }
   }
 
-  /**
-   * ~WIP, UNFINISHED (needs to be able to move strategically based on PC last seen location
-   * 
+  /** 
    * Moves monster.
    * If PC has been seen, move strategically towards last seen location.
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
    */
   figureOutWhereToGo() {
-    //if(this.floor.players.length !== 0)
-    // this.canSeePC();
-    this.targetAquired = false;
+    this.canSeePC();
     if(this.alive) {
       if(!this.targetAquired) {
         if(this.targetx === -1 || this.targety === -1) {
@@ -247,34 +197,28 @@ export default class MonsterCommon {
         if(Math.abs(this.x - this.targetx) < 2 && Math.abs(this.y - this.targety) < 2) {
           this.wander();
         }
-      } else {
-        //move strategically, to be implemented later when PC is on map WIP
       }
     }
   }
 
-  /**
-   * ~WIP, UNFINISHED (merge logic with PC class once implemented)
-   * 
+  /** 
    * Monster attacks PC
-   * @param {*} PCid id for player that monster is attacking
+   * @param {*} playerID id for player that monster is attacking
    */
-  attack(PCid) {
-    //(decrement pc health and check for pc death) within PC's beAttacked method
-    // below: psuedo until PC is implemented
-    this.floor.map.PC[PCid].beAttacked(this.damage);
+  attack(playerID) {
+    this.floor.players[playerID].beAttacked(this.damage);
   }
 
-  /**
-   * ~WIP, UNFINISHED (merge logic with PC class once implemented)
-   * 
-   * PC attacks Monster
+  /** 
+   * Player attacks Monster
    * @param {*} hp health points that the monster's health decrements by
    */
   beAttacked(hp) {
     this.hp -= hp;
-    if(this.hp <= 0)
+    if(this.hp <= 0) {
       this.die();
+    }
+    
   }
 
   /** 
