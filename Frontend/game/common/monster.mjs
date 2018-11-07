@@ -1,3 +1,5 @@
+import { timingSafeEqual } from "crypto";
+
 /* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
 /** @module Monster */
 
@@ -103,38 +105,49 @@ export default class MonsterCommon {
    */
   canSeePC() {
     this.targetAquired = false;
-    let visiblePCs = [];
-    let maneuverArray = [];
-    for(let player of this.floor.PC) {
-      if(this.canSee(player.x, player.y) && this.canSee(player.x, player.y) &&
-         this.canSee(player.x, player.y) && this.canSee(player.x, player.y)) {
-        visiblePCs.push(player);
-        maneuverArray.push(false);
-      } else if(this.canSee(player.x, player.y) || this.canSee(player.x, player.y) ||
-         this.canSee(player.x, player.y) || this.canSee(player.x, player.y)) {
-        visiblePCs.push(player);
-        maneuverArray.push(true);
+    for(let player of this.floor.players) {
+      if(this.canSee(player.x, player.y) && this.canSee(player.x + player.SPRITE_SIZE, player.y + player.SPRITE_SIZE) &&
+         this.canSee(player.x + player.SPRITE_SIZE, player.y) && this.canSee(player.x, player.y + player.SPRITE_SIZE)) {
+        this.targetAquired = true;
+        this.targetx = player.x;
+        this.targety = player.y;
+        return true;
       }
-    }
-    if(visiblePCs.length !== 0) {
-      let closestPlayer = visiblePCs[0];
-      let minDist = this.findDistance(closestPlayer.x, closestPlayer.y);
-      let maneuver = maneuverArray[0];
-      let i = 0;
-      for(let player of visiblePCs) {
-        if(this.findDistance(player.x, player.y) < minDist) {
-          minDist = this.findDistance(player.x, player.y);
-          closestPlayer = player;
-          maneuver = maneuverArray[i];
-          i++;
-        }
-      }
-      this.maneuver = maneuver;
-      this.targetAquired = true;
-      this.targetx = closestPlayer.x;
-      this.targety = closestPlayer.y;
     }
     return false;
+    // this.targetAquired = false;
+    // let visiblePCs = [];
+    // let maneuverArray = [];
+    // for(let player of this.floor.players) {
+    //   if(this.canSee(player.x, player.y) && this.canSee(player.x, player.y) &&
+    //      this.canSee(player.x, player.y) && this.canSee(player.x, player.y)) {
+    //     visiblePCs.push(player);
+    //     maneuverArray.push(false);
+    //   } else if(this.canSee(player.x, player.y) || this.canSee(player.x, player.y) ||
+    //      this.canSee(player.x, player.y) || this.canSee(player.x, player.y)) {
+    //     visiblePCs.push(player);
+    //     maneuverArray.push(true);
+    //   }
+    // }
+    // if(visiblePCs.length !== 0) {
+    //   let closestPlayer = visiblePCs[0];
+    //   let minDist = this.findDistance(closestPlayer.x, closestPlayer.y);
+    //   let maneuver = maneuverArray[0];
+    //   let i = 0;
+    //   for(let player of visiblePCs) {
+    //     if(this.findDistance(player.x, player.y) < minDist) {
+    //       minDist = this.findDistance(player.x, player.y);
+    //       closestPlayer = player;
+    //       maneuver = maneuverArray[i];
+    //       i++;
+    //     }
+    //   }
+    //   this.maneuver = maneuver;
+    //   this.targetAquired = true;
+    //   this.targetx = closestPlayer.x;
+    //   this.targety = closestPlayer.y;
+    // }
+    // return false;
     // find closest PC that can be seen: use this.findDistance(pcx, pcy) and find minimum to find closest pc of PCs of indexArray
     // assign targetx and targety to closest pc that can be seen
   }
@@ -222,7 +235,9 @@ export default class MonsterCommon {
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
    */
   figureOutWhereToGo() {
-    this.canSeePC();
+    //if(this.floor.players.length !== 0)
+    // this.canSeePC();
+    this.targetAquired = false;
     if(this.alive) {
       if(!this.targetAquired) {
         if(this.targetx === -1 || this.targety === -1) {
@@ -234,7 +249,6 @@ export default class MonsterCommon {
         }
       } else {
         //move strategically, to be implemented later when PC is on map WIP
-        console.log("omw bro");
       }
     }
   }
