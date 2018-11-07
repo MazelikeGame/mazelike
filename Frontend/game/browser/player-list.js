@@ -1,4 +1,8 @@
 /*global PIXI*/
+
+/**
+ * A list of players that displays information about each player.
+ */
 export default class PlayerList {
 
   constructor(listOfPlayers) {
@@ -19,9 +23,9 @@ export default class PlayerList {
 
   /**
    * Draws the player's information to the player list.
-   * @param {int} id
-   * @param {string} playerName 
-   * @param {int} playerHP 
+   * @param {int} id the index of the player
+   * @param {string} playerName the name of the player
+   * @param {int} playerHP the player's hp.
    */
   drawPlayerInfo(id, playerName, playerHP) {  
     let playerBox = new PIXI.Graphics();
@@ -81,7 +85,7 @@ export default class PlayerList {
 
   /**
    * Checks the player's name length.
-   * @param {string} playerName 
+   * @param {string} playerName the name of player you want to check
    */
   checkNameLength(playerName) {
     if(playerName.length >= 18) {
