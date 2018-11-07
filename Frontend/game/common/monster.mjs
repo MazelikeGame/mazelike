@@ -102,11 +102,39 @@ export default class MonsterCommon {
    * Finds closest PC that can be seen and targets it.
    */
   canSeePC() {
-    // this.targetAquired = false;
-    // let indexArray = [];
-    // for i = 0 to map.numPcs/map.PCarray.length
-    // __if(canSee(PC[i].x, PC[i].y));, repeat for all (most) pixels of pc
-    // ____push i onto indexArray;
+    this.targetAquired = false;
+    let visiblePCs = [];
+    let maneuverArray = [];
+    for(let player of this.floor.PC) {
+      if(this.canSee(player.x, player.y) && this.canSee(player.x, player.y) &&
+         this.canSee(player.x, player.y) && this.canSee(player.x, player.y)) {
+        visiblePCs.push(player);
+        maneuverArray.push(false);
+      } else if(this.canSee(player.x, player.y) || this.canSee(player.x, player.y) ||
+         this.canSee(player.x, player.y) || this.canSee(player.x, player.y)) {
+        visiblePCs.push(player);
+        maneuverArray.push(true);
+      }
+    }
+    if(visiblePCs.length !== 0) {
+      let closestPlayer = visiblePCs[0];
+      let minDist = this.findDistance(closestPlayer.x, closestPlayer.y);
+      let maneuver = maneuverArray[0];
+      let i = 0;
+      for(let player of visiblePCs) {
+        if(this.findDistance(player.x, player.y) < minDist) {
+          minDist = this.findDistance(player.x, player.y);
+          closestPlayer = player;
+          maneuver = maneuverArray[i];
+          i++;
+        }
+      }
+      this.maneuver = maneuver;
+      this.targetAquired = true;
+      this.targetx = closestPlayer.x;
+      this.targety = closestPlayer.y;
+    }
+    return false;
     // find closest PC that can be seen: use this.findDistance(pcx, pcy) and find minimum to find closest pc of PCs of indexArray
     // assign targetx and targety to closest pc that can be seen
   }
@@ -194,14 +222,13 @@ export default class MonsterCommon {
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
    */
   figureOutWhereToGo() {
-    //this.canSeePC();
+    this.canSeePC();
     if(this.alive) {
       if(!this.targetAquired) {
         if(this.targetx === -1 || this.targety === -1) {
           this.targetx = this.x;
           this.targety = this.y;
         }
-
         if(Math.abs(this.x - this.targetx) < 2 && Math.abs(this.y - this.targety) < 2) {
           this.wander();
         }
