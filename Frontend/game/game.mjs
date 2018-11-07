@@ -49,13 +49,9 @@ function getUsername(sock) {
 }
 
 function getPlayer(floor, username) {
-  let foundPlayer;
-  floor.players.forEach((player) => {
-    if(player.name === username) {
-      foundPlayer = player;
-    }
+  return floor.players.find((player) => {
+    return player.name === username;
   });
-  return foundPlayer;
 }
 
 async function setup() {
