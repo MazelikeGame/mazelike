@@ -26,7 +26,7 @@ app.renderer.view.style.display = "block";
 app.renderer.autoResize = true;
 
 window.onresize = () => {
-  app.renderer.resize(innerWidth - 1, innerHeight - 1);
+  app.renderer.resize(innerWidth, innerHeight);
 };
 
 window.onresize();
