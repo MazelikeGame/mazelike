@@ -51,17 +51,6 @@ Cleanup:
     - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
     - docker-compose down
 
-# Make branches work smoothly with deploy
-Branch_Version:
-  stage: cleanup
-  when: always
-  script:
-    - docker run --name mod-$CI_COMMIT_REF_NAME ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME sh -c "echo -n $CI_COMMIT_REF_NAME > VERSION"
-    - docker commit mod-$CI_COMMIT_REF_NAME ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME
-    - docker container rm mod-$CI_COMMIT_REF_NAME
-  except:
-    - master
-
 Deploy:
   stage: deploy
   script:
