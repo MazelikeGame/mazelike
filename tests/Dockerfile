@@ -9,5 +9,4 @@ RUN npm install
 COPY browser-ci.js .
 COPY runner.sh .
 
-ENTRYPOINT ["/bin/ash", "/usr/src/app/runner.sh"]
-CMD ["backend"]
+WORKDIR /usr/src/tests
