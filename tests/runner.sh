@@ -1,7 +1,8 @@
 #!/bin/sh
 
 if [ "$1" == "backend" ]; then
-  exec /usr/src/app/node_modules/.bin/jasmine
+  ls
+  exec /usr/src/app/node_modules/.bin/jasmine tests/spec
 elif [ "$1" == "browser" ]; then
   exec node browser-ci
 else
