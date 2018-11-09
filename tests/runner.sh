@@ -1,11 +1,9 @@
 #!/bin/sh
 
 if [ "$1" == "backend" ]; then
-  ./node_modules/.bin/jasmine
-  echo $? > /usr/src/app/runner-result
+  exec /usr/src/app/node_modules/.bin/jasmine
 elif [ "$1" == "browser" ]; then
-  node browser-ci
-  echo $? > /usr/src/app/runner-result
+  exec node browser-ci
 else
-  exec $*
+  echo "Unknown command $1"
 fi

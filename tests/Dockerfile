@@ -9,4 +9,5 @@ RUN npm install
 COPY browser-ci.js .
 COPY runner.sh .
 
-WORKDIR /usr/src/tests
+ENTRYPOINT []
+CMD []

@@ -14,7 +14,6 @@ Backend_Tests:
   tags:
     - docker
   script:
-    - pwd
     - npm install
     - "(DB_STORAGE=:memory: npm start &); /usr/src/app/runner.sh backend"
 
