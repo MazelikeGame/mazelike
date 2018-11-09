@@ -23,6 +23,7 @@ export default class Player extends PlayerCommon {
    * @param {Floor} floor - The floor to load the player for
    */
   static async load(floor) {
+    console.log(this.players);
     let lobbyId = floor.id.slice(0, floor.id.indexOf('-'));
     let lobbies = await LobbyModel.findAll({
       where: {
@@ -47,6 +48,14 @@ export default class Player extends PlayerCommon {
         floor.players.push(player);
       }
     });
+  }
+
+  /**
+   * Updates player records for all players in this lobby
+   * @param {Floor} floor - The floor to save
+   */
+  static async saveAll(floor) {
+    // console.log(floor);
   }
 
   /**
