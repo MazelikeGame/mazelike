@@ -5,6 +5,7 @@ import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
 import PlayerList from "./browser/player-list.js";
 import DisconnectMessage from "./browser/disconnect-msg.js";
+import MobileControls from "./browser/mobile-controls.mjs";
 
 
 let msgEl = document.querySelector(".msg");
@@ -25,20 +26,28 @@ app.renderer.view.style.display = "block";
 app.renderer.autoResize = true;
 
 window.onresize = () => {
-  app.renderer.resize(innerWidth - 1, innerHeight - 1);
+  app.renderer.resize(innerWidth, innerHeight);
 };
 
 window.onresize();
 
+// disable context menu
+addEventListener("contextmenu", (e) => {
+  e.preventDefault();
+});
+
 // This should be removed once player controls the viewport
-const addArrowKeyListener = (floor, username, sock) => {
-  window.addEventListener("keydown", (e) => {
+const addArrowKeyListener = (floor, controls, username, sock) => {
+  let handleKey = (e) => {
     let player = getPlayer(floor, username);
     player.keyPress(e);
 
     sock.emit('player-movement', player.x, player.y, username);
     floor.setViewport(player.x, player.y);
-  });
+  };
+
+  controls.bind(handleKey);
+  window.addEventListener("keydown", handleKey);
 };
 
 function getUsername(sock) {
@@ -48,13 +57,9 @@ function getUsername(sock) {
 }
 
 function getPlayer(floor, username) {
-  let foundPlayer;
-  floor.players.forEach((player) => {
-    if(player.name === username) {
-      foundPlayer = player;
-    }
+  return floor.players.find((player) => {
+    return player.name === username;
   });
-  return foundPlayer;
 }
 
 async function setup() {
@@ -94,8 +99,11 @@ async function setup() {
     app.stage.addChild(new PlayerList(players).render());
   });
 
+  let controls = new MobileControls();
+  app.stage.addChild(controls.sprite);
+
   window.ml.floor = floor;
-  addArrowKeyListener(floor, username, sock);
+  addArrowKeyListener(floor, controls, username, sock);
 
   sock.on("state", (state) => {
     floor.handleState(state);
@@ -148,6 +156,7 @@ async function setup() {
 
   app.ticker.add(() => {
     floor.update();
+    controls.update();
 
     if(fps) {
       fps.update();
