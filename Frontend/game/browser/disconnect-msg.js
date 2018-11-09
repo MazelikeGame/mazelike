@@ -4,7 +4,6 @@ export default class DiconnectMessage {
     this.msg = msg;
     this.graphics = new PIXI.Graphics();
     this.disconnectBox = new PIXI.Graphics();
-
   }
 
   /**
