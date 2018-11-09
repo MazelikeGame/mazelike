@@ -1,74 +1,50 @@
-stages:
-  - build
-  - test
-  - cleanup
-  - deploy
+# stages:
+#   - test
+  # - cleanup
+  # - deploy
 
-Build:
-  stage: build
-  script:
-    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-    - docker-compose build
-    - docker-compose up -d backend
-
-Eslint:
-  stage: test
-  script:
-    - npm run eslint
+# Eslint:
+#   stage: test
+#   script:
+#     - npm run eslint
 
 Backend_Tests:
   stage: test
+  image: ryan3r/mazelike_tests:branch-master
   script:
-    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-    - touch runner-result
-    - chmod 666 runner-result
-    - docker-compose up -d tests_backend
-    - node scripts/test-stopper.js tests_backend
+    - pwd
 
-Browser_Tests:
-  stage: test
-  script:
-    # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-    - touch runner-result
-    - chmod 666 runner-result
-    - docker-compose up -d tests_browser
-    - node scripts/test-stopper.js tests_browser
+# Browser_Tests:
+#   stage: test
+#   script:
+#     # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
+#     - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+#     - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+#     - touch runner-result
+#     - chmod 666 runner-result
+#     - docker-compose up -d tests_browser
+#     - node scripts/test-stopper.js tests_browser
 
-Version_Change:
-  stage: test
-  allow_failure: true
-  script:
-    - node scripts/version-check.js
+# Version_Change:
+#   stage: test
+#   allow_failure: true
+#   script:
+#     - node scripts/version-check.js
 
-Cleanup:
-  stage: cleanup
-  when: always
-  script:
-    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-    - docker-compose down
+# Cleanup:
+#   stage: cleanup
+#   when: always
+#   script:
+#     - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+#     - docker-compose down
 
-# Make branches work smoothly with deploy
-Branch_Version:
-  stage: cleanup
-  when: always
-  script:
-    - docker run --name mod-$CI_COMMIT_REF_NAME ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME sh -c "echo -n branch-$CI_COMMIT_REF_NAME > VERSION"
-    - docker commit mod-$CI_COMMIT_REF_NAME ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME
-    - docker container rm mod-$CI_COMMIT_REF_NAME
-  except:
-    - master
-
-Deploy:
-  stage: deploy
-  script:
-      - VERSION=$(cat VERSION)
-      - node scripts/version-check.js
-      - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
-      - deploy $VERSION
-      - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
-  only:
-    - master
+# Deploy:
+#   stage: deploy
+#   script:
+#       - VERSION=$(cat VERSION)
+#       - node scripts/version-check.js
+#       - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
+#       - deploy $VERSION
+#       - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
+#   only:
+#     - master
