@@ -12,7 +12,9 @@ Backend_Tests:
   stage: test
   image: ryan3r/mazelike_tests:branch-master
   script:
-    - pwd
+    - npm install
+    - npm start &
+    - /app/runner.sh backend
 
 # Browser_Tests:
 #   stage: test
