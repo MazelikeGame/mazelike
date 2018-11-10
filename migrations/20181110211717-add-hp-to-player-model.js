@@ -6,8 +6,7 @@ module.exports = {
       'players',
       'hp',
       {
-        type: Sequelize.INTEGER,
-        allowNull: false
+        type: Sequelize.INTEGER
       }
     );
   },
