@@ -14,11 +14,8 @@ export default class Floor extends FloorCommon {
    */
   static generate({gameId, floorIdx, map}) {
     let floor = new Floor(gameId, floorIdx);
-
     floor.map = GameMap.generate(map);
-
     floor.generateMonsters();
-    floor.generatePlayers();
 
     return floor;
   }
@@ -39,16 +36,6 @@ export default class Floor extends FloorCommon {
       } else if(random < 100) { // 50% chance for green demon, where 15+35+50 = 100
         this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
       }
-    }
-  }
-
-  /**
-   * Creates 4 random players
-   */
-  generatePlayers(numPlayers = 4) {
-    this.players = [];
-    for(let player = 0; player < numPlayers; ++player) {
-      this.players.push(new Player('steve', 100, PlayerModel.getRandomSprite, this));
     }
   }
 
