@@ -3,7 +3,6 @@ import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
 import Monster from "./monster.mjs";
 import Player from './player';
-import PlayerModel from '../models/player';
 
 export default class Floor extends FloorCommon {
   /**

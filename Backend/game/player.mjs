@@ -55,6 +55,7 @@ export default class Player extends PlayerCommon {
    * Loads all players
    * @param {Floor} floor - The floor to load the player for
    */
+  // eslint-disable-next-line complexity
   static async load(floor) {
     /* Load every player in this lobby that is inGame */
     let players = await Player.getPlayers(floor);
