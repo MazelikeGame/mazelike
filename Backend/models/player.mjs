@@ -23,6 +23,10 @@ let Player = sql.define('players', {
   y: {
     type: Sequelize.INTEGER,
     allowNull: true
+  },
+  hp: {
+    type: Sequelize.INTEGER,
+    allowNull: false
   }
 });
 
