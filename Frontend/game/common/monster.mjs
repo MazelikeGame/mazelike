@@ -4,6 +4,8 @@
 // The maximum amount of ms we want a monster to walk for
 const MAX_WALK_TIME = 1500;
 
+import PlayerCommon from "./player.mjs";
+
 export default class MonsterCommon {
   
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
@@ -23,6 +25,7 @@ export default class MonsterCommon {
     this.PCy = -1;
     this.maneuver = false;
     this.alive = true;
+    this.lastAttackTime = new Date().getTime();
 
     // SPEED: 10 = regular, 20 = slow
     this.speed = 100;
@@ -154,6 +157,8 @@ export default class MonsterCommon {
    * @param {number} deltaTime The number of ms since the last move
    */
   move(deltaTime) {
+    let prevy = this.y;
+    let prevx = this.x;
     if(this.alive) {
       // Get the distance in the x and y direction we have to move
       let xDist = Math.abs(this.targetx - this.x);
@@ -174,10 +179,20 @@ export default class MonsterCommon {
         this.y += Math.min(yMove, yDist) * (this.targety < this.y ? -1 : 1);
       }
     }
-    let collision = this.collisionMonsters();
-    if(collision !== -1) { // todo halt
-      this.targetx = this.x;
-      this.targety = this.y;
+    let collisionMonster = this.collisionEntities(this.floor.players, MonsterCommon.SPRITE_SIZE, false);
+    let collisionPlayer = this.collisionEntities(this.floor.players, PlayerCommon.SPRITE_SIZE, true);
+    if(collisionMonster !== -1 || collisionPlayer !== -1) { // todo
+      this.targetx = prevx;
+      this.targety = prevy;
+      this.x = prevx;
+      this.y = prevy;
+      let currentTime = new Date().getTime();
+      if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
+        this.lastAttackTime = currentTime;
+        console.log(collisionPlayer);
+        this.attack(collisionPlayer);
+        console.log(this.floor.players[collisionPlayer].hp);
+      }
     }
   }
 
@@ -217,8 +232,7 @@ export default class MonsterCommon {
     this.hp -= hp;
     if(this.hp <= 0) {
       this.die();
-    }
-    
+    }    
   }
 
   /** 
@@ -250,32 +264,44 @@ export default class MonsterCommon {
   }
 
   /**
-   * Checks to see if there's a monster colliding with this monster. todo untested
+   * Checks to see if there's a monster colliding with this monster.
    * Compares corners of each sprite to do so.
    * @returns {boolean}
    */
-  collisionMonsters() {
+  collisionEntities(entities, spriteSize, isPlayer) {
     let x = -1;
     let y = -1;
-    for(let monster of this.floor.monsters) {
-      if(this.id !== monster.id) {
+    for(let entity of entities) {
+      if(this.id !== entity.id) {
         for(let j = 0; j < 4; j++) { // four corners to check for each sprite
           if(j === 0) { // upper left corner
-            x = monster.x;
-            y = monster.y;
+            x = entity.x;
+            y = entity.y;
           } else if(j === 1) { // upper right corner
-            x = monster.x + MonsterCommon.SPRITE_SIZE;
-            y = monster.y;
+            x = entity.x + spriteSize;
+            y = entity.y;
           } else if(j === 1) { // lower right corner
-            x = monster.x + MonsterCommon.SPRITE_SIZE;
-            y = monster.y + MonsterCommon.SPRITE_SIZE;
+            x = entity.x + spriteSize;
+            y = entity.y + spriteSize;
           } else if(j === 1) { // lower left corner
-            x = monster.x;
-            y = monster.y + MonsterCommon.SPRITE_SIZE;
+            x = entity.x;
+            y = entity.y + spriteSize;
           }
-          if(x >= this.x && x <= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
-            if(y >= this.y && y <= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
-              return monster.id;
+          if(x >= this.x && x <= this.x + spriteSize) { // within x bounds
+            if(y >= this.y && y <= this.y + spriteSize) { // and within y bounds
+              if(isPlayer) {
+                let id = -1;
+                for(let player of entities) {
+                  id++;
+                  if(player.name === entity.name) {
+                    if(entities[id].alive) {
+                      return id;
+                    }
+                  }
+                }
+              } else {
+                return entity.id;
+              }
             }
           }
         }

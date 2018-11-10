@@ -20,7 +20,7 @@ export default class PlayerCommon {
     this.vy = 0;
     this.spriteName = spriteName;
     this.floor = floor;
-    this.damage = 20;
+    this.damage = 10;
   }
 
   /**
