@@ -19,34 +19,78 @@ export default class Player extends PlayerCommon {
   }
 
   /**
-   * Load a Player
-   * @param {Floor} floor - The floor to load the player for
+   * Private. Returns an object where the username of the player is the
+   * key and the value is the player object.
+   * @param {Floor} floor
    */
-  static async load(floor) {
+  static async getPlayers(floor) {
     let lobbyId = floor.id.slice(0, floor.id.indexOf('-'));
     let lobbies = await LobbyModel.findAll({
       where: {
-        lobbyId: lobbyId,
+        lobbyId: lobbyId
       }
     });
-    /* Load every player in this lobby that is inGame */
-    floor.players = [];
-    lobbies.forEach(async(lobby) => {
-      let rawPlayer = await PlayerModel.find({
+    let players = [];
+    for(var lobby of lobbies) {
+      let player = await PlayerModel.find({
         where: {
-          id: lobby.player,
+          id: lobby.player
         }
       });
+      players.push(player);
+    }
+    let users = {};
+    for(var player of players) {
       let user = await UserModel.find({
         where: {
-          id: rawPlayer.username
+          id: player.username
         }
       });
-      if(rawPlayer.inGame) {
-        let player = new Player(user.username, 100, rawPlayer.spriteName, floor);
-        floor.players.push(player);
+      users[user.username] = player;
+    }
+    return users;
+  }
+
+  /**
+   * Loads all players
+   * @param {Floor} floor - The floor to load the player for
+   */
+  static async load(floor) { // eslint-disable-line complexity
+    /* Load every player in this lobby that is inGame */
+    let players = await Player.getPlayers(floor);
+    floor.players = [];
+    for(var username of Object.keys(players)) {
+      if(players[username].inGame) {
+        if(players[username].x && players[username].y && players[username].hp) {
+          let playerToPush = new Player(username, players[username].hp, players[username].spriteName, floor);
+          playerToPush.setCoordinates(players[username].x, players[username].y);
+          floor.players.push(playerToPush);
+        } else {
+          floor.players.push(new Player(username, 100, players[username].spriteName, floor));
+        }
       }
-    });
+    }
+  }
+
+  /**
+   * Updates player records for all players in this lobby
+   * @param {Floor} floor - The floor to save
+   */
+  static async saveAll(floor) {
+    if(floor.players) {
+      let players = await Player.getPlayers(floor);
+      for(var username of Object.keys(players)) {
+        let newValues = floor.players.find((playerClass) => {
+          return playerClass.name === username;
+        });
+        await players[username].update({
+          spriteName: newValues.spriteName,
+          x: newValues.x,
+          y: newValues.y,
+          hp: newValues.hp
+        });
+      }
+    }
   }
 
   /**
