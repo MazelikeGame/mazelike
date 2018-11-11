@@ -1,5 +1,6 @@
 /* eslint-disable complexity */
 import dockerApi from "node-docker-api";
+import fs from "fs";
 
 const ENV_NAMES = [
   "DB_HOST",
@@ -14,7 +15,8 @@ if(process.env.DB_STORAGE) {
   ENV_NAMES.push("DB_STORAGE");
 }
 
-const IMAGE_NAME = process.env.IMAGE_NAME || "mazelike/backend:devel";
+const VERSION = fs.readFileSync("VERSION", "utf8").trim();
+const IMAGE_NAME = process.env.IMAGE_NAME || `ryan3r/mazelike:${VERSION}`;
 const ADDRESS = process.env.EXTERN_ADDRESS;
 const STARTING_PORT = +process.env.STARTING_PORT || 5900;
 const ENDING_PORT = +process.env.ENDING_PORT || 5999;
