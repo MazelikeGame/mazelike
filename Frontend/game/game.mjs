@@ -38,23 +38,16 @@ addEventListener("contextmenu", (e) => {
 
 // This should be removed once player controls the viewport
 const addArrowKeyListener = (floor, controls, username, sock) => {
-  var player = getPlayer(floor, username);
-  console.log(player);
 
-  let handleKeyDown = (e) => {
-    player.keyPress(e);
+  let handleKey = (e) => {
+    let player = getPlayer(floor, username);
+    player.handleKeyPress(e);
     sock.emit('player-movement', player.x, player.y, username);
     floor.setViewport(player.x, player.y);
   };
-  controls.bind(handleKeyDown);
-  window.addEventListener("keydown", handleKeyDown);
-
-  let handleKeyUp = (e) => {
-    player.keyUp(e);
-    sock.emit('player-movement', player.x, player.y, username);
-    floor.setViewPort(player.x, player.y);
-  };
-  window.addEventListener('keyup', handleKeyUp);
+  controls.bind(handleKey);
+  window.addEventListener("keydown", handleKey);
+  window.addEventListener('keyup', handleKey);
 };
 
 function getUsername(sock) {
@@ -64,7 +57,6 @@ function getUsername(sock) {
 }
 
 function getPlayer(floor, username) {
-  console.log(floor.players);
   return floor.players.find((player) => {
     return player.name === username;
   });
