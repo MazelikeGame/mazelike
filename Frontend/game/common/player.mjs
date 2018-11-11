@@ -60,8 +60,11 @@ export default class PlayerCommon {
    * @param {event} e - User's keyboard input,
    * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
-  // eslint-disable-next-line complexity
-  keyPress(e) {
+  keyPress(e) { // eslint-disable-line complexity
+    let oldPosition = {
+      x: this.x,
+      y: this.y
+    };
     let keys = {
       upArrow: 38,
       w: 87,
@@ -91,6 +94,9 @@ export default class PlayerCommon {
       break;
     default:
       break;
+    }
+    if(!this.spriteIsOnMap()) {
+      this.setCoordinates(oldPosition.x, oldPosition.y);
     }
   }
 
