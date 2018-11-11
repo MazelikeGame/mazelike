@@ -21,6 +21,10 @@ let app = express();
 let server = http.Server(app);
 global.io = socketio(server);
 
+if(process.env.PUBLIC_DIR) {
+  app.use("/public", express.static(process.env.PUBLIC_DIR));
+}
+
 app.use(express.static("Frontend"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());

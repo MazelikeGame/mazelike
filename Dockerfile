@@ -26,9 +26,9 @@ COPY config config
 COPY migrations migrations
 COPY seeders seeders
 COPY VERSION VERSION
+COPY scripts scripts
 
 VOLUME /data
 EXPOSE 3000
 
-
-CMD ["npm", "start"]
+CMD ["/bin/ash", "scripts/init"]

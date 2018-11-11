@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Set docker defaults
+if [ -z "$CLUSTER_MANAGER" ]; then
+  export CLUSTER_MANAGER="docker"
+fi
+
+if [ -z "$NODE_ENV" ]; then
+  export NODE_ENV="production"
+fi
+
+if [ -z "$DB_HOST" ] &&  [ -z "$DB_STORAGE" ]; then
+  export DB_STORAGE="/data/mazelike.sqlite"
+fi
+
+if [ -z "$PUBLIC_DIR" ]; then
+  export PUBLIC_DIR="/data"
+fi
+
+exec node --experimental-modules Backend/index.mjs
