@@ -10,6 +10,10 @@ const ENV_NAMES = [
   "NODE_ENV"
 ];
 
+if(process.env.DB_STORAGE) {
+  ENV_NAMES.push("DB_STORAGE");
+}
+
 const IMAGE_NAME = process.env.IMAGE_NAME || "mazelike/backend:devel";
 const ADDRESS = process.env.EXTERN_ADDRESS;
 const STARTING_PORT = +process.env.STARTING_PORT || 5900;
