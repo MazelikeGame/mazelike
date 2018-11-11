@@ -21,6 +21,7 @@ export default class PlayerCommon {
     this.spriteName = spriteName;
     this.floor = floor;
     this.speed = 15;
+    this.input = [];
   }
 
   /**
@@ -61,6 +62,8 @@ export default class PlayerCommon {
    * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
   keyPress(e) { // eslint-disable-line complexity
+    this.input = (this.input || []);
+    this.input[e.keyCode] = (e.type == 'keydown');
     let oldPosition = {
       x: this.x,
       y: this.y
@@ -75,26 +78,40 @@ export default class PlayerCommon {
       leftArrow: 37,
       a: 65
     };
-    switch(e.keyCode) {
-    case keys.upArrow:
-    case keys.w:
-      this.y -= this.speed;
-      break;
-    case keys.downArrow:
-    case keys.s:
-      this.y += this.speed;
-      break;
-    case keys.leftArrow:
-    case keys.a:
-      this.x -= this.speed;
-      break;
-    case keys.rightArrow:
-    case keys.d:
-      this.x += this.speed;
-      break;
-    default:
-      break;
+    if(this.input) {
+      if(this.input[keys['leftArrow']]) {
+        this.x -= this.speed;
+      }
+      if(this.input[keys['rightArrow']]) {
+        this.x += this.speed;
+      }
+      if(this.input[keys['upArrow']]) {
+        this.y -= this.speed;
+      }
+      if(this.input[keys['downArrow']]) {
+        this.y += this.speed;
+      }
     }
+    // switch(e.keyCode) {
+    // case keys.upArrow:
+    // case keys.w:
+    //   this.y -= this.speed;
+    //   break;
+    // case keys.downArrow:
+    // case keys.s:
+    //   this.y += this.speed;
+    //   break;
+    // case keys.leftArrow:
+    // case keys.a:
+    //   this.x -= this.speed;
+    //   break;
+    // case keys.rightArrow:
+    // case keys.d:
+    //   this.x += this.speed;
+    //   break;
+    // default:
+    //   break;
+    // }
     if(!this.spriteIsOnMap()) {
       this.setCoordinates(oldPosition.x, oldPosition.y);
     }
@@ -104,7 +121,8 @@ export default class PlayerCommon {
    * Modify player's velocity on key release
    * @param {String} The name of the key released
    */
-  keyRelease() {
+  keyUp(e) {
+    this.input[e.keyCode] = false;
     this.vx = 0;
     this.vy = 0;
   }
