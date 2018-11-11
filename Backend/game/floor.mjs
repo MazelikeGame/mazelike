@@ -13,9 +13,7 @@ export default class Floor extends FloorCommon {
    */
   static generate({gameId, floorIdx, map}) {
     let floor = new Floor(gameId, floorIdx);
-
     floor.map = GameMap.generate(map);
-
     floor.generateMonsters();
 
     return floor;
@@ -64,7 +62,8 @@ export default class Floor extends FloorCommon {
   save(create) {
     return Promise.all([
       this.map.save(this.id),
-      Monster.saveAll(this, create)
+      Monster.saveAll(this, create),
+      Player.saveAll(this)
     ]);
   }
 
