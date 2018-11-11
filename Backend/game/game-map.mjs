@@ -5,6 +5,7 @@ import util from "util";
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
+const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
 export default class GameMap extends GameMapCommon {
   /**
@@ -23,7 +24,7 @@ export default class GameMap extends GameMapCommon {
     // for backwards compatability the map for floorIdx == 0 is just the gameId
     let mapId = floor.id.replace("-0", "");
 
-    floor.map = GameMap.parse(await readFile(`Frontend/public/maps/${mapId}.json`, "utf8"), new GameMap());
+    floor.map = GameMap.parse(await readFile(`${DATA_DIR}/maps/${mapId}.json`, "utf8"), new GameMap());
   }
 
   /**
@@ -34,6 +35,6 @@ export default class GameMap extends GameMapCommon {
     // for backwards compatability the map for floorIdx == 0 is just the gameId
     let mapId = floorId.replace("-0", "");
 
-    return writeFile(`Frontend/public/maps/${mapId}.json`, this.serialize());
+    return writeFile(`${DATA_DIR}/maps/${mapId}.json`, this.serialize());
   }
 }

@@ -9,9 +9,10 @@ import qs from "querystring";
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 
+const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
 var storage = multer.diskStorage({
-  destination: 'Frontend/public/images',
+  destination: `${DATA_DIR}/images`,
   filename: function(req, file, cb) {
     let date_posted = Date.now().toString().concat('-');
     cb(null, date_posted.concat(file.originalname));
@@ -129,7 +130,7 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
       req.body.password && (values.password = hash); // eslint-disable-line
       if(changing_avatar === true) {
         values.image_name = file_name;
-        let file_to_delete = 'Frontend/public/images/'.concat(req.user.image_name);
+        let file_to_delete = `${DATA_DIR}/images/${req.user.image_name}`;
         fs.unlink(file_to_delete, () => {});
       }
       let selector = {

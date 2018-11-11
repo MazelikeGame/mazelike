@@ -27,7 +27,7 @@ COPY migrations migrations
 COPY seeders seeders
 COPY VERSION VERSION
 
-VOLUME /app/Frontend/public
+VOLUME /data
 EXPOSE 3000
 
 
