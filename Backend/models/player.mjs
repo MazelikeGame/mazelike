@@ -26,7 +26,7 @@ let Player = sql.define('players', {
   },
   hp: {
     type: Sequelize.INTEGER,
-    allowNull: true
+    defaultValue: 100
   }
 });
 
