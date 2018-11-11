@@ -21,6 +21,7 @@ export default class PlayerCommon {
     this.spriteName = spriteName;
     this.floor = floor;
     this.speed = 15;
+    this.input = [];
   }
 
   /**
@@ -60,11 +61,12 @@ export default class PlayerCommon {
    * @param {event} e - User's keyboard input,
    * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
-  keyPress(e) { // eslint-disable-line complexity
-    let oldPosition = {
-      x: this.x,
-      y: this.y
-    };
+  handleKeyPress(e) {
+    this.input[e.keyCode] = e.type === 'keydown';
+    this.move();
+  }
+
+  move() { // eslint-disable-line complexity
     let keys = {
       upArrow: 38,
       w: 87,
@@ -75,38 +77,29 @@ export default class PlayerCommon {
       leftArrow: 37,
       a: 65
     };
-    switch(e.keyCode) {
-    case keys.upArrow:
-    case keys.w:
-      this.y -= this.speed;
-      break;
-    case keys.downArrow:
-    case keys.s:
-      this.y += this.speed;
-      break;
-    case keys.leftArrow:
-    case keys.a:
-      this.x -= this.speed;
-      break;
-    case keys.rightArrow:
-    case keys.d:
-      this.x += this.speed;
-      break;
-    default:
-      break;
+    if(this.input) {
+      if(this.input[keys.leftArrow] || this.input[keys.a]) {
+        this.vx = -this.speed;
+      }
+      if(this.input[keys.rightArrow] || this.input[keys.d]) {
+        this.vx = this.speed;
+      }
+      if(this.input[keys.upArrow] || this.input[keys.w]) {
+        this.vy = -this.speed;
+      }
+      if(this.input[keys.downArrow] || this.input[keys.s]) {
+        this.vy = this.speed;
+      }
     }
+    let oldPosition = {
+      x: this.x,
+      y: this.y
+    };
+    this.x += this.vx;
+    this.y += this.vy;
     if(!this.spriteIsOnMap()) {
       this.setCoordinates(oldPosition.x, oldPosition.y);
     }
-  }
-
-  /**
-   * Modify player's velocity on key release
-   * @param {String} The name of the key released
-   */
-  keyRelease() {
-    this.vx = 0;
-    this.vy = 0;
   }
 
   /**
