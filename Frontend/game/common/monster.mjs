@@ -21,16 +21,13 @@ export default class MonsterCommon {
     this.y = 0;
     this.targetx = -1; // location where monster wants to move
     this.targety = -1;
-    this.PCx = -1; // (-1,-1) if not seen yet or previously seen location explored
-    this.PCy = -1;
-    this.maneuver = false;
     this.alive = true;
     this.lastAttackTime = new Date().getTime();
 
-    // SPEED: 10 = regular, 20 = slow
-    this.speed = 100;
+    // SPEED: 100 = regular, 50 = slow
+    this.speed = 200;
     if(this.type === "blue") { // slow monsters
-      this.speed = 50;
+      this.speed = 100;
     }
   }
 
@@ -108,9 +105,7 @@ export default class MonsterCommon {
     return minDist !== -1;
   }
 
-  /** 
-   * ~WIP, UNFINISHED (need to check for collisions for items/players)
-   * 
+  /**  
    * Monster moves to an adjacent, unoccupied location.
    */
   wander() {
@@ -186,13 +181,14 @@ export default class MonsterCommon {
       this.targety = prevy;
       this.x = prevx;
       this.y = prevy;
+      this.collision = true;
       let currentTime = new Date().getTime();
       if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
         this.lastAttackTime = currentTime;
-        console.log(collisionPlayer);
         this.attack(collisionPlayer);
-        console.log(this.floor.players[collisionPlayer].hp);
       }
+    } else {
+      this.collision = false;
     }
   }
 
@@ -204,7 +200,7 @@ export default class MonsterCommon {
   figureOutWhereToGo() {
     this.canSeePC();
     if(this.alive) {
-      if(!this.targetAquired) {
+      if(!this.targetAquired && !this.collision) {
         if(this.targetx === -1 || this.targety === -1) {
           this.targetx = this.x;
           this.targety = this.y;
