@@ -16,7 +16,9 @@ export default class PlayerList {
    */
   render() {
     this.listOfPlayers.forEach((player, index) => {
-      this.drawPlayerInfo(index, player, 100); //In the future change the health here.
+      let random = Math.ceil(Math.random() * 10);
+      console.log(random);
+      this.drawPlayerInfo(index, player, 100, random % 2); //In the future change the health here.
     });
 
     return this.graphics;
@@ -27,10 +29,11 @@ export default class PlayerList {
    * @param {int} id the index of the player
    * @param {string} playerName the name of the player
    * @param {int} playerHP the player's hp.
+   * @param {bool} isConnected the status of the player
    */
-  drawPlayerInfo(id, playerName, playerHP) {  
+  drawPlayerInfo(id, playerName, playerHP, isConnected) {  
     let playerBox = new PIXI.Graphics();
-
+    playerBox.fillAlpha = 0.50;
     let offset = 40; //Space between each player information box.
 
     //Black background
@@ -80,6 +83,7 @@ export default class PlayerList {
     let healthText = new PIXI.Text("Health: " + playerHP, this._hpTextStyle); //eslint-disable-line
     healthText.position.set(200, 25 + (id * offset)); //eslint-disable-line
     playerBox.addChild(healthText);
+
 
     this.graphics.addChild(playerBox);
     this.playerBoxes.set(playerName, playerBox); //Stores the playerBox for future access accessible by username.
