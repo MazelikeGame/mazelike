@@ -156,13 +156,13 @@ export default class Floor extends FloorCommon {
    * Update our state to match the server's state
    */
   handleState(state) {
-    this._diffState("id", this.monsters, state.monsters, (raw) => {
+    this._diffState("id", "id", this.monsters, state.monsters, (raw) => {
       let monster = new Monster(raw.name, raw.hp, 10, this, raw.id, raw.type);
       monster.setCoodinates(raw.x, raw.y);
       monster.createSprite();
       return monster;
     });
-    this._diffState('name', this.players, state.players, (raw) => {
+    this._diffState("username", 'name', this.players, state.players, (raw) => {
       let player = new Player(raw.username, raw.hp, raw.spriteName, this);
       player.setCoordinates(raw.x, raw.y);
       player.createSprite();
@@ -172,17 +172,18 @@ export default class Floor extends FloorCommon {
 
   /**
    * Take an array of objects and update it to match another array (keeps objects with matching ids)
+   * @param {string} idRawKey The property to use as a key
    * @param {string} idKey The property to use as a key
    * @param {object[]} current The current array of objects
    * @param {object[]} wanted The array of objects we want
    * @param {function} create A function that creates an instance of a current object
    *                          from an instance of a wanted object
    */
-  _diffState(idKey, current, wanted, create) {
+  _diffState(idRawKey, idKey, current, wanted, create) {
     // add ids to a map for quick lookups
     let wantedIds = new Map();
     for(let obj of wanted) {
-      wantedIds.set(obj[idKey], obj);
+      wantedIds.set(obj[idRawKey], obj);
     }
 
     for(let i = 0; i < current.length; ++i) {
