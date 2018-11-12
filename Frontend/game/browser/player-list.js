@@ -86,6 +86,14 @@ export default class PlayerList {
   }
 
   /**
+   * Updates the player list.
+   * @param {*} floor 
+   */
+  update(floor) {
+
+  }
+
+  /**
    * Removes the player from the list
    * @param {string} username 
    */
