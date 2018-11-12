@@ -42,7 +42,7 @@ const addArrowKeyListener = (floor, controls, username, sock) => {
   let handleKey = (e) => {
     let player = getPlayer(floor, username);
     player.handleKeyPress(e);
-    sock.emit('player-movement', player.x, player.y, username);
+    sock.emit('player-movement', player.x, player.y, player.vx, player.vy, username);
     floor.setViewport(player.x, player.y);
   };
   controls.bind(handleKey);

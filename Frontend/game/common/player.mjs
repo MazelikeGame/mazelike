@@ -61,12 +61,8 @@ export default class PlayerCommon {
    * @param {event} e - User's keyboard input,
    * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
-  handleKeyPress(e) {
+  handleKeyPress(e) { // eslint-disable-line complexity
     this.input[e.keyCode] = e.type === 'keydown';
-    this.move();
-  }
-
-  move() { // eslint-disable-line complexity
     let keys = {
       upArrow: 38,
       w: 87,
@@ -91,10 +87,10 @@ export default class PlayerCommon {
         this.vy = this.speed;
       }
     }
-    let oldPosition = {
-      x: this.x,
-      y: this.y
-    };
+  }
+
+  move() {
+    let oldPosition = this.getPosition();
     this.x += this.vx;
     this.y += this.vy;
     if(!this.spriteIsOnMap()) {

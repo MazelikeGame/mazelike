@@ -42,11 +42,13 @@ async function main() {
   initAuth(io);
 
   io.on("connection", (sock) => {
-    sock.on('player-movement', (x, y, username) => {
+    sock.on('player-movement', (x, y, vx, vy, username) => {
       floor.players.forEach((player) => {
         if(player.name === username) {
           player.x = x;
           player.y = y;
+          player.vx = vx;
+          player.vy = vy;
         }
       });
     });
