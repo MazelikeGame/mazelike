@@ -98,7 +98,6 @@ export default class PlayerList {
   update() {
     this.floor.players.forEach((player, index) => {
       let offset = 40; //Space between each player information box.
-
       let hpBox = this.hpBoxes.get(player.name);
 
       if(player.getHp() <= 0) {

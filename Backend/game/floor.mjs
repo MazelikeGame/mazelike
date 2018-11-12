@@ -78,9 +78,8 @@ export default class Floor extends FloorCommon {
       monster.figureOutWhereToGo();
     }
 
-    if(Math.floor(Math.random() * 11) > 5) {
-      this.players[0].hp--;
-    }
+    let random = Math.floor(Math.random() * this.players.length);
+    this.players[random].hp--;
   }
 
   /**
