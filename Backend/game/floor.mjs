@@ -77,6 +77,10 @@ export default class Floor extends FloorCommon {
       monster.move(deltaTime); // monster-monster collision check happens here
       monster.figureOutWhereToGo();
     }
+
+    if(Math.floor(Math.random() * 11) > 5) {
+      this.players[0].hp--;
+    }
   }
 
   /**

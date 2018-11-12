@@ -78,7 +78,7 @@ export default class PlayerList {
       fontSize: 12
     });
 
-    let healthText = new PIXI.Text("Health: " + playerHP, this._hpTextStyle); //eslint-disable-line
+    let healthText = new PIXI.Text(`Health: ${playerHP}`, this._hpTextStyle);
     healthText.position.set(200, 25 + (id * offset)); //eslint-disable-line
     playerBox.addChild(healthText);
 
@@ -87,18 +87,39 @@ export default class PlayerList {
     this.playerBoxes.set(playerName, playerBox); //Stores the playerBox for future access accessible by username.
     this.hpBoxes.set(playerName, {
       text: healthText,
-      bar: healthGreenBar
+      greenBar: healthGreenBar,
+      redBar: healthRedBar
     });
   }
 
   /**
-   * Updates the player list.
+   * Updates the player list for each player.
    */
   update() {
-    this.floor.players.forEach((player) => {
+    this.floor.players.forEach((player, index) => {
+      let offset = 40; //Space between each player information box.
+
       let hpBox = this.hpBoxes.get(player.name);
-      hpBox.text.text = "Health: " + player.hp;
-      console.log(hpBox.text);
+
+      if(player.getHp() <= 0) {
+        hpBox.text.text = `DEAD`;
+      } else {
+        hpBox.text.text = `Health: ${player.getHp()}`;
+      }
+
+      //Health bar red
+      hpBox.redBar.clear();
+      hpBox.redBar.beginFill(0xFF0000);
+      hpBox.redBar.drawRect(0, 0, 100, 10);
+      hpBox.redBar.position.set(200, 15 + (index * offset)); //eslint-disable-line
+      hpBox.redBar.endFill();
+
+      //Health bar green
+      hpBox.greenBar.clear();
+      hpBox.greenBar.beginFill(0x7CFC00);
+      hpBox.greenBar.drawRect(0, 0, player.getHp() >= 0 ? player.getHp() : 0, 10);
+      hpBox.greenBar.position.set(200, 15 + (index * offset));//eslint-disable-line
+      hpBox.greenBar.endFill();
     });
   }
 

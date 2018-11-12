@@ -161,12 +161,13 @@ async function setup() {
   sock.on("update-playerlist", (player) => {
     playerList.disconnectPlayer(player); //Update player list
   });
-  
+
   playerList.floor = floor;
 
   app.ticker.add(() => {
     floor.update();
     playerList.update();
+
     if(fps) {
       fps.update();
     }
