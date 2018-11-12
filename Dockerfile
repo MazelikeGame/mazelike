@@ -8,7 +8,8 @@ RUN apk update && apk add \
   gcc \
   g++
 
-RUN npm install bcrypt@^3.0.0 --no-save
+COPY package*.json ./
+RUN npm install --production
 
 FROM node:8.11-alpine
 
@@ -16,16 +17,7 @@ WORKDIR /app
 
 COPY --from=build /app/node_modules node_modules
 
-COPY package*.json ./
-RUN npm install --production
-
-COPY Frontend Frontend
-COPY Backend Backend
-COPY config config
-COPY migrations migrations
-COPY seeders seeders
-COPY VERSION VERSION
-COPY scripts scripts
+COPY . .
 
 VOLUME /data
 EXPOSE 3000
