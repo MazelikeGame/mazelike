@@ -59,7 +59,6 @@ export default class PlayerCommon {
   /**
    * Update the player's velocity from key input.
    * @param {event} e - User's keyboard input,
-   * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
   handleKeyPress(e) { // eslint-disable-line complexity
     this.input[e.keyCode] = e.type === 'keydown';
@@ -89,6 +88,9 @@ export default class PlayerCommon {
     }
   }
 
+  /**
+   * Update the player's position based off the player's velocity
+   */
   move() {
     let oldPosition = this.getPosition();
     this.x += this.vx;
