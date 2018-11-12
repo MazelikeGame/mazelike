@@ -133,7 +133,9 @@ const start = async() => {
     }
   }
 
-  process.stdout.write("------------------ Ignore previous mysql connection erors ------------------\n");
+  if(!process.env.DB_STORAGE) {
+    process.stdout.write("------------------ Ignore previous mysql connection erors ------------------\n");
+  }
 
   await sequelize.sync();
 

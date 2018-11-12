@@ -10,4 +10,4 @@ COPY . .
 VOLUME /data
 EXPOSE 3000
 
-CMD ["/bin/ash", "scripts/init"]
+ENTRYPOINT ["scripts/mazelike"]
