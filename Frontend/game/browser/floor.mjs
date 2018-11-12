@@ -110,7 +110,7 @@ export default class Floor extends FloorCommon {
   /**
    * Render/update the game
    */
-  update() {
+  update() {    
     this._mapRenderer.update(
       this._viewportX,
       this._viewportY,

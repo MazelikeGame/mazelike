@@ -18,6 +18,7 @@ let app = new PIXI.Application({
 });
 
 let disconnected = new DisconnectMessage("Disconnected from server!");
+let playerList = new PlayerList();
 
 document.body.appendChild(app.view);
 
@@ -44,6 +45,10 @@ const addArrowKeyListener = (floor, username, sock) => {
     floor.setViewport(player.x, player.y);
   });
 };
+
+function handlePlayerList() {
+  
+}
 
 function getUsername(sock) {
   return new Promise((resolve) => {
@@ -77,6 +82,8 @@ async function setup() {
   let masterSock = io(location.origin); //Transition this to the game server
   masterSock.emit("ready", gameId);
   let players = await getPlayers(masterSock);
+  playerList.listOfPlayers = players;
+  
   console.log("Players: " + players); //eslint-disable-line
 
   console.log(`User: ${username}`); // eslint-disable-line
@@ -101,7 +108,7 @@ async function setup() {
     app.stage.addChild(fps.sprite);
   }
 
-  app.stage.addChild(new PlayerList(players).render()); //Draw the player list
+  app.stage.addChild(playerList.render()); //Draw the player list
 
   window.ml.floor = floor;
   addArrowKeyListener(floor, username, sock);
@@ -152,6 +159,10 @@ async function setup() {
 
   sock.on("disconnect", () => {
     app.stage.addChild(disconnected.render());
+  });
+
+  sock.on("update-playerlist", (player) => {
+    console.log(player);
   });
 
   app.ticker.add(() => {

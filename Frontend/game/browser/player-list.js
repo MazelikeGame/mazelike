@@ -16,9 +16,7 @@ export default class PlayerList {
    */
   render() {
     this.listOfPlayers.forEach((player, index) => {
-      let random = Math.ceil(Math.random() * 10);
-      console.log(random);
-      this.drawPlayerInfo(index, player, 100, random % 2); //In the future change the health here.
+      this.drawPlayerInfo(index, player, 100, true); //In the future change the health here.
     });
 
     return this.graphics;
