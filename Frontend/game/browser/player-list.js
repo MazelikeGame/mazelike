@@ -16,7 +16,7 @@ export default class PlayerList {
    */
   render() {
     this.listOfPlayers.forEach((player, index) => {
-      this.drawPlayerInfo(index, player, 100, true); //In the future change the health here.
+      this.drawPlayerInfo(index, player, 50); //In the future change the health here.
     });
 
     return this.graphics;
@@ -26,7 +26,7 @@ export default class PlayerList {
    * Draws the player's information to the player list.
    * @param {int} id the index of the player
    * @param {string} playerName the name of the player
-   * @param {int} playerHP the player's hp.
+   * @param {string} playerHP the health of the player
    */
   drawPlayerInfo(id, playerName, playerHP) {  
     let playerBox = new PIXI.Graphics();

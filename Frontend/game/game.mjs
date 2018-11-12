@@ -46,10 +46,6 @@ const addArrowKeyListener = (floor, username, sock) => {
   });
 };
 
-function handlePlayerList() {
-  
-}
-
 function getUsername(sock) {
   return new Promise((resolve) => {
     sock.once("set-username", resolve);
@@ -124,10 +120,6 @@ async function setup() {
 
   // wait for the game to start
   msgEl.innerText = "Waiting for all players to join";
-
-  await new Promise((resolve) => {
-    sock.once("start-game", resolve);
-  });
 
   msgParentEl.remove();
 
