@@ -10,6 +10,7 @@ export default class PlayerList {
     this.listOfPlayers = [];
     this.graphics = new PIXI.Graphics();
     this.playerBoxes = new Map();
+    this.hpBoxes = new Map();
   }
 
   /**
@@ -84,6 +85,10 @@ export default class PlayerList {
 
     this.graphics.addChild(playerBox);
     this.playerBoxes.set(playerName, playerBox); //Stores the playerBox for future access accessible by username.
+    this.hpBoxes.set(playerName, {
+      text: healthText,
+      bar: healthGreenBar
+    });
   }
 
   /**
@@ -91,7 +96,9 @@ export default class PlayerList {
    */
   update() {
     this.floor.players.forEach((player) => {
-      //console.log(player.name);
+      let hpBox = this.hpBoxes.get(player.name);
+      hpBox.text.text = "Health: " + player.hp;
+      console.log(hpBox.text);
     });
   }
 
