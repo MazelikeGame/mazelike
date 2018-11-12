@@ -23,16 +23,10 @@ gameRouter.get("/all", async(req, res) => {
     return;
   }
 
-  // Get the hosts of all of the lobbies this user is a part of
-  let lobbies = await sql.query(`
-    SELECT l1.playerId, l1.lobbyId FROM lobbies l1
-      WHERE l1.lobbyId IN (SELECT l.lobbyId FROM lobbies l WHERE l.playerId = :userId)
-      AND l1.isHost = 1
-      ORDER BY l1.lobbyId;`, {
-    replacements: {
-      userId: req.user.username
-    },
-    type: sql.QueryTypes.SELECT
+  let lobbies = await Lobby.findAll({
+    where: {
+      playerId: req.user.username
+    }
   });
 
   let counts = await sql.query(`
@@ -279,6 +273,9 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
         });
       });
       io.emit("lobby-delete", req.params.id);
+      fs.unlink(`./Frontend/public/maps/${req.params.id}.json`, () => {
+        //pass
+      });
       res.redirect("/account/dashboard");
     } else {
       res.status(401);
