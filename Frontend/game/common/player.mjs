@@ -20,6 +20,7 @@ export default class PlayerCommon {
     this.vy = 0;
     this.spriteName = spriteName;
     this.floor = floor;
+    this.damage = 10;
     this.speed = 15;
   }
 
@@ -128,6 +129,25 @@ export default class PlayerCommon {
   setCoordinates(x, y) {
     this.x = x;
     this.y = y;
+  }
+
+  /** 
+   * Monster attacks player
+   * @param {*} hp health points that the player's health decrements by
+   */
+  beAttacked(hp) {
+    this.hp -= hp;
+    if(this.hp <= 0) {
+      this.die();
+    }
+  }
+
+  /** 
+   * Player attacks monster
+   * @param {*} monsterID id for player that monster is attacking
+   */
+  attack(monsterID) {
+    this.floor.monsters[monsterID].beAttacked(this.damage);
   }
 
 }
