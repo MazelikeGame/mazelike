@@ -106,7 +106,7 @@ async function setup() {
   addArrowKeyListener(floor, controls, username, sock);
 
   sock.on("state", (state) => {
-    floor.handleState(state);
+    floor.handleState(state, username);
   });
 
   // display the countdown when it starts

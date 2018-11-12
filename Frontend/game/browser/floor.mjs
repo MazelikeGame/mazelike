@@ -155,7 +155,7 @@ export default class Floor extends FloorCommon {
   /**
    * Update our state to match the server's state
    */
-  handleState(state) {
+  handleState(state, username) {
     this._diffState("id", "id", this.monsters, state.monsters, (raw) => {
       let monster = new Monster(raw.name, raw.hp, 10, this, raw.id, raw.type);
       monster.setCoodinates(raw.x, raw.y);
@@ -164,8 +164,13 @@ export default class Floor extends FloorCommon {
     });
     this._diffState("username", 'name', this.players, state.players, (raw) => {
       let player = new Player(raw.username, raw.hp, raw.spriteName, this);
-      player.setCoordinates(raw.x, raw.y);
+      player.handleState(raw);
       player.createSprite();
+      
+      if(raw.username === username) {
+        this.setViewport(player.x, player.y);
+      }
+
       return player;
     });
   }
