@@ -174,9 +174,11 @@ export default class MonsterCommon {
         this.y += Math.min(yMove, yDist) * (this.targety < this.y ? -1 : 1);
       }
     }
-    let collisionMonster = this.collisionEntities(this.floor.players, MonsterCommon.SPRITE_SIZE, false);
-    let collisionPlayer = this.collisionEntities(this.floor.players, PlayerCommon.SPRITE_SIZE, true);
+    let collisionMonster = this.collisionEntities(this.floor.monsters, MonsterCommon.SPRITE_SIZE);
+    let collisionPlayer = this.collisionEntities(this.floor.players, PlayerCommon.SPRITE_SIZE);
     if(collisionMonster !== -1 || collisionPlayer !== -1) { // todo
+      if(collisionPlayer !== -1)
+        console.log("collision " + this.name); // todo delete TESTING
       this.targetx = prevx;
       this.targety = prevy;
       this.x = prevx;
@@ -186,6 +188,7 @@ export default class MonsterCommon {
       if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
         this.lastAttackTime = currentTime;
         this.attack(collisionPlayer);
+        console.log("booped player");
       }
     } else {
       this.collision = false;
@@ -264,7 +267,7 @@ export default class MonsterCommon {
    * Compares corners of each sprite to do so.
    * @returns {boolean}
    */
-  collisionEntities(entities, spriteSize, isPlayer) {
+  collisionEntities(entities, spriteSize) {
     let x = -1;
     let y = -1;
     for(let entity of entities) {
@@ -285,19 +288,7 @@ export default class MonsterCommon {
           }
           if(x >= this.x && x <= this.x + spriteSize) { // within x bounds
             if(y >= this.y && y <= this.y + spriteSize) { // and within y bounds
-              if(isPlayer) {
-                let id = -1;
-                for(let player of entities) {
-                  id++;
-                  if(player.name === entity.name) {
-                    if(entities[id].alive) {
-                      return id;
-                    }
-                  }
-                }
-              } else {
-                return entity.id;
-              }
+              return entities.indexOf(entity);
             }
           }
         }
