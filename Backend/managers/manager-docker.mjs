@@ -43,12 +43,13 @@ export async function spawnGame(gameEnv = {}) {
 
   inUsePorts.add(port);
   portMap.set(gameEnv.gameId, port);
+  envArray.push(`MAZELIKE_port=${port}`);
 
   let container = await docker.container.create({
     name: hostname,
     Hostname: hostname,
     Image: IMAGE_NAME,
-    Cmd: ["node", "--experimental-modules", "Backend/game.mjs", `${port}`],
+    Cmd: ["node", "--experimental-modules", "Backend/game.mjs"],
     Env: envArray,
     ExposedPorts: {
       [`${port}/tcp`]: {}

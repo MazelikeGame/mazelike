@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign,complexity */
 import socketIO from "socket.io";
 import http from "http";
 import Floor from "./game/floor";
@@ -7,16 +8,20 @@ import initAuth from "./game-auth.mjs";
 // then interval at which we update the game state (if this is too short the server will break)
 const UPDATE_INTERVAL = 100;
 
-async function main() {
+export default async function main(env, httpd) {
   // Parse the env vars
-  const PORT = +process.argv[2];
+  const PORT = +process.env.MAZELIKE_port;
   const MAZELIKE_ENV = /^MAZELIKE_(.+)/;
-  let gameEnv = {};
+  let gameEnv = env;
 
-  for(let key of Object.keys(process.env)) {
-    let match = key.match(MAZELIKE_ENV);
-    if(match) {
-      gameEnv[match[1]] = process.env[key];
+  if(env === process.env) {
+    gameEnv = {};
+
+    for(let key of Object.keys(env)) {
+      let match = key.match(MAZELIKE_ENV);
+      if(match) {
+        gameEnv[match[1]] = env[key];
+      }
     }
   }
 
@@ -24,20 +29,24 @@ async function main() {
   let floor = await Floor.load(gameEnv.gameId, 0);
 
   // Create the socket.io server
-  let httpd = http.createServer((req, res) => {
-    res.end("Game server");
-  }).listen(PORT, () => {
-    process.stdout.write(`Game server listening on ${PORT}\n`);
-  });
+  if(!isNaN(PORT)) {
+    httpd = http.createServer((req, res) => {
+      res.end("Game server");
+    }).listen(PORT, () => {
+      process.stdout.write(`Game server listening on ${PORT}\n`);
+    });
 
-  // tell the manager this port is in use
-  httpd.on("error", (err) => {
-    if(err.errno === "EADDRINUSE") {
-      process.exit(198);
-    }
-  });
+    // tell the manager this port is in use
+    httpd.on("error", (err) => {
+      if(err.errno === "EADDRINUSE") {
+        process.exit(198);
+      }
+    });
+  }
 
-  let io = socketIO(httpd);
+  let io = socketIO(httpd, {
+    path: `/socket/${gameEnv.gameId}`
+  });
 
   initAuth(io);
 
@@ -93,4 +102,6 @@ async function triggerTick(floor, io, lastUpdate) {
   setTimeout(triggerTick.bind(undefined, floor, io, now), UPDATE_INTERVAL);
 }
 
-main();
+if(process.env.CLUSTER_MANAGER !== "single") {
+  main(process.env);
+}

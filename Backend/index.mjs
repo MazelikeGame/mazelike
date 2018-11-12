@@ -13,12 +13,14 @@ import userMiddleware from "./middleware/accounts";
 import sessionStore from "./session-store";
 import morgan from 'morgan';
 import fs from "fs";
+import {setHttpd} from "./managers/manager-single";
 
 const PACKAGE_VERSION = fs.readFileSync("VERSION", "utf8").trim();
 
 let app = express();
 let server = http.Server(app);
 global.io = socketio(server);
+setHttpd(server);
 
 if(process.env.PUBLIC_DIR) {
   app.use("/public", express.static(process.env.PUBLIC_DIR));

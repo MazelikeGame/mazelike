@@ -39,7 +39,7 @@ done
 
 # Set docker defaults
 if [ -z "$CLUSTER_MANAGER" ]; then
-  export CLUSTER_MANAGER="docker"
+  export CLUSTER_MANAGER="single"
 fi
 
 if [ -z "$NODE_ENV" ]; then
