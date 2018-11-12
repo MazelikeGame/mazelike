@@ -132,23 +132,6 @@ async function setup() {
     }, 500);
   }
 
-  if(!gameId) {
-    window.setInterval(function() {
-      for(let i = 0; i < floor.monsters.length; i++) {
-        if(floor.monsters[i].type === "blue") { // is a blue monster
-          floor.monsters[i].figureOutWhereToGo();
-        }
-      }
-    }, 1000);
-  }
-  window.setInterval(function() {
-    for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type === "blue") { // is a blue monster
-        floor.monsters[i].move();
-      }
-    }
-  }, 20);
-
   sock.on("disconnect", () => {
     new DisconnectMessage("Disconnected!");
     app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
