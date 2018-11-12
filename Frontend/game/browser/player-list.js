@@ -88,6 +88,14 @@ export default class PlayerList {
   }
 
   /**
+   * Removes the player from the list
+   * @param {*} username 
+   */
+  removePlayer(username) {
+    this.listOfPlayers.splice(this.listOfPlayers.indexOf(username), 1);
+  }
+
+  /**
    * Checks the player's name length.
    * @param {string} playerName the name of player you want to check
    */

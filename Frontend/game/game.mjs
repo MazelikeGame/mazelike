@@ -83,7 +83,7 @@ async function setup() {
   masterSock.emit("ready", gameId);
   let players = await getPlayers(masterSock);
   playerList.listOfPlayers = players;
-  
+
   console.log("Players: " + players); //eslint-disable-line
 
   console.log(`User: ${username}`); // eslint-disable-line
@@ -163,6 +163,8 @@ async function setup() {
 
   sock.on("update-playerlist", (player) => {
     console.log(player);
+    playerList.removePlayer(player);
+    console.log(playerList.listOfPlayers);
   });
 
   app.ticker.add(() => {
