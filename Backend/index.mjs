@@ -11,8 +11,7 @@ import bodyParser from 'body-parser';
 import session from 'express-session';
 import userMiddleware from "./middleware/accounts";
 import sessionStore from "./session-store";
-import winston from 'winston';
-import expressWinston from 'express-winston';
+import morgan from 'morgan';
 import fs from "fs";
 
 const PACKAGE_VERSION = fs.readFileSync("VERSION", "utf8").trim();
@@ -47,17 +46,8 @@ app.set('views', 'Frontend/views');
 
 // Middleware
 app.use(userMiddleware);
-// Winston request logging
-app.use(expressWinston.logger({
-  transports: [
-    new winston.transports.Console({
-      json: true
-    })
-  ],
-  msg: '{{req.method}} {{req.url}}, res.statusCode: {{res.statusCode}} res.responseTime: {{res.responseTime}}ms',
-  expressFormat: false,
-  meta: false
-}));
+// requret logging
+app.use(morgan(":method :status :url (:response-time ms)"));
 
 //Routes
 app.use("/game", gameRouter);
@@ -71,15 +61,6 @@ app.get('/', function(req, res) {
     res.render('index', { version: PACKAGE_VERSION });
   }
 });
-
-// Winston error logger. Must be placed after routes
-app.use(expressWinston.errorLogger({
-  transports: [
-    new winston.transports.Console({
-      colorize: true
-    })
-  ]
-}));
 
 let nextId = 0;
 let playerList = new Map(); //Lists of players
