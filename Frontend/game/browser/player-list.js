@@ -5,8 +5,9 @@
  */
 export default class PlayerList {
 
-  constructor(listOfPlayers) {
-    this.listOfPlayers = listOfPlayers;
+  constructor() {
+    this.floor = null;
+    this.listOfPlayers = [];
     this.graphics = new PIXI.Graphics();
     this.playerBoxes = new Map();
   }
@@ -87,10 +88,11 @@ export default class PlayerList {
 
   /**
    * Updates the player list.
-   * @param {*} floor 
    */
-  update(floor) {
-
+  update() {
+    this.floor.players.forEach((player) => {
+      //console.log(player.name);
+    });
   }
 
   /**

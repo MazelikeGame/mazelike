@@ -104,6 +104,7 @@ async function setup() {
     app.stage.addChild(fps.sprite);
   }
 
+  playerList.floor = floor;
   app.stage.addChild(playerList.render()); //Draw the player list
 
   window.ml.floor = floor;
@@ -120,6 +121,10 @@ async function setup() {
 
   // wait for the game to start
   msgEl.innerText = "Waiting for all players to join";
+
+  await new Promise((resolve) => {
+    sock.once("start-game", resolve);
+  });
 
   msgParentEl.remove();
 
@@ -156,10 +161,12 @@ async function setup() {
   sock.on("update-playerlist", (player) => {
     playerList.disconnectPlayer(player); //Update player list
   });
+  
+  playerList.floor = floor;
 
   app.ticker.add(() => {
     floor.update();
-
+    playerList.update();
     if(fps) {
       fps.update();
     }
