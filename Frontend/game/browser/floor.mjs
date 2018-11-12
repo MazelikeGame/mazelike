@@ -162,7 +162,7 @@ export default class Floor extends FloorCommon {
       monster.createSprite();
       return monster;
     });
-    this._diffState('username', this.players, state.players, (raw) => {
+    this._diffState('name', this.players, state.players, (raw) => {
       let player = new Player(raw.username, raw.hp, raw.spriteName, this);
       player.setCoordinates(raw.x, raw.y);
       player.createSprite();
