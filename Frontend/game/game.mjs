@@ -162,9 +162,7 @@ async function setup() {
   });
 
   sock.on("update-playerlist", (player) => {
-    console.log(player);
-    playerList.removePlayer(player);
-    console.log(playerList.listOfPlayers);
+    playerList.disconnectPlayer(player); //Update player list
   });
 
   app.ticker.add(() => {

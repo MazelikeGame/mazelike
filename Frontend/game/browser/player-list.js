@@ -27,11 +27,9 @@ export default class PlayerList {
    * @param {int} id the index of the player
    * @param {string} playerName the name of the player
    * @param {int} playerHP the player's hp.
-   * @param {bool} isConnected the status of the player
    */
-  drawPlayerInfo(id, playerName, playerHP, isConnected) {  
+  drawPlayerInfo(id, playerName, playerHP) {  
     let playerBox = new PIXI.Graphics();
-    playerBox.fillAlpha = 0.50;
     let offset = 40; //Space between each player information box.
 
     //Black background
@@ -89,10 +87,19 @@ export default class PlayerList {
 
   /**
    * Removes the player from the list
-   * @param {*} username 
+   * @param {string} username 
    */
   removePlayer(username) {
     this.listOfPlayers.splice(this.listOfPlayers.indexOf(username), 1);
+  }
+
+  /**
+   * Updates the player list to show a player disconnected.
+   * @param {string} username 
+   */
+  disconnectPlayer(username) {
+    let tempPlayerBox = this.playerBoxes.get(username);
+    tempPlayerBox.alpha = 0.35;
   }
 
   /**

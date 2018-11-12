@@ -54,7 +54,6 @@ async function main() {
     sock.emit("set-username", sock.user.username);
 
     sock.on("disconnect", () => {
-      console.log(sock.user.username + " has left");
       sock.broadcast.emit("update-playerlist", sock.user.username); //Player has left and need to update the list of players.
     });
 
