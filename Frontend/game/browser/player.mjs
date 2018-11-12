@@ -29,7 +29,6 @@ export default class Player extends PlayerCommon {
    * @param {int} viewY
    */
   update(viewX, viewY) {
-    // let now = Date.now();
     this.sprite.position.set(this.x - viewX, this.y - viewY);
   }
 
