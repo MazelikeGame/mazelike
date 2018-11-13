@@ -3,11 +3,7 @@ import dockerApi from "node-docker-api";
 import fs from "fs";
 
 const ENV_NAMES = [
-  "DB_HOST",
-  "DB_PORT",
-  "DB_USER",
-  "DB_PASS",
-  "DB_DATABASE",
+  "DB",
   "NODE_ENV"
 ];
 
