@@ -4,6 +4,8 @@
 // The maximum amount of ms we want a monster to walk for
 const MAX_WALK_TIME = 1500;
 
+import PlayerCommon from "./player.mjs";
+
 export default class MonsterCommon {
   
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
@@ -19,15 +21,13 @@ export default class MonsterCommon {
     this.y = 0;
     this.targetx = -1; // location where monster wants to move
     this.targety = -1;
-    this.PCx = -1; // (-1,-1) if not seen yet or previously seen location explored
-    this.PCy = -1;
-    this.maneuver = false;
     this.alive = true;
+    this.lastAttackTime = new Date().getTime();
 
-    // SPEED: 10 = regular, 20 = slow
-    this.speed = 100;
+    // SPEED: 100 = regular, 50 = slow
+    this.speed = 200;
     if(this.type === "blue") { // slow monsters
-      this.speed = 50;
+      this.speed = 100;
     }
   }
 
@@ -37,11 +37,8 @@ export default class MonsterCommon {
    * @param y 
    */
   canSee(x, y) {
-    this.maneuver = false;
     let x1 = -1, x2 = -1, y1 = -1, y2 = -1;
     let cornerx = this.x, cornery = this.y; // upper left
-    let clear = true;
-    let totalCorners = 0;
     for(let i = 0; i < 4; i++) {
       if(i === 1) {
         cornerx += MonsterCommon.SPRITE_SIZE; // upper right
@@ -64,24 +61,14 @@ export default class MonsterCommon {
         y1 = cornery;
         y2 = y;
       }
-      clear = true;
-      for(let j = x1; j <= x2; j++) {
-        for(let k = y1; k <= y2; k++) {
+      for(let j = x1; j <= x2; j += 20) { // checking every 20th pixel to improve runtime
+        for(let k = y1; k <= y2; k += 20) {
           if(!this.floor.map.isOnMap(j, k)) {
-            clear = false;
-            break;
-          }
-          if(!clear)
-            break;
+            return false;
+          }  
         }
       }
-      if(clear)
-        totalCorners++;
     }
-    if(totalCorners === 0)
-      return false;
-    if(totalCorners < 4)
-      this.maneuver = true;
     return true;
   }
 
@@ -98,22 +85,27 @@ export default class MonsterCommon {
     return c;
   }
 
-  /** ~WIP, UNFINISHED (need PC implementation)
+  /**
    * Finds closest PC that can be seen and targets it.
    */
   canSeePC() {
-    // this.targetAquired = false;
-    // let indexArray = [];
-    // for i = 0 to map.numPcs/map.PCarray.length
-    // __if(canSee(PC[i].x, PC[i].y));, repeat for all (most) pixels of pc
-    // ____push i onto indexArray;
-    // find closest PC that can be seen: use this.findDistance(pcx, pcy) and find minimum to find closest pc of PCs of indexArray
-    // assign targetx and targety to closest pc that can be seen
+    this.targetAquired = false;
+    let minDist = -1;
+    for(let player of this.floor.players) {
+      if(this.canSee(player.x, player.y) && this.canSee(player.x + player.SPRITE_SIZE, player.y + player.SPRITE_SIZE) &&
+         this.canSee(player.x + player.SPRITE_SIZE, player.y) && this.canSee(player.x, player.y + player.SPRITE_SIZE)) {
+        this.targetAquired = true;
+        if(this.findDistance(player.x, player.y) < minDist || minDist === -1) {
+          this.targetx = player.x;
+          this.targety = player.y;
+          minDist = this.findDistance(player.x, player.y);
+        }
+      }
+    }
+    return minDist !== -1;
   }
 
-  /** 
-   * ~WIP, UNFINISHED (need to check for collisions for items/players)
-   * 
+  /**  
    * Monster moves to an adjacent, unoccupied location.
    */
   wander() {
@@ -160,6 +152,8 @@ export default class MonsterCommon {
    * @param {number} deltaTime The number of ms since the last move
    */
   move(deltaTime) {
+    let prevy = this.y;
+    let prevx = this.x;
     if(this.alive) {
       // Get the distance in the x and y direction we have to move
       let xDist = Math.abs(this.targetx - this.x);
@@ -180,60 +174,67 @@ export default class MonsterCommon {
         this.y += Math.min(yMove, yDist) * (this.targety < this.y ? -1 : 1);
       }
     }
-    let collision = this.collisionMonsters();
-    if(collision !== -1) {
-      this.die();
+    // Disable collision detection on the client
+    if(typeof window === "undefined") {
+      let collisionMonster = this.collisionEntities(this.floor.monsters, MonsterCommon.SPRITE_SIZE);
+      let collisionPlayer = this.collisionEntities(this.floor.players, PlayerCommon.SPRITE_SIZE);
+      if(collisionMonster !== -1 || collisionPlayer !== -1) { // todo
+        if(collisionPlayer !== -1)
+          console.log("collision " + this.name); // todo delete TESTING
+        this.targetx = prevx;
+        this.targety = prevy;
+        this.x = prevx;
+        this.y = prevy;
+        this.collision = true;
+        let currentTime = new Date().getTime();
+        if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
+          this.lastAttackTime = currentTime;
+          this.attack(collisionPlayer);
+          console.log("booped player");
+        }
+      } else {
+        this.collision = false;
+      }
     }
   }
 
-  /**
-   * ~WIP, UNFINISHED (needs to be able to move strategically based on PC last seen location
-   * 
+  /** 
    * Moves monster.
    * If PC has been seen, move strategically towards last seen location.
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
    */
   figureOutWhereToGo() {
-    //this.canSeePC();
+    this.canSeePC();
     if(this.alive) {
-      if(!this.targetAquired) {
+      if(!this.targetAquired && !this.collision) {
         if(this.targetx === -1 || this.targety === -1) {
           this.targetx = this.x;
           this.targety = this.y;
         }
-
         if(Math.abs(this.x - this.targetx) < 2 && Math.abs(this.y - this.targety) < 2) {
           this.wander();
         }
-      } else {
-        //move strategically, to be implemented later when PC is on map WIP
-        console.log("omw bro");
       }
     }
   }
 
-  /**
-   * ~WIP, UNFINISHED (merge logic with PC class once implemented)
-   * 
+  /** 
    * Monster attacks PC
-   * @param {*} PCid id for player that monster is attacking
+   * @param {*} playerID id for player that monster is attacking
    */
-  attack(PCid) {
-    //(decrement pc health and check for pc death) within PC's beAttacked method
-    // below: psuedo until PC is implemented
-    this.floor.map.PC[PCid].beAttacked(this.damage);
+  attack(playerID) {
+    this.floor.players[playerID].beAttacked(this.damage);
   }
 
-  /**
-   * ~WIP, UNFINISHED (merge logic with PC class once implemented)
-   * 
-   * PC attacks Monster
+  /** 
+   * Player attacks Monster
    * @param {*} hp health points that the monster's health decrements by
    */
   beAttacked(hp) {
     this.hp -= hp;
-    if(this.hp <= 0)
+    if(this.hp <= 0) {
       this.die();
+    }    
   }
 
   /** 
@@ -265,32 +266,32 @@ export default class MonsterCommon {
   }
 
   /**
-   * Checks to see if there's a monster colliding with this monster. todo untested
+   * Checks to see if there's a monster colliding with this monster.
    * Compares corners of each sprite to do so.
    * @returns {boolean}
    */
-  collisionMonsters() {
+  collisionEntities(entities, spriteSize) {
     let x = -1;
     let y = -1;
-    for(let monster of this.floor.monsters) {
-      if(this.id !== monster.id) {
+    for(let entity of entities) {
+      if(this.id !== entity.id) {
         for(let j = 0; j < 4; j++) { // four corners to check for each sprite
           if(j === 0) { // upper left corner
-            x = monster.x;
-            y = monster.y;
+            x = entity.x;
+            y = entity.y;
           } else if(j === 1) { // upper right corner
-            x = monster.x + MonsterCommon.SPRITE_SIZE;
-            y = monster.y;
+            x = entity.x + spriteSize;
+            y = entity.y;
           } else if(j === 1) { // lower right corner
-            x = monster.x + MonsterCommon.SPRITE_SIZE;
-            y = monster.y + MonsterCommon.SPRITE_SIZE;
+            x = entity.x + spriteSize;
+            y = entity.y + spriteSize;
           } else if(j === 1) { // lower left corner
-            x = monster.x;
-            y = monster.y + MonsterCommon.SPRITE_SIZE;
+            x = entity.x;
+            y = entity.y + spriteSize;
           }
-          if(x >= this.x && x <= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
-            if(y >= this.y && y <= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
-              return monster.id;
+          if(x >= this.x && x <= this.x + spriteSize) { // within x bounds
+            if(y >= this.y && y <= this.y + spriteSize) { // and within y bounds
+              return entities.indexOf(entity);
             }
           }
         }
