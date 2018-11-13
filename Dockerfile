@@ -1,4 +1,5 @@
-FROM node:8.11-alpine
+ARG BASE="node:8.11-alpine"
+FROM ${BASE}
 
 WORKDIR /app
 
@@ -7,7 +8,8 @@ RUN npm install --production
 
 COPY . .
 
-VOLUME /data
+ARG DATA="/data"
+VOLUME ${DATA}
 EXPOSE 3000
 
-ENTRYPOINT ["scripts/mazelike"]
+ENTRYPOINT ["node", "scripts/mazelike.js"]

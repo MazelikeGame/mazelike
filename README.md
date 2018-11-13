@@ -41,3 +41,9 @@ MAILER_EMAIL_ID=noreplymazelike@gmail.com
 MAILER_PASSWORD=sneakybeakylike
 MAILER_SERVICE_PROVIDER=Gmail
 ```
+
+## Docker windows build
+
+```
+docker build --build-arg BASE=stefanscherer/node-windows:8.11 --build-arg DATA="C:\data" -t ryan3r/mazelike .
+```
