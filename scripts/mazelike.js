@@ -1,6 +1,7 @@
 /* eslint-disable */
 const {spawn} = require("child_process");
 const os = require("os");
+const fs = require("fs");
 
 // The mazelike logo
 let logo = [
@@ -36,12 +37,7 @@ let exec = (command, ...args) => {
 (async() => {
   // Allow users to run sh
   if(process.argv[2] == "sh") {
-    await exec("/bin/sh");
-    process.exit(0);
-  }
-
-  if(process.argv[2] == "cmd") {
-    await exec("cmd.exe");
+    await exec(os.platform() === "win32" ? "cmd" : "/bin/sh");
     process.exit(0);
   }
 
@@ -54,10 +50,11 @@ let exec = (command, ...args) => {
       case "--help":
         console.log(`Usage: mazelike [options]
 
-    -h, --help     Show this message
-    -v, --verbose  Print all database queries
-    -d, --docker   Run the game server instances as separate containers
-  `);
+  sh             Start ${os.platform() === "win32" ? "cmd" : "ash"} for debugging
+  -h, --help     Show this message
+  -v, --verbose  Print all database queries
+  -d, --docker   Run the game server instances as separate containers
+  --version      Print the current version`);
         return;
 
       case "-v":
@@ -68,6 +65,12 @@ let exec = (command, ...args) => {
       case "-d":
       case "--docker":
         process.env.CLUSTER_MANAGER = "docker";
+        break;
+      
+      case "--version":
+      case "cat": // for backwards compatability
+        console.log(fs.readFileSync("VERSION", "utf8").trim());
+        process.exit(0);
         break;
       
       default:
