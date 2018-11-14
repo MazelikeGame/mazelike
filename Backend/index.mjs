@@ -98,7 +98,7 @@ const sleep = (ms) => {
   });
 };
 
-const MAX_RETRIES = 50;
+const MAX_RETRIES = 10;
 const start = async() => {
   // make several attempts to connect to mysql
   for(let i = 0;; ++i) {
@@ -114,10 +114,6 @@ const start = async() => {
         process.exit(1);
       }
     }
-  }
-
-  if(!process.env.DB_STORAGE) {
-    process.stdout.write("------------------ Ignore previous mysql connection erors ------------------\n");
   }
 
   await sequelize.sync();
