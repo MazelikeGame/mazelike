@@ -18,7 +18,7 @@ export default class PlayerList {
    */
   render() {
     this.listOfPlayers.forEach((player, index) => {
-      this.drawPlayerInfo(index, player, 50); //In the future change the health here.
+      this.drawPlayerInfo(index, player, 100); //In the future change the health here.
     });
 
     return this.graphics;
@@ -82,7 +82,6 @@ export default class PlayerList {
     healthText.position.set(200, 25 + (id * offset)); //eslint-disable-line
     playerBox.addChild(healthText);
 
-
     this.graphics.addChild(playerBox);
     this.playerBoxes.set(playerName, playerBox); //Stores the playerBox for future access accessible by username.
     this.hpBoxes.set(playerName, {
@@ -121,7 +120,7 @@ export default class PlayerList {
       hpBox.greenBar.endFill();
     });
   }
-
+  
   /**
    * Removes the player from the list
    * @param {string} username 

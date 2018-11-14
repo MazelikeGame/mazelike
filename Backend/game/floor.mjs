@@ -77,9 +77,6 @@ export default class Floor extends FloorCommon {
       monster.move(deltaTime); // monster-monster collision check happens here
       monster.figureOutWhereToGo();
     }
-
-    let random = Math.floor(Math.random() * this.players.length);
-    this.players[random].hp--;
   }
 
   /**
