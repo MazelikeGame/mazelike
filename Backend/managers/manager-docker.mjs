@@ -7,10 +7,6 @@ const ENV_NAMES = [
   "NODE_ENV"
 ];
 
-if(process.env.DB_STORAGE) {
-  ENV_NAMES.push("DB_STORAGE");
-}
-
 const VERSION = fs.readFileSync("VERSION", "utf8").trim();
 const IMAGE_NAME = process.env.IMAGE_NAME || `ryan3r/mazelike:${VERSION}`;
 const ADDRESS = process.env.EXTERN_ADDRESS;
