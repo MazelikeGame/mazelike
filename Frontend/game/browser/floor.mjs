@@ -193,7 +193,7 @@ export default class Floor extends FloorCommon {
 
     for(let i = 0; i < current.length; ++i) {
       let obj = current[i];
-
+      
       // already have an instance update it
       if(wantedIds.has(obj[idKey])) {
         obj.handleState(wantedIds.get(obj[idKey]));

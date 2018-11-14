@@ -149,6 +149,5 @@ export default class PlayerCommon {
   attack(monsterID) {
     this.floor.monsters[monsterID].beAttacked(this.damage);
   }
-
 }
 PlayerCommon.SPRITE_SIZE = 48;
