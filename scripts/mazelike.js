@@ -50,11 +50,13 @@ let exec = (command, ...args) => {
       case "--help":
         console.log(`Usage: mazelike [options]
 
-  sh             Start ${os.platform() === "win32" ? "cmd" : "ash"} for debugging
-  -h, --help     Show this message
-  -v, --verbose  Print all database queries
-  -d, --docker   Run the game server instances as separate containers
-  --version      Print the current version`);
+  sh               Start ${os.platform() === "win32" ? "cmd" : "ash"} for debugging
+  -h, --help       Show this message
+  -v, --verbose    Print all database queries
+  -d, --docker     Run the game server instances as separate containers
+  --version        Print the current version
+  -t, --tag <tag>  The tag to use for spawning game servers (automatically sets -d)
+                      ex: ryan3r/mazelike`);
         return;
 
       case "-v":
@@ -71,6 +73,17 @@ let exec = (command, ...args) => {
       case "cat": // for backwards compatability
         console.log(fs.readFileSync("VERSION", "utf8").trim());
         process.exit(0);
+        break;
+      
+      case "-t":
+      case "--tag":
+        process.env.CLUSTER_MANAGER = "docker";
+        process.env.IMAGE_NAME = process.argv[++i];
+
+        if(i === process.argv.length || process.env.IMAGE_NAME[0] === "-") {
+          console.log(`Expected docker image/tag but got ${process.env.IMAGE_NAME}`);
+          process.exit(0);
+        }
         break;
       
       default:

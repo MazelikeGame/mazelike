@@ -4,6 +4,7 @@ import http from "http";
 import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
 import initAuth from "./game-auth.mjs";
+import path from "path";
 
 // then interval at which we update the game state (if this is too short the server will break)
 const UPDATE_INTERVAL = 100;
@@ -102,6 +103,6 @@ async function triggerTick(floor, io, lastUpdate) {
   setTimeout(triggerTick.bind(undefined, floor, io, now), UPDATE_INTERVAL);
 }
 
-if(process.env.CLUSTER_MANAGER !== "single") {
+if(path.relative(process.cwd(), process.argv[1]) === "Backend/game.mjs") {
   main(process.env);
 }
