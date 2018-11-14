@@ -54,7 +54,8 @@ async function main() {
     sock.emit("set-username", sock.user.username);
 
     sock.on("disconnect", () => {
-      sock.broadcast.emit("update-playerlist", sock.user.username); //Player has left and need to update the list of players.
+      //Player has left and need to update the list of players.
+      sock.broadcast.emit("update-playerlist", sock.user.username);
     });
 
     saveHandler(sock, floor);
