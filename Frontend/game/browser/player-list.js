@@ -95,10 +95,12 @@ export default class PlayerList {
    * Updates the player list for each player.
    */
   update() {
+    ///TODO
+    //Need to update for player null.
     this.floor.players.forEach((player, index) => {
       let offset = 40; //Space between each player information box.
       let hpBox = this.hpBoxes.get(player.name);
-
+      
       if(player.getHp() <= 0) {
         hpBox.text.text = `DEAD`;
       } else {

@@ -5,6 +5,7 @@ import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
 import PlayerList from "./browser/player-list.js";
 import DisconnectMessage from "./browser/disconnect-msg.js";
+import MobileControls from "./browser/mobile-controls.mjs";
 
 
 let msgEl = document.querySelector(".msg");
@@ -28,22 +29,29 @@ app.renderer.view.style.display = "block";
 app.renderer.autoResize = true;
 
 window.onresize = () => {
-  app.renderer.resize(innerWidth - 1, innerHeight - 1);
+  app.renderer.resize(innerWidth, innerHeight);
   disconnected.resize();
 };
 
 window.onresize();
 
+// disable context menu
+addEventListener("contextmenu", (e) => {
+  e.preventDefault();
+});
+
 // This should be removed once player controls the viewport
-const addArrowKeyListener = (floor, username, sock) => {
-  window.addEventListener("keydown", (e) => {
-    let speed = 15;
+const addArrowKeyListener = (floor, controls, username, sock) => {
+  let handleKey = (e) => {
     let player = getPlayer(floor, username);
-    player.keyPress(e, speed);
+    player.keyPress(e);
 
     sock.emit('player-movement', player.x, player.y, username);
     floor.setViewport(player.x, player.y);
-  });
+  };
+
+  controls.bind(handleKey);
+  window.addEventListener("keydown", handleKey);
 };
 
 function getUsername(sock) {
@@ -59,13 +67,9 @@ function getPlayers(sock) {
 }
 
 function getPlayer(floor, username) {
-  let foundPlayer;
-  floor.players.forEach((player) => {
-    if(player.name === username) {
-      foundPlayer = player;
-    }
+  return floor.players.find((player) => {
+    return player.name === username;
   });
-  return foundPlayer;
 }
 
 async function setup() {
@@ -107,11 +111,14 @@ async function setup() {
   playerList.floor = floor;
   app.stage.addChild(playerList.render()); //Draw the player list
 
+  let controls = new MobileControls();
+  app.stage.addChild(controls.sprite);
+
   window.ml.floor = floor;
-  addArrowKeyListener(floor, username, sock);
+  addArrowKeyListener(floor, controls, username, sock);
 
   sock.on("state", (state) => {
-    floor.handleState(state);
+    floor.handleState(state, username);
   });
 
   // display the countdown when it starts
@@ -137,23 +144,6 @@ async function setup() {
     }, 500);
   }
 
-  if(!gameId) {
-    window.setInterval(function() {
-      for(let i = 0; i < floor.monsters.length; i++) {
-        if(floor.monsters[i].type === "blue") { // is a blue monster
-          floor.monsters[i].figureOutWhereToGo();
-        }
-      }
-    }, 1000);
-  }
-  window.setInterval(function() {
-    for(let i = 0; i < floor.monsters.length; i++) {
-      if(floor.monsters[i].type === "blue") { // is a blue monster
-        floor.monsters[i].move();
-      }
-    }
-  }, 20);
-
   sock.on("disconnect", () => {
     app.stage.addChild(disconnected.render());
   });
@@ -167,6 +157,7 @@ async function setup() {
   app.ticker.add(() => {
     floor.update();
     playerList.update();
+    controls.update();
 
     if(fps) {
       fps.update();

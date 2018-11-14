@@ -20,6 +20,8 @@ export default class PlayerCommon {
     this.vy = 0;
     this.spriteName = spriteName;
     this.floor = floor;
+    this.damage = 10;
+    this.speed = 15;
   }
 
   /**
@@ -59,8 +61,11 @@ export default class PlayerCommon {
    * @param {event} e - User's keyboard input,
    * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
-  // eslint-disable-next-line complexity
-  keyPress(e, speed) {
+  keyPress(e) { // eslint-disable-line complexity
+    let oldPosition = {
+      x: this.x,
+      y: this.y
+    };
     let keys = {
       upArrow: 38,
       w: 87,
@@ -74,22 +79,25 @@ export default class PlayerCommon {
     switch(e.keyCode) {
     case keys.upArrow:
     case keys.w:
-      this.y -= speed;
+      this.y -= this.speed;
       break;
     case keys.downArrow:
     case keys.s:
-      this.y += speed;
+      this.y += this.speed;
       break;
     case keys.leftArrow:
     case keys.a:
-      this.x -= speed;
+      this.x -= this.speed;
       break;
     case keys.rightArrow:
     case keys.d:
-      this.x += speed;
+      this.x += this.speed;
       break;
     default:
       break;
+    }
+    if(!this.spriteIsOnMap()) {
+      this.setCoordinates(oldPosition.x, oldPosition.y);
     }
   }
 
@@ -121,6 +129,25 @@ export default class PlayerCommon {
   setCoordinates(x, y) {
     this.x = x;
     this.y = y;
+  }
+
+  /** 
+   * Monster attacks player
+   * @param {*} hp health points that the player's health decrements by
+   */
+  beAttacked(hp) {
+    this.hp -= hp;
+    if(this.hp <= 0) {
+      this.die();
+    }
+  }
+
+  /** 
+   * Player attacks monster
+   * @param {*} monsterID id for player that monster is attacking
+   */
+  attack(monsterID) {
+    this.floor.monsters[monsterID].beAttacked(this.damage);
   }
 
 }
