@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Floor</title>
+    <title>JSDoc: Class: module:Player</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Floor</h1>
+    <h1 class="page-title">Class: module:Player</h1>
 
     
 
@@ -28,10 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="module-common_Floor.html">common/Floor</a>~</span>Floor<span class="signature">(gameId, floorIdx)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>module:Player<span class="signature">()</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">The game map, monsters, players and items for this floor</div>
+            <div class="class-description">Have Player inherit from class Character. Same goes for Monster class.</div>
         
     
 </header>
@@ -46,7 +45,7 @@
     
 
     
-    <h4 class="name" id="Floor"><span class="type-signature"></span>new Floor<span class="signature">(gameId, floorIdx)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="module:Player"><span class="type-signature"></span>new module:Player<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -59,68 +58,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>gameId</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The game id for the current game</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>floorIdx</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The index of this floor</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -156,7 +93,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_floor.mjs.html">Frontend/game/common/floor.mjs</a>, <a href="Frontend_game_common_floor.mjs.html#line7">line 7</a>
+        <a href="Frontend_game_browser_player.mjs.html">Frontend/game/browser/player.mjs</a>, <a href="Frontend_game_browser_player.mjs.html#line9">line 9</a>
     </li></ul></dd>
     
 
@@ -201,6 +138,426 @@
 
     
 
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createSprite"><span class="type-signature"></span>createSprite<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create a sprite for player and add to the floor.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_player.mjs.html">Frontend/game/browser/player.mjs</a>, <a href="Frontend_game_browser_player.mjs.html#line18">line 18</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="die"><span class="type-signature"></span>die<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Player dies.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_player.mjs.html">Frontend/game/browser/player.mjs</a>, <a href="Frontend_game_browser_player.mjs.html#line46">line 46</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="remove"><span class="type-signature"></span>remove<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Remove a player from a PIXI.container
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_player.mjs.html">Frontend/game/browser/player.mjs</a>, <a href="Frontend_game_browser_player.mjs.html#line39">line 39</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(viewX,, viewY)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Update the player sprite's position for all players on the floor.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>viewX,</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>viewY</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_player.mjs.html">Frontend/game/browser/player.mjs</a>, <a href="Frontend_game_browser_player.mjs.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     
 
     

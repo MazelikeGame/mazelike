@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Frontend/game/common/floor.mjs</title>
+    <title>JSDoc: Source: Frontend/game/browser/player.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Frontend/game/common/floor.mjs</h1>
+    <h1 class="page-title">Source: Frontend/game/browser/player.mjs</h1>
 
     
 
@@ -26,28 +26,67 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @module common/Floor */
-import "./game-map/game-map-renderers.mjs";
+            <pre class="prettyprint source linenums"><code>/* global PIXI */
+import PlayerCommon from "../common/player.mjs";
+
+/** @module Player */
 
 /**
- * The game map, monsters, players and items for this floor
+ * Have Player inherit from class Character. Same goes for Monster class.
  */
-class Floor {
-  /**
-   * @private
-   * @param gameId The game id for the current game
-   * @param floorIdx The index of this floor
-   */
-  constructor(gameId, floorIdx) {
-    this.id = `${gameId}-${floorIdx}`;
-    // below: ratio of Monsters to Rooms. ex: 0.4 puts monsters in a fourth of the rooms.
-    this.monsterRatio = 0.4;
-    // Initialize players, monsters and the game map in loadBrowser, loadNode,  and generate methods
+export default class Player extends PlayerCommon {
+  constructor(...args) {
+    super(...args);
+    this._lastMove = Date.now();
   }
-  
-}
 
-export default Floor;
+  /**
+   * Create a sprite for player and add to the floor.
+   */
+  createSprite() {
+    this.sprite = new PIXI.Sprite(PIXI.loader.resources.player.textures[this.spriteName]);
+    this.sprite.position.set(this.x, this.y);
+    this.sprite.width = PlayerCommon.SPRITE_SIZE;
+    this.sprite.height = PlayerCommon.SPRITE_SIZE;
+    this.floor.playerSprites.addChild(this.sprite);
+  }
+
+  /**
+   * Update the player sprite's position for all players on the floor.
+   * @param {int} viewX,
+   * @param {int} viewY
+   */
+  update(viewX, viewY) {
+    // let now = Date.now();
+    this.sprite.position.set(this.x - viewX, this.y - viewY);
+  }
+
+  /**
+   * Remove a player from a PIXI.container
+   */
+  remove() {
+    this.floor.playerSprites.removeChild(this.sprite);
+  }
+
+  /**
+   * Player dies.
+   */
+  die() {
+    this.floor.playerSprites.removeChild(this.sprite);
+    this.hp = 0;
+    this.alive = false;
+  }
+
+  handleState(state) {
+    let oldName = this.spriteName;
+    Object.assign(this, state);
+
+    // update the sprite
+    if(oldName !== this.spriteName) {
+      this.sprite.texture = PIXI.loader.resources.demon.textures[this.spriteName];
+    }
+  }
+}
 </code></pre>
         </article>
     </section>
