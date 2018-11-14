@@ -228,10 +228,23 @@ accountRouter.get('/view', function(req, res) {
 });
 
 accountRouter.get('/forgot-password', function(req, res) {
-  res.render('forgot-password');
+  if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.MAILER_SERVICE_PROVIDER) {
+    return res.render('forgot-password', {
+      badError: new Error("Forgot password is not enabled")
+    });
+  }
+
+  return res.render('forgot-password');
 });
 
+/* eslint-disable complexity */
 accountRouter.post('/forgot-password', async(req, res) => {
+  if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.MAILER_SERVICE_PROVIDER) {
+    return res.render('forgot-password', {
+      badError: new Error("Forgot password is not enabled")
+    });
+  }
+  
   const buf = crypto.randomBytes(20);
   var token = buf.toString('hex');
   let user = await User.findOne({
@@ -328,6 +341,7 @@ accountRouter.post('/reset/:token', async(req, res) => {
     });
   });
 });
+/* eslint-enable complexity */
 
 accountRouter.get('/dashboard', async(req, res) => {
   if(res.loginRedirect()) {

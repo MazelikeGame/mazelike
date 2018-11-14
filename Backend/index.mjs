@@ -123,4 +123,20 @@ const start = async() => {
   });
 };
 
+// Warn users if the forgot password feature is disabled
+if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.MAILER_SERVICE_PROVIDER) {
+  let vars = ["MAILER_EMAIL_ID", "MAILER_PASSWORD", "MAILER_SERVICE_PROVIDER"];
+
+  vars = vars.filter((varName) => {
+    return !process.env[varName];
+  });
+  
+  let s = vars.length > 1 ? "s were" : " was";
+  vars = vars.join(", ");
+
+  process.stdout.write(
+    `Warning: the forgot password feature has been disabled because the ${vars} environment variable${s} not defined\n`
+  );
+}
+
 start();
