@@ -22,11 +22,7 @@ export default class Player extends PlayerCommon {
     this.sprite.width = PlayerCommon.SPRITE_SIZE;
     this.sprite.height = PlayerCommon.SPRITE_SIZE;
     this.floor.playerSprites.addChild(this.sprite);
-
-    this.redtint = new PIXI.Sprite(PIXI.Texture.WHITE);
-    this.redtint.tint = 0xff0000;
-    this.redtint.width = PlayerCommon.SPRITE_SIZE;
-    this.redtint.height = PlayerCommon.SPRITE_SIZE;
+    this.regularTint = this.sprite.tint;
   }
 
   /**
@@ -38,7 +34,10 @@ export default class Player extends PlayerCommon {
     // let now = Date.now();
     this.sprite.position.set(this.x - viewX, this.y - viewY);
     if(this.tinted !== -1) {
-      if(new Date().getTime() - this.tinted > 250) {
+      if(this.sprite.tint === this.regularTint) {
+        this.tint();
+      }
+      if(new Date().getTime() - this.tinted > 100) {
         this.tinted = -1;
         this.untint();
       }
@@ -64,24 +63,34 @@ export default class Player extends PlayerCommon {
     this.alive = false;
   }
 
+  /**
+   * Tints player's sprite red.
+   */
   tint() {
-    this.floor.playerSprites.addChild(this.redtint);
-    this.redtint.position.set(this.x, this.y);
-    console.log("tint");
+    this.tinted = new Date().getTime();
+    this.sprite.tint = 0xFF0000;
   }
 
+  /**
+   * Untints player's sprite.
+   */
   untint() {
-    this.floor.playerSprites.removeChild(this.redtint);
-    console.log("untint");
+    this.sprite.tint = this.regularTint;
+    this.tinted = -1;
   }
 
   handleState(state) {
     let oldName = this.spriteName;
+    let oldHP = this.hp;
+
     Object.assign(this, state);
 
     // update the sprite
     if(oldName !== this.spriteName) {
       this.sprite.texture = PIXI.loader.resources.demon.textures[this.spriteName];
+    }
+    if(oldHP !== this.hp) {
+      this.tinted = new Date().getTime();
     }
   }
 
