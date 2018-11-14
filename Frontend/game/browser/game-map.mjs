@@ -46,12 +46,13 @@ class GameMapRenderer {
     }
 
     // check that a rect is inside the box even partially
-    let inBounds = () => {
-      // return ((xMin <= rect.x && rect.x <= xMax) ||
-      //   (xMin <= rect.x + rect.width && rect.x + rect.width <= xMax)) &&
-      //   ((yMin <= rect.y && rect.y <= yMax) ||
-      //   (yMin <= rect.y + rect.height && rect.y + rect.height <= yMax));
-      return true;
+    let inBounds = (rect) => {
+      return ((xMin <= rect.x && rect.x <= xMax) ||
+        (xMin <= rect.x + rect.width && rect.x + rect.width <= xMax) ||
+        (xMin > rect.x && rect.x + rect.width > xMax)) &&
+        ((yMin <= rect.y && rect.y <= yMax) ||
+        (yMin <= rect.y + rect.height && rect.y + rect.height <= yMax) ||
+        (yMin > rect.y && rect.y + rect.height > yMax));
     };
 
     // process a single room/corridor
