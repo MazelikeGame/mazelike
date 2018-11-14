@@ -224,17 +224,6 @@ export default class MonsterCommon {
   }
 
   /** 
-   * Player attacks Monster
-   * @param {*} hp health points that the monster's health decrements by
-   */
-  beAttacked(hp) {
-    this.hp -= hp;
-    if(this.hp <= 0) {
-      this.die();
-    }    
-  }
-
-  /** 
    * Places monster in a random "room" with no other monsters.
    */
   placeInRandomRoom() {

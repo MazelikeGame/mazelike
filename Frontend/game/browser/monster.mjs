@@ -54,6 +54,17 @@ export default class Monster extends MonsterCommon {
   remove() {
     this.floor.monsterSprites.removeChild(this.sprite);
   }
+
+  /** 
+   * Player attacks Monster
+   * @param {*} hp health points that the monster's health decrements by
+   */
+  beAttacked(hp) {
+    this.hp -= hp;
+    if(this.hp <= 0) {
+      this.die();
+    }    
+  }
   
   /**
    * ~WIP drop items down the road
