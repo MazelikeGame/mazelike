@@ -88,8 +88,8 @@ let exec = (command, ...args) => {
     process.env.NODE_ENV = "production";
   }
 
-  if(!process.env.DB_HOST && !process.env.DB_STORAGE) {
-    process.env.DB_STORAGE = "/data/mazelike.sqlite";
+  if(!process.env.DB) {
+    process.env.DB = "sqlite:///data/mazelike.sqlite";
   }
 
   if(!process.env.PUBLIC_DIR) {

@@ -8,11 +8,6 @@ let conf = {
   logging: process.env.DB_DEBUG !== "no" ? console.log : false
 };
 
-// default to sqlite
-if(!process.env.DB) {
-  process.env.DB = "sqlite:///data/mazelike.sqlite";
-}
-
 let dbUrl;
 
 try {
