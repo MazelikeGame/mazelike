@@ -2,6 +2,7 @@ import socketIO from "socket.io";
 import http from "http";
 import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
+import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth.mjs";
 
 // then interval at which we update the game state (if this is too short the server will break)
@@ -42,19 +43,9 @@ async function main() {
   initAuth(io);
 
   io.on("connection", (sock) => {
-    sock.on('player-movement', (x, y, vx, vy, username) => {
-      floor.players.forEach((player) => {
-        if(player.name === username) {
-          player.x = x;
-          player.y = y;
-          player.vx = vx;
-          player.vy = vy;
-        }
-      });
-    });
-
     sock.emit("set-username", sock.user.username);
     saveHandler(sock, floor);
+    movementHandler(sock, floor, io);
   });
 
   // In the future we should wait for all players to join here
