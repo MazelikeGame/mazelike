@@ -40,6 +40,10 @@ addEventListener("contextmenu", (e) => {
 const addArrowKeyListener = (floor, controls, username, sock) => {
   let handleKey = (e) => {
     let player = getPlayer(floor, username);
+    // player probably died
+    if(!player) {
+      return;
+    }
     player.keyPress(e);
 
     sock.emit('player-movement', player.x, player.y, username);
