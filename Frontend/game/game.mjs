@@ -131,7 +131,7 @@ async function setup() {
       }
     }, 500);
   }
-  
+
   sock.on("disconnect", () => {
     new DisconnectMessage("Disconnected!");
     app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());

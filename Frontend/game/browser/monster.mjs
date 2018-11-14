@@ -19,6 +19,7 @@ export default class Monster extends MonsterCommon {
     this.sprite.width = MonsterCommon.SPRITE_SIZE;
     this.sprite.height = MonsterCommon.SPRITE_SIZE;
     this.floor.monsterSprites.addChild(this.sprite);
+    this.regularTint = this.sprite.tint;
   }
 
   /**
@@ -31,18 +32,32 @@ export default class Monster extends MonsterCommon {
     this.move(this._lastMove - now);
     this._lastMove = now;
     this.sprite.position.set(this.x - viewX, this.y - viewY);
+    if(this.tinted !== -1) {
+      if(this.sprite.tint === this.regularTint) {
+        this.tint();
+      }
+      if(new Date().getTime() - this.tinted > 100) {
+        this.tinted = -1;
+        this.untint();
+      }
+    }
   }
 
   /**
    * Handle state updates from the server
    */
   handleState(state) {
+    let oldHP = this.hp;
     let oldName = this.name;
+
     Object.assign(this, state);
 
     // update the sprite
     if(oldName !== this.name) {
       this.sprite.texture = PIXI.loader.resources.demon.textures[this.name];
+    }
+    if(oldHP !== this.hp) {
+      this.tinted = new Date().getTime();
     }
   }
 
@@ -64,5 +79,21 @@ export default class Monster extends MonsterCommon {
     this.x = -1; // (-1, -1) coordinate tells us that the monster is dead
     this.y = -1;
     this.alive = false;
+  }
+
+  /**
+   * Tints player's sprite red. TODO need to test once players can attack.
+   */
+  tint() {
+    this.tinted = new Date().getTime();
+    this.sprite.tint = 0xFF0000;
+  }
+
+  /**
+   * Untints player's sprite.
+   */
+  untint() {
+    this.sprite.tint = this.regularTint;
+    this.tinted = -1;
   }
 }
