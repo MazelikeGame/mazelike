@@ -135,15 +135,4 @@ export default class Monster extends MonsterCommon {
     // add to the list of monsters for save to delete
     deadMonsterIds.push(`${this.floor.id}-${this.id}`);
   }
-
-  /** 
-   * Player attacks Monster
-   * @param {*} hp health points that the monster's health decrements by
-   */
-  beAttacked(hp) {
-    this.hp -= hp;
-    if(this.hp <= 0) {
-      this.die();
-    }    
-  }
 }
