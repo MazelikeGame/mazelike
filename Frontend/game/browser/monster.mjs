@@ -16,8 +16,8 @@ export default class Monster extends MonsterCommon {
   createSprite() {
     this.sprite = new PIXI.Sprite(PIXI.loader.resources.demon.textures[this.name]);
     this.sprite.position.set(this.x, this.y);
-    this.sprite.width = MonsterCommon.SPRITE_SIZE;
-    this.sprite.height = MonsterCommon.SPRITE_SIZE;
+    this.sprite.width = MonsterCommon.SPRITE_SIZE * this.size;
+    this.sprite.height = MonsterCommon.SPRITE_SIZE * this.size;
     this.floor.monsterSprites.addChild(this.sprite);
     this.regularTint = this.sprite.tint;
   }
