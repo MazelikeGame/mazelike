@@ -89,6 +89,11 @@ async function triggerTick(floor, io, lastUpdate) {
   // save and quit if we loose all the clients
   if(io.engine.clientsCount === 0) {
     await floor.save();
+
+    if(process.env.CLUSTER_MANAGER === "single") {
+      return;
+    }
+
     process.exit(0);
   }
 
