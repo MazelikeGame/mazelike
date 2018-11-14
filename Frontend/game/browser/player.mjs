@@ -75,4 +75,14 @@ export default class Player extends PlayerCommon {
     console.log("untint");
   }
 
+  handleState(state) {
+    let oldName = this.spriteName;
+    Object.assign(this, state);
+
+    // update the sprite
+    if(oldName !== this.spriteName) {
+      this.sprite.texture = PIXI.loader.resources.demon.textures[this.spriteName];
+    }
+  }
+
 }

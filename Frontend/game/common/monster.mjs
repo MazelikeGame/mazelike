@@ -174,24 +174,27 @@ export default class MonsterCommon {
         this.y += Math.min(yMove, yDist) * (this.targety < this.y ? -1 : 1);
       }
     }
-    let collisionMonster = this.collisionEntities(this.floor.monsters, MonsterCommon.SPRITE_SIZE);
-    let collisionPlayer = this.collisionEntities(this.floor.players, PlayerCommon.SPRITE_SIZE);
-    if(collisionMonster !== -1 || collisionPlayer !== -1) { // todo
-      if(collisionPlayer !== -1)
-        console.log("collision " + this.name); // todo delete TESTING
-      this.targetx = prevx;
-      this.targety = prevy;
-      this.x = prevx;
-      this.y = prevy;
-      this.collision = true;
-      let currentTime = new Date().getTime();
-      if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
-        this.lastAttackTime = currentTime;
-        this.attack(collisionPlayer);
-        console.log("booped player");
+    // Disable collision detection on the client
+    if(typeof window === "undefined") {
+      let collisionMonster = this.collisionEntities(this.floor.monsters, MonsterCommon.SPRITE_SIZE);
+      let collisionPlayer = this.collisionEntities(this.floor.players, PlayerCommon.SPRITE_SIZE);
+      if(collisionMonster !== -1 || collisionPlayer !== -1) { // todo
+        if(collisionPlayer !== -1)
+          console.log("collision " + this.name); // todo delete TESTING
+        this.targetx = prevx;
+        this.targety = prevy;
+        this.x = prevx;
+        this.y = prevy;
+        this.collision = true;
+        let currentTime = new Date().getTime();
+        if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
+          this.lastAttackTime = currentTime;
+          this.attack(collisionPlayer);
+          console.log("booped player");
+        }
+      } else {
+        this.collision = false;
       }
-    } else {
-      this.collision = false;
     }
   }
 
