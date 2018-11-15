@@ -219,14 +219,6 @@ export default class MonsterCommon {
   }
 
   /** 
-   * Monster attacks PC
-   * @param {*} playerID id for player that monster is attacking
-   */
-  attack(playerID) {
-    this.floor.players[playerID].beAttacked(this.damage);
-  }
-
-  /** 
    * Player attacks Monster
    * @param {*} hp health points that the monster's health decrements by
    */
@@ -235,6 +227,14 @@ export default class MonsterCommon {
     if(this.hp <= 0) {
       this.die();
     }    
+  }
+
+  /** 
+   * Monster attacks PC
+   * @param {*} playerID id for player that monster is attacking
+   */
+  attack(playerID) {
+    this.floor.players[playerID].beAttacked(this.damage);
   }
 
   /** 
