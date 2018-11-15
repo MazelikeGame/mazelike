@@ -22,6 +22,7 @@ export default class PlayerCommon {
     this.floor = floor;
     this.damage = 10;
     this.speed = 15;
+    this.input = [];
   }
 
   /**
@@ -59,13 +60,9 @@ export default class PlayerCommon {
   /**
    * Update the player's velocity from key input.
    * @param {event} e - User's keyboard input,
-   * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
-  keyPress(e) { // eslint-disable-line complexity
-    let oldPosition = {
-      x: this.x,
-      y: this.y
-    };
+  handleKeyPress(e) { // eslint-disable-line complexity
+    this.input[e.keyCode] = e.type === 'keydown';
     let keys = {
       upArrow: 38,
       w: 87,
@@ -76,38 +73,32 @@ export default class PlayerCommon {
       leftArrow: 37,
       a: 65
     };
-    switch(e.keyCode) {
-    case keys.upArrow:
-    case keys.w:
-      this.y -= this.speed;
-      break;
-    case keys.downArrow:
-    case keys.s:
-      this.y += this.speed;
-      break;
-    case keys.leftArrow:
-    case keys.a:
-      this.x -= this.speed;
-      break;
-    case keys.rightArrow:
-    case keys.d:
-      this.x += this.speed;
-      break;
-    default:
-      break;
-    }
-    if(!this.spriteIsOnMap()) {
-      this.setCoordinates(oldPosition.x, oldPosition.y);
+    if(this.input) {
+      if(this.input[keys.leftArrow] || this.input[keys.a]) {
+        this.vx = -this.speed;
+      }
+      if(this.input[keys.rightArrow] || this.input[keys.d]) {
+        this.vx = this.speed;
+      }
+      if(this.input[keys.upArrow] || this.input[keys.w]) {
+        this.vy = -this.speed;
+      }
+      if(this.input[keys.downArrow] || this.input[keys.s]) {
+        this.vy = this.speed;
+      }
     }
   }
 
   /**
-   * Modify player's velocity on key release
-   * @param {String} The name of the key released
+   * Update the player's position based off the player's velocity
    */
-  keyRelease() {
-    this.vx = 0;
-    this.vy = 0;
+  move() {
+    let oldPosition = this.getPosition();
+    this.x += this.vx;
+    this.y += this.vy;
+    if(!this.spriteIsOnMap()) {
+      this.setCoordinates(oldPosition.x, oldPosition.y);
+    }
   }
 
   /**

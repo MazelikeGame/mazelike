@@ -38,16 +38,16 @@ addEventListener("contextmenu", (e) => {
 
 // This should be removed once player controls the viewport
 const addArrowKeyListener = (floor, controls, username, sock) => {
+
   let handleKey = (e) => {
     let player = getPlayer(floor, username);
-    player.keyPress(e);
-
-    sock.emit('player-movement', player.x, player.y, username);
+    player.handleKeyPress(e);
+    sock.emit('player-movement', player.x, player.y, player.vx, player.vy, username);
     floor.setViewport(player.x, player.y);
   };
-
   controls.bind(handleKey);
   window.addEventListener("keydown", handleKey);
+  window.addEventListener('keyup', handleKey);
 };
 
 function getUsername(sock) {
