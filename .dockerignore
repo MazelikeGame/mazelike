@@ -17,3 +17,4 @@ tests
 .gitlab-ci.yml
 .vscode
 .babelrc
+scripts/build
