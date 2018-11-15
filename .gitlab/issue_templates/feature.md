@@ -1,5 +1,5 @@
 # Changes
  * [ ] Major|Minor|Patch version
 
-/label ~feature
+/label ~Feature
 /milestone %"Demo 4"

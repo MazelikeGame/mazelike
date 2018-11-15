@@ -7,5 +7,5 @@
 # Changes
  * [ ] Major|Minor|Patch version
 
-/label ~bug
+/label ~Bug
 /milestone %"Demo 4"
