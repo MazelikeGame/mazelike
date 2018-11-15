@@ -78,6 +78,16 @@ export default class Floor extends FloorCommon {
     }
     for(let player of this.players) {
       player.move();
+      if(player._frames.length) {
+        player._confirmedId = player._frames[player._frames.length - 1].id;
+      }
+      player._confirmedX = player.x;
+      player._confirmedY = player.y;
+      player.dropConfirmed();
+      
+      if(player._frames.length > 0) {
+        console.log("Bad");
+      }
     }
   }
 

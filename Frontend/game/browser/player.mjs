@@ -11,6 +11,7 @@ export default class Player extends PlayerCommon {
     super(...args);
     this._lastMove = Date.now();
     this.tinted = -1;
+    this._lastFrame = undefined;
   }
 
   /**
@@ -30,8 +31,10 @@ export default class Player extends PlayerCommon {
    * @param {int} viewX,
    * @param {int} viewY
    */
-  update(viewX, viewY) {
-    // let now = Date.now();
+  update(viewX, viewY) {    
+    this.sendFrame();
+    this.dropConfirmed();
+    this.move();
     this.sprite.position.set(this.x - viewX, this.y - viewY);
     if(this.tinted !== -1) {
       if(this.sprite.tint === this.regularTint) {
@@ -83,6 +86,7 @@ export default class Player extends PlayerCommon {
     let oldName = this.spriteName;
     let oldHP = this.hp;
 
+    delete state._lastFrame;
     Object.assign(this, state);
 
     // update the sprite

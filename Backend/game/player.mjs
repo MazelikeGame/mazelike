@@ -14,8 +14,8 @@ export default class Player extends PlayerCommon {
   constructor(...args) {
     super(...args);
     let spawn = this.floor.map.getSpawnPoint();
-    this.x = spawn.x;
-    this.y = spawn.y;
+    this._confirmedX = spawn.x;
+    this._confirmedY = spawn.y;
   }
 
   /**
@@ -102,10 +102,12 @@ export default class Player extends PlayerCommon {
       hp: this.hp,
       x: this.x,
       y: this.y,
-      vx: this.vx,
-      vy: this.vy,
       spriteName: this.spriteName,
-      alive: this.alive
+      alive: this.alive,
+      _confirmedId: this._confirmedId,
+      _lastFrame: this._lastFrame,
+      _confirmedX: this._confirmedX,
+      _confirmedY: this._confirmedY
     };
   }
 

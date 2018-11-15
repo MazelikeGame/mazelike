@@ -111,18 +111,18 @@ export default class Floor extends FloorCommon {
    * Render/update the game
    */
   update() {
-    this._mapRenderer.update(
-      this._viewportX,
-      this._viewportY,
-      this._viewportX + innerWidth,
-      this._viewportY + innerHeight
-    );
     for(let i = 0; i < this.monsters.length; i++) {
       this.monsters[i].update(this._viewportX, this._viewportY);
     }
     for(let i = 0; i < this.players.length; ++i) {
       this.players[i].update(this._viewportX, this._viewportY);
     }
+    this._mapRenderer.update(
+      this._viewportX,
+      this._viewportY,
+      this._viewportX + innerWidth,
+      this._viewportY + innerHeight
+    );
   }
 
   /**
@@ -166,6 +166,7 @@ export default class Floor extends FloorCommon {
       let player = new Player(raw.username, raw.hp, raw.spriteName, this);
       player.handleState(raw);
       player.createSprite();
+      player._lastFrameSent = raw._lastFrame;
       
       if(raw.username === username) {
         this.setViewport(player.x, player.y);

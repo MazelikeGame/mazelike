@@ -37,17 +37,15 @@ addEventListener("contextmenu", (e) => {
 });
 
 // This should be removed once player controls the viewport
-const addArrowKeyListener = (floor, controls, username, sock) => {
-
-  let handleKey = (e) => {
+const addArrowKeyListener = (floor, controls, username) => {
+  let handleKey = (type, e) => {
     let player = getPlayer(floor, username);
-    player.handleKeyPress(e);
-    sock.emit('player-movement', player.x, player.y, player.vx, player.vy, username);
-    floor.setViewport(player.x, player.y);
+    player.handleKeyPress(type, e);
   };
-  controls.bind(handleKey);
-  window.addEventListener("keydown", handleKey);
-  window.addEventListener('keyup', handleKey);
+
+  controls.bind(handleKey.bind(null, "down"), handleKey.bind(null, "up"));
+  window.addEventListener("keydown", handleKey.bind(null, "down"));
+  window.addEventListener('keyup', handleKey.bind(null, "up"));
 };
 
 function getUsername(sock) {
@@ -103,7 +101,7 @@ async function setup() {
   app.stage.addChild(controls.sprite);
 
   window.ml.floor = floor;
-  addArrowKeyListener(floor, controls, username, sock);
+  addArrowKeyListener(floor, controls, username);
 
   sock.on("state", (state) => {
     floor.handleState(state, username);
@@ -138,6 +136,11 @@ async function setup() {
   });
 
   app.ticker.add(() => {
+    let player = getPlayer(floor, username);
+    if(player) {
+      floor.setViewport(player.x, player.y);
+    }
+
     floor.update();
     controls.update();
 

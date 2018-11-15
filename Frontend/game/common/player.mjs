@@ -1,4 +1,24 @@
 /** @module PlayerCommon */
+
+const KEYS = {
+  upArrow: 38,
+  w: 87,
+  rightArrow: 39,
+  d: 68,
+  downArrow: 40,
+  s: 83,
+  leftArrow: 37,
+  a: 65
+};
+
+// map w to up, d to right, etc
+const MAPPINGS = {
+  [KEYS.w]: KEYS.upArrow,
+  [KEYS.d]: KEYS.rightArrow,
+  [KEYS.s]: KEYS.downArrow,
+  [KEYS.a]: KEYS.leftArrow
+};
+
 /**
  * The player class.
  */
@@ -22,7 +42,10 @@ export default class PlayerCommon {
     this.floor = floor;
     this.damage = 10;
     this.speed = 15;
-    this.input = [];
+    this.input = new Set();
+    this._nextId = 0;
+    this._lastFrame = Date.now();
+    this._frames = [];
   }
 
   /**
@@ -59,33 +82,53 @@ export default class PlayerCommon {
 
   /**
    * Update the player's velocity from key input.
+   * @param {string} type - Either down or up
    * @param {event} e - User's keyboard input,
    */
-  handleKeyPress(e) { // eslint-disable-line complexity
-    this.input[e.keyCode] = e.type === 'keydown';
-    let keys = {
-      upArrow: 38,
-      w: 87,
-      rightArrow: 39,
-      d: 68,
-      downArrow: 40,
-      s: 83,
-      leftArrow: 37,
-      a: 65
+  handleKeyPress(type, e) { // eslint-disable-line complexity
+    let code = MAPPINGS[e.keyCode] || e.keyCode;
+
+    if(type === "down") {
+      this.input.add(code);
+    } else {
+      this.input.delete(code);
+    }
+
+    // change in x and y
+    this.vx = 0;
+    this.vy = 0;
+
+    if(this.input.has(KEYS.upArrow)) {
+      this.vy -= 1;
+    }
+    if(this.input.has(KEYS.downArrow)) {
+      this.vy += 1;
+    }
+    if(this.input.has(KEYS.rightArrow)) {
+      this.vx += 1;
+    }
+    if(this.input.has(KEYS.leftArrow)) {
+      this.vx -= 1;
+    }
+  }
+
+  /**
+   * Send an input frame to the server
+   */
+  sendFrame() {
+    let now = Date.now();
+    let frame = {
+      id: ++this._nextId,
+      start: this._lastFrameSent,
+      end: now,
+      vx: this.vx,
+      vy: this.vy
     };
-    if(this.input) {
-      if(this.input[keys.leftArrow] || this.input[keys.a]) {
-        this.vx = -this.speed;
-      }
-      if(this.input[keys.rightArrow] || this.input[keys.d]) {
-        this.vx = this.speed;
-      }
-      if(this.input[keys.upArrow] || this.input[keys.w]) {
-        this.vy = -this.speed;
-      }
-      if(this.input[keys.downArrow] || this.input[keys.s]) {
-        this.vy = this.speed;
-      }
+
+    this._lastFrameSent = now;
+    if(this.vx || this.vy) {
+      this._frames.push(frame);
+      this.floor.sock.emit("player-frame", frame);
     }
   }
 
@@ -93,11 +136,45 @@ export default class PlayerCommon {
    * Update the player's position based off the player's velocity
    */
   move() {
-    let oldPosition = this.getPosition();
-    this.x += this.vx;
-    this.y += this.vy;
-    if(!this.spriteIsOnMap()) {
-      this.setCoordinates(oldPosition.x, oldPosition.y);
+    this.x = this._confirmedX;
+    this.y = this._confirmedY;
+
+    /* eslint-disable complexity */
+    this._frames.forEach((frame) => {
+      // Ensure vx and vy are -1, 0, or 1
+      if(frame.vx !== 0) {
+        frame.vx = frame.vx < 0 ? -1 : 1;
+      }
+      if(frame.vy !== 0) {
+        frame.vy = frame.vy < 0 ? -1 : 1;
+      }
+
+      // Ensure frame times make sense
+      if(frame.start < this._lastFrame) {
+        frame.start = this._lastFrame;
+      }
+      if(typeof window === "undefined") {
+        let now = Date.now();
+        if(frame.end > now) {
+          frame.end = now;
+        }
+      }
+      this._lastFrame = frame.end;
+
+      // move the player
+      let duration = frame.end - frame.start;
+      this.x += frame.vx * duration;
+      this.y += frame.vy * duration;
+    });
+    /* eslint-enable complexity */
+  }
+
+  /**
+   * Drop all confirmed frames
+   */
+  dropConfirmed() {
+    while(this._frames.length && this._frames[0].id <= this._confirmedId) {
+      this._frames.shift();
     }
   }
 
