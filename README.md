@@ -21,8 +21,7 @@ Run `npm run doc`
 ## Manual deploy/rollback
 
 1. Ssh into the server
-2. Put the version you want in /etc/mazelike/VERSION
-3. Restart the server with `sudo systemctl restart mazelike`
+2. Run `deploy VERSION_YOU_WANT`
 
 Also to you can run `deploy latest` to redeploy the latest version of the server.
 
