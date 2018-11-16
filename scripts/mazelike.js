@@ -43,7 +43,7 @@ let exec = (command, ...args) => {
 
   // Run a game server
   if(process.argv[2] == "game") {
-    await exec("node --experimental-modules Backend/game.mjs");
+    await exec("node", "--experimental-modules", "Backend/game.mjs");
     process.exit(0);
   }
 
