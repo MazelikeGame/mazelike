@@ -1,25 +1,18 @@
 /* eslint-disable complexity */
 import dockerApi from "node-docker-api";
+import fs from "fs";
 
 const ENV_NAMES = [
-  "DB_HOST",
-  "DB_PORT",
-  "DB_USER",
-  "DB_PASS",
-  "DB_DATABASE",
+  "DB",
   "NODE_ENV"
 ];
 
-if(process.env.DB_STORAGE) {
-  ENV_NAMES.push("DB_STORAGE");
-}
-
-const IMAGE_NAME = process.env.IMAGE_NAME || "mazelike/backend:devel";
+const VERSION = fs.readFileSync("VERSION", "utf8").trim();
+const IMAGE_NAME = process.env.IMAGE_NAME || `ryan3r/mazelike:${VERSION}`;
 const ADDRESS = process.env.EXTERN_ADDRESS;
 const STARTING_PORT = +process.env.STARTING_PORT || 5900;
 const ENDING_PORT = +process.env.ENDING_PORT || 5999;
-const PREFIX = process.env.CONTAINER_PREFIX || "";
-const PUBLIC_DIR = process.env.PUBLIC_DIR;
+const PUBLIC_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
 let docker = new dockerApi.Docker({ socketPath: "/var/run/docker.sock" });
 let inUsePorts = new Set();
@@ -37,17 +30,18 @@ export async function spawnGame(gameEnv = {}) {
     envArray.push(`${envName}=${process.env[envName]}`);
   }
 
-  let hostname = `mazelike-${PREFIX}${gameEnv.gameId}`;
+  let hostname = `mazelike-${gameEnv.gameId}`;
   let port = pickPort();
 
   inUsePorts.add(port);
   portMap.set(gameEnv.gameId, port);
+  envArray.push(`MAZELIKE_port=${port}`);
 
   let container = await docker.container.create({
     name: hostname,
     Hostname: hostname,
     Image: IMAGE_NAME,
-    Cmd: ["node", "--experimental-modules", "Backend/game.mjs", `${port}`],
+    Cmd: ["node", "--experimental-modules", "Backend/game.mjs"],
     Env: envArray,
     ExposedPorts: {
       [`${port}/tcp`]: {}
@@ -59,11 +53,11 @@ export async function spawnGame(gameEnv = {}) {
         }]
       },
       Binds: [
-        `${PUBLIC_DIR}:/app/Frontend/public`
+        `${PUBLIC_DIR}:/data`
       ]
     },
     Labels: {
-      "edu.iastate.ryanr": `mazelike-${PREFIX}`
+      "edu.iastate.ryanr": `mazelike`
     }
   });
 
@@ -106,7 +100,8 @@ async function startContainer(container, gameId, gameEnv) {
     await container.start();
   } catch(err) {
     // check if the port is already being used
-    if(err.message.indexOf("address already in use") !== -1) {
+    if(err.message.indexOf("address already in use") !== -1 ||
+        err.message.indexOf("port is already allocated") !== -1) {
       portMap.delete(gameId);
       await container.delete();
 

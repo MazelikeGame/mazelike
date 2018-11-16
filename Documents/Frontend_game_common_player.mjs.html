@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Frontend/game/common/floor.mjs</title>
+    <title>JSDoc: Source: Frontend/game/common/player.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Frontend/game/common/floor.mjs</h1>
+    <h1 class="page-title">Source: Frontend/game/common/player.mjs</h1>
 
     
 
@@ -26,28 +26,160 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @module common/Floor */
-import "./game-map/game-map-renderers.mjs";
-
+            <pre class="prettyprint source linenums"><code>/** @module PlayerCommon */
 /**
- * The game map, monsters, players and items for this floor
+ * The player class.
  */
-class Floor {
-  /**
-   * @private
-   * @param gameId The game id for the current game
-   * @param floorIdx The index of this floor
-   */
-  constructor(gameId, floorIdx) {
-    this.id = `${gameId}-${floorIdx}`;
-    // below: ratio of Monsters to Rooms. ex: 0.4 puts monsters in a fourth of the rooms.
-    this.monsterRatio = 0.4;
-    // Initialize players, monsters and the game map in loadBrowser, loadNode,  and generate methods
-  }
-  
-}
+export default class PlayerCommon {
 
-export default Floor;
+  /**
+   * @param {string} name - The name of the player. Should be the same as user.username
+   * @param {int} hp - The player's hitpoints
+   * @param {string} spriteName - The name of the sprite for this player.
+   * @param {floor} floor - The floor this player is on.
+   */
+  constructor(name, hp, spriteName, floor) {
+    this.name = name;
+    this.hp = hp;
+    this.alive = true;
+    this.x = 0;
+    this.y = 0;
+    this.vx = 0;
+    this.vy = 0;
+    this.spriteName = spriteName;
+    this.floor = floor;
+    this.damage = 10;
+    this.speed = 15;
+  }
+
+  /**
+   * Get the position of the player.
+   * @return {object}
+   */
+  getPosition() {
+    return { x: this.x, y: this.y };
+  }
+
+  /**
+   * Get the name of the player
+   * @return {String} Name of this player.
+   */
+  getName() {
+    return this.name;
+  }
+
+  /**
+   * Get the hp of this player
+   * @return {int} This player's hp.
+   */
+  getHp() {
+    return this.hp;
+  }
+
+  /**
+   * Get the velocity of the player
+   * @return {object} { vx: int, vy: int }
+   */
+  getVelocity() {
+    return { vx: this.vx, vy: this.vy };
+  }
+
+  /**
+   * Update the player's velocity from key input.
+   * @param {event} e - User's keyboard input,
+   * @param {int} speed - Desired speed of the player(should switch to this.speed)
+   */
+  keyPress(e) { // eslint-disable-line complexity
+    let oldPosition = {
+      x: this.x,
+      y: this.y
+    };
+    let keys = {
+      upArrow: 38,
+      w: 87,
+      rightArrow: 39,
+      d: 68,
+      downArrow: 40,
+      s: 83,
+      leftArrow: 37,
+      a: 65
+    };
+    switch(e.keyCode) {
+    case keys.upArrow:
+    case keys.w:
+      this.y -= this.speed;
+      break;
+    case keys.downArrow:
+    case keys.s:
+      this.y += this.speed;
+      break;
+    case keys.leftArrow:
+    case keys.a:
+      this.x -= this.speed;
+      break;
+    case keys.rightArrow:
+    case keys.d:
+      this.x += this.speed;
+      break;
+    default:
+      break;
+    }
+    if(!this.spriteIsOnMap()) {
+      this.setCoordinates(oldPosition.x, oldPosition.y);
+    }
+  }
+
+  /**
+   * Modify player's velocity on key release
+   * @param {String} The name of the key released
+   */
+  keyRelease() {
+    this.vx = 0;
+    this.vy = 0;
+  }
+
+  /**
+   * Checks to see if whole sprite is on the map. (Same as monster class)
+   * @returns {boolean}
+   */
+  spriteIsOnMap() {
+    return this.floor.map.isOnMap(this.x, this.y) &amp;&amp;
+      this.floor.map.isOnMap(this.x + PlayerCommon.SPRITE_SIZE, this.y) &amp;&amp;
+      this.floor.map.isOnMap(this.x, this.y + PlayerCommon.SPRITE_SIZE) &amp;&amp;
+      this.floor.map.isOnMap(this.x + PlayerCommon.SPRITE_SIZE, this.y + PlayerCommon.SPRITE_SIZE);
+  }
+
+  /**
+   * Set coordinates for this player
+   * @param {int} x - new x-coordinate,
+   * @param {int} y - new y-coordinate
+   */
+  setCoordinates(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  /** 
+   * Monster attacks player
+   * @param {*} hp health points that the player's health decrements by
+   */
+  beAttacked(hp) {
+    this.hp -= hp;
+    if(this.hp &lt;= 0) {
+      this.die();
+    }
+  }
+
+  /** 
+   * Player attacks monster
+   * @param {*} monsterID id for player that monster is attacking
+   */
+  attack(monsterID) {
+    this.floor.monsters[monsterID].beAttacked(this.damage);
+  }
+
+}
+PlayerCommon.SPRITE_SIZE = 48;
 </code></pre>
         </article>
     </section>

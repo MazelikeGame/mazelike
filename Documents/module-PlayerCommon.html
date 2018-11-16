@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: browser/Floor</title>
+    <title>JSDoc: Class: module:PlayerCommon</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: browser/Floor</h1>
+    <h1 class="page-title">Class: module:PlayerCommon</h1>
 
     
 
@@ -28,6 +28,9 @@
 
 <header>
     
+        <h2><span class="attribs"><span class="type-signature"></span></span>module:PlayerCommon<span class="signature">(name, hp, spriteName, floor)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">The player class.</div>
         
     
 </header>
@@ -37,7 +40,205 @@
     
         
 
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="module:PlayerCommon"><span class="type-signature"></span>new module:PlayerCommon<span class="signature">(name, hp, spriteName, floor)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
         
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the player. Should be the same as user.username</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>hp</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The player's hitpoints</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>spriteName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of the sprite for this player.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>floor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">floor</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The floor this player is on.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line5">line 5</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     </div>
 
@@ -64,7 +265,7 @@
     
 
     
-    <h4 class="name" id=".generate"><span class="type-signature">(static) </span>generate<span class="signature">(gameId, floorIdx, opts)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="attack"><span class="type-signature"></span>attack<span class="signature">(monsterID)</span><span class="type-signature"></span></h4>
     
 
     
@@ -72,7 +273,7 @@
 
 
 <div class="description">
-    Generate a new floor (runs on the server and the browser)
+    Player attacks monster
 </div>
 
 
@@ -108,49 +309,13 @@
 
         <tr>
             
-                <td class="name"><code>gameId</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The game id for the game we want to generate</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>floorIdx</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The index of floor we want to generate</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>opts</code></td>
+                <td class="name"><code>monsterID</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">*</span>
 
 
             
@@ -160,7 +325,7 @@
 
             
 
-            <td class="description last">The options of the specific generators</td>
+            <td class="description last">id for player that monster is attacking</td>
         </tr>
 
     
@@ -201,7 +366,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_floor.mjs.html">Frontend/game/browser/floor.mjs</a>, <a href="Frontend_game_browser_floor.mjs.html#line30">line 30</a>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line149">line 149</a>
     </li></ul></dd>
     
 
@@ -235,7 +400,7 @@
     
 
     
-    <h4 class="name" id=".load"><span class="type-signature">(async, static) </span>load<span class="signature">(gameId, floorIdx)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="beAttacked"><span class="type-signature"></span>beAttacked<span class="signature">(hp)</span><span class="type-signature"></span></h4>
     
 
     
@@ -243,7 +408,7 @@
 
 
 <div class="description">
-    Load everything in the browser
+    Monster attacks player
 </div>
 
 
@@ -279,10 +444,15 @@
 
         <tr>
             
-                <td class="name"><code>gameId</code></td>
+                <td class="name"><code>hp</code></td>
             
 
             <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
             
             </td>
 
@@ -290,25 +460,7 @@
 
             
 
-            <td class="description last">The game id for the game we want to load</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>floorIdx</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The index of floor we want to load</td>
+            <td class="description last">health points that the player's health decrements by</td>
         </tr>
 
     
@@ -349,7 +501,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_floor.mjs.html">Frontend/game/browser/floor.mjs</a>, <a href="Frontend_game_browser_floor.mjs.html#line64">line 64</a>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line138">line 138</a>
     </li></ul></dd>
     
 
@@ -383,7 +535,7 @@
     
 
     
-    <h4 class="name" id="_diffState"><span class="type-signature"></span>_diffState<span class="signature">(idRawKey, idKey, current, wanted, create)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getHp"><span class="type-signature"></span>getHp<span class="signature">()</span><span class="type-signature"> &rarr; {int}</span></h4>
     
 
     
@@ -391,234 +543,7 @@
 
 
 <div class="description">
-    Take an array of objects and update it to match another array (keeps objects with matching ids)
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>idRawKey</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The property to use as a key</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>idKey</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The property to use as a key</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>current</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;object></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The current array of objects</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>wanted</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;object></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The array of objects we want</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>create</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A function that creates an instance of a current object                         from an instance of a wanted object</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_floor.mjs.html">Frontend/game/browser/floor.mjs</a>, <a href="Frontend_game_browser_floor.mjs.html#line187">line 187</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="_initRendering"><span class="type-signature"></span>_initRendering<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Do any rendering setup and add all sprites to the stage
+    Get the hp of this player
 </div>
 
 
@@ -662,228 +587,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_floor.mjs.html">Frontend/game/browser/floor.mjs</a>, <a href="Frontend_game_browser_floor.mjs.html#line90">line 90</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="generateMonsters"><span class="type-signature"></span>generateMonsters<span class="signature">(floor)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Puts a monster in half of all "rooms".Occurs twice upon floor generation, shouldnt cause errors though.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>floor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Floor</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The floor to add monsters to</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_floor.mjs.html">Frontend/game/browser/floor.mjs</a>, <a href="Frontend_game_browser_floor.mjs.html#line44">line 44</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getViewport"><span class="type-signature"></span>getViewport<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Get the current viewport
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_floor.mjs.html">Frontend/game/browser/floor.mjs</a>, <a href="Frontend_game_browser_floor.mjs.html#line145">line 145</a>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -910,7 +614,327 @@
 
         
 <div class="param-desc">
-    {x, y}
+    This player's hp.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">int</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getName"><span class="type-signature"></span>getName<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get the name of the player
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line39">line 39</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Name of this player.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getPosition"><span class="type-signature"></span>getPosition<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get the position of the player.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getVelocity"><span class="type-signature"></span>getVelocity<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Get the velocity of the player
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line55">line 55</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    { vx: int, vy: int }
 </div>
 
 
@@ -939,7 +963,7 @@
     
 
     
-    <h4 class="name" id="handleState"><span class="type-signature"></span>handleState<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="keyPress"><span class="type-signature"></span>keyPress<span class="signature">(e, speed)</span><span class="type-signature"></span></h4>
     
 
     
@@ -947,7 +971,7 @@
 
 
 <div class="description">
-    Update our state to match the server's state
+    Update the player's velocity from key input.
 </div>
 
 
@@ -956,6 +980,78 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>e</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">User's keyboard input,</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>speed</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Desired speed of the player(should switch to this.speed)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -991,7 +1087,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_floor.mjs.html">Frontend/game/browser/floor.mjs</a>, <a href="Frontend_game_browser_floor.mjs.html#line158">line 158</a>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line64">line 64</a>
     </li></ul></dd>
     
 
@@ -1025,7 +1121,7 @@
     
 
     
-    <h4 class="name" id="setViewport"><span class="type-signature"></span>setViewport<span class="signature">(x, y)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="keyRelease"><span class="type-signature"></span>keyRelease<span class="signature">(The)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1033,7 +1129,142 @@
 
 
 <div class="description">
-    Set the viewport of the cient (ie the coordiates for the center of their screen)
+    Modify player's velocity on key release
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>The</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">name of the key released</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line108">line 108</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setCoordinates"><span class="type-signature"></span>setCoordinates<span class="signature">(x, y)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Set coordinates for this player
 </div>
 
 
@@ -1075,7 +1306,7 @@
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">int</span>
 
 
             
@@ -1085,7 +1316,7 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last">new x-coordinate,</td>
         </tr>
 
     
@@ -1098,7 +1329,7 @@
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">int</span>
 
 
             
@@ -1108,7 +1339,7 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last">new y-coordinate</td>
         </tr>
 
     
@@ -1149,7 +1380,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_floor.mjs.html">Frontend/game/browser/floor.mjs</a>, <a href="Frontend_game_browser_floor.mjs.html#line133">line 133</a>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line129">line 129</a>
     </li></ul></dd>
     
 
@@ -1183,7 +1414,7 @@
     
 
     
-    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="spriteIsOnMap"><span class="type-signature"></span>spriteIsOnMap<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
 
     
@@ -1191,7 +1422,7 @@
 
 
 <div class="description">
-    Render/update the game
+    Checks to see if whole sprite is on the map. (Same as monster class)
 </div>
 
 
@@ -1235,7 +1466,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_floor.mjs.html">Frontend/game/browser/floor.mjs</a>, <a href="Frontend_game_browser_floor.mjs.html#line113">line 113</a>
+        <a href="Frontend_game_common_player.mjs.html">Frontend/game/common/player.mjs</a>, <a href="Frontend_game_common_player.mjs.html#line117">line 117</a>
     </li></ul></dd>
     
 
@@ -1258,6 +1489,24 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 

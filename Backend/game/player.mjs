@@ -83,6 +83,15 @@ export default class Player extends PlayerCommon {
         let newValues = floor.players.find((playerClass) => {
           return playerClass.name === username;
         });
+
+        if(!newValues) {
+          // player died do something about that here
+          await players[username].update({
+            hp: 0
+          });
+          continue;
+        }
+
         await players[username].update({
           spriteName: newValues.spriteName,
           x: newValues.x,

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Frontend/game/common/floor.mjs</title>
+    <title>JSDoc: Source: Backend/models/player.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Frontend/game/common/floor.mjs</h1>
+    <h1 class="page-title">Source: Backend/models/player.mjs</h1>
 
     
 
@@ -26,28 +26,52 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @module common/Floor */
-import "./game-map/game-map-renderers.mjs";
+            <pre class="prettyprint source linenums"><code>import Sequelize from 'sequelize';
+import sql from '../sequelize';
+import Lobby from './lobby';
+
+let Player = sql.define('players', {
+  spriteName: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  numFloor: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+    allowNull: false
+  },
+  inGame: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: true
+  },
+  x: {
+    type: Sequelize.INTEGER,
+    allowNull: true
+  },
+  y: {
+    type: Sequelize.INTEGER,
+    allowNull: true
+  },
+  hp: {
+    type: Sequelize.INTEGER,
+    defaultValue: 100
+  }
+});
+
+Player.hasOne(Lobby, { foreignKey: 'player', targetKey: 'lobbyId' });
+
+Player.getRandomSprite = () => {
+  let playerSprites = ['player1', 'player2', 'player3', 'player4'];
+  return playerSprites[Math.floor(Math.random() * playerSprites.length)];
+};
 
 /**
- * The game map, monsters, players and items for this floor
+ * The player model. Has one to many relationship with the User model.
+ * Has one to one relationship with the Lobby model.
+ * @param {String} spriteName - Name of the sprite used for this player.
+ * @param {Integer} numFloor - The floorId the player is on.
  */
-class Floor {
-  /**
-   * @private
-   * @param gameId The game id for the current game
-   * @param floorIdx The index of this floor
-   */
-  constructor(gameId, floorIdx) {
-    this.id = `${gameId}-${floorIdx}`;
-    // below: ratio of Monsters to Rooms. ex: 0.4 puts monsters in a fourth of the rooms.
-    this.monsterRatio = 0.4;
-    // Initialize players, monsters and the game map in loadBrowser, loadNode,  and generate methods
-  }
-  
-}
-
-export default Floor;
+export default Player;
 </code></pre>
         </article>
     </section>

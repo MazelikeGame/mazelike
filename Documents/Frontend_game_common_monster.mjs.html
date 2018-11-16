@@ -29,10 +29,14 @@
             <pre class="prettyprint source linenums"><code>/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
 /** @module Monster */
 
+// The maximum amount of ms we want a monster to walk for
+const MAX_WALK_TIME = 1500;
+
+import PlayerCommon from "./player.mjs";
+
 export default class MonsterCommon {
   
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
-    
     this.name = name_in;
     this.hp = hp_in;
     this.damage = damage_in;
@@ -45,14 +49,14 @@ export default class MonsterCommon {
     this.y = 0;
     this.targetx = -1; // location where monster wants to move
     this.targety = -1;
-    this.PCx = -1; // (-1,-1) if not seen yet or previously seen location explored
-    this.PCy = -1;
-    this.maneuver = false;
     this.alive = true;
+    this.lastAttackTime = new Date().getTime();
 
-    this.placeInRandomRoom();
-
-    this.figureOutWhereToGo();
+    // SPEED: 100 = regular, 50 = slow
+    this.speed = 200;
+    if(this.type === "blue") { // slow monsters
+      this.speed = 100;
+    }
   }
 
   /** 
@@ -61,11 +65,8 @@ export default class MonsterCommon {
    * @param y 
    */
   canSee(x, y) {
-    this.maneuver = false;
     let x1 = -1, x2 = -1, y1 = -1, y2 = -1;
     let cornerx = this.x, cornery = this.y; // upper left
-    let clear = true;
-    let totalCorners = 0;
     for(let i = 0; i &lt; 4; i++) {
       if(i === 1) {
         cornerx += MonsterCommon.SPRITE_SIZE; // upper right
@@ -88,24 +89,14 @@ export default class MonsterCommon {
         y1 = cornery;
         y2 = y;
       }
-      clear = true;
-      for(let j = x1; j &lt;= x2; j++) {
-        for(let k = y1; k &lt;= y2; k++) {
+      for(let j = x1; j &lt;= x2; j += 20) { // checking every 20th pixel to improve runtime
+        for(let k = y1; k &lt;= y2; k += 20) {
           if(!this.floor.map.isOnMap(j, k)) {
-            clear = false;
-            break;
-          }
-          if(!clear)
-            break;
+            return false;
+          }  
         }
       }
-      if(clear)
-        totalCorners++;
     }
-    if(totalCorners === 0)
-      return false;
-    if(totalCorners &lt; 4)
-      this.maneuver = true;
     return true;
   }
 
@@ -122,103 +113,156 @@ export default class MonsterCommon {
     return c;
   }
 
-  /** ~WIP, UNFINISHED (need PC implementation)
+  /**
    * Finds closest PC that can be seen and targets it.
    */
   canSeePC() {
-    // this.targetAquired = false;
-    // let indexArray = [];
-    // for i = 0 to map.numPcs/map.PCarray.length
-    // __if(canSee(PC[i].x, PC[i].y));, repeat for all (most) pixels of pc
-    // ____push i onto indexArray;
-    // find closest PC that can be seen: use this.findDistance(pcx, pcy) and find minimum to find closest pc of PCs of indexArray
-    // assign targetx and targety to closest pc that can be seen
+    this.targetAquired = false;
+    let minDist = -1;
+    for(let player of this.floor.players) {
+      if(this.canSee(player.x, player.y) &amp;&amp; this.canSee(player.x + player.SPRITE_SIZE, player.y + player.SPRITE_SIZE) &amp;&amp;
+         this.canSee(player.x + player.SPRITE_SIZE, player.y) &amp;&amp; this.canSee(player.x, player.y + player.SPRITE_SIZE)) {
+        this.targetAquired = true;
+        if(this.findDistance(player.x, player.y) &lt; minDist || minDist === -1) {
+          this.targetx = player.x;
+          this.targety = player.y;
+          minDist = this.findDistance(player.x, player.y);
+        }
+      }
+    }
+    return minDist !== -1;
   }
 
-  /** 
-   * ~WIP, UNFINISHED (need to check for collisions for items/players)
-   * 
+  /**  
    * Monster moves to an adjacent, unoccupied location.
    */
   wander() {
-    let random = Math.floor(Math.random() * 4); 
-    let prevX = this.x;
-    let prevY = this.y;
-    if(random === 0)
-      this.x += MonsterCommon.SPRITE_SIZE;
-    else if(random === 1)
-      this.x -= MonsterCommon.SPRITE_SIZE;
-    else if(random === 2)
-      this.y += MonsterCommon.SPRITE_SIZE;
-    else if(random === 3)
-      this.y -= MonsterCommon.SPRITE_SIZE;
-    if(!this.spriteIsOnMap()) { // if trying to wander off map, doesn't move at all (until it wanders again)
-      this.x = prevX;
-      this.y = prevY;
+    let prev = {x: this.x, y: this.y};
+    let dist;
+    // the distance we want to travel
+    let targetDist = this.speed * (MAX_WALK_TIME / 1000);
+    let count = 1000;
+
+    // the angle of the direction we want to travel in
+    // eslint-disable-next-line
+    let theta = Math.floor(Math.random() * 360) * (Math.PI / 180) - Math.PI;
+    Object.assign(this, prev);
+
+    // start moving in that direction until we reach our target or a wall
+    do {
+      this.x += Math.cos(theta);
+      this.y += Math.sin(theta);
+      // eslint-disable-next-line
+      dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
+    } while(this.spriteIsOnMap() &amp;&amp; dist &lt; targetDist &amp;&amp; --count > 0);
+    
+    // Back up until we are back on the map
+    do {
+      this.x -= Math.cos(theta);
+      this.y -= Math.sin(theta);
+      // eslint-disable-next-line
+      dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
+    } while(!this.spriteIsOnMap() &amp;&amp; dist > 0 &amp;&amp; --count > 0);
+
+    this.targetx = Math.floor(this.x);
+    this.targety = Math.floor(this.y);
+    Object.assign(this, prev);
+
+    // Don't go anywhere if we ran for too long
+    if(count === 0) {
+      this.targetx = this.x;
+      this.targety = this.y;
     }
-    this.targetx = this.x;
-    this.x = prevX;
-    this.targety = this.y;
-    this.y = prevY;
   }
 
   /**
    * Sets the position closer to the target position.
+   * @param {number} deltaTime The number of ms since the last move
    */
-  move() {
+  move(deltaTime) {
+    let prevy = this.y;
+    let prevx = this.x;
     if(this.alive) {
-      if(this.targetx &lt; this.x)
-        this.x--;
-      else this.x++;
-      if(this.targety &lt; this.y)
-        this.y--;
-      else this.y++;
-      if(this.spriteCollision())
-        this.wander();
+      // Get the distance in the x and y direction we have to move
+      let xDist = Math.abs(this.targetx - this.x);
+      let yDist = Math.abs(this.targety - this.y);
+      // Figure out what percentage of our next turn should be in each direction
+      let xPerc = xDist / (xDist + yDist);
+      let yPerc = 1 - xPerc;
+      // Use pythagorean theorem to distrubute 
+      let root = Math.sqrt(this.speed * (deltaTime / 1000));
+      let xMove = Math.floor((root * xPerc) ** 2);
+      let yMove = Math.floor((root * yPerc) ** 2);
+
+      if(!isNaN(xMove)) {
+        this.x += Math.min(xMove, xDist) * (this.targetx &lt; this.x ? -1 : 1);
+      }
+
+      if(!isNaN(yMove)) {
+        this.y += Math.min(yMove, yDist) * (this.targety &lt; this.y ? -1 : 1);
+      }
+    }
+    // Disable collision detection on the client
+    if(typeof window === "undefined") {
+      let collisionMonster = this.collisionEntities(this.floor.monsters, MonsterCommon.SPRITE_SIZE);
+      let collisionPlayer = this.collisionEntities(this.floor.players, PlayerCommon.SPRITE_SIZE);
+      if(collisionMonster !== -1 || collisionPlayer !== -1) { // todo
+        if(collisionPlayer !== -1)
+          console.log("collision " + this.name); // todo delete TESTING
+        this.targetx = prevx;
+        this.targety = prevy;
+        this.x = prevx;
+        this.y = prevy;
+        this.collision = true;
+        let currentTime = new Date().getTime();
+        if(collisionPlayer !== -1 &amp;&amp; currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
+          this.lastAttackTime = currentTime;
+          this.attack(collisionPlayer);
+          console.log("booped player");
+        }
+      } else {
+        this.collision = false;
+      }
     }
   }
 
-  /**
-   * ~WIP, UNFINISHED (needs to be able to move strategically based on PC last seen location
-   * 
+  /** 
    * Moves monster.
    * If PC has been seen, move strategically towards last seen location.
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
    */
   figureOutWhereToGo() {
-    //this.canSeePC();
+    this.canSeePC();
     if(this.alive) {
-      if(!this.targetAquired) {
-        this.wander();
-      } else {
-        //move strategically, to be implemented later when PC is on map WIP
-        console.log("omw bro");
+      if(!this.targetAquired &amp;&amp; !this.collision) {
+        if(this.targetx === -1 || this.targety === -1) {
+          this.targetx = this.x;
+          this.targety = this.y;
+        }
+        if(Math.abs(this.x - this.targetx) &lt; 2 &amp;&amp; Math.abs(this.y - this.targety) &lt; 2) {
+          this.wander();
+        }
       }
     }
   }
 
-  /**
-   * ~WIP, UNFINISHED (merge logic with PC class once implemented)
-   * 
+  /** 
    * Monster attacks PC
-   * @param {*} PCid id for player that monster is attacking
+   * @param {*} playerID id for player that monster is attacking
    */
-  attack(PCid) {
-    //(decrement pc health and check for pc death) within PC's beAttacked method
-    // below: psuedo until PC is implemented
-    this.floor.map.PC[PCid].beAttacked(this.damage);
+  attack(playerID) {
+    this.floor.players[playerID].beAttacked(this.damage);
   }
 
-  /**
-   * ~WIP, UNFINISHED (merge logic with PC class once implemented)
-   * 
-   * PC attacks Monster
+  /** 
+   * Player attacks Monster
    * @param {*} hp health points that the monster's health decrements by
    */
   beAttacked(hp) {
     this.hp -= hp;
-    if(this.hp &lt;= 0)
+    if(this.hp &lt;= 0) {
       this.die();
+    }    
   }
 
   /** 
@@ -227,8 +271,8 @@ export default class MonsterCommon {
   placeInRandomRoom() {
     let numRooms = this.floor.map.rooms.length;
     this.initialRoom = Math.floor(Math.random() * numRooms);
-    for(let i = 0; i &lt; this.floor.monsters.length; i++) {
-      if(this.id !== this.floor.monsters[i].id &amp;&amp; this.floor.monsters[i].initialRoom === this.initialRoom) {
+    for(let monster of this.floor.monsters) {
+      if(this.id !== monster.id &amp;&amp; monster.initialRoom === this.initialRoom) {
         this.placeInRandomRoom();
       }
     }
@@ -250,21 +294,38 @@ export default class MonsterCommon {
   }
 
   /**
-   * Checks to see if there's a monster colliding with this monster. todo untested
+   * Checks to see if there's a monster colliding with this monster.
    * Compares corners of each sprite to do so.
    * @returns {boolean}
    */
-  spriteCollision() {
-    for(let i = 0; i &lt; this.floor.monsters.length; i++) {
-      if(this.id !== this.floor.monsters[i].id) {
-        if(this.floor.monsters[i].x >= this.x &amp;&amp; this.floor.monsters[i].x &lt;= this.x + MonsterCommon.SPRITE_SIZE) { // within x bounds
-          if(this.floor.monsters[i].y >= this.y &amp;&amp; this.floor.monsters[i].y &lt;= this.y + MonsterCommon.SPRITE_SIZE) { // and within y bounds
-            return true;
+  collisionEntities(entities, spriteSize) {
+    let x = -1;
+    let y = -1;
+    for(let entity of entities) {
+      if(this.id !== entity.id) {
+        for(let j = 0; j &lt; 4; j++) { // four corners to check for each sprite
+          if(j === 0) { // upper left corner
+            x = entity.x;
+            y = entity.y;
+          } else if(j === 1) { // upper right corner
+            x = entity.x + spriteSize;
+            y = entity.y;
+          } else if(j === 1) { // lower right corner
+            x = entity.x + spriteSize;
+            y = entity.y + spriteSize;
+          } else if(j === 1) { // lower left corner
+            x = entity.x;
+            y = entity.y + spriteSize;
+          }
+          if(x >= this.x &amp;&amp; x &lt;= this.x + spriteSize) { // within x bounds
+            if(y >= this.y &amp;&amp; y &lt;= this.y + spriteSize) { // and within y bounds
+              return entities.indexOf(entity);
+            }
           }
         }
       }
     }
-    return false;
+    return -1; // indicate no collision
   }
 
   /**
@@ -286,13 +347,13 @@ MonsterCommon.SPRITE_SIZE = 48;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#unbind">unbind</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 30 2018 23:50:00 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 14 2018 01:13:52 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
