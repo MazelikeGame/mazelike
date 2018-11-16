@@ -41,6 +41,12 @@ let exec = (command, ...args) => {
     process.exit(0);
   }
 
+  // Run a game server
+  if(process.argv[2] == "game") {
+    await exec("node --experimental-modules Backend/game.mjs");
+    process.exit(0);
+  }
+
   process.env.DB_DEBUG = "no";
 
   // Parse command line arguments
