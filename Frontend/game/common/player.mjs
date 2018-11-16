@@ -22,6 +22,7 @@ export default class PlayerCommon {
     this.floor = floor;
     this.damage = 10;
     this.speed = 15;
+    this.size = 1; // used with monster collision checking, acts as a size multiplier
   }
 
   /**

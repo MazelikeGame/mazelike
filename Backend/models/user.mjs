@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import sql from '../sequelize';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import Player from './player';
 
 // You can call this with or without new it should work either way

@@ -8,6 +8,11 @@ let inUsePorts = new Set();
 let portMap = new Map();
 
 export function spawnGame(gameEnv = {}) {
+  let port = pickPort();
+  portMap.set(gameId, port);
+  inUsePorts.add(port);
+  gameEnv.port = port;
+
   let gameId = gameEnv.gameId;
   let origEnv = Object.assign({}, gameEnv);
   // prefix all mazelike env vars
@@ -16,11 +21,7 @@ export function spawnGame(gameEnv = {}) {
     delete gameEnv[key];
   }
 
-  let port = pickPort();
-  portMap.set(gameId, port);
-  inUsePorts.add(port);
-
-  let child = child_process.spawn(process.argv[0], ['--experimental-modules', CHILD_MAIN, port], {
+  let child = child_process.spawn(process.argv[0], ['--experimental-modules', CHILD_MAIN], {
     env: gameEnv,
     stdio: ['ignore', 'inherit', 'inherit']
   });

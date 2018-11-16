@@ -5,3 +5,4 @@ node_modules
 runner-result
 Frontend/public/*
 *.sqlite
+data

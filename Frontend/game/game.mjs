@@ -40,6 +40,10 @@ addEventListener("contextmenu", (e) => {
 const addArrowKeyListener = (floor, controls, username, sock) => {
   let handleKey = (e) => {
     let player = getPlayer(floor, username);
+    // player probably died
+    if(!player) {
+      return;
+    }
     player.keyPress(e);
 
     sock.emit('player-movement', player.x, player.y, username);
@@ -64,7 +68,16 @@ function getPlayer(floor, username) {
 
 async function setup() {
   msgEl.innerText = "Connecting to the game server";
-  let sock = io(`http://${await (await fetch(`/game/addr/${gameId}`)).text()}`);
+  let addr = await (await fetch(`/game/addr/${gameId}`)).text();
+
+  if(addr === "__current__") {
+    addr = location.host;
+  }
+
+  let sock = io(`http://${addr}`, {
+    path: `/socket/${gameId}`
+  });
+
   let username = await getUsername(sock);
   msgEl.innerText = "Loading game";
   let floor;
