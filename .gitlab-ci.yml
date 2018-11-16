@@ -57,7 +57,8 @@ Deploy:
       - VERSION=$(cat VERSION)
       - node scripts/version-check.js
       - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
-      - deploy $VERSION
+      - echo -n latest > /etc/mazelike/VERSION
+      - sudo systemctl restart mazelike
       - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
   only:
     - master

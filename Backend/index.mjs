@@ -48,7 +48,7 @@ app.set('views', 'Frontend/views');
 
 // Middleware
 app.use(userMiddleware);
-// requret logging
+// request logging
 app.use(morgan(":method :status :url (:response-time ms)"));
 
 //Routes

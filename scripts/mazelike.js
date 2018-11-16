@@ -111,10 +111,6 @@ let exec = (command, ...args) => {
 
   console.log(logo);
 
-  // Only run migrations when we are not running sqlite
-  if(process.env.DB.trim().indexOf("sqlite:") !== 0) {
-    await exec("./node_modules/.bin/sequelize", "db:migrate");
-  }
-
+  await exec("./node_modules/.bin/sequelize", "db:migrate");
   await exec("node", "--experimental-modules", "Backend/index.mjs");
 })();
