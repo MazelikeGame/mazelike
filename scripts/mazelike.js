@@ -41,13 +41,8 @@ let exec = (command, ...args) => {
     process.exit(0);
   }
 
-  // Run a game server
-  if(process.argv[2] == "game") {
-    await exec("node", "--experimental-modules", "Backend/game.mjs");
-    process.exit(0);
-  }
-
   process.env.DB_DEBUG = "no";
+  let isGameServer = false;
 
   // Parse command line arguments
   for(let i = 2; i < process.argv.length; ++i) {
@@ -61,6 +56,7 @@ let exec = (command, ...args) => {
   -v, --verbose    Print all database queries
   -d, --docker     Run the game server instances as separate containers
   --version        Print the current version
+  -g, --game       Start a game server
   -t, --tag <tag>  The tag to use for spawning game servers (automatically sets -d)
                       ex: ryan3r/mazelike`);
         return;
@@ -92,6 +88,11 @@ let exec = (command, ...args) => {
         }
         break;
       
+      case "-g":
+      case "--game":
+        isGameServer = true;
+        break;
+      
       default:
         console.log(`Unknown argument ${process.argv[i]}`);
         break;
@@ -117,6 +118,10 @@ let exec = (command, ...args) => {
 
   console.log(logo);
 
-  await exec("./node_modules/.bin/sequelize", "db:migrate");
-  await exec("node", "--experimental-modules", "Backend/index.mjs");
+  if(isGameServer) {
+    await exec("node", "--experimental-modules", "Backend/game.mjs");
+  } else {
+    await exec("./node_modules/.bin/sequelize", "db:migrate");
+    await exec("node", "--experimental-modules", "Backend/index.mjs");
+  }
 })();
