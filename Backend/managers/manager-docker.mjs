@@ -41,7 +41,7 @@ export async function spawnGame(gameEnv = {}) {
     name: hostname,
     Hostname: hostname,
     Image: IMAGE_NAME,
-    Cmd: ["node", "--experimental-modules", "Backend/game.mjs"],
+    Cmd: ["game"],
     Env: envArray,
     ExposedPorts: {
       [`${port}/tcp`]: {}
