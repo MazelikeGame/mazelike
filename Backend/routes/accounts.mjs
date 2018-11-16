@@ -227,22 +227,31 @@ accountRouter.get('/view', function(req, res) {
   });
 });
 
-accountRouter.get('/forgot-password', function(req, res) {
+// Check if forgot password is enabled if not send an error message to the user
+const checkForgotPassword = (res) => {
   if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.MAILER_SERVICE_PROVIDER) {
-    return res.render('forgot-password', {
+    res.render('forgot-password', {
       badError: new Error("Forgot password is not enabled")
     });
+
+    return false;
   }
 
-  return res.render('forgot-password');
+  return true;
+};
+
+accountRouter.get('/forgot-password', function(req, res) {
+  if(!checkForgotPassword(res)) {
+    return;
+  }
+
+  res.render('forgot-password');
 });
 
 /* eslint-disable complexity */
 accountRouter.post('/forgot-password', async(req, res) => {
-  if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.MAILER_SERVICE_PROVIDER) {
-    return res.render('forgot-password', {
-      badError: new Error("Forgot password is not enabled")
-    });
+  if(!checkForgotPassword(res)) {
+    return undefined;
   }
   
   const buf = crypto.randomBytes(20);
