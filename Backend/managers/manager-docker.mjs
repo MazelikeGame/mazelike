@@ -12,7 +12,6 @@ const IMAGE_NAME = process.env.IMAGE_NAME || `ryan3r/mazelike:${VERSION}`;
 const ADDRESS = process.env.EXTERN_ADDRESS;
 const STARTING_PORT = +process.env.STARTING_PORT || 5900;
 const ENDING_PORT = +process.env.ENDING_PORT || 5999;
-const PUBLIC_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
 let docker = new dockerApi.Docker({ socketPath: "/var/run/docker.sock" });
 let inUsePorts = new Set();
