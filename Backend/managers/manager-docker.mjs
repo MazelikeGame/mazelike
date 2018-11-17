@@ -53,7 +53,7 @@ export async function spawnGame(gameEnv = {}) {
         }]
       },
       Binds: [
-        `${PUBLIC_DIR}:/data`
+        `${process.env.EXTERN_PUBLIC_DIR}:/data`
       ]
     },
     Labels: {
