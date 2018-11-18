@@ -156,8 +156,8 @@ async function setup() {
 
   app.ticker.add(() => {
     floor.update();
-    playerList.update();
     controls.update();
+    playerList.update();
 
     if(fps) {
       fps.update();
