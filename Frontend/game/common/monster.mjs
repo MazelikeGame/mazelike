@@ -1,4 +1,4 @@
-/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
+/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments, no-mixed-operators */
 /** @module Monster */
 
 // The maximum amount of ms we want a monster to walk for
@@ -23,11 +23,15 @@ export default class MonsterCommon {
     this.targety = -1;
     this.alive = true;
     this.lastAttackTime = new Date().getTime();
+    this.size = 1; // size multiplier
 
     // SPEED: 100 = regular, 50 = slow
     this.speed = 200;
     if(this.type === "blue") { // slow monsters
       this.speed = 100;
+    } else if(this.type === "boss") { // very slow
+      this.speed = 75;
+      this.size = 2;
     }
   }
 
@@ -41,11 +45,11 @@ export default class MonsterCommon {
     let cornerx = this.x, cornery = this.y; // upper left
     for(let i = 0; i < 4; i++) {
       if(i === 1) {
-        cornerx += MonsterCommon.SPRITE_SIZE; // upper right
+        cornerx += MonsterCommon.SPRITE_SIZE * this.size; // upper right
       } else if(i === 2) {
-        cornery += MonsterCommon.SPRITE_SIZE; // lower right
+        cornery += MonsterCommon.SPRITE_SIZE * this.size; // lower right
       } else if(i === 3) {
-        cornerx -= MonsterCommon.SPRITE_SIZE; // lower left
+        cornerx -= MonsterCommon.SPRITE_SIZE * this.size; // lower left
       }
       if(x < cornerx) {
         x1 = x;
@@ -92,8 +96,8 @@ export default class MonsterCommon {
     this.targetAquired = false;
     let minDist = -1;
     for(let player of this.floor.players) {
-      if(this.canSee(player.x, player.y) && this.canSee(player.x + player.SPRITE_SIZE, player.y + player.SPRITE_SIZE) &&
-         this.canSee(player.x + player.SPRITE_SIZE, player.y) && this.canSee(player.x, player.y + player.SPRITE_SIZE)) {
+      if(this.canSee(player.x, player.y) && this.canSee(player.x + player.SPRITE_SIZE * this.size, player.y + player.SPRITE_SIZE * this.size) &&
+         this.canSee(player.x + player.SPRITE_SIZE * this.size, player.y) && this.canSee(player.x, player.y + player.SPRITE_SIZE * this.size)) {
         this.targetAquired = true;
         if(this.findDistance(player.x, player.y) < minDist || minDist === -1) {
           this.targetx = player.x;
@@ -178,9 +182,7 @@ export default class MonsterCommon {
     if(typeof window === "undefined") {
       let collisionMonster = this.collisionEntities(this.floor.monsters, MonsterCommon.SPRITE_SIZE);
       let collisionPlayer = this.collisionEntities(this.floor.players, PlayerCommon.SPRITE_SIZE);
-      if(collisionMonster !== -1 || collisionPlayer !== -1) { // todo
-        if(collisionPlayer !== -1)
-          console.log("collision " + this.name); // todo delete TESTING
+      if(collisionMonster !== -1 || collisionPlayer !== -1) {
         this.targetx = prevx;
         this.targety = prevy;
         this.x = prevx;
@@ -190,7 +192,6 @@ export default class MonsterCommon {
         if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
           this.lastAttackTime = currentTime;
           this.attack(collisionPlayer);
-          console.log("booped player");
         }
       } else {
         this.collision = false;
@@ -219,14 +220,6 @@ export default class MonsterCommon {
   }
 
   /** 
-   * Monster attacks PC
-   * @param {*} playerID id for player that monster is attacking
-   */
-  attack(playerID) {
-    this.floor.players[playerID].beAttacked(this.damage);
-  }
-
-  /** 
    * Player attacks Monster
    * @param {*} hp health points that the monster's health decrements by
    */
@@ -235,6 +228,14 @@ export default class MonsterCommon {
     if(this.hp <= 0) {
       this.die();
     }    
+  }
+
+  /** 
+   * Monster attacks PC
+   * @param {*} playerID id for player that monster is attacking
+   */
+  attack(playerID) {
+    this.floor.players[playerID].beAttacked(this.damage);
   }
 
   /** 
@@ -261,8 +262,8 @@ export default class MonsterCommon {
    * @returns {boolean}
    */
   spriteIsOnMap() {
-    return this.floor.map.isOnMap(this.x, this.y) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE, this.y) 
-    && this.floor.map.isOnMap(this.x, this.y + MonsterCommon.SPRITE_SIZE) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE, this.y + MonsterCommon.SPRITE_SIZE);
+    return this.floor.map.isOnMap(this.x, this.y) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y) 
+    && this.floor.map.isOnMap(this.x, this.y + MonsterCommon.SPRITE_SIZE * this.size) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y + MonsterCommon.SPRITE_SIZE * this.size);
   }
 
   /**
@@ -280,17 +281,17 @@ export default class MonsterCommon {
             x = entity.x;
             y = entity.y;
           } else if(j === 1) { // upper right corner
-            x = entity.x + spriteSize;
+            x = entity.x + spriteSize * entity.size;
             y = entity.y;
           } else if(j === 1) { // lower right corner
-            x = entity.x + spriteSize;
-            y = entity.y + spriteSize;
+            x = entity.x + spriteSize * entity.size;
+            y = entity.y + spriteSize * entity.size;
           } else if(j === 1) { // lower left corner
             x = entity.x;
-            y = entity.y + spriteSize;
+            y = entity.y + spriteSize * entity.size;
           }
-          if(x >= this.x && x <= this.x + spriteSize) { // within x bounds
-            if(y >= this.y && y <= this.y + spriteSize) { // and within y bounds
+          if(x >= this.x && x <= this.x + spriteSize * entity.size) { // within x bounds
+            if(y >= this.y && y <= this.y + spriteSize * entity.size) { // and within y bounds
               return entities.indexOf(entity);
             }
           }

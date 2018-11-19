@@ -9,9 +9,10 @@ import qs from "querystring";
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 
+const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
 var storage = multer.diskStorage({
-  destination: 'Frontend/public/images',
+  destination: `${DATA_DIR}/images`,
   filename: function(req, file, cb) {
     let date_posted = Date.now().toString().concat('-');
     cb(null, date_posted.concat(file.originalname));
@@ -129,7 +130,7 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
       req.body.password && (values.password = hash); // eslint-disable-line
       if(changing_avatar === true) {
         values.image_name = file_name;
-        let file_to_delete = 'Frontend/public/images/'.concat(req.user.image_name);
+        let file_to_delete = `${DATA_DIR}/images/${req.user.image_name}`;
         fs.unlink(file_to_delete, () => {});
       }
       let selector = {
@@ -226,11 +227,33 @@ accountRouter.get('/view', function(req, res) {
   });
 });
 
+// Check if forgot password is enabled if not send an error message to the user
+const checkForgotPassword = (res) => {
+  if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.MAILER_SERVICE_PROVIDER) {
+    res.render('forgot-password', {
+      badError: new Error("Forgot password is not enabled")
+    });
+
+    return false;
+  }
+
+  return true;
+};
+
 accountRouter.get('/forgot-password', function(req, res) {
+  if(!checkForgotPassword(res)) {
+    return;
+  }
+
   res.render('forgot-password');
 });
 
+/* eslint-disable complexity */
 accountRouter.post('/forgot-password', async(req, res) => {
+  if(!checkForgotPassword(res)) {
+    return undefined;
+  }
+  
   const buf = crypto.randomBytes(20);
   var token = buf.toString('hex');
   let user = await User.findOne({
@@ -327,6 +350,7 @@ accountRouter.post('/reset/:token', async(req, res) => {
     });
   });
 });
+/* eslint-enable complexity */
 
 accountRouter.get('/dashboard', async(req, res) => {
   if(res.loginRedirect()) {

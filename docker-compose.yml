@@ -6,9 +6,6 @@ services:
     image: ryan3r/mazelike:latest
     build:
       context: .
-    environment:
-      DB_STORAGE: ":memory:"
-      CLUSTER_MANAGER: none
     expose:
       - 3000
     networks:

@@ -165,7 +165,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line45">line 45</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line52">line 52</a>
     </li></ul></dd>
     
 
@@ -199,7 +199,7 @@
     
 
     
-    <h4 class="name" id="attack"><span class="type-signature"></span>attack<span class="signature">(PCid)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="attack"><span class="type-signature"></span>attack<span class="signature">(playerID)</span><span class="type-signature"></span></h4>
     
 
     
@@ -207,9 +207,7 @@
 
 
 <div class="description">
-    ~WIP, UNFINISHED (merge logic with PC class once implemented)
-
-Monster attacks PC
+    Monster attacks PC
 </div>
 
 
@@ -245,7 +243,7 @@ Monster attacks PC
 
         <tr>
             
-                <td class="name"><code>PCid</code></td>
+                <td class="name"><code>playerID</code></td>
             
 
             <td class="type">
@@ -302,7 +300,7 @@ Monster attacks PC
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line178">line 178</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line225">line 225</a>
     </li></ul></dd>
     
 
@@ -344,9 +342,7 @@ Monster attacks PC
 
 
 <div class="description">
-    ~WIP, UNFINISHED (merge logic with PC class once implemented)
-
-PC attacks Monster
+    Player attacks Monster
 </div>
 
 
@@ -439,7 +435,7 @@ PC attacks Monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line190">line 190</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line233">line 233</a>
     </li></ul></dd>
     
 
@@ -587,7 +583,7 @@ PC attacks Monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line35">line 35</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line39">line 39</a>
     </li></ul></dd>
     
 
@@ -629,8 +625,7 @@ PC attacks Monster
 
 
 <div class="description">
-    ~WIP, UNFINISHED (need PC implementation)
-Finds closest PC that can be seen and targets it.
+    Finds closest PC that can be seen and targets it.
 </div>
 
 
@@ -674,7 +669,7 @@ Finds closest PC that can be seen and targets it.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line100">line 100</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line91">line 91</a>
     </li></ul></dd>
     
 
@@ -697,6 +692,111 @@ Finds closest PC that can be seen and targets it.
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="collisionEntities"><span class="type-signature"></span>collisionEntities<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Checks to see if there's a monster colliding with this monster.
+Compares corners of each sprite to do so.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line273">line 273</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -760,7 +860,7 @@ Finds closest PC that can be seen and targets it.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line12">line 12</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -848,7 +948,7 @@ Monster dies.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line55">line 55</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -936,7 +1036,7 @@ Monster dies.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line119">line 119</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -978,9 +1078,7 @@ Monster dies.
 
 
 <div class="description">
-    ~WIP, UNFINISHED (needs to be able to move strategically based on PC last seen location
-
-Moves monster.
+    Moves monster.
 If PC has been seen, move strategically towards last seen location.
 Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
 </div>
@@ -1026,7 +1124,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line160">line 160</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line206">line 206</a>
     </li></ul></dd>
     
 
@@ -1174,7 +1272,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line90">line 90</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line81">line 81</a>
     </li></ul></dd>
     
 
@@ -1328,7 +1426,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line18">line 18</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line25">line 25</a>
     </li></ul></dd>
     
 
@@ -1476,7 +1574,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line94">line 94</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line101">line 101</a>
     </li></ul></dd>
     
 
@@ -1562,7 +1660,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line32">line 32</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -1596,7 +1694,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
 
     
-    <h4 class="name" id="move"><span class="type-signature"></span>move<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="move"><span class="type-signature"></span>move<span class="signature">(deltaTime)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1613,6 +1711,55 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>deltaTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The number of ms since the last move</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -1648,7 +1795,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line140">line 140</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line154">line 154</a>
     </li></ul></dd>
     
 
@@ -1734,7 +1881,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line199">line 199</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line243">line 243</a>
     </li></ul></dd>
     
 
@@ -1869,7 +2016,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line46">line 46</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line54">line 54</a>
     </li></ul></dd>
     
 
@@ -1955,7 +2102,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line245">line 245</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line306">line 306</a>
     </li></ul></dd>
     
 
@@ -1978,111 +2125,6 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
 
 
 
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="spriteCollision"><span class="type-signature"></span>spriteCollision<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Checks to see if there's a monster colliding with this monster. todo untested
-Compares corners of each sprite to do so.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line229">line 229</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -2146,7 +2188,7 @@ Compares corners of each sprite to do so.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line219">line 219</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line263">line 263</a>
     </li></ul></dd>
     
 
@@ -2250,7 +2292,7 @@ Compares corners of each sprite to do so.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line101">line 101</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line108">line 108</a>
     </li></ul></dd>
     
 
@@ -2398,7 +2440,7 @@ Compares corners of each sprite to do so.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line25">line 25</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line29">line 29</a>
     </li></ul></dd>
     
 
@@ -2440,9 +2482,7 @@ Compares corners of each sprite to do so.
 
 
 <div class="description">
-    ~WIP, UNFINISHED (need to check for collisions for items/players)
-
-Monster moves to an adjacent, unoccupied location.
+    Monster moves to an adjacent, unoccupied location.
 </div>
 
 
@@ -2486,7 +2526,7 @@ Monster moves to an adjacent, unoccupied location.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line115">line 115</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line111">line 111</a>
     </li></ul></dd>
     
 
@@ -2671,7 +2711,7 @@ Monster moves to an adjacent, unoccupied location.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line45">line 45</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line52">line 52</a>
     </li></ul></dd>
     
 
@@ -2705,7 +2745,7 @@ Monster moves to an adjacent, unoccupied location.
     
 
     
-    <h4 class="name" id="attack"><span class="type-signature"></span>attack<span class="signature">(PCid)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="attack"><span class="type-signature"></span>attack<span class="signature">(playerID)</span><span class="type-signature"></span></h4>
     
 
     
@@ -2713,9 +2753,7 @@ Monster moves to an adjacent, unoccupied location.
 
 
 <div class="description">
-    ~WIP, UNFINISHED (merge logic with PC class once implemented)
-
-Monster attacks PC
+    Monster attacks PC
 </div>
 
 
@@ -2751,7 +2789,7 @@ Monster attacks PC
 
         <tr>
             
-                <td class="name"><code>PCid</code></td>
+                <td class="name"><code>playerID</code></td>
             
 
             <td class="type">
@@ -2808,7 +2846,7 @@ Monster attacks PC
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line178">line 178</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line225">line 225</a>
     </li></ul></dd>
     
 
@@ -2850,9 +2888,7 @@ Monster attacks PC
 
 
 <div class="description">
-    ~WIP, UNFINISHED (merge logic with PC class once implemented)
-
-PC attacks Monster
+    Player attacks Monster
 </div>
 
 
@@ -2945,7 +2981,7 @@ PC attacks Monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line190">line 190</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line233">line 233</a>
     </li></ul></dd>
     
 
@@ -3093,7 +3129,7 @@ PC attacks Monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line35">line 35</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line39">line 39</a>
     </li></ul></dd>
     
 
@@ -3135,8 +3171,7 @@ PC attacks Monster
 
 
 <div class="description">
-    ~WIP, UNFINISHED (need PC implementation)
-Finds closest PC that can be seen and targets it.
+    Finds closest PC that can be seen and targets it.
 </div>
 
 
@@ -3180,7 +3215,7 @@ Finds closest PC that can be seen and targets it.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line100">line 100</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line91">line 91</a>
     </li></ul></dd>
     
 
@@ -3203,6 +3238,111 @@ Finds closest PC that can be seen and targets it.
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="collisionEntities"><span class="type-signature"></span>collisionEntities<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Checks to see if there's a monster colliding with this monster.
+Compares corners of each sprite to do so.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line273">line 273</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -3266,7 +3406,7 @@ Finds closest PC that can be seen and targets it.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line12">line 12</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -3354,7 +3494,7 @@ Monster dies.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line55">line 55</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -3442,7 +3582,7 @@ Monster dies.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line119">line 119</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -3484,9 +3624,7 @@ Monster dies.
 
 
 <div class="description">
-    ~WIP, UNFINISHED (needs to be able to move strategically based on PC last seen location
-
-Moves monster.
+    Moves monster.
 If PC has been seen, move strategically towards last seen location.
 Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
 </div>
@@ -3532,7 +3670,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line160">line 160</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line206">line 206</a>
     </li></ul></dd>
     
 
@@ -3680,7 +3818,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line90">line 90</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line81">line 81</a>
     </li></ul></dd>
     
 
@@ -3834,7 +3972,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line18">line 18</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line25">line 25</a>
     </li></ul></dd>
     
 
@@ -3982,7 +4120,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line94">line 94</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line101">line 101</a>
     </li></ul></dd>
     
 
@@ -4068,7 +4206,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line32">line 32</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -4102,7 +4240,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
 
     
-    <h4 class="name" id="move"><span class="type-signature"></span>move<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="move"><span class="type-signature"></span>move<span class="signature">(deltaTime)</span><span class="type-signature"></span></h4>
     
 
     
@@ -4119,6 +4257,55 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>deltaTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The number of ms since the last move</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -4154,7 +4341,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line140">line 140</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line154">line 154</a>
     </li></ul></dd>
     
 
@@ -4240,7 +4427,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line199">line 199</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line243">line 243</a>
     </li></ul></dd>
     
 
@@ -4375,7 +4562,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line46">line 46</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line54">line 54</a>
     </li></ul></dd>
     
 
@@ -4461,7 +4648,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line245">line 245</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line306">line 306</a>
     </li></ul></dd>
     
 
@@ -4484,111 +4671,6 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
 
 
 
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="spriteCollision"><span class="type-signature"></span>spriteCollision<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Checks to see if there's a monster colliding with this monster. todo untested
-Compares corners of each sprite to do so.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line229">line 229</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -4652,7 +4734,7 @@ Compares corners of each sprite to do so.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line219">line 219</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line263">line 263</a>
     </li></ul></dd>
     
 
@@ -4756,7 +4838,7 @@ Compares corners of each sprite to do so.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line101">line 101</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line108">line 108</a>
     </li></ul></dd>
     
 
@@ -4904,7 +4986,7 @@ Compares corners of each sprite to do so.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line25">line 25</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line29">line 29</a>
     </li></ul></dd>
     
 
@@ -4946,9 +5028,7 @@ Compares corners of each sprite to do so.
 
 
 <div class="description">
-    ~WIP, UNFINISHED (need to check for collisions for items/players)
-
-Monster moves to an adjacent, unoccupied location.
+    Monster moves to an adjacent, unoccupied location.
 </div>
 
 
@@ -4992,7 +5072,7 @@ Monster moves to an adjacent, unoccupied location.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line115">line 115</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line111">line 111</a>
     </li></ul></dd>
     
 
@@ -5177,7 +5257,7 @@ Monster moves to an adjacent, unoccupied location.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line45">line 45</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line52">line 52</a>
     </li></ul></dd>
     
 
@@ -5211,7 +5291,7 @@ Monster moves to an adjacent, unoccupied location.
     
 
     
-    <h4 class="name" id="attack"><span class="type-signature"></span>attack<span class="signature">(PCid)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="attack"><span class="type-signature"></span>attack<span class="signature">(playerID)</span><span class="type-signature"></span></h4>
     
 
     
@@ -5219,9 +5299,7 @@ Monster moves to an adjacent, unoccupied location.
 
 
 <div class="description">
-    ~WIP, UNFINISHED (merge logic with PC class once implemented)
-
-Monster attacks PC
+    Monster attacks PC
 </div>
 
 
@@ -5257,7 +5335,7 @@ Monster attacks PC
 
         <tr>
             
-                <td class="name"><code>PCid</code></td>
+                <td class="name"><code>playerID</code></td>
             
 
             <td class="type">
@@ -5314,7 +5392,7 @@ Monster attacks PC
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line178">line 178</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line225">line 225</a>
     </li></ul></dd>
     
 
@@ -5356,9 +5434,7 @@ Monster attacks PC
 
 
 <div class="description">
-    ~WIP, UNFINISHED (merge logic with PC class once implemented)
-
-PC attacks Monster
+    Player attacks Monster
 </div>
 
 
@@ -5451,7 +5527,7 @@ PC attacks Monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line190">line 190</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line233">line 233</a>
     </li></ul></dd>
     
 
@@ -5599,7 +5675,7 @@ PC attacks Monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line35">line 35</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line39">line 39</a>
     </li></ul></dd>
     
 
@@ -5641,8 +5717,7 @@ PC attacks Monster
 
 
 <div class="description">
-    ~WIP, UNFINISHED (need PC implementation)
-Finds closest PC that can be seen and targets it.
+    Finds closest PC that can be seen and targets it.
 </div>
 
 
@@ -5686,7 +5761,7 @@ Finds closest PC that can be seen and targets it.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line100">line 100</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line91">line 91</a>
     </li></ul></dd>
     
 
@@ -5709,6 +5784,111 @@ Finds closest PC that can be seen and targets it.
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="collisionEntities"><span class="type-signature"></span>collisionEntities<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Checks to see if there's a monster colliding with this monster.
+Compares corners of each sprite to do so.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line273">line 273</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -5772,7 +5952,7 @@ Finds closest PC that can be seen and targets it.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line12">line 12</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -5860,7 +6040,7 @@ Monster dies.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line55">line 55</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -5948,7 +6128,7 @@ Monster dies.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line119">line 119</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -5990,9 +6170,7 @@ Monster dies.
 
 
 <div class="description">
-    ~WIP, UNFINISHED (needs to be able to move strategically based on PC last seen location
-
-Moves monster.
+    Moves monster.
 If PC has been seen, move strategically towards last seen location.
 Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
 </div>
@@ -6038,7 +6216,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line160">line 160</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line206">line 206</a>
     </li></ul></dd>
     
 
@@ -6186,7 +6364,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line90">line 90</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line81">line 81</a>
     </li></ul></dd>
     
 
@@ -6340,7 +6518,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line18">line 18</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line25">line 25</a>
     </li></ul></dd>
     
 
@@ -6488,7 +6666,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line94">line 94</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line101">line 101</a>
     </li></ul></dd>
     
 
@@ -6574,7 +6752,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line32">line 32</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -6608,7 +6786,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
 
     
-    <h4 class="name" id="move"><span class="type-signature"></span>move<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="move"><span class="type-signature"></span>move<span class="signature">(deltaTime)</span><span class="type-signature"></span></h4>
     
 
     
@@ -6625,6 +6803,55 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>deltaTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The number of ms since the last move</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -6660,7 +6887,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line140">line 140</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line154">line 154</a>
     </li></ul></dd>
     
 
@@ -6746,7 +6973,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line199">line 199</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line243">line 243</a>
     </li></ul></dd>
     
 
@@ -6881,7 +7108,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line46">line 46</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line54">line 54</a>
     </li></ul></dd>
     
 
@@ -6967,7 +7194,7 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line245">line 245</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line306">line 306</a>
     </li></ul></dd>
     
 
@@ -6990,111 +7217,6 @@ Else (if PC not seen yet or last seen PC location has been explored) the monster
 
 
 
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="spriteCollision"><span class="type-signature"></span>spriteCollision<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Checks to see if there's a monster colliding with this monster. todo untested
-Compares corners of each sprite to do so.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line229">line 229</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -7158,7 +7280,7 @@ Compares corners of each sprite to do so.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line219">line 219</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line263">line 263</a>
     </li></ul></dd>
     
 
@@ -7262,7 +7384,7 @@ Compares corners of each sprite to do so.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line101">line 101</a>
+        <a href="Backend_game_monster.mjs.html">Backend/game/monster.mjs</a>, <a href="Backend_game_monster.mjs.html#line108">line 108</a>
     </li></ul></dd>
     
 
@@ -7410,7 +7532,7 @@ Compares corners of each sprite to do so.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line25">line 25</a>
+        <a href="Frontend_game_browser_monster.mjs.html">Frontend/game/browser/monster.mjs</a>, <a href="Frontend_game_browser_monster.mjs.html#line29">line 29</a>
     </li></ul></dd>
     
 
@@ -7452,9 +7574,7 @@ Compares corners of each sprite to do so.
 
 
 <div class="description">
-    ~WIP, UNFINISHED (need to check for collisions for items/players)
-
-Monster moves to an adjacent, unoccupied location.
+    Monster moves to an adjacent, unoccupied location.
 </div>
 
 
@@ -7498,7 +7618,7 @@ Monster moves to an adjacent, unoccupied location.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line115">line 115</a>
+        <a href="Frontend_game_common_monster.mjs.html">Frontend/game/common/monster.mjs</a>, <a href="Frontend_game_common_monster.mjs.html#line111">line 111</a>
     </li></ul></dd>
     
 
@@ -7542,13 +7662,13 @@ Monster moves to an adjacent, unoccupied location.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#unbind">unbind</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 30 2018 23:50:01 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 14 2018 01:13:53 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
