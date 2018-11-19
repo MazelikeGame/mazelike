@@ -64,12 +64,6 @@ function getUsername(sock) {
   });
 }
 
-function getPlayers(sock) {
-  return new Promise((resolve) => {
-    sock.once("player-list", resolve);
-  });
-}
-
 function getPlayer(floor, username) {
   return floor.players.find((player) => {
     return player.name === username;
@@ -91,9 +85,6 @@ async function setup() {
   let username = await getUsername(sock);
   msgEl.innerText = "Loading game";
   let floor;
-
-  let masterSock = io(location.origin); //Transition this to the game server
-  masterSock.emit("ready", gameId);
 
   console.log(`User: ${username}`); // eslint-disable-line
 

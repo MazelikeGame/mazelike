@@ -65,7 +65,6 @@ app.get('/', function(req, res) {
 });
 
 let nextId = 0;
-let playerList = new Map(); //Lists of players
 
 io.on("connection", (client) => {
   const id = ++nextId;
@@ -74,11 +73,6 @@ io.on("connection", (client) => {
   client.once("ready", (_gameId) => {
     gameId = _gameId;
     client.emit("id", id);
-    client.emit("player-list", playerList.get(gameId));
-  });
-
-  client.on("setup-playerlist", (_gameId, usernames) => {
-    playerList.set(_gameId, usernames);
   });
 
   client.on("position", (pos) => {

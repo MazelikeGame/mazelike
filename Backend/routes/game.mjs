@@ -350,23 +350,6 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
   });
 
   if(lobby && lobby.isHost) {
-    let lobbyResults = await Lobby.findAll({
-      where: {
-        lobbyId: req.params.id
-      }
-    });
-
-    let players = lobbyResults.map((row) => {
-      return {
-        id: row.playerId,
-        isHost: row.isHost
-      };
-    });
-
-    let usernames = players.map((player) => {
-      return player.id;
-    });
-
     try {
       await mkdir(`${DATA_DIR}/maps`);
     } catch(err) {
@@ -391,7 +374,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
             lobbyId: req.params.id,
           }
         });
-      io.emit("lobby-start", req.params.id, usernames);
+      io.emit("lobby-start", req.params.id);
       res.end("Game started");
     } catch(err) {
       await Lobby.update({ inProgress: false },
