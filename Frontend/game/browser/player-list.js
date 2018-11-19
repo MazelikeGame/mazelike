@@ -17,9 +17,8 @@ export default class PlayerList {
    * Renders the player list.
    */
   render() {
-    console.log(this.listOfPlayers);
     this.listOfPlayers.forEach((player, index) => {
-      this.drawPlayerInfo(index, player, 100); //change this to match player.getHp() in the future
+      this.drawPlayerInfo(index, player); //change this to match player.getHp() in the future
     });
 
     return this.graphics;
@@ -28,10 +27,9 @@ export default class PlayerList {
   /**
    * Draws the player's information to the player list.
    * @param {int} id the index of the player
-   * @param {string} playerName the name of the player
-   * @param {string} playerHP the health of the player
+   * @param {string} player the player being drawn
    */
-  drawPlayerInfo(id, playerName, playerHP) {  
+  drawPlayerInfo(id, player) {  
     let playerBox = new PIXI.Graphics();
     let offset = 40; //Space between each player information box.
 
@@ -51,9 +49,9 @@ export default class PlayerList {
     });
     
     //Player name
-    let player = new PIXI.Text(this.checkNameLength(playerName), this._playerNameStyle);
-    player.position.set(35, 15 + (id * offset)); //eslint-disable-line
-    playerBox.addChild(player);
+    let playerName = new PIXI.Text(this.checkNameLength(player.name), this._playerNameStyle);
+    playerName.position.set(35, 15 + (id * offset)); //eslint-disable-line
+    playerBox.addChild(playerName);
 
     //Health bar red
     let healthRedBar = new PIXI.Graphics();
@@ -67,25 +65,25 @@ export default class PlayerList {
     //Health bar green
     let healthGreenBar = new PIXI.Graphics();
     healthGreenBar.beginFill(0x7CFC00);
-    healthGreenBar.drawRect(0, 0, playerHP, 10);
+    healthGreenBar.drawRect(0, 0, player.getHp(), 10);
     healthGreenBar.position.set(200, 15 + (id * offset));//eslint-disable-line
     healthGreenBar.endFill();
 
     playerBox.addChild(healthGreenBar);
 
-    //Health Text (Health: 100)
+    //Health Text
     this._hpTextStyle = new PIXI.TextStyle({
       fill: "#FFFFFF",
       fontSize: 12
     });
 
-    let healthText = new PIXI.Text(`Health: ${playerHP}`, this._hpTextStyle);
+    let healthText = new PIXI.Text(`Health: ${player.getHp()}`, this._hpTextStyle);
     healthText.position.set(200, 25 + (id * offset)); //eslint-disable-line
     playerBox.addChild(healthText);
 
     this.graphics.addChild(playerBox);
-    this.playerBoxes.set(playerName, playerBox); //Stores the playerBox for future access accessible by username.
-    this.hpBoxes.set(playerName, {
+    this.playerBoxes.set(player.name, playerBox); //Stores the playerBox for future access accessible by username.
+    this.hpBoxes.set(player.name, {
       text: healthText,
       greenBar: healthGreenBar,
       redBar: healthRedBar
@@ -98,7 +96,7 @@ export default class PlayerList {
   update() {
     ///TODO
     //Need to update for player null.
-    this.floor.players.forEach((player, index) => {
+    this.listOfPlayers.forEach((player, index) => {
       let offset = 40; //Space between each player information box.
       let hpBox = this.hpBoxes.get(player.name);
       
