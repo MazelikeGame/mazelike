@@ -164,6 +164,10 @@ export default class PlayerCommon {
 
       // move the player
       let duration = frame.end - frame.start;
+      if(duration < 0) {
+        duration = 0;
+      }
+      
       this.x += frame.vx * duration;
       this.y += frame.vy * duration;
     });
