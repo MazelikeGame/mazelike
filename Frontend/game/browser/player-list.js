@@ -8,6 +8,7 @@ export default class PlayerList {
   constructor() {
     this.floor = null;
     this.listOfPlayers = [];
+
     this.graphics = new PIXI.Graphics();
     this.playerBoxes = new Map();
     this.hpBoxes = new Map();
@@ -94,7 +95,7 @@ export default class PlayerList {
    * Updates the player list for each player.
    */
   update() {
-    ///TODO
+    //Compare listOfPlayers to playerBox map.
     //Need to update for player null.
     this.listOfPlayers.forEach((player, index) => {
       let offset = 40; //Space between each player information box.
