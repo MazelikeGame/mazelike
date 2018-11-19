@@ -94,10 +94,6 @@ async function setup() {
 
   let masterSock = io(location.origin); //Transition this to the game server
   masterSock.emit("ready", gameId);
-  let players = await getPlayers(masterSock);
-  playerList.listOfPlayers = players;
-
-  console.log("Players: " + players); //eslint-disable-line
 
   console.log(`User: ${username}`); // eslint-disable-line
 
@@ -120,9 +116,6 @@ async function setup() {
     fps = new FpsCounter();
     app.stage.addChild(fps.sprite);
   }
-
-  playerList.floor = floor;
-  app.stage.addChild(playerList.render()); //Draw the player list
 
   let controls = new MobileControls();
   app.stage.addChild(controls.sprite);
@@ -166,11 +159,13 @@ async function setup() {
   });
 
   playerList.floor = floor;
+  playerList.listOfPlayers = floor.players;
+  app.stage.addChild(playerList.render()); //Draw the player list
 
   app.ticker.add(() => {
     floor.update();
     controls.update();
-    playerList.update();
+    //playerList.update();
 
     if(fps) {
       fps.update();

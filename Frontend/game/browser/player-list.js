@@ -17,6 +17,7 @@ export default class PlayerList {
    * Renders the player list.
    */
   render() {
+    console.log(this.listOfPlayers);
     this.listOfPlayers.forEach((player, index) => {
       this.drawPlayerInfo(index, player, 100); //change this to match player.getHp() in the future
     });
