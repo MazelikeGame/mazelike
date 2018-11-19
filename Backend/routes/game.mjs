@@ -14,6 +14,7 @@ import Floor from "../game/floor";
 
 const mkdir = util.promisify(fs.mkdir);
 const exists = util.promisify(fs.exists);
+const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
 export let gameRouter = express.Router();
 
@@ -273,7 +274,7 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
         });
       });
       io.emit("lobby-delete", req.params.id);
-      fs.unlink(`./Frontend/public/maps/${req.params.id}.json`, () => {
+      fs.unlink(`${DATA_DIR}/maps/${req.params.id}.json`, () => {
         //pass
       });
       res.redirect("/account/dashboard");
@@ -367,13 +368,13 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     });
 
     try {
-      await mkdir("Frontend/public/maps");
+      await mkdir(`${DATA_DIR}/maps`);
     } catch(err) {
       // pass
     }
 
     // Generate the game
-    if(!await exists(`Frontend/public/maps/${req.params.id}.json`)) {
+    if(!await exists(`${DATA_DIR}/maps/${req.params.id}.json`)) {
       await Floor.generate({
         gameId: req.params.id,
         floorIdx: 0

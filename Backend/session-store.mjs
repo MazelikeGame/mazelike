@@ -16,7 +16,7 @@ let Session = sql.define("sessions", {
  * @param sid The session id
  */
 async function get(sid) {
-  let dbSession = await Session.findById(sid);
+  let dbSession = await Session.findByPk(sid);
 
   return dbSession && dbSession.session;
 }
@@ -27,7 +27,7 @@ async function get(sid) {
  * @param session The session data
  */
 async function set(sid, session) {
-  let dbSession = await Session.findById(sid);
+  let dbSession = await Session.findByPk(sid);
 
   if(dbSession) {
     dbSession.update({
@@ -46,7 +46,7 @@ async function set(sid, session) {
  * @param sid The session id
  */
 async function destroy(sid) {
-  let dbSession = await Session.findById(sid);
+  let dbSession = await Session.findByPk(sid);
 
   if(dbSession) {
     await dbSession.destroy();

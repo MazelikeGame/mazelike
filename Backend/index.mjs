@@ -11,15 +11,20 @@ import bodyParser from 'body-parser';
 import session from 'express-session';
 import userMiddleware from "./middleware/accounts";
 import sessionStore from "./session-store";
-import winston from 'winston';
-import expressWinston from 'express-winston';
+import morgan from 'morgan';
 import fs from "fs";
+import {setHttpd} from "./managers/manager-single";
 
 const PACKAGE_VERSION = fs.readFileSync("VERSION", "utf8").trim();
 
 let app = express();
 let server = http.Server(app);
 global.io = socketio(server);
+setHttpd(server);
+
+if(process.env.PUBLIC_DIR) {
+  app.use("/public", express.static(process.env.PUBLIC_DIR));
+}
 
 app.use(express.static("Frontend"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -43,17 +48,8 @@ app.set('views', 'Frontend/views');
 
 // Middleware
 app.use(userMiddleware);
-// Winston request logging
-app.use(expressWinston.logger({
-  transports: [
-    new winston.transports.Console({
-      json: true
-    })
-  ],
-  msg: '{{req.method}} {{req.url}}, res.statusCode: {{res.statusCode}} res.responseTime: {{res.responseTime}}ms',
-  expressFormat: false,
-  meta: false
-}));
+// request logging
+app.use(morgan(":method :status :url (:response-time ms)"));
 
 //Routes
 app.use("/game", gameRouter);
@@ -67,15 +63,6 @@ app.get('/', function(req, res) {
     res.render('index', { version: PACKAGE_VERSION });
   }
 });
-
-// Winston error logger. Must be placed after routes
-app.use(expressWinston.errorLogger({
-  transports: [
-    new winston.transports.Console({
-      colorize: true
-    })
-  ]
-}));
 
 let nextId = 0;
 let playerList = new Map(); //Lists of players
@@ -111,7 +98,7 @@ const sleep = (ms) => {
   });
 };
 
-const MAX_RETRIES = 50;
+const MAX_RETRIES = 10;
 const start = async() => {
   // make several attempts to connect to mysql
   for(let i = 0;; ++i) {
@@ -129,13 +116,27 @@ const start = async() => {
     }
   }
 
-  process.stdout.write("------------------ Ignore previous mysql connection erors ------------------\n");
-
   await sequelize.sync();
 
   server.listen(3000, () => {
     process.stdout.write("Server started on port 3000\n");
   });
 };
+
+// Warn users if the forgot password feature is disabled
+if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.MAILER_SERVICE_PROVIDER) {
+  let vars = ["MAILER_EMAIL_ID", "MAILER_PASSWORD", "MAILER_SERVICE_PROVIDER"];
+
+  vars = vars.filter((varName) => {
+    return !process.env[varName];
+  });
+  
+  let s = vars.length > 1 ? "s were" : " was";
+  vars = vars.join(", ");
+
+  process.stdout.write(
+    `Warning: the forgot password feature has been disabled because the ${vars} environment variable${s} not defined\n`
+  );
+}
 
 start();

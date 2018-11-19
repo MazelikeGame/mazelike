@@ -1,5 +1,6 @@
 import * as child from "./manager-child";
 import * as docker from "./manager-docker";
+import * as single from "./manager-single";
 
 let exp;
 
@@ -13,6 +14,10 @@ case "none":
 
 case "docker":
   exp = docker;
+  break;
+
+case "single":
+  exp = single;
   break;
 
 default:

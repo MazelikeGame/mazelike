@@ -37,9 +37,10 @@ import qs from "querystring";
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 
+const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
 var storage = multer.diskStorage({
-  destination: 'Frontend/public/images',
+  destination: `${DATA_DIR}/images`,
   filename: function(req, file, cb) {
     let date_posted = Date.now().toString().concat('-');
     cb(null, date_posted.concat(file.originalname));
@@ -83,19 +84,20 @@ accountRouter.get('/create', function(req, res) {
   }
 });
 
-accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), function(req, res) {
-  var userModel = new User(sql);
+accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), async(req, res) => {
 
-  userModel.username = req.body.username;
-  userModel.email = req.body.email;
+  let image_name = null;
   try {
-    userModel.image_name = req.files.avatar[0].filename;
+    image_name = req.files.avatar[0].filename;
   } catch(e) {
-    userModel.image_name = null;
+    image_name = null;
   }
 
-  userModel.sync().then(() => {
-    userModel.findOne({
+  let username = req.body.username;
+  let email = req.body.email;
+
+  User.sync().then(() => {
+    User.findOne({
       where: {
         [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
       }
@@ -108,12 +110,12 @@ accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), f
             ""
         });
       } else {
-        userModel.encryptPassword(req.body.password, (err, hash) => {
-          userModel.create({
-            username: userModel.username,
-            email: userModel.email,
+        User.encryptPassword(req.body.password, (err, hash) => {
+          User.create({
+            username: username,
+            email: email,
             password: hash,
-            image_name: userModel.image_name
+            image_name: image_name
           });
           res.loginRedirect(req.query.returnUrl || "");
         });
@@ -139,8 +141,6 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
     return;
   }
 
-  var userModel = new User(sql);
-
   var argument, file_name;
   var changing_avatar = false;
   try {
@@ -152,19 +152,19 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
   }
 
   if (argument &amp;&amp; req.session.username !== undefined) {
-    userModel.encryptPassword(req.body.password, (err, hash) => {
+    User.encryptPassword(req.body.password, (err, hash) => {
       let values = {};
       req.body.email &amp;&amp; (values.email = req.body.email); // eslint-disable-line
       req.body.password &amp;&amp; (values.password = hash); // eslint-disable-line
       if(changing_avatar === true) {
         values.image_name = file_name;
-        let file_to_delete = 'Frontend/public/images/'.concat(req.user.image_name);
+        let file_to_delete = `${DATA_DIR}/images/${req.user.image_name}`;
         fs.unlink(file_to_delete, () => {});
       }
       let selector = {
         where: { username: req.session.username }
       };
-      userModel.update(values, selector).then(function(result) {
+      User.update(values, selector).then(function(result) {
         if(result) {
           res.redirect('dashboard');
         } else {
@@ -207,15 +207,13 @@ accountRouter.get('/login', function(req, res) {
 });
 
 accountRouter.post('/login', function(req, res) {
-  var userModel = new User(sql); //make username, email, password properties in the user model.
-
-  userModel.findOne({
+  User.findOne({
     where: {
       username: req.body.username
     }
   }).then(function(user) {
     if(user) {
-      userModel.comparePassword(req.body.password, user.password, (err, result) => {
+      User.comparePassword(req.body.password, user.password, (err, result) => {
         if(result) {
           req.session.authenticated = true;
           req.session.username = user.username;
@@ -258,14 +256,26 @@ accountRouter.get('/view', function(req, res) {
 });
 
 accountRouter.get('/forgot-password', function(req, res) {
-  res.render('forgot-password');
+  if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.MAILER_SERVICE_PROVIDER) {
+    return res.render('forgot-password', {
+      badError: new Error("Forgot password is not enabled")
+    });
+  }
+
+  return res.render('forgot-password');
 });
 
+/* eslint-disable complexity */
 accountRouter.post('/forgot-password', async(req, res) => {
-  var userModel = new User(sql);
+  if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.MAILER_SERVICE_PROVIDER) {
+    return res.render('forgot-password', {
+      badError: new Error("Forgot password is not enabled")
+    });
+  }
+  
   const buf = crypto.randomBytes(20);
   var token = buf.toString('hex');
-  let user = await userModel.findOne({
+  let user = await User.findOne({
     where: {
       username: req.body.username
     }
@@ -310,8 +320,7 @@ accountRouter.post('/forgot-password', async(req, res) => {
 });
 
 accountRouter.get('/reset/:token', async(req, res) => {
-  var userModel = new User(sql);
-  let user = await userModel.findOne({
+  let user = await User.findOne({
     where: {
       resetPasswordToken: req.params.token
     }
@@ -328,8 +337,7 @@ accountRouter.get('/reset/:token', async(req, res) => {
 });
 
 accountRouter.post('/reset/:token', async(req, res) => {
-  var userModel = new User(sql);
-  let user = await userModel.findOne({
+  let user = await User.findOne({
     where: {
       resetPasswordToken: req.params.token
     }
@@ -339,7 +347,7 @@ accountRouter.post('/reset/:token', async(req, res) => {
       tokenError: 'Reset token is invalid'
     });
   }
-  userModel.encryptPassword(req.body.password, (err, hash) => {
+  User.encryptPassword(req.body.password, (err, hash) => {
     let values = {
       password: hash
     };
@@ -348,7 +356,7 @@ accountRouter.post('/reset/:token', async(req, res) => {
         username: user.username
       }
     };
-    userModel.update(values, selector).then((result) => {
+    User.update(values, selector).then((result) => {
       if(result) {
         res.render('reset_password', {
           successfulReset: 'Password reset was successful for user '.concat(user.username)
@@ -361,6 +369,7 @@ accountRouter.post('/reset/:token', async(req, res) => {
     });
   });
 });
+/* eslint-enable complexity */
 
 accountRouter.get('/dashboard', async(req, res) => {
   if(res.loginRedirect()) {
@@ -394,13 +403,13 @@ export default accountRouter;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#unbind">unbind</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 30 2018 23:50:00 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 14 2018 01:13:52 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

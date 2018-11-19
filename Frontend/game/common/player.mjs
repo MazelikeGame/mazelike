@@ -46,6 +46,7 @@ export default class PlayerCommon {
     this._nextId = 0;
     this._lastFrame = Date.now();
     this._frames = [];
+    this.size = 1; // used with monster collision checking, acts as a size multiplier
   }
 
   /**

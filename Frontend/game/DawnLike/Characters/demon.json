@@ -74,6 +74,30 @@
         "x": 0.5,
         "y": 0.5
       }
+    },
+    "boss": {
+      "frame": {
+        "x": 64,
+        "y": 17,
+        "w": 15,
+        "h": 14
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 64,
+        "y": 17,
+        "w": 15,
+        "h": 14
+      },
+      "sourceSize": {
+        "w": 15,
+        "h": 14
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
     }
   }
 }
