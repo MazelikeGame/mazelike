@@ -151,15 +151,15 @@ export default class PlayerCommon {
       }
 
       // Ensure frame times make sense
-      if(frame.start < this._lastFrame) {
-        frame.start = this._lastFrame;
-      }
-      if(typeof window === "undefined") {
-        let now = Date.now();
-        if(frame.end > now) {
-          frame.end = now;
-        }
-      }
+      // if(frame.start < this._lastFrame) {
+      //   frame.start = this._lastFrame;
+      // }
+      // if(typeof window === "undefined") {
+      //   let now = Date.now();
+      //   if(frame.end > now) {
+      //     frame.end = now;
+      //   }
+      // }
       this._lastFrame = frame.end;
 
       // move the player

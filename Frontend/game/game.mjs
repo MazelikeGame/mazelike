@@ -40,7 +40,9 @@ addEventListener("contextmenu", (e) => {
 const addArrowKeyListener = (floor, controls, username) => {
   let handleKey = (type, e) => {
     let player = getPlayer(floor, username);
-    player.handleKeyPress(type, e);
+    if(player) {
+      player.handleKeyPress(type, e);
+    }
   };
 
   controls.bind(handleKey.bind(null, "down"), handleKey.bind(null, "up"));
@@ -147,6 +149,9 @@ async function setup() {
   app.ticker.add(() => {
     let player = getPlayer(floor, username);
     if(player) {
+      player.sendFrame();
+      player.dropConfirmed();
+      player.move();
       floor.setViewport(player.x, player.y);
     }
 

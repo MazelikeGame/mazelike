@@ -31,10 +31,7 @@ export default class Player extends PlayerCommon {
    * @param {int} viewX,
    * @param {int} viewY
    */
-  update(viewX, viewY) {    
-    this.sendFrame();
-    this.dropConfirmed();
-    this.move();
+  update(viewX, viewY) {
     this.sprite.position.set(this.x - viewX, this.y - viewY);
     if(this.tinted !== -1) {
       if(this.sprite.tint === this.regularTint) {
