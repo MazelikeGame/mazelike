@@ -9,11 +9,12 @@ let portMap = new Map();
 
 export function spawnGame(gameEnv = {}) {
   let port = pickPort();
+  let gameId = gameEnv.gameId;
+  
   portMap.set(gameId, port);
   inUsePorts.add(port);
   gameEnv.port = port;
 
-  let gameId = gameEnv.gameId;
   let origEnv = Object.assign({}, gameEnv);
   // prefix all mazelike env vars
   for(let key of Object.keys(gameEnv)) {
