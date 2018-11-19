@@ -3,6 +3,8 @@ const {spawn} = require("child_process");
 const os = require("os");
 const fs = require("fs");
 
+const SEQUELIZE = os.platform() === "win32" ? "node_modules\\.bin\\sequelize.cmd" : "./node_modules/.bin/sequelize";
+
 // The mazelike logo
 let logo = [
   "___  ___                  _  _  _         ",
@@ -121,7 +123,7 @@ let exec = (command, ...args) => {
   if(isGameServer) {
     await exec("node", "--experimental-modules", "Backend/game.mjs");
   } else {
-    await exec("./node_modules/.bin/sequelize", "db:migrate");
+    await exec(SEQUELIZE, "db:migrate");
     await exec("node", "--experimental-modules", "Backend/index.mjs");
   }
 })();
