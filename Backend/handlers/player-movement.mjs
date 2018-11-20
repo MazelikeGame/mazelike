@@ -9,6 +9,8 @@ export default function movementHandler(sock, floor) {
       return _player.name === sock.user.username;
     });
 
-    player._frames.push(frame);
+    if(player && player.alive) {
+      player._frames.push(frame);
+    }
   });
 }
