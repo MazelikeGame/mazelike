@@ -12,14 +12,6 @@ export default class MobileControls {
     
     this._players = new Set();
 
-    // stop all triggers when global pointer up is triggered
-    addEventListener("pointerup", () => {
-      // eslint-disable-next-line no-unused-vars
-      for(let [_, timer] of this._timers) {
-        clear(timer);
-      }
-    });
-
     this.update();
   }
 
@@ -59,7 +51,7 @@ export default class MobileControls {
    * @param keyCode 
    */
   _start(keyCode) {
-    this._trigger(0, keyCode);
+    this._trigger("down", keyCode);
   }
 
   /**
@@ -80,16 +72,16 @@ export default class MobileControls {
    * @param keyCode 
    */
   _stop(keyCode) {
-    this._trigger(1, keyCode);
+    this._trigger("up", keyCode);
   }
 
   /**
    * Bind an event listener for virtual key presses
-   * @param downFn The keydown event listener
-   * @param upFn The keyup event listener
+   * @param down The keydown event listener
+   * @param up The keyup event listener
    */
-  bind(downFn, upFn) {
-    this._players.add([downFn, upFn]);
+  bind(down, up) {
+    this._players.add({down, up});
   }
 }
 
