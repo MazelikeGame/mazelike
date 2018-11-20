@@ -12,8 +12,8 @@ export default function interpolate(entity, deltaTime, targetx, targety) {
   
   // The distance we can move
   let move = entity.speed * (deltaTime / 1000);
-  let xMove = Math.min(move, xDist);
-  let yMove = Math.min(move, yDist);
+  let xMove = Math.min(Math.abs(move), Math.abs(xDist));
+  let yMove = Math.min(Math.abs(move), Math.abs(yDist));
 
   if(!isNaN(xMove)) {
     entity.x += Math.min(xMove, xDist) * (targetx < entity.x ? -1 : 1);
