@@ -14,7 +14,7 @@ import Floor from "../game/floor";
 import MonsterModel from "../models/monster.mjs";
 import Sequelize from "sequelize";
 
-let monsterModel = MonsterModel(sql);
+let monsterModel = new MonsterModel(sql);
 
 const mkdir = util.promisify(fs.mkdir);
 const exists = util.promisify(fs.exists);
