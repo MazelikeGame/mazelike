@@ -89,10 +89,6 @@ export default class Floor extends FloorCommon {
       player._confirmedX = player.x;
       player._confirmedY = player.y;
       player.dropConfirmed();
-      
-      if(player._frames.length > 0) {
-        console.log("Bad");
-      }
     }
   }
 
