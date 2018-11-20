@@ -169,8 +169,14 @@ export default class PlayerCommon {
         duration = 0;
       }
 
+      let prev = this.getPosition();
       this.x += frame.vx * duration;
       this.y += frame.vy * duration;
+
+      if(!this.spriteIsOnMap()) {
+        this.x = prev.x;
+        this.y = prev.y;
+      }
     });
     /* eslint-enable complexity */
   }
