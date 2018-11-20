@@ -40,7 +40,7 @@ export async function spawnGame(gameEnv = {}) {
     name: hostname,
     Hostname: hostname,
     Image: IMAGE_NAME,
-    Cmd: ["-g", "-v"],
+    Cmd: ["-g", "-v", "-d"],
     Env: envArray,
     ExposedPorts: {
       [`${port}/tcp`]: {}
