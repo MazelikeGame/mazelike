@@ -4,6 +4,7 @@ import * as single from "./manager-single";
 
 let exp;
 
+console.log(process.env.CLUSTER_MANAGER);
 switch(process.env.CLUSTER_MANAGER) {
 case "none":
   exp = {
