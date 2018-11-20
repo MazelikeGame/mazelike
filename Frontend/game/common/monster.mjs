@@ -27,11 +27,11 @@ export default class MonsterCommon {
     this.size = 1; // size multiplier
 
     // SPEED: 100 = regular, 50 = slow
-    this.speed = 200;
+    this.speed = 100;
     if(this.type === "blue") { // slow monsters
-      this.speed = 100;
+      this.speed = 50;
     } else if(this.type === "boss") { // very slow
-      this.speed = 75;
+      this.speed = 38;
       this.size = 2;
     }
   }
