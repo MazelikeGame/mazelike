@@ -151,18 +151,6 @@ export default class PlayerCommon {
         frame.vy = frame.vy < 0 ? -1 : 1;
       }
 
-      // Ensure frame times make sense
-      if(typeof window === "undefined") {
-        if(frame.start < this._lastFrame) {
-          frame.start = this._lastFrame;
-        }
-        let now = Date.now();
-        if(frame.end > now) {
-          frame.end = now;
-        }
-      }
-      this._lastFrame = frame.end;
-
       // move the player
       let duration = frame.end - frame.start;
       if(duration < 0) {
