@@ -7,7 +7,6 @@ import PlayerList from "./browser/player-list.js";
 import DisconnectMessage from "./browser/disconnect-msg.js";
 import MobileControls from "./browser/mobile-controls.mjs";
 
-
 let msgEl = document.querySelector(".msg");
 let msgParentEl = document.querySelector(".msg-parent");
 
@@ -70,12 +69,10 @@ async function setup() {
   msgEl.innerText = "Connecting to the game server";
   let addr = await (await fetch(`/game/addr/${gameId}`)).text();
 
-  console.log(addr); // eslint-disable-line
   if(addr === "__current__") {
     addr = location.host;
   }
 
-  console.log(addr); // eslint-disable-line
   let sock = io(`http://${addr}`, {
     path: `/socket/${gameId}`
   });
