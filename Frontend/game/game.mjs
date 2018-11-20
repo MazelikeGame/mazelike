@@ -7,7 +7,6 @@ import PlayerList from "./browser/player-list.js";
 import DisconnectMessage from "./browser/disconnect-msg.js";
 import MobileControls from "./browser/mobile-controls.mjs";
 
-
 let msgEl = document.querySelector(".msg");
 let msgParentEl = document.querySelector(".msg-parent");
 
