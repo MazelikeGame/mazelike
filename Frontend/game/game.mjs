@@ -73,7 +73,7 @@ async function setup() {
     addr = location.host;
   }
 
-  let sock = io(`http://${addr}`, {
+  let sock = io(`${location.protocol}//${addr}`, {
     path: `/socket/${gameId}`
   });
 
