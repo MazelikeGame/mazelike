@@ -7,9 +7,6 @@ import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth.mjs";
 import path from "path";
 
-// then interval at which we update the game state (if this is too short the server will break)
-const UPDATE_INTERVAL = 100;
-
 export default async function main(env, httpd) {
   // Parse the env vars
   const PORT = +process.env.MAZELIKE_port;
@@ -98,7 +95,7 @@ async function triggerTick(floor, io, lastUpdate) {
     process.stderr.write(`${err.stack}\n`);
   }
 
-  setTimeout(triggerTick.bind(undefined, floor, io, now), UPDATE_INTERVAL);
+  setTimeout(triggerTick.bind(undefined, floor, io, now), Floor.UPDATE_INTERVAL);
 }
 
 if(path.relative(process.cwd(), process.argv[1]) === "Backend/game.mjs") {

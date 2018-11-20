@@ -1,5 +1,6 @@
 /* global PIXI */
 import PlayerCommon from "../common/player.mjs";
+import interpolate from "../common/interpolator.mjs";
 
 /** @module Player */
 
@@ -32,6 +33,13 @@ export default class Player extends PlayerCommon {
    * @param {int} viewY
    */
   update(viewX, viewY) {
+    // Interpolate players who are not the current player
+    if(this.floor.username !== this.name) {
+      let now = Date.now();
+      interpolate(this, now - this._lastMove, this._confirmedX, this._confirmedY);
+      this._lastMove = now;
+    }
+
     this.sprite.position.set(this.x - viewX, this.y - viewY);
     if(this.tinted !== -1) {
       if(this.sprite.tint === this.regularTint) {
@@ -94,5 +102,4 @@ export default class Player extends PlayerCommon {
       this.tinted = new Date().getTime();
     }
   }
-
 }

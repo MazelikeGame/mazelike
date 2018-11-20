@@ -7,9 +7,10 @@ import Player from "./player.mjs";
 import Monster from "./monster.mjs";
 
 export default class Floor extends FloorCommon {
-  constructor(gameId, floorIdx, sock) {
+  constructor(gameId, floorIdx, sock, username) {
     super(gameId, floorIdx);
     this.sock = sock;
+    this.username = username;
     // the top left corrner of the user's screen
     this._viewportX = 0;
     this._viewportY = 0;
@@ -27,8 +28,8 @@ export default class Floor extends FloorCommon {
    * @param floorIdx The index of floor we want to generate
    * @param {object} opts The options of the specific generators
    */
-  static generate({gameId, floorIdx, map, sock}) {
-    let floor = new Floor(gameId, floorIdx, sock);
+  static generate({gameId, floorIdx, map, sock, username}) {
+    let floor = new Floor(gameId, floorIdx, sock, username);
     floor.map = GameMap.generate(map);
 
     floor._initRendering();
@@ -64,9 +65,11 @@ export default class Floor extends FloorCommon {
    * Load everything in the browser
    * @param gameId The game id for the game we want to load
    * @param floorIdx The index of floor we want to load
+   * @param sock The connection to the game server
+   * @param username The username of the current player
    */
-  static async load(gameId, floorIdx, sock) {
-    let floor = new Floor(gameId, floorIdx, sock);
+  static async load(gameId, floorIdx, sock, username) {
+    let floor = new Floor(gameId, floorIdx, sock, username);
 
     await Promise.all([
       // NOTE: You should define your functions here and they should
@@ -171,6 +174,8 @@ export default class Floor extends FloorCommon {
       player.handleState(raw);
       player.createSprite();
       player._lastFrameSent = raw._lastFrame;
+      player.x = raw._confirmedX;
+      player.y = raw._confirmedY;
       
       if(raw.username === username) {
         this.setViewport(player.x, player.y);

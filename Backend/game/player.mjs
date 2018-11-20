@@ -109,8 +109,6 @@ export default class Player extends PlayerCommon {
     return {
       username: this.name,
       hp: this.hp,
-      x: this.x,
-      y: this.y,
       spriteName: this.spriteName,
       alive: this.alive,
       _confirmedId: this._confirmedId,
