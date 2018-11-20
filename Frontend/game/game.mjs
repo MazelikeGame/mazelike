@@ -84,8 +84,6 @@ async function setup() {
   let masterSock = io(location.origin); //Transition this to the game server
   masterSock.emit("ready", gameId);
 
-  console.log(`User: ${username}`); // eslint-disable-line
-
   if(gameId) {
     floor = await Floor.load(gameId, 0, sock);
   } else {

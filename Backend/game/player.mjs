@@ -77,12 +77,9 @@ export default class Player extends PlayerCommon {
    * @param {Floor} floor - The floor to save
    */
   static async saveAll(floor) {
-    console.log("Player save"); // eslint-disable-line
     if(floor.players) {
-      console.log("Saving"); // eslint-disable-line
       let players = await Player.getPlayers(floor);
       for(var username of Object.keys(players)) {
-        console.log(`Saving player ${username}`); // eslint-disable-line
         let newValues = floor.players.find((playerClass) => {
           return playerClass.name === username;
         });
@@ -101,7 +98,6 @@ export default class Player extends PlayerCommon {
           y: newValues.y,
           hp: newValues.hp
         });
-        console.log(`Done ${username}`); // eslint-disable-line
       }
     }
   }

@@ -88,15 +88,12 @@ async function triggerTick(floor, io, lastUpdate) {
 
   // save and quit if we loose all the clients
   if(io.engine.clientsCount === 0) {
-    console.log("Saving"); // eslint-disable-line
     await floor.save();
 
-    console.log("Exit 1"); // eslint-disable-line
     if(process.env.CLUSTER_MANAGER === "single") {
       return;
     }
 
-    console.log("Exit 2"); // eslint-disable-line
     process.exit(0);
   }
 
