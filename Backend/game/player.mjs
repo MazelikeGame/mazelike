@@ -13,9 +13,12 @@ export default class Player extends PlayerCommon {
 
   constructor(...args) {
     super(...args);
-    let spawn = this.floor.map.getSpawnPoint();
-    this._confirmedX = spawn.x;
-    this._confirmedY = spawn.y;
+
+    do {
+      let spawn = this.floor.map.getSpawnPoint();
+      this.x = this._confirmedX = spawn.x;
+      this.y = this._confirmedY = spawn.y;
+    } while(!this.spriteIsOnMap());
   }
 
   /**
