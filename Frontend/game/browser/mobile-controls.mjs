@@ -5,10 +5,10 @@ export default class MobileControls {
   constructor() {
     this.sprite = new PIXI.Container();
     
-    this._createArrow([-20, 30, 20, 30, 0, 0], 38); // up
-    this._createArrow([-20, 80, 20, 80, 0, 110], 40); // down
-    this._createArrow([-25, 35, -25, 75, -55, 55], 37); // left
-    this._createArrow([25, 35, 25, 75, 55, 55], 39); // right
+    this._createArrow([-20, 30, 20, 30, 0, 0], [-24, -4, 46, 36], 38); // up
+    this._createArrow([-20, 80, 20, 80, 0, 110], [-24, 76, 46, 36], 40); // down
+    this._createArrow([-25, 35, -25, 75, -55, 55], [-59, 31, 36, 46], 37); // left
+    this._createArrow([25, 35, 25, 75, 55, 55], [21, 31, 36, 46], 39); // right
     
     this._players = new Set();
 
@@ -21,9 +21,13 @@ export default class MobileControls {
    * @param points 
    * @param keyCode 
    */
-  _createArrow(points, keyCode) {
+  _createArrow(points, rect, keyCode) {
     let triangle = new PIXI.Graphics();
+    triangle.alpha = 0.5;
     triangle.beginFill(0xffffff);
+    triangle.drawRect(rect[0], rect[1], rect[2], rect[3]);
+    triangle.endFill();
+    triangle.beginFill(0x0);
     triangle.drawPolygon(points);
     triangle.endFill();
     triangle.x = 0;
@@ -83,9 +87,4 @@ export default class MobileControls {
   bind(down, up) {
     this._players.add({down, up});
   }
-}
-
-function clear(timer) {
-  clearInterval(timer);
-  clearTimeout(timer);
 }
