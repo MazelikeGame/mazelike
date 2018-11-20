@@ -70,10 +70,12 @@ async function setup() {
   msgEl.innerText = "Connecting to the game server";
   let addr = await (await fetch(`/game/addr/${gameId}`)).text();
 
+  console.log(addr); // eslint-disable-line
   if(addr === "__current__") {
     addr = location.host;
   }
 
+  console.log(addr); // eslint-disable-line
   let sock = io(`http://${addr}`, {
     path: `/socket/${gameId}`
   });
@@ -84,7 +86,6 @@ async function setup() {
 
   let masterSock = io(location.origin); //Transition this to the game server
   masterSock.emit("ready", gameId);
-
 
   console.log(`User: ${username}`); // eslint-disable-line
 
