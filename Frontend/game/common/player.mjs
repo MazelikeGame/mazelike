@@ -47,7 +47,7 @@ export default class PlayerCommon {
     this._lastFrame = Date.now();
     this._frames = [];
     this.size = 1; // used with monster collision checking, acts as a size multiplier
-    this.speed = 50;
+    this.speed = 200;
   }
 
   /**
@@ -157,6 +157,7 @@ export default class PlayerCommon {
         duration = 0;
       }
 
+      duration *= this.speed / 1000;
       let prev = this.getPosition();
       this.x += frame.vx * duration;
       this.y += frame.vy * duration;
