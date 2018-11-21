@@ -9,6 +9,8 @@ import path from "path";
 // then interval at which we update the game state (if this is too short the server will break)
 const UPDATE_INTERVAL = 100;
 
+let isGameRunning = false;
+
 export default async function main(env, httpd) {
   // Parse the env vars
   const PORT = +process.env.MAZELIKE_port;
@@ -51,7 +53,13 @@ export default async function main(env, httpd) {
 
   initAuth(io);
 
-  io.on("connection", (sock) => {
+  io.on("connection", async(sock) => {
+    // not logged in enter spectator mode
+    if(!sock.user) {
+      sock.emit("set-username");
+      return;
+    }
+
     sock.on('player-movement', (x, y, username) => {
       floor.players.forEach((player) => {
         if(player.name === username) {
@@ -77,8 +85,9 @@ export default async function main(env, httpd) {
   }
 
   // start the game
-  await floor.sendState(io);
+  await floor.sendState(io, isGameRunning);
   io.emit("start-game");
+  isGameRunning = true;
 
   triggerTick(floor, io, Date.now());
 }
@@ -100,7 +109,7 @@ async function triggerTick(floor, io, lastUpdate) {
   // move monsters and check for collisions
   try {
     await floor.tick(now - lastUpdate);
-    await floor.sendState(io);
+    await floor.sendState(io, isGameRunning);
   } catch(err) {
     process.stderr.write(`${err.stack}\n`);
   }

@@ -114,8 +114,17 @@ async function setup() {
   window.ml.floor = floor;
   addArrowKeyListener(floor, controls, username, sock);
 
+  let resolveGameRunning;
+  let gameRunning = new Promise((resolve) => {
+    resolveGameRunning = resolve;
+  });
+
   sock.on("state", (state) => {
     floor.handleState(state, username);
+
+    if(state.isGameRunning) {
+      resolveGameRunning();
+    }
   });
 
   // display the countdown when it starts
@@ -126,9 +135,12 @@ async function setup() {
   // wait for the game to start
   msgEl.innerText = "Waiting for all players to join";
 
-  await new Promise((resolve) => {
-    sock.once("start-game", resolve);
-  });
+  await Promise.race([
+    new Promise((resolve) => {
+      sock.once("start-game", resolve);
+    }),
+    gameRunning
+  ]);
 
   msgParentEl.remove();
 
