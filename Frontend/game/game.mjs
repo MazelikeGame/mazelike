@@ -36,21 +36,17 @@ addEventListener("contextmenu", (e) => {
 });
 
 // This should be removed once player controls the viewport
-const addArrowKeyListener = (floor, controls, username, sock) => {
-  let handleKey = (e) => {
+const addArrowKeyListener = (floor, controls, username) => {
+  let handleKey = (type, e) => {
     let player = getPlayer(floor, username);
-    // player probably died
-    if(!player) {
-      return;
+    if(player) {
+      player.handleKeyPress(type, e);
     }
-    player.keyPress(e);
-
-    sock.emit('player-movement', player.x, player.y, username);
-    floor.setViewport(player.x, player.y);
   };
 
-  controls.bind(handleKey);
-  window.addEventListener("keydown", handleKey);
+  controls.bind(handleKey.bind(null, "down"), handleKey.bind(null, "up"));
+  window.addEventListener("keydown", handleKey.bind(null, "down"));
+  window.addEventListener('keyup', handleKey.bind(null, "up"));
 };
 
 function getUsername(sock) {
@@ -85,12 +81,13 @@ async function setup() {
   masterSock.emit("ready", gameId);
 
   if(gameId) {
-    floor = await Floor.load(gameId, 0, sock);
+    floor = await Floor.load(gameId, 0, sock, username);
   } else {
     floor = Floor.generate({
       gameId,
       floorIdx: 0,
-      sock
+      sock,
+      username
     });
   }
 
@@ -112,7 +109,7 @@ async function setup() {
   app.stage.addChild(controls.sprite);
 
   window.ml.floor = floor;
-  addArrowKeyListener(floor, controls, username, sock);
+  addArrowKeyListener(floor, controls, username);
 
   sock.on("state", (state) => {
     floor.handleState(state, username);
@@ -147,6 +144,14 @@ async function setup() {
   });
 
   app.ticker.add(() => {
+    let player = getPlayer(floor, username);
+    if(player) {
+      player.sendFrame();
+      player.dropConfirmed();
+      player.move();
+      floor.setViewport(player.x, player.y);
+    }
+
     floor.update();
     controls.update();
 

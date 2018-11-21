@@ -23,6 +23,11 @@ const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
 export let gameRouter = express.Router();
 
+gameRouter.use((req, res, next) => {
+  res.set("Cache-Control", "no-cache");
+  next();
+});
+
 // List all lobbies
 gameRouter.get("/all", async(req, res) => {
   if(res.loginRedirect()) {

@@ -22,6 +22,11 @@ var upload = multer({ storage: storage });
 
 const accountRouter = express.Router();
 
+accountRouter.use((req, res, next) => {
+  res.set("Cache-Control", "no-cache");
+  next();
+});
+
 /**
  * Checks to make sure the user is authenticated.
  * @param req
