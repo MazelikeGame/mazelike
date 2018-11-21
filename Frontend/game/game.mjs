@@ -136,7 +136,7 @@ async function setup() {
   }
 
   masterSock.on("player-list", (players) => {
-    app.stage.addChild(new PlayerList(players).render());
+    app.stage.addChild(new PlayerList(players, floor).render());
   });
 
   let controls = new MobileControls();

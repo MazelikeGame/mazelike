@@ -1,8 +1,9 @@
 /*global PIXI*/
 export default class PlayerList {
 
-  constructor(listOfPlayers) {
+  constructor(listOfPlayers, floor) {
     this.listOfPlayers = listOfPlayers;
+    this.floor = floor;
     this.graphics = new PIXI.Graphics();
   }
 
@@ -28,7 +29,7 @@ export default class PlayerList {
     //Black background
     let outline = new PIXI.Graphics();
     outline.beginFill(0x000000);
-    outline.fillAlpha = 0.75;
+    outline.fillAlpha = this.floor.followingUser === playerName ? 0.85 : 0.7;
     outline.lineStyle(2, 0xFFFFFFF, 1);
     outline.drawRect(0, 0, 300, 30);
     outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
