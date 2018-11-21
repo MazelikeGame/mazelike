@@ -49,6 +49,40 @@ const addArrowKeyListener = (floor, controls, username) => {
   window.addEventListener('keyup', handleKey.bind(null, "up"));
 };
 
+/**
+ * Handle key presses for spectators
+ * @private
+ */
+function spectatorHandler(floor, e) {
+  if(floor.players.length === 0) {
+    return;
+  }
+
+  let index = floor.players.findIndex((player) => {
+    return player.name === floor.followingUser;
+  });
+
+  // Handle the arrow keys
+  if(e.keyCode === 38 /* up */ || e.keyCode === 87 /* w */) {
+    --index;
+  }
+
+  if(e.keyCode === 40 /* down */ || e.keyCode === 83 /* s */) {
+    ++index;
+  }
+
+  // Wrap at the ends
+  if(index < 0) {
+    index = floor.players.length - 1;
+  }
+
+  if(index >= floor.players.length) {
+    index = 0;
+  }
+  
+  floor.followingUser = floor.players[index].name;
+}
+
 function getUsername(sock) {
   return new Promise((resolve) => {
     sock.once("set-username", resolve);
@@ -69,7 +103,7 @@ async function setup() {
     addr = location.host;
   }
 
-  let sock = io(`http://${addr}`, {
+  let sock = io(`${location.protocol}//${addr}`, {
     path: `/socket/${gameId}`
   });
 
@@ -102,7 +136,7 @@ async function setup() {
   }
 
   masterSock.on("player-list", (players) => {
-    app.stage.addChild(new PlayerList(players).render());
+    app.stage.addChild(new PlayerList(players, floor).render());
   });
 
   let controls = new MobileControls();
@@ -111,8 +145,17 @@ async function setup() {
   window.ml.floor = floor;
   addArrowKeyListener(floor, controls, username);
 
+  let resolveGameRunning;
+  let gameRunning = new Promise((resolve) => {
+    resolveGameRunning = resolve;
+  });
+
   sock.on("state", (state) => {
     floor.handleState(state, username);
+
+    if(state.isGameRunning) {
+      resolveGameRunning();
+    }
   });
 
   // display the countdown when it starts
@@ -123,9 +166,12 @@ async function setup() {
   // wait for the game to start
   msgEl.innerText = "Waiting for all players to join";
 
-  await new Promise((resolve) => {
-    sock.once("start-game", resolve);
-  });
+  await Promise.race([
+    new Promise((resolve) => {
+      sock.once("start-game", resolve);
+    }),
+    gameRunning
+  ]);
 
   msgParentEl.remove();
 
@@ -143,7 +189,28 @@ async function setup() {
     app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
   });
 
+  let isSpectator = false;
   app.ticker.add(() => {
+    // spectator mode
+    if(!isSpectator && !getPlayer(floor, username)) {
+      controls.becomeSpectator();
+      isSpectator = true;
+      floor.followingUser = floor.players[0] && floor.players[0].name;
+      // switch following users by pressing up and down
+      controls.bind(spectatorHandler.bind(null, floor), () => {});
+      window.addEventListener("keydown", spectatorHandler.bind(null, floor));
+    }
+
+    // follow a specific player in spectator mode
+    if(isSpectator) {
+      let following = getPlayer(floor, floor.followingUser);
+      if(following) {
+        floor.setViewport(following.x, following.y);
+      } else if(floor.players.length) {
+        floor.followingUser = floor.players[0].name;
+      }
+    }
+    
     let player = getPlayer(floor, username);
     if(player) {
       player.sendFrame();

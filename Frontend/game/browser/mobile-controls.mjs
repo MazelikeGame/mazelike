@@ -4,11 +4,14 @@
 export default class MobileControls {
   constructor() {
     this.sprite = new PIXI.Container();
+    this._players = new Set();
+    this._timers = new Map();
+    this._arrowName = {};
     
-    this._createArrow([-20, 30, 20, 30, 0, 0], [-24, -4, 46, 36], 38); // up
-    this._createArrow([-20, 80, 20, 80, 0, 110], [-24, 76, 46, 36], 40); // down
-    this._createArrow([-25, 35, -25, 75, -55, 55], [-59, 31, 36, 46], 37); // left
-    this._createArrow([25, 35, 25, 75, 55, 55], [21, 31, 36, 46], 39); // right
+    this._createArrow("up", [-20, 30, 20, 30, 0, 0], [-24, -4, 46, 36], 38);
+    this._createArrow("down", [-20, 80, 20, 80, 0, 110], [-24, 76, 46, 36], 40);
+    this._createArrow("left", [-25, 35, -25, 75, -55, 55], [-59, 31, 36, 46], 37);
+    this._createArrow("right", [25, 35, 25, 75, 55, 55], [21, 31, 36, 46], 39);
     
     this._players = new Set();
 
@@ -18,10 +21,11 @@ export default class MobileControls {
   /**
    * Create a arrow for a control
    * @private
+   * @param name
    * @param points 
    * @param keyCode 
    */
-  _createArrow(points, rect, keyCode) {
+  _createArrow(name, points, rect, keyCode) {
     let triangle = new PIXI.Graphics();
     triangle.alpha = 0.5;
     triangle.beginFill(0xffffff);
@@ -39,6 +43,8 @@ export default class MobileControls {
     triangle.on("pointerdown", () => this._start(keyCode));
     triangle.on("pointerup", () => this._stop(keyCode));
     triangle.on("pointerleave", () => this._stop(keyCode));
+
+    this._arrowName[name] = triangle;
   }
 
   /**
@@ -86,5 +92,13 @@ export default class MobileControls {
    */
   bind(down, up) {
     this._players.add({down, up});
+  }
+
+  /**
+   * Hide up down arrow keys
+   */
+  becomeSpectator() {
+    this.sprite.removeChild(this._arrowName.left);
+    this.sprite.removeChild(this._arrowName.right);
   }
 }

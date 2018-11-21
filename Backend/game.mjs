@@ -7,6 +7,8 @@ import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth.mjs";
 import path from "path";
 
+let isGameRunning = false;
+
 export default async function main(env, httpd) {
   // Parse the env vars
   const PORT = +process.env.MAZELIKE_port;
@@ -49,13 +51,30 @@ export default async function main(env, httpd) {
 
   initAuth(io);
 
-  io.on("connection", (sock) => {
+  // eslint-disable-next-line arrow-parens,arrow-body-style
+  let awaitedPlayers = new Set(floor.players.map(player => player.name));
+  let readyResolver;
+  io.on("connection", async(sock) => {
+    // Not logged in enter spectator mode
+    if(!sock.user) {
+      sock.emit("set-username");
+      return;
+    }
+
     sock.emit("set-username", sock.user.username);
     saveHandler(sock, floor);
     movementHandler(sock, floor, io);
+
+    // Mark this player as ready
+    awaitedPlayers.delete(sock.user.username);
+    if(awaitedPlayers.size === 0) {
+      readyResolver();
+    }
   });
 
-  // In the future we should wait for all players to join here
+  await new Promise((resolve) => {
+    readyResolver = resolve;
+  });
 
   // start the count down
   for(let i = 5; i > 0; --i) {
@@ -67,8 +86,9 @@ export default async function main(env, httpd) {
   }
 
   // start the game
-  await floor.sendState(io);
+  await floor.sendState(io, isGameRunning);
   io.emit("start-game");
+  isGameRunning = true;
 
   triggerTick(floor, io, Date.now());
 }
@@ -90,7 +110,7 @@ async function triggerTick(floor, io, lastUpdate) {
   // move monsters and check for collisions
   try {
     await floor.tick(now - lastUpdate);
-    await floor.sendState(io);
+    await floor.sendState(io, isGameRunning);
   } catch(err) {
     process.stderr.write(`${err.stack}\n`);
   }
