@@ -11,9 +11,14 @@ import path from "path";
 import fs from "fs";
 import {spawnGame, getGameAddr} from "../managers/manager";
 import Floor from "../game/floor";
+import MonsterModel from "../models/monster.mjs";
+import Sequelize from "sequelize";
+
+let monsterModel = new MonsterModel(sql);
 
 const mkdir = util.promisify(fs.mkdir);
 const exists = util.promisify(fs.exists);
+const unlink = util.promisify(fs.unlink);
 const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
 export let gameRouter = express.Router();
@@ -274,9 +279,7 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
         });
       });
       io.emit("lobby-delete", req.params.id);
-      fs.unlink(`${DATA_DIR}/maps/${req.params.id}.json`, () => {
-        //pass
-      });
+      await deleteGame(req.params.id);
       res.redirect("/account/dashboard");
     } else {
       res.status(401);
@@ -423,3 +426,18 @@ gameRouter.get('/test', (req, res) => {
   res.sendFile(path.resolve("Frontend/game/Tests/index.html"));
 });
 
+function deleteGame(id) {
+  return Promise.all([
+    unlink(`${DATA_DIR}/maps/${id}.json`),
+
+    monsterModel.destroy({
+      where: {
+        floorId: {
+          [Sequelize.Op.like]: `${id}-%`
+        }
+      }
+    })
+  ])
+    // Ignore all errors
+    .catch(() => {});
+}
