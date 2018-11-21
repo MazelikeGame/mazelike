@@ -162,7 +162,7 @@ async function setup() {
   app.ticker.add(() => {
     // spectator mode
     if(!isSpectator && !getPlayer(floor, username)) {
-      app.stage.removeChild(controls.sprite);
+      controls.becomeSpectator();
       isSpectator = true;
       floor.followingUser = floor.players[0] && floor.players[0].name;
     }

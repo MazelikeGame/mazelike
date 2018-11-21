@@ -7,14 +7,14 @@ const REPEAT_DELAY = 500; // Delay between initial press and repeated presses
 export default class MobileControls {
   constructor() {
     this.sprite = new PIXI.Container();
-    
-    this._createArrow([-20, 30, 20, 30, 0, 0], 38); // up
-    this._createArrow([-20, 80, 20, 80, 0, 110], 40); // down
-    this._createArrow([-25, 35, -25, 75, -55, 55], 37); // left
-    this._createArrow([25, 35, 25, 75, 55, 55], 39); // right
-    
     this._players = new Set();
     this._timers = new Map();
+    this._arrowName = {};
+    
+    this._createArrow("up", [-20, 30, 20, 30, 0, 0], 38);
+    this._createArrow("down", [-20, 80, 20, 80, 0, 110], 40);
+    this._createArrow("left", [-25, 35, -25, 75, -55, 55], 37);
+    this._createArrow("right", [25, 35, 25, 75, 55, 55], 39);
 
     // stop all triggers when global pointer up is triggered
     addEventListener("pointerup", () => {
@@ -30,10 +30,11 @@ export default class MobileControls {
   /**
    * Create a arrow for a control
    * @private
+   * @param name
    * @param points 
    * @param keyCode 
    */
-  _createArrow(points, keyCode) {
+  _createArrow(name, points, keyCode) {
     let triangle = new PIXI.Graphics();
     triangle.beginFill(0xffffff);
     triangle.drawPolygon(points);
@@ -47,6 +48,8 @@ export default class MobileControls {
     triangle.on("pointerdown", () => this._start(keyCode));
     triangle.on("pointerup", () => this._stop(keyCode));
     triangle.on("pointerleave", () => this._stop(keyCode));
+
+    this._arrowName[name] = triangle;
   }
 
   /**
@@ -55,6 +58,10 @@ export default class MobileControls {
   update() {
     this.sprite.x = innerWidth - (this.sprite.width / 2) - 10;
     this.sprite.y = innerHeight - this.sprite.height - 10;
+
+    if(!this._arrowName.up) {
+      this.sprite.y -= 40;
+    }
   }
 
   /**
@@ -109,6 +116,16 @@ export default class MobileControls {
    */
   unbind(fn) {
     this._players.delete(fn);
+  }
+
+  /**
+   * Hide up down arrow keys
+   */
+  becomeSpectator() {
+    this.sprite.removeChild(this._arrowName.up);
+    this.sprite.removeChild(this._arrowName.down);
+    delete this._arrowName.up;
+    delete this._arrowName.down;
   }
 }
 
