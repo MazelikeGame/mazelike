@@ -158,10 +158,21 @@ async function setup() {
     app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
   });
 
+  let isSpectator = false;
   app.ticker.add(() => {
     // spectator mode
-    if(!getPlayer(floor, username)) {
+    if(!isSpectator && !getPlayer(floor, username)) {
       app.stage.removeChild(controls.sprite);
+      isSpectator = true;
+      floor.followingUser = floor.players[0] && floor.players[0].name;
+    }
+
+    // follow a specific player in spectator mode
+    if(isSpectator) {
+      let following = getPlayer(floor, floor.followingUser);
+      if(following) {
+        floor.setViewport(following.x, following.y);
+      }
     }
 
     floor.update();
