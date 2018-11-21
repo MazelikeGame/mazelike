@@ -159,6 +159,11 @@ async function setup() {
   });
 
   app.ticker.add(() => {
+    // spectator mode
+    if(!getPlayer(floor, username)) {
+      app.stage.removeChild(controls.sprite);
+    }
+
     floor.update();
     controls.update();
 
