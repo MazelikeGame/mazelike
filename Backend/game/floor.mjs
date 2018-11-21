@@ -81,6 +81,15 @@ export default class Floor extends FloorCommon {
       monster.move(deltaTime); // monster-monster collision check happens here
       monster.figureOutWhereToGo();
     }
+    for(let player of this.players) {
+      player.move();
+      if(player._frames.length) {
+        player._confirmedId = player._frames[player._frames.length - 1].id;
+      }
+      player._confirmedX = player.x;
+      player._confirmedY = player.y;
+      player.dropConfirmed();
+    }
   }
 
   /**

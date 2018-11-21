@@ -1,4 +1,24 @@
 /** @module PlayerCommon */
+
+const KEYS = {
+  upArrow: 38,
+  w: 87,
+  rightArrow: 39,
+  d: 68,
+  downArrow: 40,
+  s: 83,
+  leftArrow: 37,
+  a: 65
+};
+
+// map w to up, d to right, etc
+const MAPPINGS = {
+  [KEYS.w]: KEYS.upArrow,
+  [KEYS.d]: KEYS.rightArrow,
+  [KEYS.s]: KEYS.downArrow,
+  [KEYS.a]: KEYS.leftArrow
+};
+
 /**
  * The player class.
  */
@@ -22,7 +42,12 @@ export default class PlayerCommon {
     this.floor = floor;
     this.damage = 10;
     this.speed = 15;
+    this.input = new Set();
+    this._nextId = 0;
+    this._lastFrame = Date.now();
+    this._frames = [];
     this.size = 1; // used with monster collision checking, acts as a size multiplier
+    this.speed = 400;
   }
 
   /**
@@ -59,56 +84,99 @@ export default class PlayerCommon {
 
   /**
    * Update the player's velocity from key input.
+   * @param {string} type - Either down or up
    * @param {event} e - User's keyboard input,
-   * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
-  keyPress(e) { // eslint-disable-line complexity
-    let oldPosition = {
-      x: this.x,
-      y: this.y
-    };
-    let keys = {
-      upArrow: 38,
-      w: 87,
-      rightArrow: 39,
-      d: 68,
-      downArrow: 40,
-      s: 83,
-      leftArrow: 37,
-      a: 65
-    };
-    switch(e.keyCode) {
-    case keys.upArrow:
-    case keys.w:
-      this.y -= this.speed;
-      break;
-    case keys.downArrow:
-    case keys.s:
-      this.y += this.speed;
-      break;
-    case keys.leftArrow:
-    case keys.a:
-      this.x -= this.speed;
-      break;
-    case keys.rightArrow:
-    case keys.d:
-      this.x += this.speed;
-      break;
-    default:
-      break;
+  handleKeyPress(type, e) { // eslint-disable-line complexity
+    let code = MAPPINGS[e.keyCode] || e.keyCode;
+
+    if(type === "down") {
+      this.input.add(code);
+    } else {
+      this.input.delete(code);
     }
-    if(!this.spriteIsOnMap()) {
-      this.setCoordinates(oldPosition.x, oldPosition.y);
+
+    // change in x and y
+    this.vx = 0;
+    this.vy = 0;
+
+    if(this.input.has(KEYS.upArrow)) {
+      this.vy -= 1;
+    }
+    if(this.input.has(KEYS.downArrow)) {
+      this.vy += 1;
+    }
+    if(this.input.has(KEYS.rightArrow)) {
+      this.vx += 1;
+    }
+    if(this.input.has(KEYS.leftArrow)) {
+      this.vx -= 1;
     }
   }
 
   /**
-   * Modify player's velocity on key release
-   * @param {String} The name of the key released
+   * Send an input frame to the server
    */
-  keyRelease() {
-    this.vx = 0;
-    this.vy = 0;
+  sendFrame() {
+    let now = Date.now();
+    let frame = {
+      id: ++this._nextId,
+      start: this._lastFrameSent,
+      end: now,
+      vx: this.vx,
+      vy: this.vy
+    };
+
+    this._lastFrameSent = now;
+    if(this.vx || this.vy) {
+      this._frames.push(frame);
+      this.floor.sock.emit("player-frame", frame);
+    }
+  }
+
+  /**
+   * Update the player's position based off the player's velocity
+   */
+  move() {
+    this.x = this._confirmedX;
+    this.y = this._confirmedY;
+
+    /* eslint-disable complexity */
+    this._frames.forEach((frame) => {
+      // Ensure vx and vy are -1, 0, or 1
+      if(frame.vx !== 0) {
+        frame.vx = frame.vx < 0 ? -1 : 1;
+      }
+      if(frame.vy !== 0) {
+        frame.vy = frame.vy < 0 ? -1 : 1;
+      }
+
+      // move the player
+      let duration = frame.end - frame.start;
+      if(duration < 0) {
+        duration = 0;
+      }
+
+      duration *= this.speed / 1000;
+      let prev = this.getPosition();
+      this.x += frame.vx * duration;
+      this.y += frame.vy * duration;
+
+      if(!this.spriteIsOnMap()) {
+        this.x = prev.x;
+        this.y = prev.y;
+      }
+    });
+    /* eslint-enable complexity */
+  }
+
+  /**
+   * Drop all confirmed frames
+   */
+  dropConfirmed() {
+    while(this._frames.length && this._frames[0].id <= this._confirmedId) {
+      this._frames.shift();
+    }
   }
 
   /**

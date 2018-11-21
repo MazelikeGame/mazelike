@@ -3,11 +3,9 @@ import socketIO from "socket.io";
 import http from "http";
 import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
+import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth.mjs";
 import path from "path";
-
-// then interval at which we update the game state (if this is too short the server will break)
-const UPDATE_INTERVAL = 100;
 
 let isGameRunning = false;
 
@@ -60,17 +58,9 @@ export default async function main(env, httpd) {
       return;
     }
 
-    sock.on('player-movement', (x, y, username) => {
-      floor.players.forEach((player) => {
-        if(player.name === username) {
-          player.x = x;
-          player.y = y;
-        }
-      });
-    });
-
     sock.emit("set-username", sock.user.username);
     saveHandler(sock, floor);
+    movementHandler(sock, floor, io);
   });
 
   // In the future we should wait for all players to join here
@@ -114,7 +104,7 @@ async function triggerTick(floor, io, lastUpdate) {
     process.stderr.write(`${err.stack}\n`);
   }
 
-  setTimeout(triggerTick.bind(undefined, floor, io, now), UPDATE_INTERVAL);
+  setTimeout(triggerTick.bind(undefined, floor, io, now), Floor.UPDATE_INTERVAL);
 }
 
 if(path.relative(process.cwd(), process.argv[1]) === "Backend/game.mjs") {
