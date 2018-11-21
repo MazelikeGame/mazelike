@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Backend/game/game-map.mjs</title>
+    <title>JSDoc: Source: Backend/handlers/player-movement.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Backend/game/game-map.mjs</h1>
+    <h1 class="page-title">Source: Backend/handlers/player-movement.mjs</h1>
 
     
 
@@ -26,45 +26,52 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @module backend/game/GameMap */
-import GameMapCommon from "../../Frontend/game/common/game-map/game-map.mjs";
-import fs from "fs";
-import util from "util";
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-extra-parens */
 
-const readFile = util.promisify(fs.readFile);
-const writeFile = util.promisify(fs.writeFile);
-const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
+const GRACE_PERIOD = 100;
+const MAX_FRAME_LENGTH = 50; /* # of ms between frames at 20 fps */
 
-export default class GameMap extends GameMapCommon {
-  /**
-   * Geneate a game map
-   * @returns {GameMap}
-   */
-  static generate(params) {
-    return GameMapCommon.generate(new GameMap(), params);
+/**
+ * Handle player movement
+ * @param sock 
+ * @param floor 
+ */
+export default function movementHandler(sock, floor) { 
+  sock.on("player-frame", async(frame) => {
+    let player = floor.players.find((_player) => {
+      return _player.name === sock.user.username;
+    });
+
+    if(player &amp;&amp; player.alive) {
+      verifyTimes(frame, player);
+      let frames = breakUpFrame(frame);
+      player._frames = player._frames.concat(frames);
+    }
+  });
+}
+
+// Ensure frame times make sense
+function verifyTimes(frame, player) {
+  let duration = (Date.now() - player._lastFrame) + GRACE_PERIOD;
+  let userDuration = Math.abs(frame.end - frame.start);
+  player._lastFrame = Date.now();
+
+  frame.end = frame.start + Math.min(userDuration, duration);
+}
+
+// Break up a long frame so collision detection can work
+function breakUpFrame(frame) {
+  let frames = [];
+
+  while(frame.end - frame.start > MAX_FRAME_LENGTH) {
+    let first = Object.assign({}, frame);
+    first.end = first.start + MAX_FRAME_LENGTH;
+    frame.start = first.end;
+    frames.push(first);
   }
 
-  /**
-   * Load the game map in nodejs
-   * @param {Floor} floor The floor to load the map for
-   */
-  static async load(floor) {
-    // for backwards compatability the map for floorIdx == 0 is just the gameId
-    let mapId = floor.id.replace("-0", "");
-
-    floor.map = GameMap.parse(await readFile(`${DATA_DIR}/maps/${mapId}.json`, "utf8"), new GameMap());
-  }
-
-  /**
-   * Save the game map in nodejs
-   * @param {string} id The floor id to save the map for
-   */
-  save(floorId) {
-    // for backwards compatability the map for floorIdx == 0 is just the gameId
-    let mapId = floorId.replace("-0", "");
-
-    return writeFile(`${DATA_DIR}/maps/${mapId}.json`, this.serialize());
-  }
+  frames.push(frame);
+  return frames;
 }</code></pre>
         </article>
     </section>
