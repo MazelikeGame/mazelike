@@ -27,6 +27,26 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/** @module PlayerCommon */
+
+const KEYS = {
+  upArrow: 38,
+  w: 87,
+  rightArrow: 39,
+  d: 68,
+  downArrow: 40,
+  s: 83,
+  leftArrow: 37,
+  a: 65
+};
+
+// map w to up, d to right, etc
+const MAPPINGS = {
+  [KEYS.w]: KEYS.upArrow,
+  [KEYS.d]: KEYS.rightArrow,
+  [KEYS.s]: KEYS.downArrow,
+  [KEYS.a]: KEYS.leftArrow
+};
+
 /**
  * The player class.
  */
@@ -50,6 +70,12 @@ export default class PlayerCommon {
     this.floor = floor;
     this.damage = 10;
     this.speed = 15;
+    this.input = new Set();
+    this._nextId = 0;
+    this._lastFrame = Date.now();
+    this._frames = [];
+    this.size = 1; // used with monster collision checking, acts as a size multiplier
+    this.speed = 400;
   }
 
   /**
@@ -86,56 +112,99 @@ export default class PlayerCommon {
 
   /**
    * Update the player's velocity from key input.
+   * @param {string} type - Either down or up
    * @param {event} e - User's keyboard input,
-   * @param {int} speed - Desired speed of the player(should switch to this.speed)
    */
-  keyPress(e) { // eslint-disable-line complexity
-    let oldPosition = {
-      x: this.x,
-      y: this.y
-    };
-    let keys = {
-      upArrow: 38,
-      w: 87,
-      rightArrow: 39,
-      d: 68,
-      downArrow: 40,
-      s: 83,
-      leftArrow: 37,
-      a: 65
-    };
-    switch(e.keyCode) {
-    case keys.upArrow:
-    case keys.w:
-      this.y -= this.speed;
-      break;
-    case keys.downArrow:
-    case keys.s:
-      this.y += this.speed;
-      break;
-    case keys.leftArrow:
-    case keys.a:
-      this.x -= this.speed;
-      break;
-    case keys.rightArrow:
-    case keys.d:
-      this.x += this.speed;
-      break;
-    default:
-      break;
+  handleKeyPress(type, e) { // eslint-disable-line complexity
+    let code = MAPPINGS[e.keyCode] || e.keyCode;
+
+    if(type === "down") {
+      this.input.add(code);
+    } else {
+      this.input.delete(code);
     }
-    if(!this.spriteIsOnMap()) {
-      this.setCoordinates(oldPosition.x, oldPosition.y);
+
+    // change in x and y
+    this.vx = 0;
+    this.vy = 0;
+
+    if(this.input.has(KEYS.upArrow)) {
+      this.vy -= 1;
+    }
+    if(this.input.has(KEYS.downArrow)) {
+      this.vy += 1;
+    }
+    if(this.input.has(KEYS.rightArrow)) {
+      this.vx += 1;
+    }
+    if(this.input.has(KEYS.leftArrow)) {
+      this.vx -= 1;
     }
   }
 
   /**
-   * Modify player's velocity on key release
-   * @param {String} The name of the key released
+   * Send an input frame to the server
    */
-  keyRelease() {
-    this.vx = 0;
-    this.vy = 0;
+  sendFrame() {
+    let now = Date.now();
+    let frame = {
+      id: ++this._nextId,
+      start: this._lastFrameSent,
+      end: now,
+      vx: this.vx,
+      vy: this.vy
+    };
+
+    this._lastFrameSent = now;
+    if(this.vx || this.vy) {
+      this._frames.push(frame);
+      this.floor.sock.emit("player-frame", frame);
+    }
+  }
+
+  /**
+   * Update the player's position based off the player's velocity
+   */
+  move() {
+    this.x = this._confirmedX;
+    this.y = this._confirmedY;
+
+    /* eslint-disable complexity */
+    this._frames.forEach((frame) => {
+      // Ensure vx and vy are -1, 0, or 1
+      if(frame.vx !== 0) {
+        frame.vx = frame.vx &lt; 0 ? -1 : 1;
+      }
+      if(frame.vy !== 0) {
+        frame.vy = frame.vy &lt; 0 ? -1 : 1;
+      }
+
+      // move the player
+      let duration = frame.end - frame.start;
+      if(duration &lt; 0) {
+        duration = 0;
+      }
+
+      duration *= this.speed / 1000;
+      let prev = this.getPosition();
+      this.x += frame.vx * duration;
+      this.y += frame.vy * duration;
+
+      if(!this.spriteIsOnMap()) {
+        this.x = prev.x;
+        this.y = prev.y;
+      }
+    });
+    /* eslint-enable complexity */
+  }
+
+  /**
+   * Drop all confirmed frames
+   */
+  dropConfirmed() {
+    while(this._frames.length &amp;&amp; this._frames[0].id &lt;= this._confirmedId) {
+      this._frames.shift();
+    }
   }
 
   /**
@@ -177,7 +246,6 @@ export default class PlayerCommon {
   attack(monsterID) {
     this.floor.monsters[monsterID].beAttacked(this.damage);
   }
-
 }
 PlayerCommon.SPRITE_SIZE = 48;
 </code></pre>
@@ -190,13 +258,13 @@ PlayerCommon.SPRITE_SIZE = 48;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#unbind">unbind</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 14 2018 01:13:52 GMT-0600 (Central Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 21 2018 14:36:58 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

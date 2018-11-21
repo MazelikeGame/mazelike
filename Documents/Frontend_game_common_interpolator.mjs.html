@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Backend/game/game-map.mjs</title>
+    <title>JSDoc: Source: Frontend/game/common/interpolator.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Backend/game/game-map.mjs</h1>
+    <h1 class="page-title">Source: Frontend/game/common/interpolator.mjs</h1>
 
     
 
@@ -26,44 +26,29 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @module backend/game/GameMap */
-import GameMapCommon from "../../Frontend/game/common/game-map/game-map.mjs";
-import fs from "fs";
-import util from "util";
+            <pre class="prettyprint source linenums"><code>/**
+ * Move an entity between 2 points over time
+ * @param entity The thing to move has (x, y and speed)
+ * @param deltaTime The time since the last move
+ * @param targetx The target x coordinate
+ * @param targety The target y coordinate
+ */
+export default function interpolate(entity, deltaTime, targetx, targety) {
+  // Get the distance in the x and y direction we have to move
+  let xDist = Math.abs(targetx - entity.x);
+  let yDist = Math.abs(targety - entity.y);
+  
+  // The distance we can move
+  let move = entity.speed * (deltaTime / 1000);
+  let xMove = Math.min(Math.abs(move), Math.abs(xDist));
+  let yMove = Math.min(Math.abs(move), Math.abs(yDist));
 
-const readFile = util.promisify(fs.readFile);
-const writeFile = util.promisify(fs.writeFile);
-const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
-
-export default class GameMap extends GameMapCommon {
-  /**
-   * Geneate a game map
-   * @returns {GameMap}
-   */
-  static generate(params) {
-    return GameMapCommon.generate(new GameMap(), params);
+  if(!isNaN(xMove)) {
+    entity.x += Math.min(xMove, xDist) * (targetx &lt; entity.x ? -1 : 1);
   }
 
-  /**
-   * Load the game map in nodejs
-   * @param {Floor} floor The floor to load the map for
-   */
-  static async load(floor) {
-    // for backwards compatability the map for floorIdx == 0 is just the gameId
-    let mapId = floor.id.replace("-0", "");
-
-    floor.map = GameMap.parse(await readFile(`${DATA_DIR}/maps/${mapId}.json`, "utf8"), new GameMap());
-  }
-
-  /**
-   * Save the game map in nodejs
-   * @param {string} id The floor id to save the map for
-   */
-  save(floorId) {
-    // for backwards compatability the map for floorIdx == 0 is just the gameId
-    let mapId = floorId.replace("-0", "");
-
-    return writeFile(`${DATA_DIR}/maps/${mapId}.json`, this.serialize());
+  if(!isNaN(yMove)) {
+    entity.y += Math.min(yMove, yDist) * (targety &lt; entity.y ? -1 : 1);
   }
 }</code></pre>
         </article>
