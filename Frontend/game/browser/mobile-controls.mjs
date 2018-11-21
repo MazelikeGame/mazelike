@@ -53,10 +53,6 @@ export default class MobileControls {
   update() {
     this.sprite.x = innerWidth - (this.sprite.width / 2) - 10;
     this.sprite.y = innerHeight - this.sprite.height - 10;
-
-    if(!this._arrowName.up) {
-      this.sprite.y -= 40;
-    }
   }
 
   /**
@@ -102,9 +98,7 @@ export default class MobileControls {
    * Hide up down arrow keys
    */
   becomeSpectator() {
-    this.sprite.removeChild(this._arrowName.up);
-    this.sprite.removeChild(this._arrowName.down);
-    delete this._arrowName.up;
-    delete this._arrowName.down;
+    this.sprite.removeChild(this._arrowName.left);
+    this.sprite.removeChild(this._arrowName.right);
   }
 }

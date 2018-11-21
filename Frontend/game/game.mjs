@@ -49,6 +49,40 @@ const addArrowKeyListener = (floor, controls, username) => {
   window.addEventListener('keyup', handleKey.bind(null, "up"));
 };
 
+/**
+ * Handle key presses for spectators
+ * @private
+ */
+function spectatorHandler(floor, e) {
+  if(floor.players.length === 0) {
+    return;
+  }
+
+  let index = floor.players.findIndex((player) => {
+    return player.name === floor.followingUser;
+  });
+
+  // Handle the arrow keys
+  if(e.keyCode === 38 /* up */ || e.keyCode === 87 /* w */) {
+    --index;
+  }
+
+  if(e.keyCode === 40 /* down */ || e.keyCode === 83 /* s */) {
+    ++index;
+  }
+
+  // Wrap at the ends
+  if(index < 0) {
+    index = floor.players.length - 1;
+  }
+
+  if(index >= floor.players.length) {
+    index = 0;
+  }
+  
+  floor.followingUser = floor.players[index].name;
+}
+
 function getUsername(sock) {
   return new Promise((resolve) => {
     sock.once("set-username", resolve);
@@ -162,6 +196,9 @@ async function setup() {
       controls.becomeSpectator();
       isSpectator = true;
       floor.followingUser = floor.players[0] && floor.players[0].name;
+      // switch following users by pressing up and down
+      controls.bind(spectatorHandler.bind(null, floor), () => {});
+      window.addEventListener("keydown", spectatorHandler.bind(null, floor));
     }
 
     // follow a specific player in spectator mode
@@ -169,6 +206,8 @@ async function setup() {
       let following = getPlayer(floor, floor.followingUser);
       if(following) {
         floor.setViewport(following.x, following.y);
+      } else if(floor.players.length) {
+        floor.followingUser = floor.players[0].name;
       }
     }
     
