@@ -6,7 +6,6 @@ import saveHandler from "./handlers/save";
 import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth.mjs";
 import path from "path";
-import Lobby from "./models/lobby";
 
 let isGameRunning = false;
 
@@ -46,23 +45,14 @@ export default async function main(env, httpd) {
     });
   }
 
-  // Get all the players in this game
-  let players = new Set(
-    (await Lobby.findAll({
-      where: {
-        lobbyId: gameEnv.gameId
-      }
-    })).map((lobby) => {
-      return lobby.playerId;
-    })
-  );
-
   let io = socketIO(httpd, {
     path: `/socket/${gameEnv.gameId}`
   });
 
   initAuth(io);
 
+  // eslint-disable-next-line arrow-parens,arrow-body-style
+  let awaitedPlayers = new Set(floor.players.map(player => player.name));
   let readyResolver;
   io.on("connection", async(sock) => {
     // Not logged in enter spectator mode
@@ -76,8 +66,8 @@ export default async function main(env, httpd) {
     movementHandler(sock, floor, io);
 
     // Mark this player as ready
-    players.delete(sock.user.username);
-    if(players.size === 0) {
+    awaitedPlayers.delete(sock.user.username);
+    if(awaitedPlayers.size === 0) {
       readyResolver();
     }
   });
