@@ -1,5 +1,6 @@
-/* global io */
+/* global io ml */
 // jshint esversion: 6
+import "./logger.mjs"; // THIS MUST BE THE FIRST IMPORT
 import sequelize from "./sequelize";
 import express from "express";
 import http from "http";
@@ -11,7 +12,6 @@ import bodyParser from 'body-parser';
 import session from 'express-session';
 import userMiddleware from "./middleware/accounts";
 import sessionStore from "./session-store";
-import morgan from 'morgan';
 import fs from "fs";
 import {setHttpd} from "./managers/manager-single";
 
@@ -21,6 +21,19 @@ let app = express();
 let server = http.Server(app);
 global.io = socketio(server);
 setHttpd(server);
+
+// Log http requests
+let nextReqId = 1;
+app.use((req, res, next) => {
+  req.logger = ml.logger.child({ req_id: nextReqId++ });
+  req.logger.info({req, res}, `${req.method} ${req.url}`);
+
+  res.on("finish", () => {
+    req.logger.info({res}, `${res.statusCode} ${req.url}`);
+  });
+
+  next();
+});
 
 if(process.env.PUBLIC_DIR) {
   app.use("/public", express.static(process.env.PUBLIC_DIR));
@@ -48,8 +61,6 @@ app.set('views', 'Frontend/views');
 
 // Middleware
 app.use(userMiddleware);
-// request logging
-app.use(morgan(":method :status :url (:response-time ms)"));
 
 //Routes
 app.use("/game", gameRouter);
@@ -92,34 +103,11 @@ io.on("connection", (client) => {
   });
 });
 
-const sleep = (ms) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-};
-
-const MAX_RETRIES = 10;
 const start = async() => {
-  // make several attempts to connect to mysql
-  for(let i = 0;; ++i) {
-    try {
-      await sequelize.authenticate();
-      break;
-    } catch(err) {
-      process.stderr.write(`[${i + 1}/${MAX_RETRIES}] MySql connection failed ${err.message} (retrying in 5s)\n`);
-      await sleep(5000);
-
-      if(i === MAX_RETRIES) {
-        process.stderr.write(err.stack);
-        process.exit(1);
-      }
-    }
-  }
-
   await sequelize.sync();
 
   server.listen(3000, () => {
-    process.stdout.write("Server started on port 3000\n");
+    ml.logger.info("Server started on port 3000");
   });
 };
 
@@ -134,8 +122,8 @@ if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.
   let s = vars.length > 1 ? "s were" : " was";
   vars = vars.join(", ");
 
-  process.stdout.write(
-    `Warning: the forgot password feature has been disabled because the ${vars} environment variable${s} not defined\n`
+  ml.logger.warn(
+    `The forgot password feature has been disabled because the ${vars} environment variable${s} not defined`
   );
 }
 

@@ -1,6 +1,7 @@
 /* global PIXI io  */
 /* eslint-disable complexity */
 
+import "./logger.mjs"; // MUST BE THE FIRST IMPORT
 import Floor from "./browser/floor.mjs";
 import FpsCounter from "./fps-counter.js";
 import PlayerList from "./browser/player-list.js";

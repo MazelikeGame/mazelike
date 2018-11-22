@@ -12,4 +12,4 @@ ARG DATA="/data"
 VOLUME ${DATA}
 EXPOSE 3000
 
-ENTRYPOINT ["node", "scripts/mazelike.js"]
+ENTRYPOINT ["/bin/ash", "scripts/mazelike.sh"]
