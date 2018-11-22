@@ -5,6 +5,7 @@
 const MAX_WALK_TIME = 1500;
 
 import PlayerCommon from "./player.mjs";
+import interpolate from "./interpolator.mjs";
 
 export default class MonsterCommon {
   
@@ -159,24 +160,7 @@ export default class MonsterCommon {
     let prevy = this.y;
     let prevx = this.x;
     if(this.alive) {
-      // Get the distance in the x and y direction we have to move
-      let xDist = Math.abs(this.targetx - this.x);
-      let yDist = Math.abs(this.targety - this.y);
-      // Figure out what percentage of our next turn should be in each direction
-      let xPerc = xDist / (xDist + yDist);
-      let yPerc = 1 - xPerc;
-      // Use pythagorean theorem to distrubute 
-      let root = Math.sqrt(this.speed * (deltaTime / 1000));
-      let xMove = Math.floor((root * xPerc) ** 2);
-      let yMove = Math.floor((root * yPerc) ** 2);
-
-      if(!isNaN(xMove)) {
-        this.x += Math.min(xMove, xDist) * (this.targetx < this.x ? -1 : 1);
-      }
-
-      if(!isNaN(yMove)) {
-        this.y += Math.min(yMove, yDist) * (this.targety < this.y ? -1 : 1);
-      }
+      interpolate(this, deltaTime, this.targetx, this.targety);
     }
     // Disable collision detection on the client
     if(typeof window === "undefined") {

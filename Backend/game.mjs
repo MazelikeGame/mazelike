@@ -3,11 +3,11 @@ import socketIO from "socket.io";
 import http from "http";
 import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
+import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth.mjs";
 import path from "path";
 
-// then interval at which we update the game state (if this is too short the server will break)
-const UPDATE_INTERVAL = 100;
+let isGameRunning = false;
 
 export default async function main(env, httpd) {
   // Parse the env vars
@@ -51,21 +51,30 @@ export default async function main(env, httpd) {
 
   initAuth(io);
 
-  io.on("connection", (sock) => {
-    sock.on('player-movement', (x, y, username) => {
-      floor.players.forEach((player) => {
-        if(player.name === username) {
-          player.x = x;
-          player.y = y;
-        }
-      });
-    });
+  // eslint-disable-next-line arrow-parens,arrow-body-style
+  let awaitedPlayers = new Set(floor.players.map(player => player.name));
+  let readyResolver;
+  io.on("connection", async(sock) => {
+    // Not logged in enter spectator mode
+    if(!sock.user) {
+      sock.emit("set-username");
+      return;
+    }
 
     sock.emit("set-username", sock.user.username);
     saveHandler(sock, floor);
+    movementHandler(sock, floor, io);
+
+    // Mark this player as ready
+    awaitedPlayers.delete(sock.user.username);
+    if(awaitedPlayers.size === 0) {
+      readyResolver();
+    }
   });
 
-  // In the future we should wait for all players to join here
+  await new Promise((resolve) => {
+    readyResolver = resolve;
+  });
 
   // start the count down
   for(let i = 5; i > 0; --i) {
@@ -77,8 +86,9 @@ export default async function main(env, httpd) {
   }
 
   // start the game
-  await floor.sendState(io);
+  await floor.sendState(io, isGameRunning);
   io.emit("start-game");
+  isGameRunning = true;
 
   triggerTick(floor, io, Date.now());
 }
@@ -100,12 +110,12 @@ async function triggerTick(floor, io, lastUpdate) {
   // move monsters and check for collisions
   try {
     await floor.tick(now - lastUpdate);
-    await floor.sendState(io);
+    await floor.sendState(io, isGameRunning);
   } catch(err) {
     process.stderr.write(`${err.stack}\n`);
   }
 
-  setTimeout(triggerTick.bind(undefined, floor, io, now), UPDATE_INTERVAL);
+  setTimeout(triggerTick.bind(undefined, floor, io, now), Floor.UPDATE_INTERVAL);
 }
 
 if(path.relative(process.cwd(), process.argv[1]) === "Backend/game.mjs") {

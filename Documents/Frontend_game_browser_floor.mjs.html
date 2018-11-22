@@ -35,9 +35,10 @@ import Player from "./player.mjs";
 import Monster from "./monster.mjs";
 
 export default class Floor extends FloorCommon {
-  constructor(gameId, floorIdx, sock) {
+  constructor(gameId, floorIdx, sock, username) {
     super(gameId, floorIdx);
     this.sock = sock;
+    this.username = username;
     // the top left corrner of the user's screen
     this._viewportX = 0;
     this._viewportY = 0;
@@ -55,8 +56,8 @@ export default class Floor extends FloorCommon {
    * @param floorIdx The index of floor we want to generate
    * @param {object} opts The options of the specific generators
    */
-  static generate({gameId, floorIdx, map, sock}) {
-    let floor = new Floor(gameId, floorIdx, sock);
+  static generate({gameId, floorIdx, map, sock, username}) {
+    let floor = new Floor(gameId, floorIdx, sock, username);
     floor.map = GameMap.generate(map);
 
     floor._initRendering();
@@ -73,13 +74,17 @@ export default class Floor extends FloorCommon {
     this.monsters = [];
     let random = 0;
     for(let i = 0; i &lt; this.map.rooms.length * this.monsterRatio; i++) {
-      random = Math.floor(Math.random() * 100);
-      if(random &lt; 5) { // 5% chance for blue demon
-        this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
-      } else if(random &lt; 45) { // 40% chance for red demon, where 5+40 = 45
-        this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
-      } else if(random &lt; 100) { // 55% chance for green demon, where 5+40+55 = 100
-        this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
+      if(i === 0) {
+        this.monsters[i] = new Monster('boss', 200, 15, this, i, 'boss');
+      } else {
+        random = Math.floor(Math.random() * 100);
+        if(random &lt; 15) { // 15% chance for blue demon
+          this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
+        } else if(random &lt; 50) { // 35% chance for red demon, where 15+35 = 50
+          this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
+        } else if(random &lt; 100) { // 50% chance for green demon, where 15+35+50 = 100
+          this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
+        }
       }
     }
   }
@@ -88,9 +93,11 @@ export default class Floor extends FloorCommon {
    * Load everything in the browser
    * @param gameId The game id for the game we want to load
    * @param floorIdx The index of floor we want to load
+   * @param sock The connection to the game server
+   * @param username The username of the current player
    */
-  static async load(gameId, floorIdx, sock) {
-    let floor = new Floor(gameId, floorIdx, sock);
+  static async load(gameId, floorIdx, sock, username) {
+    let floor = new Floor(gameId, floorIdx, sock, username);
 
     await Promise.all([
       // NOTE: You should define your functions here and they should
@@ -139,18 +146,18 @@ export default class Floor extends FloorCommon {
    * Render/update the game
    */
   update() {
-    this._mapRenderer.update(
-      this._viewportX,
-      this._viewportY,
-      this._viewportX + innerWidth,
-      this._viewportY + innerHeight
-    );
     for(let i = 0; i &lt; this.monsters.length; i++) {
       this.monsters[i].update(this._viewportX, this._viewportY);
     }
     for(let i = 0; i &lt; this.players.length; ++i) {
       this.players[i].update(this._viewportX, this._viewportY);
     }
+    this._mapRenderer.update(
+      this._viewportX,
+      this._viewportY,
+      this._viewportX + innerWidth,
+      this._viewportY + innerHeight
+    );
   }
 
   /**
@@ -194,6 +201,9 @@ export default class Floor extends FloorCommon {
       let player = new Player(raw.username, raw.hp, raw.spriteName, this);
       player.handleState(raw);
       player.createSprite();
+      player._lastFrameSent = raw._lastFrame;
+      player.x = raw._confirmedX;
+      player.y = raw._confirmedY;
       
       if(raw.username === username) {
         this.setViewport(player.x, player.y);
@@ -221,7 +231,7 @@ export default class Floor extends FloorCommon {
 
     for(let i = 0; i &lt; current.length; ++i) {
       let obj = current[i];
-
+      
       // already have an instance update it
       if(wantedIds.has(obj[idKey])) {
         obj.handleState(wantedIds.get(obj[idKey]));
@@ -250,13 +260,13 @@ export default class Floor extends FloorCommon {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#unbind">unbind</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 14 2018 01:13:52 GMT-0600 (Central Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 21 2018 14:44:17 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -7,7 +7,6 @@ import PlayerList from "./browser/player-list.js";
 import DisconnectMessage from "./browser/disconnect-msg.js";
 import MobileControls from "./browser/mobile-controls.mjs";
 
-
 let msgEl = document.querySelector(".msg");
 let msgParentEl = document.querySelector(".msg-parent");
 
@@ -37,22 +36,52 @@ addEventListener("contextmenu", (e) => {
 });
 
 // This should be removed once player controls the viewport
-const addArrowKeyListener = (floor, controls, username, sock) => {
-  let handleKey = (e) => {
+const addArrowKeyListener = (floor, controls, username) => {
+  let handleKey = (type, e) => {
     let player = getPlayer(floor, username);
-    // player probably died
-    if(!player) {
-      return;
+    if(player) {
+      player.handleKeyPress(type, e);
     }
-    player.keyPress(e);
-
-    sock.emit('player-movement', player.x, player.y, username);
-    floor.setViewport(player.x, player.y);
   };
 
-  controls.bind(handleKey);
-  window.addEventListener("keydown", handleKey);
+  controls.bind(handleKey.bind(null, "down"), handleKey.bind(null, "up"));
+  window.addEventListener("keydown", handleKey.bind(null, "down"));
+  window.addEventListener('keyup', handleKey.bind(null, "up"));
 };
+
+/**
+ * Handle key presses for spectators
+ * @private
+ */
+function spectatorHandler(floor, e) {
+  if(floor.players.length === 0) {
+    return;
+  }
+
+  let index = floor.players.findIndex((player) => {
+    return player.name === floor.followingUser;
+  });
+
+  // Handle the arrow keys
+  if(e.keyCode === 38 /* up */ || e.keyCode === 87 /* w */) {
+    --index;
+  }
+
+  if(e.keyCode === 40 /* down */ || e.keyCode === 83 /* s */) {
+    ++index;
+  }
+
+  // Wrap at the ends
+  if(index < 0) {
+    index = floor.players.length - 1;
+  }
+
+  if(index >= floor.players.length) {
+    index = 0;
+  }
+  
+  floor.followingUser = floor.players[index].name;
+}
 
 function getUsername(sock) {
   return new Promise((resolve) => {
@@ -74,7 +103,7 @@ async function setup() {
     addr = location.host;
   }
 
-  let sock = io(`http://${addr}`, {
+  let sock = io(`${location.protocol}//${addr}`, {
     path: `/socket/${gameId}`
   });
 
@@ -85,16 +114,14 @@ async function setup() {
   let masterSock = io(location.origin); //Transition this to the game server
   masterSock.emit("ready", gameId);
 
-
-  console.log(`User: ${username}`); // eslint-disable-line
-
   if(gameId) {
-    floor = await Floor.load(gameId, 0, sock);
+    floor = await Floor.load(gameId, 0, sock, username);
   } else {
     floor = Floor.generate({
       gameId,
       floorIdx: 0,
-      sock
+      sock,
+      username
     });
   }
 
@@ -109,17 +136,26 @@ async function setup() {
   }
 
   masterSock.on("player-list", (players) => {
-    app.stage.addChild(new PlayerList(players).render());
+    app.stage.addChild(new PlayerList(players, floor).render());
   });
 
   let controls = new MobileControls();
   app.stage.addChild(controls.sprite);
 
   window.ml.floor = floor;
-  addArrowKeyListener(floor, controls, username, sock);
+  addArrowKeyListener(floor, controls, username);
+
+  let resolveGameRunning;
+  let gameRunning = new Promise((resolve) => {
+    resolveGameRunning = resolve;
+  });
 
   sock.on("state", (state) => {
     floor.handleState(state, username);
+
+    if(state.isGameRunning) {
+      resolveGameRunning();
+    }
   });
 
   // display the countdown when it starts
@@ -130,9 +166,12 @@ async function setup() {
   // wait for the game to start
   msgEl.innerText = "Waiting for all players to join";
 
-  await new Promise((resolve) => {
-    sock.once("start-game", resolve);
-  });
+  await Promise.race([
+    new Promise((resolve) => {
+      sock.once("start-game", resolve);
+    }),
+    gameRunning
+  ]);
 
   msgParentEl.remove();
 
@@ -150,7 +189,36 @@ async function setup() {
     app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
   });
 
+  let isSpectator = false;
   app.ticker.add(() => {
+    // spectator mode
+    if(!isSpectator && !getPlayer(floor, username)) {
+      controls.becomeSpectator();
+      isSpectator = true;
+      floor.followingUser = floor.players[0] && floor.players[0].name;
+      // switch following users by pressing up and down
+      controls.bind(spectatorHandler.bind(null, floor), () => {});
+      window.addEventListener("keydown", spectatorHandler.bind(null, floor));
+    }
+
+    // follow a specific player in spectator mode
+    if(isSpectator) {
+      let following = getPlayer(floor, floor.followingUser);
+      if(following) {
+        floor.setViewport(following.x, following.y);
+      } else if(floor.players.length) {
+        floor.followingUser = floor.players[0].name;
+      }
+    }
+    
+    let player = getPlayer(floor, username);
+    if(player) {
+      player.sendFrame();
+      player.dropConfirmed();
+      player.move();
+      floor.setViewport(player.x, player.y);
+    }
+
     floor.update();
     controls.update();
 
