@@ -14,6 +14,8 @@ if [ "$1" == "sh" ]; then
   exec /bin/ash
 fi
 
+rm /data/logs/$(hostname).log
+
   export DB_DEBUG="no"
   # let isGameServer = false;
 

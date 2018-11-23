@@ -1,11 +1,11 @@
+/* global ml */
 require('dotenv').config();
 const url = require("url");
 const os = require("os");
 
 let conf = {
   operatorsAliases: false,
-  // eslint-disable-next-line
-  logging: process.env.DB_DEBUG !== "no" ? console.log : false
+  logging: typeof ml !== "undefined" ? ml.logger.debug.bind(ml.logger) : false
 };
 
 let dbUrl;

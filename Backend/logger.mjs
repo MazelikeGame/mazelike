@@ -11,7 +11,8 @@ let logger = bunyan.createLogger({
     type: "rotating-file",
     path: `/data/logs/${os.hostname()}.log`,
     period: "1d",
-    count: 3
+    count: 3,
+    level: process.env.NODE_ENV === "production" ? "info" : "debug"
   }],
   serializers: {
     err: bunyan.stdSerializers.err,
@@ -28,26 +29,6 @@ let logger = bunyan.createLogger({
     monster: monsterSerial,
     monsters: function(monsters) {
       return monsters.map(monsterSerial);
-    },
-  
-    req: function(req) {
-      return {
-        path: req.path,
-        query: req.query,
-        method: req.method
-      };
-    },
-  
-    res: function(res) {
-      let raw = {
-        statusCode: res.statusCode
-      };
-
-      if(res.statusCode === 302) {
-        raw.redirect = res.getHeader("location");
-      }
-
-      return raw;
     }
   }
 });
@@ -74,6 +55,30 @@ function monsterSerial(monster) {
     y: monster.y,
     lastAttackTime: monster.lastAttackTime
   };
+}
+
+let nextReqId = 1;
+export function httpLogs(req, res, next) {
+  // Set up the logger for this request and log when the request comes in
+  req.logger = logger.child({ req_id: nextReqId++ });
+  req.logger.info({method: req.method, url: req.url, query: req.query}, `${req.method} ${req.url}`);
+  let start = Date.now();
+
+  res.on("finish", () => {
+    let data = {
+      status: res.statusCode,
+      type: res.getHeader("Content-Type"),
+      res_time: Date.now() - start
+    };
+
+    if(res.statusCode === 302) {
+      data.redirect = res.getHeader("location");
+    }
+
+    req.logger.info(data, `Respond ${res.statusCode} ${req.url} in ${data.res_time}ms`);
+  });
+
+  next();
 }
 
 // NOTE: I use a global because dynamic import is not supported in node 8.11

@@ -1,6 +1,6 @@
 /* global io ml */
 // jshint esversion: 6
-import "./logger.mjs"; // THIS MUST BE THE FIRST IMPORT
+import {httpLogs} from "./logger.mjs"; // THIS MUST BE THE FIRST IMPORT
 import sequelize from "./sequelize";
 import express from "express";
 import http from "http";
@@ -23,17 +23,7 @@ global.io = socketio(server);
 setHttpd(server);
 
 // Log http requests
-let nextReqId = 1;
-app.use((req, res, next) => {
-  req.logger = ml.logger.child({ req_id: nextReqId++ });
-  req.logger.info({req, res}, `${req.method} ${req.url}`);
-
-  res.on("finish", () => {
-    req.logger.info({res}, `${res.statusCode} ${req.url}`);
-  });
-
-  next();
-});
+app.use(httpLogs);
 
 if(process.env.PUBLIC_DIR) {
   app.use("/public", express.static(process.env.PUBLIC_DIR));
