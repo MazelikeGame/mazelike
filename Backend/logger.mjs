@@ -5,14 +5,14 @@ import os from "os";
 let logger = bunyan.createLogger({
   name: "mazelike",
   streams: [{
-    level: "info",
+    level: process.env.LOG_LEVEL || "debug",
     stream: process.stdout
   }, {
     type: "rotating-file",
     path: `/data/logs/${os.hostname()}.log`,
     period: "1d",
     count: 3,
-    level: process.env.NODE_ENV === "production" ? "info" : "debug"
+    level: "debug"
   }],
   serializers: {
     err: bunyan.stdSerializers.err,
@@ -61,21 +61,23 @@ let nextReqId = 1;
 export function httpLogs(req, res, next) {
   // Set up the logger for this request and log when the request comes in
   req.logger = logger.child({ req_id: nextReqId++ });
-  req.logger.info({method: req.method, url: req.url, query: req.query}, `${req.method} ${req.url}`);
   let start = Date.now();
 
   res.on("finish", () => {
     let data = {
       status: res.statusCode,
       type: res.getHeader("Content-Type"),
-      res_time: Date.now() - start
+      res_time: Date.now() - start,
+      method: req.method,
+      url: req.url,
+      query: req.query
     };
 
     if(res.statusCode === 302) {
       data.redirect = res.getHeader("location");
     }
 
-    req.logger.info(data, `Respond ${res.statusCode} ${req.url} in ${data.res_time}ms`);
+    req.logger.info(data, `${req.method} ${res.statusCode} ${req.url} [time ${data.res_time}ms]`);
   });
 
   next();

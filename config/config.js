@@ -1,11 +1,12 @@
 /* global ml */
+/* eslint-disable arrow-body-style */
 require('dotenv').config();
 const url = require("url");
 const os = require("os");
 
 let conf = {
   operatorsAliases: false,
-  logging: typeof ml !== "undefined" ? ml.logger.debug.bind(ml.logger) : false
+  logging: typeof ml !== "undefined" ? (msg) => ml.logger.debug(msg) : false
 };
 
 let dbUrl;
