@@ -1,6 +1,7 @@
 /* eslint-disable */
 const moment = require("moment");
 const chalk = require("chalk");
+const fs = require("fs");
 
 // Properties to skip
 const SKIP_PROPS = new Set([
@@ -38,16 +39,93 @@ const IN_MESSAGE_VARS = new Set([
   "url"
 ]);
 
-const VERBOSE = false;
+let verbose = false;
+let noJson = false;
+let logPath;
+let minLevel = 0;
+let filter = () => true;
+let reqIds = new Set();
 
-let log = require("fs").readFileSync("data/logs/mazelike.log", "utf8");
+for(let i = 2; i < process.argv.length; ++i) {
+  switch(process.argv[i]) {
+  case "-f":
+    filter = new Function(`return (${process.argv[++i]});`);
+    break;
+  
+  case "-v":
+    verbose = true;
+    break;
+  
+  case "-0":
+    noJson = true;
+    break;
+  
+  case "-l":
+    let level = process.argv[++i];
+    minLevel = +Object.keys(LEVELS).find(l => LEVELS[l] == level);
+    break;
+  
+  case "-h":
+    console.log("node scripts/sanity.js [log file path]");
+    console.log("-f <filter expr>  An expression to evaluate against logs (this = log object)");
+    console.log("-v                Print all json fileds (don't ignore keys in IN_MESSAGE_VARS)");
+    console.log("-0                Don't print any json fileds");
+    console.log("-l <level>        Only print logs at or above the log level");
+    console.log("-req <req_id>     Only print logs from the request or requests by the coma separated req_ids");
+    process.exit(0);
+    break;
+  
+  case "-req":
+    reqIds = new Set(process.argv[++i].split(",").map(n => +n));
+    break;
+  
+  default:
+    logPath = process.argv[i];
+    break;
+  }
+} 
 
-log = log.trim().replace(/\r?\n/g, ",");
-log = JSON.parse(`[${log}]`);
+if(logPath) {
+  processStream(fs.createReadStream(logPath));
+} else {
+  processStream(process.stdin);
+}
 
-for(let lo of log) {
-  let keys = Object.keys(lo)
-    .filter(k => !SKIP_PROPS.has(k) && (!IN_MESSAGE_VARS.has(k) || VERBOSE));
+function processStream(stream) {
+  let buffer = "";
+
+  stream.setEncoding("utf8");
+  stream.on("data", (raw) => {
+    buffer += raw;
+
+    let lines = buffer.split(/\r?\n/);
+    
+    buffer = lines.pop();
+
+    lines.forEach(processLog);
+  });
+
+  stream.on("end", () => {
+    let lines = buffer.split(/\r?\n/);
+    lines.pop();
+    lines.forEach(processLog);
+  });
+}
+
+function processLog(lo) {
+  lo = JSON.parse(lo);
+
+  if(!filter.call(lo) || minLevel > lo.level || (lo.req_id && reqIds.size !== 0 && !reqIds.has(lo.req_id))) {
+    return;
+  }
+
+  let keys;
+  
+  if(noJson) {
+    keys = [];
+  } else {
+    keys = Object.keys(lo).filter(k => !SKIP_PROPS.has(k) && (!IN_MESSAGE_VARS.has(k) || verbose));
+  }
   
   let numShort = 3;
   let shiftIdx = 0;
@@ -71,8 +149,16 @@ for(let lo of log) {
   }
 
   let timestamp = chalk.magenta(moment(lo.time).format("hh:mm:ss"));
-  let shortProps = chalk.blue(`(${inline.map(k => `${k}=${lo[k]}`).join(", ")})`);
+  let shortProps = "";
+
+  if(inline.length) {
+    shortProps = chalk.blue(`(${inline.map(k => `${k}=${lo[k]}`).join(", ")})`);
+  }
+
   console.log(timestamp, COLORS[lo.level](LEVELS[lo.level]), lo.msg, shortProps);
   
-  keys.forEach(k => console.log(`${k} ${JSON.stringify(lo[k], null, 2)}`));
+  keys.forEach((k, i) => {
+    if(i > 0) console.log("---");
+    console.log(`${k} ${JSON.stringify(lo[k], null, 2)}`);
+  });
 }
