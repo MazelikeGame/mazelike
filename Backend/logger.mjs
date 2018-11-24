@@ -1,87 +1,51 @@
 /* eslint-disable arrow-body-style */
-import bunyan from "bunyan";
-import os from "os";
+import winston from "winston";
+import chalk from "chalk";
+import moment from "moment";
+import fs from "fs";
+import path from "path";
 
-let logger = bunyan.createLogger({
-  name: "mazelike",
-  streams: [{
-    level: process.env.LOG_LEVEL || "debug",
-    stream: process.stdout
-  }, {
-    type: "rotating-file",
-    path: `/data/logs/${os.hostname()}.log`,
-    period: "1d",
-    count: 3,
-    level: "debug"
-  }],
-  serializers: {
-    err: bunyan.stdSerializers.err,
-  
-    floor: function(floor) {
-      return floor.id;
-    },
-  
-    player: playerSerial,
-    players: function(players) {
-      return players.map(playerSerial);
-    },
-  
-    monster: monsterSerial,
-    monsters: function(monsters) {
-      return monsters.map(monsterSerial);
-    }
-  }
-});
+let logFile = process.env.LOG_FILE || "mazelike.log";
 
-function playerSerial(player) {
-  return {
-    name: player.name,
-    x: player.x,
-    y: player.y,
-    vx: player.vx,
-    vy: player.vy,
-    hp: player.hp
-  };
+// Empty the log
+if(path.relative(process.cwd(), process.argv[1]) === "Backend/index.mjs") {
+  fs.writeFileSync(logFile, "");
 }
 
-function monsterSerial(monster) {
-  return {
-    name: monster.name,
-    hp: monster.hp,
-    targetAquired: monster.targetAquired,
-    targetx: monster.targetx,
-    targety: monster.targety,
-    x: monster.x,
-    y: monster.y,
-    lastAttackTime: monster.lastAttackTime
+let noop = (msg) => msg;
+
+function formatter(colors) {
+  const LEVELS = {
+    error: colors.red,
+    warn: colors.yellow,
+    info: colors.cyan,
+    verbose: colors.magenta,
+    debug: colors.magenta,
+    silly: colors.green
   };
-}
 
-let nextReqId = 1;
-export function httpLogs(req, res, next) {
-  // Set up the logger for this request and log when the request comes in
-  req.logger = logger.child({ req_id: nextReqId++ });
-  let start = Date.now();
+  return winston.format.printf((info) => {
+    let timestamp = moment().format("hh:mm:ss");
+    let levelFn = LEVELS[info.level] || noop;
+    let blueFn = colors.blue || noop;
 
-  res.on("finish", () => {
-    let data = {
-      status: res.statusCode,
-      type: res.getHeader("Content-Type"),
-      res_time: Date.now() - start,
-      method: req.method,
-      url: req.url,
-      query: req.query
-    };
-
-    if(res.statusCode === 302) {
-      data.redirect = res.getHeader("location");
-    }
-
-    req.logger.info(data, `${req.method} ${res.statusCode} ${req.url} [time ${data.res_time}ms]`);
+    return `${blueFn(timestamp)} ${levelFn(info.level.toUpperCase())} - ${info.message}`;
   });
-
-  next();
 }
+
+const logger = winston.createLogger({
+  transports: [
+    new winston.transports.Console({
+      level: "info",
+      format: formatter(chalk),
+    }),
+    new winston.transports.File({
+      level: "silly",
+      format: formatter({}),
+      filename: logFile
+    })
+  ]
+});
 
 // NOTE: I use a global because dynamic import is not supported in node 8.11
 global.ml || (global.ml = {}); // eslint-disable-line

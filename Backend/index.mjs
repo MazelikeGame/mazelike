@@ -1,6 +1,6 @@
 /* global io ml */
 // jshint esversion: 6
-import {httpLogs} from "./logger.mjs"; // THIS MUST BE THE FIRST IMPORT
+import "./logger.mjs"; // THIS MUST BE THE FIRST IMPORT
 import sequelize from "./sequelize";
 import express from "express";
 import http from "http";
@@ -14,6 +14,7 @@ import userMiddleware from "./middleware/accounts";
 import sessionStore from "./session-store";
 import fs from "fs";
 import {setHttpd} from "./managers/manager-single";
+import morgan from "morgan";
 
 const PACKAGE_VERSION = fs.readFileSync("VERSION", "utf8").trim();
 
@@ -23,7 +24,13 @@ global.io = socketio(server);
 setHttpd(server);
 
 // Log http requests
-app.use(httpLogs);
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms", {
+  stream: {
+    write(data) {
+      ml.logger.info(data.trim(), { label: "HTTP" });
+    }
+  }
+}));
 
 if(process.env.PUBLIC_DIR) {
   app.use("/public", express.static(process.env.PUBLIC_DIR));

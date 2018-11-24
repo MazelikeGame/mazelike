@@ -5,8 +5,6 @@ if [ "$1" == "sh" ]; then
   exec /bin/ash
 fi
 
-mkdir -p /data/logs
-
 isGameServer="no"
 
 # Parse command line arguments
@@ -76,9 +74,7 @@ if [ -z "$PUBLIC_DIR" ]; then
   export PUBLIC_DIR="/data"
 fi
 
-if [ -z "$LOG_LEVEL" ]; then
-  export LOG_LEVEL="info"
-fi
+export LOG_FILE="/data/mazelike.log";
 
 cat <<"EOF"
 ___  ___                  _  _  _         
@@ -93,13 +89,11 @@ EOF
 if [ "$isGameServer" == "yes" ]; then
   exec node --experimental-modules Backend/game.mjs
 else
-  rm -f /data/logs/$(hostname).log
-
   ./node_modules/.bin/sequelize db:migrate
 
   if [ $? -ne 0 ]; then
     exit $?
   fi
 
-  exec node --experimental-modules Backend/index.mjs | node scripts/sanity
+  exec node --experimental-modules Backend/index.mjs
 fi
