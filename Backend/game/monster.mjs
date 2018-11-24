@@ -1,3 +1,4 @@
+/* global ml */
 /* eslint-disable no-extra-parens,max-len,curly,complexity,prefer-template, no-warning-comments */
 /** @module Monster */
 

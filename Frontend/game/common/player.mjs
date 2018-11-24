@@ -1,3 +1,4 @@
+/* global ml */
 /** @module PlayerCommon */
 
 const KEYS = {

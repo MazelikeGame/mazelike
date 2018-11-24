@@ -1,4 +1,4 @@
-/* global m */
+/* global ml */
 import * as child from "./manager-child";
 import * as docker from "./manager-docker";
 import * as single from "./manager-single";

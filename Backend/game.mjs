@@ -1,3 +1,4 @@
+/* global ml */
 /* eslint-disable no-param-reassign,complexity */
 import "./logger.js"; // THIS MUST BE THE FIRST IMPORT
 import socketIO from "socket.io";

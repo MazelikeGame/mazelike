@@ -1,3 +1,4 @@
+/* global ml */
 import child_process from "child_process";
 
 const CHILD_MAIN = "Backend/game.mjs";

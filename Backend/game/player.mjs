@@ -1,3 +1,4 @@
+/* global ml */
 /* jshint node: true */
 import PlayerCommon from '../../Frontend/game/common/player';
 import PlayerModel from '../models/player';
