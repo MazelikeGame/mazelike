@@ -12,3 +12,5 @@ ml.logger = {
   silly: noop,
   log: noop
 };
+
+ml.tags = noop;

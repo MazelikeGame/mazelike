@@ -35,7 +35,7 @@ export default async function main(env, httpd) {
     httpd = http.createServer((req, res) => {
       res.end("Game server");
     }).listen(PORT, () => {
-      process.stdout.write(`Game server listening on ${PORT}\n`);
+      ml.logger.info(`Game server listening on ${PORT}`);
     });
 
     // tell the manager this port is in use
@@ -54,8 +54,11 @@ export default async function main(env, httpd) {
 
   // eslint-disable-next-line arrow-parens,arrow-body-style
   let awaitedPlayers = new Set(floor.players.map(player => player.name));
+  ml.logger.verbose(`Waiting for players to join (${Array.from(awaitedPlayers).join(", ")})`, ml.tags.pregame);
+
   let readyResolver;
   io.on("connection", async(sock) => {
+    ml.logger.info(`Game client connected (username: ${sock.user ? sock.user.username : "No auth"})`);
     // Not logged in enter spectator mode
     if(!sock.user) {
       sock.emit("set-username");
@@ -68,6 +71,9 @@ export default async function main(env, httpd) {
 
     // Mark this player as ready
     awaitedPlayers.delete(sock.user.username);
+
+    ml.logger.verbose(`Waiting for players to join (${Array.from(awaitedPlayers).join(", ")})`, ml.tags.pregame);
+
     if(awaitedPlayers.size === 0) {
       readyResolver();
     }
@@ -77,6 +83,8 @@ export default async function main(env, httpd) {
     readyResolver = resolve;
   });
 
+  ml.logger.verbose(`Starting countdown`, ml.tags.pregame);
+
   // start the count down
   for(let i = 5; i > 0; --i) {
     await new Promise((resolve) => {
@@ -85,6 +93,8 @@ export default async function main(env, httpd) {
 
     io.emit("countdown", i);
   }
+
+  ml.logger.info("Starting game", ml.tags("game"));
 
   // start the game
   await floor.sendState(io, isGameRunning);
@@ -99,6 +109,8 @@ async function triggerTick(floor, io, lastUpdate) {
 
   // save and quit if we loose all the clients
   if(io.engine.clientsCount === 0) {
+    ml.logger.verbose("All clients left saving game", ml.tags("game"));
+
     await floor.save();
 
     if(process.env.CLUSTER_MANAGER === "single") {
@@ -113,12 +125,14 @@ async function triggerTick(floor, io, lastUpdate) {
     await floor.tick(now - lastUpdate);
     await floor.sendState(io, isGameRunning);
   } catch(err) {
-    process.stderr.write(`${err.stack}\n`);
+    ml.logger.error(`${err.stack}`, ml.tags("game"));
   }
 
   setTimeout(triggerTick.bind(undefined, floor, io, now), Floor.UPDATE_INTERVAL);
 }
 
 if(path.relative(process.cwd(), process.argv[1]) === "Backend/game.mjs") {
+  ml.logger.debug("Running as game server process", ml.tags.manager);
+
   main(process.env);
 }

@@ -27,7 +27,7 @@ setHttpd(server);
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms", {
   stream: {
     write(data) {
-      ml.logger.info(data.trim(), { tags: "http" });
+      ml.logger.verbose(data.trim(), ml.tags("http"));
     }
   }
 }));

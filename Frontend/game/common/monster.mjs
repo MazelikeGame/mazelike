@@ -4,11 +4,6 @@
 // The maximum amount of ms we want a monster to walk for
 const MAX_WALK_TIME = 1500;
 
-// logger tags for the monster
-const MONSTER_TAGS = {
-  tags: ["game", "monster"]
-};
-
 import PlayerCommon from "./player.mjs";
 import interpolate from "./interpolator.mjs";
 
@@ -196,7 +191,7 @@ export default class MonsterCommon {
   figureOutWhereToGo() {
     this.canSeePC();
     if(this.targetAquired) {
-      ml.logger.debug(`Monster ${this.id} targeting player at (${this.targetx, this.targety})`, MONSTER_TAGS);
+      ml.logger.debug(`Monster ${this.id} targeting player at (${this.targetx, this.targety})`, ml.tags.monster);
     }
     if(this.alive) {
       if(!this.targetAquired && !this.collision) {
@@ -207,7 +202,7 @@ export default class MonsterCommon {
         if(Math.abs(this.x - this.targetx) < 2 && Math.abs(this.y - this.targety) < 2) {
           this.wander();
         }
-        ml.logger.debug(`Monster ${this.id} wandering to (${this.targetx}, ${this.targety})`, MONSTER_TAGS);
+        ml.logger.debug(`Monster ${this.id} wandering to (${this.targetx}, ${this.targety})`, ml.tags.monster);
       }
     }
   }
@@ -221,7 +216,7 @@ export default class MonsterCommon {
     if(this.hp <= 0) {
       this.die();
     }
-    ml.logger.verbose(`Monster ${this.id} was attached with ${hp} damage (hp: ${this.hp})`, MONSTER_TAGS);
+    ml.logger.verbose(`Monster ${this.id} was attached with ${hp} damage (hp: ${this.hp})`, ml.tags.monster);
   }
 
   /** 
@@ -287,7 +282,7 @@ export default class MonsterCommon {
           if(x >= this.x && x <= this.x + spriteSize * entity.size) { // within x bounds
             if(y >= this.y && y <= this.y + spriteSize * entity.size) { // and within y bounds
               let index = entities.indexOf(entity);
-              ml.logger.debug(`Monster ${this.id} at (${this.x}, ${this.y}) collided with entity ${index} at (${entity.x}, ${entity.y})`, MONSTER_TAGS);
+              ml.logger.debug(`Monster ${this.id} at (${this.x}, ${this.y}) collided with entity ${index} at (${entity.x}, ${entity.y})`, ml.tags.monster);
               return index;
             }
           }

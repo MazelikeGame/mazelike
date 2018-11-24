@@ -6,11 +6,6 @@ import UserModel from '../models/user';
 
 /** @module backend/game/player */
 
-// The logger tags for the player
-const PLAYER_TAG = {
-  tags: ["game", "player"]
-};
-
 /**
  * The player class.
  */
@@ -130,7 +125,7 @@ export default class Player extends PlayerCommon {
    * Player dies
    */
   die() {
-    ml.logger.info(`Player ${this.name} died`, PLAYER_TAG);
+    ml.logger.info(`Player ${this.name} died`, ml.tags.player);
     this.alive = false;
     /* Remove the player from the player array */
     let player = this.floor.players.indexOf(this);

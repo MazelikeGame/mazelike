@@ -19,11 +19,6 @@ const MAPPINGS = {
   [KEYS.a]: KEYS.leftArrow
 };
 
-// The logger tags for the player
-const PLAYER_TAG = {
-  tags: ["game", "player"]
-};
-
 /**
  * The player class.
  */
@@ -172,7 +167,7 @@ export default class PlayerCommon {
         this.y = prev.y;
       }
 
-      ml.logger.debug(`Player ${this.name} moving from (${this._confirmedX}, ${this._confirmedY}) to (${this.x}, ${this.y})`, PLAYER_TAG);
+      ml.logger.debug(`Player ${this.name} moving from (${this._confirmedX}, ${this._confirmedY}) to (${this.x}, ${this.y})`, ml.tags.player);
     });
     /* eslint-enable complexity */
   }
@@ -216,7 +211,7 @@ export default class PlayerCommon {
     if(this.hp <= 0) {
       this.die();
     }
-    ml.logger.verbose(`Player ${this.name} was attacked with ${hp} damage (hp: ${this.hp})`, PLAYER_TAG);
+    ml.logger.verbose(`Player ${this.name} was attacked with ${hp} damage (hp: ${this.hp})`, ml.tags.player);
   }
 
   /** 

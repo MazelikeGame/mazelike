@@ -52,7 +52,7 @@ gameRouter.get("/all", async(req, res) => {
   });
 
   if(counts.length !== lobbies.length) {
-    process.stderr.write("Lobbies and counts results were different from /game/all\n");
+    ml.logger.error("Lobbies and counts results were different from /game/all", ml.tags("assertion"));
     res.writeHead(500);
     res.end("Internal server error (see server logs)");
     return;
@@ -61,7 +61,7 @@ gameRouter.get("/all", async(req, res) => {
   // Merge counts and lobbies
   for(let i = 0; i < lobbies.length; ++i) {
     if(lobbies[i].lobbyId !== counts[i].lobbyId) {
-      process.stderr.write("Lobbies and counts lobbyIds were different from /game/all\n");
+      ml.logger.error("Lobbies and counts lobbyIds were different from /game/all", ml.tags("assertion"));
       res.writeHead(500);
       res.end("Internal server error (see server logs)");
       return;
@@ -408,7 +408,8 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
             lobbyId: req.params.id,
           }
         });
-      process.stderr.write(`Error starting game: ${err.message}\n`);
+      ml.logger.error(`Error starting game: ${err.message}`, ml.logger.manager);
+      ml.logger.verbose(err.stack, ml.logger.manager);
       res.end("An error occured while starting game");
     }
     return;

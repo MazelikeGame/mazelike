@@ -46,7 +46,8 @@ function formatter(colors) {
 
 let filter = winston.format(function(info) {
   let tags = arrayify(info.tags);
-  return (onlyTags.size === 0 || tags.find((t) => onlyTags.has(t))) && !tags.find((t) => excludeTags.has(t)) ? info : false;
+  return info.level == "error" || (onlyTags.size === 0 || tags.find((t) => onlyTags.has(t))) && !tags.find((t) => excludeTags.has(t))
+    ? info : false;
 });
 
 const logger = winston.createLogger({
@@ -66,6 +67,34 @@ const logger = winston.createLogger({
   ]
 });
 
+// short hand tag syntax
+const tags = (...tags) => ({tags});
+
+// Commonly used logger tags
+tags.monster = tags("game", "monster");
+tags.player = tags("game", "player");
+tags.pregame = tags("game", "pregame");
+tags.manager = tags("manager");
+
 // NOTE: I use a global because dynamic import is not supported in node 8.11
 global.ml || (global.ml = {}); // eslint-disable-line
 global.ml.logger = logger;
+global.ml.tags = tags;
+
+process.on("uncaughtException", (err) => {
+  if(!ml.logger) return;
+  ml.logger.error(`Unhandled exception: ${err.message}`);
+  ml.logger.verbose(err.stack);
+  ml.logger.close();
+  ml.logger = undefined;
+  setImmediate(() => process.exit(0)); // hack to get winston to save logs
+});
+
+process.on("unhandledRejection", (err) => {
+  if(!ml.logger) return;
+  ml.logger.error(`Unhandled exception: ${err.message}`);
+  ml.logger.verbose(err.stack);
+  ml.logger.close();
+  ml.logger = undefined;
+  setImmediate(() => process.exit(0)); // hack to get winston to save logs
+});

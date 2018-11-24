@@ -28,10 +28,11 @@ export function spawnGame(gameEnv = {}) {
 
   child.on("exit", (code) => {
     if(code !== 0) {
-      process.stderr.write(`Child exited with non-zero status code ${code}\n`);
+      ml.logger.error(`Child exited with non-zero status code ${code}`, ml.tags.manager);
     }
 
     if(code === 198) {
+      ml.logger.verbose(`Port already in use ${port}`, ml.tags.manager);
       inUsePorts.add(port);
       spawnGame(origEnv);
     }
@@ -41,7 +42,7 @@ export function spawnGame(gameEnv = {}) {
   });
 
   child.on("error", (err) => {
-    process.stderr.write(`An error occured when spawning the game server: ${err.message}`);
+    ml.logger.error(`An error occured when spawning the game server: ${err.message}`, ml.tags.manager);
     inUsePorts.delete(port);
     portMap.delete(gameId);
   });

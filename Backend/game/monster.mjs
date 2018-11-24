@@ -5,11 +5,6 @@ import MonsterCommon from "../../Frontend/game/common/monster.mjs";
 import MonsterModel from "../models/monster";
 import sql from "../sequelize";
 
-// logger tags for the monster
-const MONSTER_TAGS = {
-  tags: ["game", "monster"]
-};
-
 // a list of all dead monsters (improves the performance of save)
 let deadMonsterIds = [];
 
@@ -129,7 +124,7 @@ export default class Monster extends MonsterCommon {
    * Monster dies.
    */
   die() {
-    ml.logger.verbose(`Monster ${this.id} died`, MONSTER_TAGS);
+    ml.logger.verbose(`Monster ${this.id} died`, ml.tags.monster);
     this.x = -1; // (-1, -1) coordinate tells us that the monster is dead
     this.y = -1;
     this.alive = false;
