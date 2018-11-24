@@ -1,9 +1,9 @@
 /* eslint-disable arrow-body-style */
-import winston from "winston";
-import chalk from "chalk";
-import moment from "moment";
-import fs from "fs";
-import path from "path";
+const winston = require("winston");
+const chalk = require("chalk");
+const moment = require("moment");
+const fs = require("fs");
+const path = require("path");
 
 let logFile = process.env.LOG_FILE || "mazelike.log";
 
@@ -13,6 +13,7 @@ if(path.relative(process.cwd(), process.argv[1]) === "Backend/index.mjs") {
 }
 
 let noop = (msg) => msg;
+let arrayify = (obj) => Array.isArray(obj) ? obj : [obj];
 
 function formatter(colors) {
   const LEVELS = {
@@ -28,8 +29,10 @@ function formatter(colors) {
     let timestamp = moment().format("hh:mm:ss");
     let levelFn = LEVELS[info.level] || noop;
     let blueFn = colors.blue || noop;
+    let tags = arrayify(info.tags);
+    let tagsStr = info.tags ? `[${tags.join(", ")}] ` : "";
 
-    return `${blueFn(timestamp)} ${levelFn(info.level.toUpperCase())} - ${info.message}`;
+    return `${blueFn(timestamp)} ${tagsStr}${levelFn(info.level.toUpperCase())} - ${info.message}`;
   });
 }
 

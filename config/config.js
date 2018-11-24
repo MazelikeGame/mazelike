@@ -1,13 +1,13 @@
 /* global ml */
 /* eslint-disable arrow-body-style */
-import "./logger.mjs"; // THIS MUST BE THE FIRST IMPORT
+require("../Backend/logger.js"); // THIS MUST BE THE FIRST IMPORT
 require('dotenv').config();
 const url = require("url");
 const os = require("os");
 
 let conf = {
   operatorsAliases: false,
-  logging: typeof ml !== "undefined" ? (msg) => ml.logger.debug(msg) : false
+  logging: (msg) => ml.logger.debug(msg, { tags: "db" })
 };
 
 let dbUrl;

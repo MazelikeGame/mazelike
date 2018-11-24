@@ -1,8 +1,13 @@
-/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments, no-mixed-operators */
+/* eslint-disable no-extra-parens,max-len,curly,complexity,prefer-template, no-warning-comments, no-mixed-operators */
 /** @module Monster */
 
 // The maximum amount of ms we want a monster to walk for
 const MAX_WALK_TIME = 1500;
+
+// logger tags for the monster
+const MONSTER_TAGS = {
+  tags: ["game", "monster"]
+};
 
 import PlayerCommon from "./player.mjs";
 import interpolate from "./interpolator.mjs";
@@ -190,6 +195,9 @@ export default class MonsterCommon {
    */
   figureOutWhereToGo() {
     this.canSeePC();
+    if(this.targetAquired) {
+      ml.logger.debug(`Monster ${this.id} targeting player at (${this.targetx, this.targety})`, MONSTER_TAGS);
+    }
     if(this.alive) {
       if(!this.targetAquired && !this.collision) {
         if(this.targetx === -1 || this.targety === -1) {
@@ -199,6 +207,7 @@ export default class MonsterCommon {
         if(Math.abs(this.x - this.targetx) < 2 && Math.abs(this.y - this.targety) < 2) {
           this.wander();
         }
+        ml.logger.debug(`Monster ${this.id} wandering to (${this.targetx}, ${this.targety})`, MONSTER_TAGS);
       }
     }
   }
@@ -211,7 +220,8 @@ export default class MonsterCommon {
     this.hp -= hp;
     if(this.hp <= 0) {
       this.die();
-    }    
+    }
+    ml.logger.verbose(`Monster ${this.id} was attached with ${hp} damage (hp: ${this.hp})`, MONSTER_TAGS);
   }
 
   /** 
@@ -276,7 +286,9 @@ export default class MonsterCommon {
           }
           if(x >= this.x && x <= this.x + spriteSize * entity.size) { // within x bounds
             if(y >= this.y && y <= this.y + spriteSize * entity.size) { // and within y bounds
-              return entities.indexOf(entity);
+              let index = entities.indexOf(entity);
+              ml.logger.debug(`Monster ${this.id} at (${this.x}, ${this.y}) collided with entity ${index} at (${entity.x}, ${entity.y})`, MONSTER_TAGS);
+              return index;
             }
           }
         }

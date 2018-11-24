@@ -1,6 +1,6 @@
 /* global io ml */
 // jshint esversion: 6
-import "./logger.mjs"; // THIS MUST BE THE FIRST IMPORT
+import "./logger.js"; // THIS MUST BE THE FIRST IMPORT
 import sequelize from "./sequelize";
 import express from "express";
 import http from "http";
@@ -27,7 +27,7 @@ setHttpd(server);
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms", {
   stream: {
     write(data) {
-      ml.logger.info(data.trim(), { label: "HTTP" });
+      ml.logger.info(data.trim(), { tags: "http" });
     }
   }
 }));

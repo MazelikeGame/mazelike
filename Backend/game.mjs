@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign,complexity */
-import "./logger.mjs"; // THIS MUST BE THE FIRST IMPORT
+import "./logger.js"; // THIS MUST BE THE FIRST IMPORT
 import socketIO from "socket.io";
 import http from "http";
 import Floor from "./game/floor";
