@@ -192,7 +192,7 @@ export default class MonsterCommon {
   figureOutWhereToGo() {
     this.canSeePC();
     if(this.targetAquired) {
-      ml.logger.debug(`Monster ${this.id} targeting player at (${this.targetx, this.targety})`, ml.tags.monster);
+      ml.logger.debug(`Monster ${this.id} targeting player at (${this.targetx}, ${this.targety})`, ml.tags.monster);
     }
     if(this.alive) {
       if(!this.targetAquired && !this.collision) {
