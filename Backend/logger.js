@@ -6,6 +6,9 @@ const fs = require("fs");
 const path = require("path");
 
 let logFile = process.env.LOG_FILE || "mazelike.log";
+// Filter out tags
+let onlyTags = new Set((process.env.LOG_ONLY || "").split(/\s*,\s*/).filter(t => t));
+let excludeTags = new Set((process.env.LOG_EXCLUDE || "").split(/\s*,\s*/).filter(t => t));
 
 // Empty the log
 if(path.relative(process.cwd(), process.argv[1]) === "Backend/index.mjs") {
@@ -13,7 +16,11 @@ if(path.relative(process.cwd(), process.argv[1]) === "Backend/index.mjs") {
 }
 
 let noop = (msg) => msg;
-let arrayify = (obj) => Array.isArray(obj) ? obj : [obj];
+let arrayify = (obj) => {
+  if(!obj) return [];
+
+  return Array.isArray(obj) ? obj : [obj];
+};
 
 function formatter(colors) {
   const LEVELS = {
@@ -32,18 +39,27 @@ function formatter(colors) {
     let tags = arrayify(info.tags);
     let tagsStr = info.tags ? `[${tags.join(", ")}] ` : "";
 
+
     return `${blueFn(timestamp)} ${tagsStr}${levelFn(info.level.toUpperCase())} - ${info.message}`;
   });
 }
 
+let filter = winston.format(function(info) {
+  let tags = arrayify(info.tags);
+  return (onlyTags.size === 0 || tags.find((t) => onlyTags.has(t))) && !tags.find((t) => excludeTags.has(t)) ? info : false;
+});
+
 const logger = winston.createLogger({
   transports: [
     new winston.transports.Console({
-      level: "info",
-      format: formatter(chalk),
+      level: process.env.LOG_LEVEL || "info",
+      format: winston.format.combine(
+        filter(),
+        formatter(chalk)
+      ),
     }),
     new winston.transports.File({
-      level: "silly",
+      level: process.env.LOG_FILE_LEVEL || "silly",
       format: formatter({}),
       filename: logFile
     })
