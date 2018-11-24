@@ -1,3 +1,4 @@
+/* eslint-disable no-extra-parens, max-len, complexity, prefer-template */
 /* global PIXI */
 import PlayerCommon from "../common/player.mjs";
 import interpolate from "../common/interpolator.mjs";
@@ -11,8 +12,10 @@ export default class Player extends PlayerCommon {
   constructor(...args) {
     super(...args);
     this._lastMove = Date.now();
-    this.tinted = -1;
     this._lastFrame = undefined;
+    
+    this.tinted = -1;
+    this.hpDamageTaken = -1;
   }
 
   /**
@@ -30,10 +33,22 @@ export default class Player extends PlayerCommon {
       fill: "#fff",
       fontSize: 17
     });
+    this._textStyle2 = new PIXI.TextStyle({
+      fill: "#ff0000",
+      fontSize: 24,
+      fontFamily: "Tahoma",
+      fontWeight: "bold"
+    });
+
     this.usernameSprite = new PIXI.Text(this.username, this._textStyle);
     this.usernameSpriteOffset = (this.sprite.width / 2) - (this.usernameSprite.width / 2);
-    this.usernameSprite.position.set(this.sprite.position.x + this.usernameSpriteOffset, this.sprite.position.y - 10);
+    this.usernameSprite.position.set(this.sprite.position.x + this.usernameSpriteOffset, this.sprite.position.y - 15);
     this.floor.playerSprites.addChild(this.usernameSprite);
+
+    this.hpNotificationSprite = new PIXI.Text("", this._textStyle2);
+    this.hpNotificationSpriteOffset = (this.sprite.width / 2) - (this.hpNotificationSprite.width / 2);
+    this.hpNotificationSprite.position.set(this.sprite.position.x + this.hpNotificationSpriteOffset, this.sprite.position.y - 40);
+    this.floor.playerSprites.addChild(this.hpNotificationSprite);
   }
 
   /**
@@ -48,16 +63,20 @@ export default class Player extends PlayerCommon {
       interpolate(this, now - this._lastMove, this._confirmedX, this._confirmedY);
       this._lastMove = now;
     }
-
-    this.sprite.position.set(this.x - viewX - this.usernameSpriteOffset, this.y - viewY + 10);
-    this.usernameSprite.position.set(this.x - viewX, this.y - viewY);
+    this.sprite.position.set(this.x - viewX, this.y - viewY);
+    this.usernameSprite.position.set(this.x - viewX + this.usernameSpriteOffset, this.y - viewY - 15);
+    this.hpNotificationSprite.position.set(this.x - viewX + this.hpNotificationSpriteOffset, this.y - viewY - 40);
     if(this.tinted !== -1) {
       if(this.sprite.tint === this.regularTint) {
         this.tint();
+        this.hpNotificationSprite.setText("-" + this.hpDamageTaken);
+        this.hpNotificationSpriteOffset = (this.sprite.width / 2) - (this.hpNotificationSprite.width / 2);
+        this.usernameSprite.position.set(this.x - viewX + this.usernameSpriteOffset, this.y - viewY - 15);
       }
-      if(new Date().getTime() - this.tinted > 100) {
+      if(new Date().getTime() - this.tinted > 200) {
         this.tinted = -1;
         this.untint();
+        this.hpNotificationSprite.setText();
       }
     }
   }
@@ -68,6 +87,7 @@ export default class Player extends PlayerCommon {
   remove() {
     this.floor.playerSprites.removeChild(this.sprite);
     this.floor.playerSprites.removeChild(this.usernameSprite);
+    this.floor.playerSprites.removeChild(this.hpNotificationSprite);
   }
 
   /**
@@ -76,6 +96,7 @@ export default class Player extends PlayerCommon {
   die() {
     this.floor.playerSprites.removeChild(this.sprite);
     this.floor.playerSprites.removeChild(this.usernameSprite);
+    this.floor.playerSprites.removeChild(this.hpNotificationSprite);
     if(this.tinted !== -1) {
       this.untint();
     }
@@ -112,6 +133,7 @@ export default class Player extends PlayerCommon {
     }
     if(oldHP !== this.hp) {
       this.tinted = new Date().getTime();
+      this.hpDamageTaken = oldHP - this.hp;
     }
   }
 }
