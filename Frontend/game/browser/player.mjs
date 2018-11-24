@@ -25,6 +25,15 @@ export default class Player extends PlayerCommon {
     this.sprite.height = PlayerCommon.SPRITE_SIZE;
     this.floor.playerSprites.addChild(this.sprite);
     this.regularTint = this.sprite.tint;
+
+    this._textStyle = new PIXI.TextStyle({
+      fill: "#fff",
+      fontSize: 17
+    });
+    this.usernameSprite = new PIXI.Text(this.username, this._textStyle);
+    this.usernameSpriteOffset = (this.sprite.width / 2) - (this.usernameSprite.width / 2);
+    this.usernameSprite.position.set(this.sprite.position.x + this.usernameSpriteOffset, this.sprite.position.y - 10);
+    this.floor.playerSprites.addChild(this.usernameSprite);
   }
 
   /**
@@ -40,7 +49,8 @@ export default class Player extends PlayerCommon {
       this._lastMove = now;
     }
 
-    this.sprite.position.set(this.x - viewX, this.y - viewY);
+    this.sprite.position.set(this.x - viewX - this.usernameSpriteOffset, this.y - viewY + 10);
+    this.usernameSprite.position.set(this.x - viewX, this.y - viewY);
     if(this.tinted !== -1) {
       if(this.sprite.tint === this.regularTint) {
         this.tint();
@@ -57,6 +67,7 @@ export default class Player extends PlayerCommon {
    */
   remove() {
     this.floor.playerSprites.removeChild(this.sprite);
+    this.floor.playerSprites.removeChild(this.usernameSprite);
   }
 
   /**
@@ -64,6 +75,7 @@ export default class Player extends PlayerCommon {
    */
   die() {
     this.floor.playerSprites.removeChild(this.sprite);
+    this.floor.playerSprites.removeChild(this.usernameSprite);
     if(this.tinted !== -1) {
       this.untint();
     }
