@@ -11,8 +11,10 @@ let logFile = process.env.LOG_FILE || "mazelike.log";
 let onlyTags = new Set((process.env.LOG_ONLY || "").split(/\s*,\s*/).filter((t) => t));
 let excludeTags = new Set((process.env.LOG_EXCLUDE || "").split(/\s*,\s*/).filter((t) => t));
 
+global.ml || (global.ml = {}); // eslint-disable-line
+
 // Empty the log
-if(path.relative(process.cwd(), process.argv[1]) === "Backend/index.mjs") {
+if(path.relative(process.cwd(), process.argv[1]) === "Backend/index.mjs" && !ml.noCreateLogger) {
   fs.writeFileSync(logFile, "");
 }
 
@@ -36,12 +38,11 @@ function formatter(colors) {
   };
 
   return winston.format.printf((info) => {
-    let timestamp = moment().format("hh:mm:ss");
+    let timestamp = moment(info.timestamp).format("hh:mm:ss");
     let levelFn = LEVELS[info.level] || noop;
     let blueFn = colors.blue || noop;
     let tags = arrayify(info.tags);
     let tagsStr = info.tags ? `[${tags.join(", ")}] ` : "";
-
 
     return `${blueFn(timestamp)} ${tagsStr}${levelFn(info.level.toUpperCase())} - ${info.message}`;
   });
@@ -49,62 +50,77 @@ function formatter(colors) {
 
 let filter = winston.format(function(info) {
   let tags = arrayify(info.tags);
-  // eslint-disable-next-line
-  return info.level === "error" || ((onlyTags.size === 0 || tags.find((t) => onlyTags.has(t))) && !tags.find((t) => excludeTags.has(t)))
+  return (onlyTags.size === 0 || tags.find((t) => onlyTags.has(t))) && !tags.find((t) => excludeTags.has(t))
     ? info : false;
 });
 
-const logger = winston.createLogger({
-  transports: [
-    new winston.transports.Console({
-      level: process.env.LOG_LEVEL || "info",
-      format: winston.format.combine(
-        filter(),
-        formatter(chalk)
-      ),
-    }),
-    new winston.transports.File({
-      level: process.env.LOG_FILE_LEVEL || "silly",
-      format: formatter({}),
-      filename: logFile
-    })
-  ]
+let timestamp = winston.format((info) => {
+  info.timestamp = Date.now();
+  return info;
 });
 
-// short hand tag syntax
-const tags = (...tags) => ({tags}); // eslint-disable-line
+// export for the log parser
+exports.filter = filter;
+exports.formatter = formatter;
 
-// Commonly used logger tags
-tags.monster = tags("game", "monster");
-tags.player = tags("game", "player");
-tags.pregame = tags("game", "pregame");
-tags.manager = tags("manager");
+// Don't initialize the logger
+if(!ml.noCreateLogger) {
+  const logger = winston.createLogger({
+    transports: [
+      new winston.transports.Console({
+        level: process.env.LOG_LEVEL || "info",
+        format: winston.format.combine(
+          timestamp(),
+          filter(),
+          formatter(chalk)
+        ),
+      }),
+      new winston.transports.File({
+        level: process.env.LOG_FILE_LEVEL || "silly",
+        format: winston.format.combine(
+          timestamp(),
+          winston.format.json()
+        ),
+        filename: logFile,
+        timestamp: true
+      })
+    ]
+  });
 
-// NOTE: I use a global because dynamic import is not supported in node 8.11
-global.ml || (global.ml = {}); // eslint-disable-line
-global.ml.logger = logger;
-global.ml.tags = tags;
+  // short hand tag syntax
+  const tags = (...tags) => ({tags}); // eslint-disable-line
 
-process.on("uncaughtException", (err) => {
-  if(!ml.logger) {
-    return;
-  }
+  // Commonly used logger tags
+  tags.monster = tags("game", "monster");
+  tags.player = tags("game", "player");
+  tags.pregame = tags("game", "pregame");
+  tags.manager = tags("manager");
 
-  ml.logger.error(`Unhandled exception: ${err.message}`);
-  ml.logger.verbose(err.stack);
-  ml.logger.close();
-  ml.logger = undefined;
-  setImmediate(() => process.exit(0)); // hack to get winston to save logs
-});
+  // NOTE: I use a global because dynamic import is not supported in node 8.11
+  global.ml.logger = logger;
+  global.ml.tags = tags;
 
-process.on("unhandledRejection", (err) => {
-  if(!ml.logger) {
-    return;
-  }
-  
-  ml.logger.error(`Unhandled exception: ${err.message}`);
-  ml.logger.verbose(err.stack);
-  ml.logger.close();
-  ml.logger = undefined;
-  setImmediate(() => process.exit(0)); // hack to get winston to save logs
-});
+  process.on("uncaughtException", (err) => {
+    if(!ml.logger) {
+      return;
+    }
+
+    ml.logger.error(`Unhandled exception: ${err.message}`);
+    ml.logger.verbose(err.stack);
+    ml.logger.close();
+    ml.logger = undefined;
+    setImmediate(() => process.exit(0)); // hack to get winston to save logs
+  });
+
+  process.on("unhandledRejection", (err) => {
+    if(!ml.logger) {
+      return;
+    }
+    
+    ml.logger.error(`Unhandled exception: ${err.message}`);
+    ml.logger.verbose(err.stack);
+    ml.logger.close();
+    ml.logger = undefined;
+    setImmediate(() => process.exit(0)); // hack to get winston to save logs
+  });
+}

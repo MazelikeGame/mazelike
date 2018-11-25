@@ -5,6 +5,12 @@ if [ "$1" == "sh" ]; then
   exec /bin/ash
 fi
 
+# Run the log processing script
+if [ "$1" == "log" ]; then
+  shift
+  exec tail -n +0 -f /data/mazelike.log | node scripts/log-parser $*
+fi
+
 isGameServer="no"
 
 # Parse command line arguments
