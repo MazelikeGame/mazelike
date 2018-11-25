@@ -9,7 +9,7 @@ let portMap = new Map();
 
 export function spawnGame(gameEnv = {}) {
   let port = pickPort();
-  portMap.set(gameId, port);
+  portMap.set(gameEnv.gameId, port);
   inUsePorts.add(port);
   gameEnv.port = port;
 
@@ -20,6 +20,8 @@ export function spawnGame(gameEnv = {}) {
     gameEnv[`MAZELIKE_${key}`] = gameEnv[key];
     delete gameEnv[key];
   }
+
+  Object.assign(gameEnv, process.env);
 
   let child = child_process.spawn(process.argv[0], ['--experimental-modules', CHILD_MAIN], {
     env: gameEnv,
