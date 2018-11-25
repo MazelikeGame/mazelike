@@ -158,6 +158,7 @@ export const joinRoute = async(req, res) => {
   if(!lobby) {
     res.status(404);
     res.end("Join code is invalid");
+    ml.logger.verbose(`${req.user.username} failed to join a lobby becuase the join code ${req.params.id} is invalid`, ml.tags.lobby);
     return;
   }
   let user = await User.findOne({
@@ -197,6 +198,8 @@ export const joinRoute = async(req, res) => {
     });
     await newPlayer.setLobby(newLobby);
   }
+
+  ml.logger.info(`${req.user.username} joined ${lobby.lobbyId}`, ml.tags.lobby);
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
@@ -246,6 +249,7 @@ gameRouter.get("/new", async(req, res) => {
   });
   await newPlayer.setLobby(newLobby);
 
+  ml.logger.info(`${id} created (secret: ${secret})`, ml.tags.lobby);
   res.redirect(`/game/lobby/${id}`);
 });
 
@@ -285,10 +289,12 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
       });
       io.emit("lobby-delete", req.params.id);
       await deleteGame(req.params.id);
+      ml.logger.info(`Deleted ${req.params.id}`, ml.tags.lobby);
       res.redirect("/account/dashboard");
     } else {
       res.status(401);
       res.end("Only the host can delete this lobby.");
+      ml.logger.verbose(`${req.user.username} failed to delete ${req.params.id} because they are not the host`, ml.tags.lobby);
     }
     return;
   }
@@ -313,6 +319,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
   if(!host.isHost) {
     res.status(401);
     res.end("Only the host can drop a player");
+    ml.logger.verbose(`${req.user.username} failed to drop ${req.params.player} from ${req.params.id} becuase they are not the host`, ml.tags.lobby);
     return;
   }
 
@@ -338,6 +345,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
       player: req.params.player
     });
     res.end("Player removed");
+    ml.logger.info(`Droped ${req.params.player} from ${req.params.id}`, ml.tags.lobby);
   }
 
   res.status(404);
@@ -381,8 +389,11 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       // pass
     }
 
+    ml.logger.info(`Starting game ${req.params.id}`, ml.tags.lobby);
+
     // Generate the game
     if(!await exists(`${DATA_DIR}/maps/${req.params.id}.json`)) {
+      ml.logger.verbose(`Generating floor ${req.params.id}-0`, ml.tags.lobby);
       await Floor.generate({
         gameId: req.params.id,
         floorIdx: 0
@@ -390,6 +401,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     }
 
     try {
+      ml.logger.verbose(`Spawning ${req.params.id}`, ml.tags.lobby);
       await spawnGame({
         gameId: req.params.id
       });
@@ -415,6 +427,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     return;
   }
 
+  ml.logger.verbose(`${req.user.username} failed to start ${req.params.id}`, ml.tags.lobby);
   res.end("No such lobby or you are not the host");
 });
 
