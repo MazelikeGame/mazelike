@@ -148,7 +148,7 @@ export const joinRoute = async(req, res) => {
   if(res.loginRedirect()) {
     return;
   }
-  let lobby = await Lobby.find({
+  let lobby = await Lobby.findOne({
     where: {
       secret: req.params.id
     }
@@ -255,7 +255,7 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
     return;
   }
 
-  let lobby = await Lobby.find({
+  let lobby = await Lobby.findOne({
     where: {
       lobbyId: req.params.id,
       playerId: req.user.username
@@ -303,7 +303,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
     return;
   }
 
-  let host = await Lobby.find({
+  let host = await Lobby.findOne({
     where: {
       lobbyId: req.params.id,
       playerId: req.user.username
@@ -316,14 +316,14 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
     return;
   }
 
-  let lobby = await Lobby.find({
+  let lobby = await Lobby.findOne({
     where: {
       lobbyId: req.params.id,
       playerId: req.params.player
     }
   });
 
-  let player = await Player.find({
+  let player = await Player.findOne({
     where: {
       id: lobby.player
     }
@@ -350,7 +350,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     return;
   }
 
-  let lobby = await Lobby.find({
+  let lobby = await Lobby.findOne({
     where: {
       lobbyId: req.params.id,
       playerId: req.user.username

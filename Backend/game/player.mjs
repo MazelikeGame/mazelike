@@ -36,7 +36,7 @@ export default class Player extends PlayerCommon {
     });
     let players = [];
     for(var lobby of lobbies) {
-      let player = await PlayerModel.find({
+      let player = await PlayerModel.findOne({
         where: {
           id: lobby.player
         }
@@ -45,7 +45,7 @@ export default class Player extends PlayerCommon {
     }
     let users = {};
     for(var player of players) {
-      let user = await UserModel.find({
+      let user = await UserModel.findOne({
         where: {
           id: player.username
         }
