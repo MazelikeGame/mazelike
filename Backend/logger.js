@@ -96,6 +96,7 @@ if(!ml.noCreateLogger) {
   tags.pregame = tags("game", "pregame");
   tags.manager = tags("manager");
   tags.lobby = tags("lobby");
+  tags.account = tags("account");
 
   // NOTE: I use a global because dynamic import is not supported in node 8.11
   global.ml.logger = logger;
