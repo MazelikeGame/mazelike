@@ -1,3 +1,4 @@
+/* global ml */
 /* jshint node: true */
 import PlayerCommon from '../../Frontend/game/common/player';
 import PlayerModel from '../models/player';
@@ -35,7 +36,7 @@ export default class Player extends PlayerCommon {
     });
     let players = [];
     for(var lobby of lobbies) {
-      let player = await PlayerModel.find({
+      let player = await PlayerModel.findOne({
         where: {
           id: lobby.player
         }
@@ -44,7 +45,7 @@ export default class Player extends PlayerCommon {
     }
     let users = {};
     for(var player of players) {
-      let user = await UserModel.find({
+      let user = await UserModel.findOne({
         where: {
           id: player.username
         }
@@ -125,6 +126,7 @@ export default class Player extends PlayerCommon {
    * Player dies
    */
   die() {
+    ml.logger.info(`Player ${this.name} died`, ml.tags.player);
     this.alive = false;
     /* Remove the player from the player array */
     let player = this.floor.players.indexOf(this);

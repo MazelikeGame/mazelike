@@ -1,3 +1,4 @@
+/* global ml */
 /** @module PlayerCommon */
 
 const KEYS = {
@@ -166,6 +167,8 @@ export default class PlayerCommon {
         this.x = prev.x;
         this.y = prev.y;
       }
+
+      ml.logger.debug(`Player ${this.name} moving from (${this._confirmedX}, ${this._confirmedY}) to (${this.x}, ${this.y})`, ml.tags.player);
     });
     /* eslint-enable complexity */
   }
@@ -209,6 +212,7 @@ export default class PlayerCommon {
     if(this.hp <= 0) {
       this.die();
     }
+    ml.logger.verbose(`Player ${this.name} was attacked with ${hp} damage (hp: ${this.hp})`, ml.tags.player);
   }
 
   /** 
