@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function(queryInterface, Sequelize) {
-    return [
+    return Promise.all([
       queryInterface.addColumn(
         'lobbies',
         'inProgress',
@@ -11,12 +11,12 @@ module.exports = {
           defaultValue: false
         }
       )
-    ];
+    ]);
   },
 
   down: (queryInterface, Sequelize) => {
-    return [
+    return Promise.all([
       queryInterface.removeColumn('lobbies', 'inProgress')
-    ];
+    ]);
   }
 };

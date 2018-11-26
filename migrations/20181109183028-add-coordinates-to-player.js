@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return [
+    return Promise.all([
       queryInterface.addColumn(
         'players',
         'x',
@@ -19,13 +19,13 @@ module.exports = {
           allowNull: true
         }
       )
-    ];
+    ]);
   },
 
   down: (queryInterface) => {
-    return [
+    return Promise.all([
       queryInterface.removeColumn('players', 'x'),
       queryInterface.removeColumn('players', 'y')
-    ];
+    ]);
   }
 };
