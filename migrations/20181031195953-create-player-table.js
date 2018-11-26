@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return [
+    return Promise.all([
       queryInterface.createTable(
         'players',
         {
@@ -31,12 +31,12 @@ module.exports = {
           }
         }
       ),
-    ];
+    ]);
   },
 
   down: (queryInterface, Sequelize) => {
-    return [
+    return Promise.all([
       queryInterface.dropTable('players')
-    ];
+    ]);
   }
 };
