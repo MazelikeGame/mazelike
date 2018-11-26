@@ -109,8 +109,9 @@ async function triggerTick(floor, io, lastUpdate) {
   let now = Date.now();
 
   // save and quit if we loose all the clients
-  if(io.engine.clientsCount === 0) {
-    ml.logger.verbose("All clients left saving game", ml.tags("game"));
+  if(io.engine.clientsCount === 0 || floor.players.length === 0) {
+    await floor.sendState(io, isGameRunning);
+    ml.logger.verbose("All clients left or died saving game", ml.tags("game"));
 
     await floor.save();
 
