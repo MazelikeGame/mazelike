@@ -1,0 +1,40 @@
+{
+  "itemDefinitions":[
+    {
+      "spriteName":"Iron Dagger",
+      "spriteSize":32,
+      "movementSpeed":0,
+      "attackSpeed":6,
+      "attack":20,
+      "defence":1,
+      "range":1
+    },
+    {
+      "spriteName":"Wooden Shield",
+      "spriteSize":32,
+      "movementSpeed":0,
+      "attackSpeed":0,
+      "attack":0,
+      "defence":10,
+      "range":1
+    },
+    {
+      "spriteName":"Iron Full Helm",
+      "spriteSize":32,
+      "movementSpeed":0,
+      "attackSpeed":0,
+      "attack":0,
+      "defence":15,
+      "range":0
+    },
+    {
+      "spriteName":"Iron Boots",
+      "spriteSize":32,
+      "movementSpeed":3,
+      "attackSpeed":0,
+      "attack":0,
+      "defence":3,
+      "range":0
+    }
+  ]
+}
