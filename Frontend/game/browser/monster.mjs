@@ -1,4 +1,4 @@
-/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
+/* eslint-disable no-extra-parens,max-len,curly,complexity,prefer-template, no-warning-comments */
 /* global PIXI */
 /** @module Monster */
 
