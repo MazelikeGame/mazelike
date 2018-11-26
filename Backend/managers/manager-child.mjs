@@ -14,6 +14,7 @@ export function spawnGame(gameEnv = {}) {
   inUsePorts.add(port);
   gameEnv.port = port;
 
+  let gameId = gameEnv.gameId;
   let origEnv = Object.assign({}, gameEnv);
   // prefix all mazelike env vars
   for(let key of Object.keys(gameEnv)) {
