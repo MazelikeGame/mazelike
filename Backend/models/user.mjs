@@ -2,8 +2,10 @@ import Sequelize from 'sequelize';
 import sql from '../sequelize';
 import bcrypt from 'bcryptjs';
 import Player from './player';
-
-// You can call this with or without new it should work either way
+/**
+ * Represents a users.
+ * @constructor
+ */
 let User = sql.define('users', {
   username: Sequelize.STRING,
   email: Sequelize.STRING,
@@ -26,12 +28,22 @@ User.hasMany(Player, { foreignKey: 'username' });
 
 // add methods here as user.method = function() {};
 // do not use an => if you want to use this in the function
+
+/**
+ * Encrypts the users password.
+ * @param {string} password the given password to encrypt.
+ */
 User.encryptPassword = function(password, callback) {
   bcrypt.hash(password, 10, function(err, hash) {
     callback(err, hash);
   });
 };
 
+/**
+ * Compares the password.
+ * @param {string} password the given password to compare.
+ * @param {string} realPassword the encrypted password from the database.
+ */
 User.comparePassword = function(password, realPassword, callback) {
   bcrypt.compare(password, realPassword, function(err, result) {
     callback(err, result);

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Floor</title>
+    <title>JSDoc: Class: User</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Floor</h1>
+    <h1 class="page-title">Class: User</h1>
 
     
 
@@ -28,10 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="module-common_Floor.html">common/Floor</a>~</span>Floor<span class="signature">(gameId, floorIdx)</span><span class="type-signature"></span></h2>
-        
-            <div class="class-description">The game map, monsters, players and items for this floor</div>
+        <h2><span class="attribs"><span class="type-signature"></span></span>User<span class="signature">()</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -42,18 +39,18 @@
         
 
     
-    <h2>Constructor</h2>
+
+    
+    <h4 class="name" id="User"><span class="type-signature"></span>new User<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
-    <h4 class="name" id="Floor"><span class="type-signature"></span>new Floor<span class="signature">(gameId, floorIdx)</span><span class="type-signature"></span></h4>
-    
-
-    
 
 
 
-
+<div class="description">
+    Represents a users.
+</div>
 
 
 
@@ -61,66 +58,6 @@
 
 
 
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>gameId</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The game id for the current game</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>floorIdx</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The index of this floor</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -156,7 +93,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_floor.mjs.html">Frontend/game/common/floor.mjs</a>, <a href="Frontend_game_common_floor.mjs.html#line7">line 7</a>
+        <a href="Backend_models_user.mjs.html">Backend/models/user.mjs</a>, <a href="Backend_models_user.mjs.html#line9">line 9</a>
     </li></ul></dd>
     
 
@@ -200,19 +137,105 @@
     
 
     
-        <h3 class="subsection-title">Members</h3>
+
+    
+        <h3 class="subsection-title">Methods</h3>
 
         
             
-<h4 class="name" id=".UPDATE_INTERVAL"><span class="type-signature">(static) </span>UPDATE_INTERVAL<span class="type-signature"></span></h4>
 
+    
+
+    
+    <h4 class="name" id=".comparePassword"><span class="type-signature">(static) </span>comparePassword<span class="signature">(password, realPassword)</span><span class="type-signature"></span></h4>
+    
+
+    
 
 
 
 <div class="description">
-    The interval at which we update the game state (if this is too short the server will break)
+    Compares the password.
 </div>
 
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>password</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the given password to compare.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>realPassword</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the encrypted password from the database.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -248,7 +271,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_floor.mjs.html">Frontend/game/common/floor.mjs</a>, <a href="Frontend_game_common_floor.mjs.html#line23">line 23</a>
+        <a href="Backend_models_user.mjs.html">Backend/models/user.mjs</a>, <a href="Backend_models_user.mjs.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -264,9 +287,154 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
         
+            
+
     
 
+    
+    <h4 class="name" id=".encryptPassword"><span class="type-signature">(static) </span>encryptPassword<span class="signature">(password)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Encrypts the users password.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>password</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the given password to encrypt.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Backend_models_user.mjs.html">Backend/models/user.mjs</a>, <a href="Backend_models_user.mjs.html#line36">line 36</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     
 
     
@@ -288,7 +456,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 26 2018 14:41:36 GMT-0600 (CST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 26 2018 14:41:37 GMT-0600 (CST)
 </footer>
 
 <script> prettyPrint(); </script>

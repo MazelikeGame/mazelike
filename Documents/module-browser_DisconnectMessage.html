@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Backend/game/floor.mjs</title>
+    <title>JSDoc: Class: module:browser/DisconnectMessage</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,124 +17,450 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Backend/game/floor.mjs</h1>
+    <h1 class="page-title">Class: module:browser/DisconnectMessage</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/* eslint-disable complexity */
-/** @module backend/game/Floor */
-import FloorCommon from "../../Frontend/game/common/floor.mjs";
-import GameMap from "./game-map";
-import Monster from "./monster.mjs";
-import Player from './player';
+        <h2><span class="attribs"><span class="type-signature"></span></span>module:browser/DisconnectMessage<span class="signature">(msg)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">A message that shows when disconnected.</div>
+        
+    
+</header>
 
-export default class Floor extends FloorCommon {
-  /**
-   * Generate a new floor (runs on the server and the browser)
-   * @param gameId The game id for the game we want to generate
-   * @param floorIdx The index of floor we want to generate
-   * @param {object} opts The options of the specific generators
-   */
-  static generate({gameId, floorIdx, map}) {
-    let floor = new Floor(gameId, floorIdx);
-    floor.map = GameMap.generate(map);
-    floor.generateMonsters();
+<article>
+    <div class="container-overview">
+    
+        
 
-    return floor;
-  }
+    
+    <h2>Constructor</h2>
+    
 
-  /**
-   * Puts a monster in half of all "rooms".
-   * @param {Floor} floor The floor to add monsters to
-   */
-  generateMonsters() {
-    this.monsters = [];
-    let random = 0;
-    for(let i = 0; i &lt; this.map.rooms.length * this.monsterRatio; i++) {
-      if(i === 0) {
-        this.monsters[i] = new Monster('boss', 200, 15, this, i, 'boss');
-      } else {
-        random = Math.floor(Math.random() * 100);
-        if(random &lt; 15) { // 15% chance for blue demon
-          this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
-        } else if(random &lt; 50) { // 35% chance for red demon, where 15+35 = 50
-          this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
-        } else if(random &lt; 100) { // 50% chance for green demon, where 15+35+50 = 100
-          this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
-        }
-      }
-    }
-  }
+    
+    <h4 class="name" id="module:browser/DisconnectMessage"><span class="type-signature"></span>new module:browser/DisconnectMessage<span class="signature">(msg)</span><span class="type-signature"></span></h4>
+    
 
-  /**
-   * Load everything on the server
-   * @param gameId The game id for the game we want to load
-   * @param floorIdx The index of floor we want to load
-   */
-  static async load(gameId, floorIdx) {
-    let floor = new Floor(gameId, floorIdx);
+    
 
-    await Promise.all([
-      GameMap.load(floor),
-      Monster.load(floor),
-      Player.load(floor)
-    ]);
 
-    return floor;
-  }
 
-  /**
-   * Save the floor (server side)
-   * @param {boolean} create Create new rows (first save only)
-   */
-  save(create) {
-    return Promise.all([
-      this.map.save(this.id),
-      Monster.saveAll(this, create),
-      Player.saveAll(this)
-    ]);
-  }
+<div class="description">
+    Creates a new message with a given value.
+</div>
 
-  /**
-   * Moves all monsters and checks for collisions (also anything else that happens every turn)
-   * @param {number} deltaTime The time that has ellasped since the last tick
-   */
-  tick(deltaTime) {
-    for(let monster of this.monsters) {
-      monster.move(deltaTime); // monster-monster collision check happens here
-      monster.figureOutWhereToGo();
-    }
-    for(let player of this.players) {
-      player.move();
-      if(player._frames.length) {
-        player._confirmedId = player._frames[player._frames.length - 1].id;
-      }
-      player._confirmedX = player.x;
-      player._confirmedY = player.y;
-      player.dropConfirmed();
-    }
-  }
 
-  /**
-   * Send the current state of the floor to the client
-   * @param {} io The socket io instance (not a sock)
-   */
-  sendState(io, isGameRunning) {
-    io.emit("state", {
-      monsters: this.monsters,
-      players: this.players,
-      isGameRunning
-    });
-  }
-}
-</code></pre>
-        </article>
-    </section>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>msg</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the message you want to send</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_disconnect-msg.js.html">Frontend/game/browser/disconnect-msg.js</a>, <a href="Frontend_game_browser_disconnect-msg.js.html#line8">line 8</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="draw"><span class="type-signature"></span>draw<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates the elements of the disconnect message in PIXI.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_disconnect-msg.js.html">Frontend/game/browser/disconnect-msg.js</a>, <a href="Frontend_game_browser_disconnect-msg.js.html#line37">line 37</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="render"><span class="type-signature"></span>render<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Renders the disconnect message.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_disconnect-msg.js.html">Frontend/game/browser/disconnect-msg.js</a>, <a href="Frontend_game_browser_disconnect-msg.js.html#line22">line 22</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="resize"><span class="type-signature"></span>resize<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Resizes the disconnect box when the window is resized.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_disconnect-msg.js.html">Frontend/game/browser/disconnect-msg.js</a>, <a href="Frontend_game_browser_disconnect-msg.js.html#line30">line 30</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

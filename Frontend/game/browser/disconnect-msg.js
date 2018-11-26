@@ -1,5 +1,15 @@
 /*global PIXI*/
+
+/** @module browser/DisconnectMessage */
+
+/**
+ * A message that shows when disconnected.
+ */
 export default class DiconnectMessage {
+  /**
+   * Creates a new message with a given value.
+   * @param {string} msg the message you want to send
+   */
   constructor(msg) {
     this.msg = msg;
     this.graphics = new PIXI.Graphics();
@@ -46,5 +56,4 @@ export default class DiconnectMessage {
     this.disconnectBox.addChild(msg);
     this.graphics.addChild(this.disconnectBox);
   }
-
 }

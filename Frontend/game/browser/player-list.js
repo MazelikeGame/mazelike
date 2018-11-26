@@ -1,5 +1,7 @@
 /*global PIXI*/
 
+/** @module browser/PlayerList */
+
 /**
  * A list of players that displays information about each player.
  */
@@ -137,7 +139,7 @@ export default class PlayerList {
   
   /**
    * Removes the player from the list
-   * @param {string} username 
+   * @param {string} username the username you want to remove.
    */
   removePlayer(username) {
     this.listOfPlayers.splice(this.listOfPlayers.indexOf(username), 1);
@@ -145,7 +147,7 @@ export default class PlayerList {
 
   /**
    * Updates the player list to show a player disconnected.
-   * @param {string} username 
+   * @param {string} username the username you want to show disconnected.
    */
   disconnectPlayer(username) {
     let tempPlayerBox = this.playerBoxes.get(username);

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Backend/game/floor.mjs</title>
+    <title>JSDoc: Source: Frontend/game/browser/disconnect-msg.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Backend/game/floor.mjs</h1>
+    <h1 class="page-title">Source: Frontend/game/browser/disconnect-msg.js</h1>
 
     
 
@@ -26,110 +26,63 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/* eslint-disable complexity */
-/** @module backend/game/Floor */
-import FloorCommon from "../../Frontend/game/common/floor.mjs";
-import GameMap from "./game-map";
-import Monster from "./monster.mjs";
-import Player from './player';
+            <pre class="prettyprint source linenums"><code>/*global PIXI*/
 
-export default class Floor extends FloorCommon {
+/** @module browser/DisconnectMessage */
+
+/**
+ * A message that shows when disconnected.
+ */
+export default class DiconnectMessage {
   /**
-   * Generate a new floor (runs on the server and the browser)
-   * @param gameId The game id for the game we want to generate
-   * @param floorIdx The index of floor we want to generate
-   * @param {object} opts The options of the specific generators
+   * Creates a new message with a given value.
+   * @param {string} msg the message you want to send
    */
-  static generate({gameId, floorIdx, map}) {
-    let floor = new Floor(gameId, floorIdx);
-    floor.map = GameMap.generate(map);
-    floor.generateMonsters();
-
-    return floor;
+  constructor(msg) {
+    this.msg = msg;
+    this.graphics = new PIXI.Graphics();
+    this.disconnectBox = new PIXI.Graphics();
   }
 
   /**
-   * Puts a monster in half of all "rooms".
-   * @param {Floor} floor The floor to add monsters to
+   * Renders the disconnect message.
    */
-  generateMonsters() {
-    this.monsters = [];
-    let random = 0;
-    for(let i = 0; i &lt; this.map.rooms.length * this.monsterRatio; i++) {
-      if(i === 0) {
-        this.monsters[i] = new Monster('boss', 200, 15, this, i, 'boss');
-      } else {
-        random = Math.floor(Math.random() * 100);
-        if(random &lt; 15) { // 15% chance for blue demon
-          this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
-        } else if(random &lt; 50) { // 35% chance for red demon, where 15+35 = 50
-          this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
-        } else if(random &lt; 100) { // 50% chance for green demon, where 15+35+50 = 100
-          this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
-        }
-      }
-    }
+  render() {
+    this.draw();
+    return this.graphics;
   }
 
   /**
-   * Load everything on the server
-   * @param gameId The game id for the game we want to load
-   * @param floorIdx The index of floor we want to load
+   * Resizes the disconnect box when the window is resized.
    */
-  static async load(gameId, floorIdx) {
-    let floor = new Floor(gameId, floorIdx);
-
-    await Promise.all([
-      GameMap.load(floor),
-      Monster.load(floor),
-      Player.load(floor)
-    ]);
-
-    return floor;
+  resize() {
+    this.disconnectBox.position.set(window.innerWidth - 310, 10); //eslint-disable-line
   }
 
   /**
-   * Save the floor (server side)
-   * @param {boolean} create Create new rows (first save only)
+   * Creates the elements of the disconnect message in PIXI.
    */
-  save(create) {
-    return Promise.all([
-      this.map.save(this.id),
-      Monster.saveAll(this, create),
-      Player.saveAll(this)
-    ]);
-  }
+  draw() {  
+    //Black background with white border
+    let outline = new PIXI.Graphics();
+    outline.beginFill(0x000000);
+    outline.fillAlpha = 0.75;
+    outline.lineStyle(2, 0xFFFFFFF, 1);
+    outline.drawRect(0, 0, 300, 30);
+    outline.position.set(0, 0); //eslint-disable-line
+    outline.endFill();
+    this.disconnectBox.addChild(outline);
 
-  /**
-   * Moves all monsters and checks for collisions (also anything else that happens every turn)
-   * @param {number} deltaTime The time that has ellasped since the last tick
-   */
-  tick(deltaTime) {
-    for(let monster of this.monsters) {
-      monster.move(deltaTime); // monster-monster collision check happens here
-      monster.figureOutWhereToGo();
-    }
-    for(let player of this.players) {
-      player.move();
-      if(player._frames.length) {
-        player._confirmedId = player._frames[player._frames.length - 1].id;
-      }
-      player._confirmedX = player.x;
-      player._confirmedY = player.y;
-      player.dropConfirmed();
-    }
-  }
-
-  /**
-   * Send the current state of the floor to the client
-   * @param {} io The socket io instance (not a sock)
-   */
-  sendState(io, isGameRunning) {
-    io.emit("state", {
-      monsters: this.monsters,
-      players: this.players,
-      isGameRunning
+    this._disconnectMessageStyle = new PIXI.TextStyle({
+      fill: "#fff",
+      fontSize: 16
     });
+    
+    //Disconnect Message
+    let msg = new PIXI.Text(this.msg, this._disconnectMessageStyle);
+    msg.position.set(15, 5); //eslint-disable-line
+    this.disconnectBox.addChild(msg);
+    this.graphics.addChild(this.disconnectBox);
   }
 }
 </code></pre>
