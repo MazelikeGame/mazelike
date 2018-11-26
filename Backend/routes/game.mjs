@@ -1,4 +1,4 @@
-/* global io */
+/* global io ml */
 /* eslint-disable complexity */
 import express from "express";
 import crypto from "crypto";
@@ -52,7 +52,7 @@ gameRouter.get("/all", async(req, res) => {
   });
 
   if(counts.length !== lobbies.length) {
-    process.stderr.write("Lobbies and counts results were different from /game/all\n");
+    ml.logger.error("Lobbies and counts results were different from /game/all", ml.tags("assertion"));
     res.writeHead(500);
     res.end("Internal server error (see server logs)");
     return;
@@ -61,7 +61,7 @@ gameRouter.get("/all", async(req, res) => {
   // Merge counts and lobbies
   for(let i = 0; i < lobbies.length; ++i) {
     if(lobbies[i].lobbyId !== counts[i].lobbyId) {
-      process.stderr.write("Lobbies and counts lobbyIds were different from /game/all\n");
+      ml.logger.error("Lobbies and counts lobbyIds were different from /game/all", ml.tags("assertion"));
       res.writeHead(500);
       res.end("Internal server error (see server logs)");
       return;
@@ -148,7 +148,7 @@ export const joinRoute = async(req, res) => {
   if(res.loginRedirect()) {
     return;
   }
-  let lobby = await Lobby.find({
+  let lobby = await Lobby.findOne({
     where: {
       secret: req.params.id
     }
@@ -158,6 +158,7 @@ export const joinRoute = async(req, res) => {
   if(!lobby) {
     res.status(404);
     res.end("Join code is invalid");
+    ml.logger.verbose(`${req.user.username} failed to join a lobby becuase the join code ${req.params.id} is invalid`, ml.tags.lobby);
     return;
   }
   let user = await User.findOne({
@@ -197,6 +198,8 @@ export const joinRoute = async(req, res) => {
     });
     await newPlayer.setLobby(newLobby);
   }
+
+  ml.logger.info(`${req.user.username} joined ${lobby.lobbyId}`, ml.tags.lobby);
 
   io.emit("lobby-add", {
     id: lobby.lobbyId,
@@ -246,6 +249,7 @@ gameRouter.get("/new", async(req, res) => {
   });
   await newPlayer.setLobby(newLobby);
 
+  ml.logger.info(`${id} created (secret: ${secret})`, ml.tags.lobby);
   res.redirect(`/game/lobby/${id}`);
 });
 
@@ -255,7 +259,7 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
     return;
   }
 
-  let lobby = await Lobby.find({
+  let lobby = await Lobby.findOne({
     where: {
       lobbyId: req.params.id,
       playerId: req.user.username
@@ -285,10 +289,12 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
       });
       io.emit("lobby-delete", req.params.id);
       await deleteGame(req.params.id);
+      ml.logger.info(`Deleted ${req.params.id}`, ml.tags.lobby);
       res.redirect("/account/dashboard");
     } else {
       res.status(401);
       res.end("Only the host can delete this lobby.");
+      ml.logger.verbose(`${req.user.username} failed to delete ${req.params.id} because they are not the host`, ml.tags.lobby);
     }
     return;
   }
@@ -303,7 +309,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
     return;
   }
 
-  let host = await Lobby.find({
+  let host = await Lobby.findOne({
     where: {
       lobbyId: req.params.id,
       playerId: req.user.username
@@ -313,17 +319,18 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
   if(!host.isHost) {
     res.status(401);
     res.end("Only the host can drop a player");
+    ml.logger.verbose(`${req.user.username} failed to drop ${req.params.player} from ${req.params.id} becuase they are not the host`, ml.tags.lobby);
     return;
   }
 
-  let lobby = await Lobby.find({
+  let lobby = await Lobby.findOne({
     where: {
       lobbyId: req.params.id,
       playerId: req.params.player
     }
   });
 
-  let player = await Player.find({
+  let player = await Player.findOne({
     where: {
       id: lobby.player
     }
@@ -338,6 +345,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
       player: req.params.player
     });
     res.end("Player removed");
+    ml.logger.info(`Droped ${req.params.player} from ${req.params.id}`, ml.tags.lobby);
   }
 
   res.status(404);
@@ -350,7 +358,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     return;
   }
 
-  let lobby = await Lobby.find({
+  let lobby = await Lobby.findOne({
     where: {
       lobbyId: req.params.id,
       playerId: req.user.username
@@ -381,8 +389,11 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       // pass
     }
 
+    ml.logger.info(`Starting game ${req.params.id}`, ml.tags.lobby);
+
     // Generate the game
     if(!await exists(`${DATA_DIR}/maps/${req.params.id}.json`)) {
+      ml.logger.verbose(`Generating floor ${req.params.id}-0`, ml.tags.lobby);
       await Floor.generate({
         gameId: req.params.id,
         floorIdx: 0
@@ -390,6 +401,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     }
 
     try {
+      ml.logger.verbose(`Spawning ${req.params.id}`, ml.tags.lobby);
       await spawnGame({
         gameId: req.params.id
       });
@@ -408,12 +420,14 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
             lobbyId: req.params.id,
           }
         });
-      process.stderr.write(`Error starting game: ${err.message}\n`);
+      ml.logger.error(`Error starting game: ${err.message}`, ml.logger.manager);
+      ml.logger.verbose(err.stack, ml.logger.manager);
       res.end("An error occured while starting game");
     }
     return;
   }
 
+  ml.logger.verbose(`${req.user.username} failed to start ${req.params.id}`, ml.tags.lobby);
   res.end("No such lobby or you are not the host");
 });
 
