@@ -96,7 +96,11 @@ export default class PlayerList {
    */
   update() {
     //Compare listOfPlayers to playerBox map.
-    //Need to update for player null.
+
+    this.playerBoxes.forEach((value, key) => {
+      console.log(key);
+    });
+
     this.listOfPlayers.forEach((player, index) => {
       let offset = 40; //Space between each player information box.
       let hpBox = this.hpBoxes.get(player.name);
