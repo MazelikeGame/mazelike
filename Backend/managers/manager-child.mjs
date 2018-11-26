@@ -1,3 +1,4 @@
+/* global ml */
 import child_process from "child_process";
 
 const CHILD_MAIN = "Backend/game.mjs";
@@ -9,9 +10,7 @@ let portMap = new Map();
 
 export function spawnGame(gameEnv = {}) {
   let port = pickPort();
-  let gameId = gameEnv.gameId;
-  
-  portMap.set(gameId, port);
+  portMap.set(gameEnv.gameId, port);
   inUsePorts.add(port);
   gameEnv.port = port;
 
@@ -22,6 +21,8 @@ export function spawnGame(gameEnv = {}) {
     delete gameEnv[key];
   }
 
+  Object.assign(gameEnv, process.env);
+
   let child = child_process.spawn(process.argv[0], ['--experimental-modules', CHILD_MAIN], {
     env: gameEnv,
     stdio: ['ignore', 'inherit', 'inherit']
@@ -29,10 +30,11 @@ export function spawnGame(gameEnv = {}) {
 
   child.on("exit", (code) => {
     if(code !== 0) {
-      process.stderr.write(`Child exited with non-zero status code ${code}\n`);
+      ml.logger.error(`Child exited with non-zero status code ${code}`, ml.tags.manager);
     }
 
     if(code === 198) {
+      ml.logger.verbose(`Port already in use ${port}`, ml.tags.manager);
       inUsePorts.add(port);
       spawnGame(origEnv);
     }
@@ -42,7 +44,7 @@ export function spawnGame(gameEnv = {}) {
   });
 
   child.on("error", (err) => {
-    process.stderr.write(`An error occured when spawning the game server: ${err.message}`);
+    ml.logger.error(`An error occured when spawning the game server: ${err.message}`, ml.tags.manager);
     inUsePorts.delete(port);
     portMap.delete(gameId);
   });

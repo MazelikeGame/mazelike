@@ -37,7 +37,7 @@ export default class PlayerList {
     //Black background
     let outline = new PIXI.Graphics();
     outline.beginFill(0x000000);
-    outline.fillAlpha = 0.75;
+    outline.fillAlpha = this.floor.followingUser === player.name ? 0.85 : 0.7;
     outline.lineStyle(2, 0xFFFFFFF, 1);
     outline.drawRect(0, 0, 300, 30);
     outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
@@ -94,21 +94,27 @@ export default class PlayerList {
   /**
    * Updates the player list for each player.
    */
-  update() {
-    //Compare listOfPlayers to playerBox map.
-
+  update() { 
+    let index = 0;
     this.playerBoxes.forEach((value, key) => {
-      console.log(key);
-    });
+      let name = key;
+      let hp = 0;
 
-    this.listOfPlayers.forEach((player, index) => {
+      for(let player of this.listOfPlayers) {
+        if(key === player.name) {
+          name = player.name;
+          hp = player.getHp();
+          break;
+        }
+      }
+
       let offset = 40; //Space between each player information box.
-      let hpBox = this.hpBoxes.get(player.name);
+      let hpBox = this.hpBoxes.get(name);
       
-      if(player.getHp() <= 0) {
+      if(hp <= 0) {
         hpBox.text.text = `DEAD`;
       } else {
-        hpBox.text.text = `Health: ${player.getHp()}`;
+        hpBox.text.text = `Health: ${hp}`;
       }
 
       //Health bar red
@@ -121,9 +127,11 @@ export default class PlayerList {
       //Health bar green
       hpBox.greenBar.clear();
       hpBox.greenBar.beginFill(0x7CFC00);
-      hpBox.greenBar.drawRect(0, 0, player.getHp() >= 0 ? player.getHp() : 0, 10);
+      hpBox.greenBar.drawRect(0, 0, hp >= 0 ? hp : 0, 10);
       hpBox.greenBar.position.set(200, 15 + (index * offset));//eslint-disable-line
       hpBox.greenBar.endFill();
+
+      index++;
     });
   }
   

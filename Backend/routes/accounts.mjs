@@ -1,4 +1,5 @@
 // jshint esversion: 6
+/* global ml */
 import express from "express";
 import Sequelize from 'sequelize';
 import User from '../models/user.mjs';
@@ -21,6 +22,11 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 const accountRouter = express.Router();
+
+accountRouter.use((req, res, next) => {
+  res.set("Cache-Control", "no-cache");
+  next();
+});
 
 /**
  * Checks to make sure the user is authenticated.
@@ -82,6 +88,7 @@ accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), a
             ""
         });
       } else {
+        ml.logger.info(`Created user ${username}`, ml.tags.account);
         User.encryptPassword(req.body.password, (err, hash) => {
           User.create({
             username: username,
@@ -126,16 +133,24 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
   if (argument && req.session.username !== undefined) {
     User.encryptPassword(req.body.password, (err, hash) => {
       let values = {};
-      req.body.email && (values.email = req.body.email); // eslint-disable-line
-      req.body.password && (values.password = hash); // eslint-disable-line
+      if(req.body.email) {
+        values.email = req.body.email;
+        ml.logger.verbose(`Updating email for ${req.session.username} to ${req.body.email}`, ml.tags.account);
+      }
+      if(req.body.password) {
+        values.password = hash;
+        ml.logger.verbose(`Updating password for ${req.session.username}`, ml.tags.account);
+      }
       if(changing_avatar === true) {
         values.image_name = file_name;
         let file_to_delete = `${DATA_DIR}/images/${req.user.image_name}`;
         fs.unlink(file_to_delete, () => {});
+        ml.logger.verbose(`Update profie pic for ${req.session.username}`, ml.tags.account);
       }
       let selector = {
         where: { username: req.session.username }
       };
+      ml.logger.info(`Updated account ${req.session.username}`, ml.tags.account);
       User.update(values, selector).then(function(result) {
         if(result) {
           res.redirect('dashboard');
@@ -152,6 +167,7 @@ accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), fun
  * LOGOUT
  */
 accountRouter.get('/logout', isAuthenticated, function(req, res) {
+  ml.logger.info(`${req.session && req.session.username} logged out`, ml.tags.account);
   req.session.destroy(function(err) {
     if(!err) {
       res.redirect('login');
@@ -187,6 +203,7 @@ accountRouter.post('/login', function(req, res) {
     if(user) {
       User.comparePassword(req.body.password, user.password, (err, result) => {
         if(result) {
+          ml.logger.info(`${req.body.username} logged in`, ml.tags.account);
           req.session.authenticated = true;
           req.session.username = user.username;
           req.session.userId = user.id;
@@ -196,6 +213,7 @@ accountRouter.post('/login', function(req, res) {
             res.redirect('dashboard');
           }
         } else {
+          ml.logger.verbose(`${req.body.username} failed to login because of invalid password`, ml.tags.account);
           res.render('login', {
             wrongPassword: true,
             returnUrl: req.query.returnUrl ?
@@ -205,6 +223,7 @@ accountRouter.post('/login', function(req, res) {
         }
       });
     } else {
+      ml.logger.verbose(`${req.body.username} failed to login because the user did not exist`, ml.tags.account);
       res.render('login', {
         wrongUsername: true,
         returnUrl: req.query.returnUrl ?
@@ -262,6 +281,7 @@ accountRouter.post('/forgot-password', async(req, res) => {
     }
   });
   if(!user) {
+    ml.logger.verbose(`Forgot password failed because ${req.body.username} does not exist`, ml.tags.account);
     return res.render('forgot-password', {
       noUserExists: true
     });
@@ -290,6 +310,7 @@ accountRouter.post('/forgot-password', async(req, res) => {
   };
   try {
     await smtpTransport.sendMail(mailOptions);
+    ml.logger.info(`Sent forget password email to ${user.email} for ${user.username}`, ml.tags.account);
   } catch (err) {
     return res.render('forgot-password', {
       badError: err
@@ -307,6 +328,7 @@ accountRouter.get('/reset/:token', async(req, res) => {
     }
   });
   if(!user) {
+    ml.logger.verbose(`Password reset token ${req.params.token} is invalid`, ml.tags.account);
     return res.render('forgot-password', {
       badError: 'Password reset token is invalid or has expired. '.concat(user)
     });
@@ -324,6 +346,7 @@ accountRouter.post('/reset/:token', async(req, res) => {
     }
   });
   if(!user) {
+    ml.logger.verbose(`Password reset token ${req.params.token} is invalid`, ml.tags.account);
     res.render('reset', {
       tokenError: 'Reset token is invalid'
     });
@@ -337,6 +360,7 @@ accountRouter.post('/reset/:token', async(req, res) => {
         username: user.username
       }
     };
+    ml.logger.info(`Reset password for ${user.username}`, ml.tags.account);
     User.update(values, selector).then((result) => {
       if(result) {
         res.render('reset_password', {

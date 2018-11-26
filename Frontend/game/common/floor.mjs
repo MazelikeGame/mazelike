@@ -16,7 +16,13 @@ class Floor {
     this.monsterRatio = 0.4;
     // Initialize players, monsters and the game map in loadBrowser, loadNode,  and generate methods
   }
-  
+ 
+  /**
+   * The interval at which we update the game state (if this is too short the server will break)
+   */
+  static get UPDATE_INTERVAL() {
+    return 100;
+  }
 }
 
 export default Floor;

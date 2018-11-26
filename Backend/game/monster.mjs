@@ -1,4 +1,5 @@
-/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments */
+/* global ml */
+/* eslint-disable no-extra-parens,max-len,curly,complexity,prefer-template, no-warning-comments */
 /** @module Monster */
 
 import MonsterCommon from "../../Frontend/game/common/monster.mjs";
@@ -124,6 +125,7 @@ export default class Monster extends MonsterCommon {
    * Monster dies.
    */
   die() {
+    ml.logger.verbose(`Monster ${this.id} died`, ml.tags.monster);
     this.x = -1; // (-1, -1) coordinate tells us that the monster is dead
     this.y = -1;
     this.alive = false;

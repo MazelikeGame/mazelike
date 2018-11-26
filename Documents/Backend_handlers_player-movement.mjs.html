@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Backend/models/player.mjs</title>
+    <title>JSDoc: Source: Backend/handlers/player-movement.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Backend/models/player.mjs</h1>
+    <h1 class="page-title">Source: Backend/handlers/player-movement.mjs</h1>
 
     
 
@@ -26,53 +26,53 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import Sequelize from 'sequelize';
-import sql from '../sequelize';
-import Lobby from './lobby';
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-extra-parens */
 
-let Player = sql.define('players', {
-  spriteName: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  numFloor: {
-    type: Sequelize.INTEGER,
-    defaultValue: 0,
-    allowNull: false
-  },
-  inGame: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: true
-  },
-  x: {
-    type: Sequelize.INTEGER,
-    allowNull: true
-  },
-  y: {
-    type: Sequelize.INTEGER,
-    allowNull: true
-  },
-  hp: {
-    type: Sequelize.INTEGER,
-    defaultValue: 100
-  }
-});
-
-Player.hasOne(Lobby, { foreignKey: 'player', targetKey: 'lobbyId' });
-
-Player.getRandomSprite = () => {
-  let playerSprites = ['player1', 'player2', 'player3', 'player4'];
-  return playerSprites[Math.floor(Math.random() * playerSprites.length)];
-};
+const GRACE_PERIOD = 100;
+const MAX_FRAME_LENGTH = 50; /* # of ms between frames at 20 fps */
 
 /**
- * The player model. Has one to many relationship with the User model.
- * Has one to one relationship with the Lobby model.
- * @param {String} spriteName - Name of the sprite used for this player.
- * @param {Integer} numFloor - The floorId the player is on.
+ * Handle player movement
+ * @param sock 
+ * @param floor 
  */
-export default Player;
-</code></pre>
+export default function movementHandler(sock, floor) { 
+  sock.on("player-frame", async(frame) => {
+    let player = floor.players.find((_player) => {
+      return _player.name === sock.user.username;
+    });
+
+    if(player &amp;&amp; player.alive) {
+      verifyTimes(frame, player);
+      let frames = breakUpFrame(frame);
+      player._frames = player._frames.concat(frames);
+    }
+  });
+}
+
+// Ensure frame times make sense
+function verifyTimes(frame, player) {
+  let duration = (Date.now() - player._lastFrame) + GRACE_PERIOD;
+  let userDuration = Math.abs(frame.end - frame.start);
+  player._lastFrame = Date.now();
+
+  frame.end = frame.start + Math.min(userDuration, duration);
+}
+
+// Break up a long frame so collision detection can work
+function breakUpFrame(frame) {
+  let frames = [];
+
+  while(frame.end - frame.start > MAX_FRAME_LENGTH) {
+    let first = Object.assign({}, frame);
+    first.end = first.start + MAX_FRAME_LENGTH;
+    frame.start = first.end;
+    frames.push(first);
+  }
+
+  frames.push(frame);
+  return frames;
+}</code></pre>
         </article>
     </section>
 

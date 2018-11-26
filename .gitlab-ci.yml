@@ -7,8 +7,9 @@ stages:
 Build:
   stage: build
   script:
-    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -c 1-15)
+    - sed s/branch/$BRANCH/ -i docker-compose.yml
+    - sed s/latest/branch-$BRANCH/ -i docker-compose.yml
     - docker-compose build
     - docker-compose up -d backend
 
@@ -20,8 +21,9 @@ Eslint:
 Backend_Tests:
   stage: test
   script:
-    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -c 1-15)
+    - sed s/branch/$BRANCH/ -i docker-compose.yml
+    - sed s/latest/branch-$BRANCH/ -i docker-compose.yml
     - touch runner-result
     - chmod 666 runner-result
     - docker-compose up -d tests_backend
@@ -30,9 +32,10 @@ Backend_Tests:
 Browser_Tests:
   stage: test
   script:
+    - BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -c 1-15)
     # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
-    - sed s/latest/branch-$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - sed s/branch/$BRANCH/ -i docker-compose.yml
+    - sed s/latest/branch-$BRANCH/ -i docker-compose.yml
     - touch runner-result
     - chmod 666 runner-result
     - docker-compose up -d tests_browser
@@ -48,16 +51,18 @@ Cleanup:
   stage: cleanup
   when: always
   script:
-    - sed s/branch/$CI_COMMIT_REF_NAME/ -i docker-compose.yml
+    - BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -c 1-15)
+    - sed s/branch/$BRANCH/ -i docker-compose.yml
     - docker-compose down
 
 Deploy:
   stage: deploy
   script:
-      - VERSION=$(cat VERSION)
-      - node scripts/version-check.js
-      - docker tag ryan3r/mazelike:branch-$CI_COMMIT_REF_NAME ryan3r/mazelike:$VERSION
-      - deploy $VERSION
-      - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
+    - BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -c 1-15)
+    - VERSION=$(cat VERSION)
+    - node scripts/version-check.js
+    - docker tag ryan3r/mazelike:branch-$BRANCH ryan3r/mazelike:$VERSION
+    - deploy $VERSION
+    - docker tag ryan3r/mazelike:$VERSION ryan3r/mazelike:latest
   only:
     - master

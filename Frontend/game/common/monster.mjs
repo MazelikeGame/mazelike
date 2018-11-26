@@ -1,10 +1,12 @@
-/* eslint-disable no-extra-parens,max-len,curly,no-console,complexity,prefer-template, no-warning-comments, no-mixed-operators */
+/* global ml */
+/* eslint-disable no-extra-parens,max-len,curly,complexity,prefer-template, no-warning-comments, no-mixed-operators */
 /** @module Monster */
 
 // The maximum amount of ms we want a monster to walk for
 const MAX_WALK_TIME = 1500;
 
 import PlayerCommon from "./player.mjs";
+import interpolate from "./interpolator.mjs";
 
 export default class MonsterCommon {
   
@@ -159,24 +161,7 @@ export default class MonsterCommon {
     let prevy = this.y;
     let prevx = this.x;
     if(this.alive) {
-      // Get the distance in the x and y direction we have to move
-      let xDist = Math.abs(this.targetx - this.x);
-      let yDist = Math.abs(this.targety - this.y);
-      // Figure out what percentage of our next turn should be in each direction
-      let xPerc = xDist / (xDist + yDist);
-      let yPerc = 1 - xPerc;
-      // Use pythagorean theorem to distrubute 
-      let root = Math.sqrt(this.speed * (deltaTime / 1000));
-      let xMove = Math.floor((root * xPerc) ** 2);
-      let yMove = Math.floor((root * yPerc) ** 2);
-
-      if(!isNaN(xMove)) {
-        this.x += Math.min(xMove, xDist) * (this.targetx < this.x ? -1 : 1);
-      }
-
-      if(!isNaN(yMove)) {
-        this.y += Math.min(yMove, yDist) * (this.targety < this.y ? -1 : 1);
-      }
+      interpolate(this, deltaTime, this.targetx, this.targety);
     }
     // Disable collision detection on the client
     if(typeof window === "undefined") {
@@ -206,6 +191,9 @@ export default class MonsterCommon {
    */
   figureOutWhereToGo() {
     this.canSeePC();
+    if(this.targetAquired) {
+      ml.logger.debug(`Monster ${this.id} targeting player at (${this.targetx}, ${this.targety})`, ml.tags.monster);
+    }
     if(this.alive) {
       if(!this.targetAquired && !this.collision) {
         if(this.targetx === -1 || this.targety === -1) {
@@ -215,6 +203,7 @@ export default class MonsterCommon {
         if(Math.abs(this.x - this.targetx) < 2 && Math.abs(this.y - this.targety) < 2) {
           this.wander();
         }
+        ml.logger.debug(`Monster ${this.id} wandering to (${this.targetx}, ${this.targety})`, ml.tags.monster);
       }
     }
   }
@@ -227,7 +216,8 @@ export default class MonsterCommon {
     this.hp -= hp;
     if(this.hp <= 0) {
       this.die();
-    }    
+    }
+    ml.logger.verbose(`Monster ${this.id} was attached with ${hp} damage (hp: ${this.hp})`, ml.tags.monster);
   }
 
   /** 
@@ -292,7 +282,9 @@ export default class MonsterCommon {
           }
           if(x >= this.x && x <= this.x + spriteSize * entity.size) { // within x bounds
             if(y >= this.y && y <= this.y + spriteSize * entity.size) { // and within y bounds
-              return entities.indexOf(entity);
+              let index = entities.indexOf(entity);
+              ml.logger.debug(`Monster ${this.id} at (${this.x}, ${this.y}) collided with entity ${index} at (${entity.x}, ${entity.y})`, ml.tags.monster);
+              return index;
             }
           }
         }

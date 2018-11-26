@@ -1,28 +1,19 @@
 /* global PIXI */
 /* eslint-disable no-extra-parens,arrow-body-style */
 
-const KEY_TRIGGER = 50; // Delay between repeated presses
-const REPEAT_DELAY = 500; // Delay between initial press and repeated presses
-
 export default class MobileControls {
   constructor() {
     this.sprite = new PIXI.Container();
-    
-    this._createArrow([-20, 30, 20, 30, 0, 0], 38); // up
-    this._createArrow([-20, 80, 20, 80, 0, 110], 40); // down
-    this._createArrow([-25, 35, -25, 75, -55, 55], 37); // left
-    this._createArrow([25, 35, 25, 75, 55, 55], 39); // right
-    
     this._players = new Set();
     this._timers = new Map();
-
-    // stop all triggers when global pointer up is triggered
-    addEventListener("pointerup", () => {
-      // eslint-disable-next-line no-unused-vars
-      for(let [_, timer] of this._timers) {
-        clear(timer);
-      }
-    });
+    this._arrowName = {};
+    
+    this._createArrow("up", [-20, 30, 20, 30, 0, 0], [-24, -4, 46, 36], 38);
+    this._createArrow("down", [-20, 80, 20, 80, 0, 110], [-24, 76, 46, 36], 40);
+    this._createArrow("left", [-25, 35, -25, 75, -55, 55], [-59, 31, 36, 46], 37);
+    this._createArrow("right", [25, 35, 25, 75, 55, 55], [21, 31, 36, 46], 39);
+    
+    this._players = new Set();
 
     this.update();
   }
@@ -30,12 +21,17 @@ export default class MobileControls {
   /**
    * Create a arrow for a control
    * @private
+   * @param name
    * @param points 
    * @param keyCode 
    */
-  _createArrow(points, keyCode) {
+  _createArrow(name, points, rect, keyCode) {
     let triangle = new PIXI.Graphics();
+    triangle.alpha = 0.5;
     triangle.beginFill(0xffffff);
+    triangle.drawRect(rect[0], rect[1], rect[2], rect[3]);
+    triangle.endFill();
+    triangle.beginFill(0x0);
     triangle.drawPolygon(points);
     triangle.endFill();
     triangle.x = 0;
@@ -47,6 +43,8 @@ export default class MobileControls {
     triangle.on("pointerdown", () => this._start(keyCode));
     triangle.on("pointerup", () => this._stop(keyCode));
     triangle.on("pointerleave", () => this._stop(keyCode));
+
+    this._arrowName[name] = triangle;
   }
 
   /**
@@ -63,25 +61,18 @@ export default class MobileControls {
    * @param keyCode 
    */
   _start(keyCode) {
-    clear(this._timers.get(keyCode));
-
-    this._timers.set(keyCode, setTimeout(() => {
-      this._timers.set(keyCode, setInterval(() => {
-        this._trigger(keyCode);
-      }, KEY_TRIGGER));
-    }, REPEAT_DELAY));
-
-    this._trigger(keyCode);
+    this._trigger("down", keyCode);
   }
 
   /**
    * Trigger a key press for all players
    * @private
+   * @param type
    * @param keyCode 
    */
-  _trigger(keyCode) {
+  _trigger(type, keyCode) {
     for(let fn of this._players) {
-      fn({ keyCode });
+      fn[type]({ keyCode });
     }
   }
 
@@ -91,28 +82,23 @@ export default class MobileControls {
    * @param keyCode 
    */
   _stop(keyCode) {
-    clear(this._timers.get(keyCode));
-    this._timers.delete(keyCode);
+    this._trigger("up", keyCode);
   }
 
   /**
    * Bind an event listener for virtual key presses
-   * @param fn The event listener
+   * @param down The keydown event listener
+   * @param up The keyup event listener
    */
-  bind(fn) {
-    this._players.add(fn);
+  bind(down, up) {
+    this._players.add({down, up});
   }
 
   /**
-   * Unbind an event listener for virtual key presses
-   * @param fn The event listener
+   * Hide up down arrow keys
    */
-  unbind(fn) {
-    this._players.delete(fn);
+  becomeSpectator() {
+    this.sprite.removeChild(this._arrowName.left);
+    this.sprite.removeChild(this._arrowName.right);
   }
-}
-
-function clear(timer) {
-  clearInterval(timer);
-  clearTimeout(timer);
 }

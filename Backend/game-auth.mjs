@@ -28,11 +28,6 @@ export default function initAuth(io) {
         }
       });
 
-      if(!socket.user) {
-        next(new Error("Not authenitcated"));
-        return;
-      }
-
       next();
     });
   });
