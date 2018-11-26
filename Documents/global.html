@@ -112,7 +112,9 @@
 
 
 <div class="description">
-    Run some shared teardown once after all of the specs in the <a href="global.html#describe">describe</a> are run._Note:_ Be careful, sharing the teardown from a afterAll makes it easy to accidentally leak state between your specs so that they erroneously pass or fail.
+    Run some shared teardown once after all of the specs in the <a href="global.html#describe">describe</a> are run.
+
+_Note:_ Be careful, sharing the teardown from a afterAll makes it easy to accidentally leak state between your specs so that they erroneously pass or fail.
 </div>
 
 
@@ -596,7 +598,9 @@
 
 
 <div class="description">
-    Run some shared setup once before all of the specs in the <a href="global.html#describe">describe</a> are run._Note:_ Be careful, sharing the setup from a beforeAll makes it easy to accidentally leak state between your specs so that they erroneously pass or fail.
+    Run some shared setup once before all of the specs in the <a href="global.html#describe">describe</a> are run.
+
+_Note:_ Be careful, sharing the setup from a beforeAll makes it easy to accidentally leak state between your specs so that they erroneously pass or fail.
 </div>
 
 
@@ -1407,7 +1411,9 @@
 
 
 <div class="description">
-    Create a group of specs (often called a suite).Calls to `describe` can be nested within other calls to compose your suite as a tree.
+    Create a group of specs (often called a suite).
+
+Calls to `describe` can be nested within other calls to compose your suite as a tree.
 </div>
 
 
@@ -2006,7 +2012,10 @@
 
 
 <div class="description">
-    Create an asynchronous expectation for a spec. Note that the matchersthat are provided by an asynchronous expectation all return promiseswhich must be either returned from the spec or waited for using `await`in order for Jasmine to associate them with the correct spec.
+    Create an asynchronous expectation for a spec. Note that the matchers
+that are provided by an asynchronous expectation all return promises
+which must be either returned from the spec or waited for using `await`
+in order for Jasmine to associate them with the correct spec.
 </div>
 
 
@@ -2316,7 +2325,9 @@
 
 
 <div class="description">
-    A focused <a href="global.html#describe">`describe`</a>If suites or specs are focused, only those that are focused will be executed
+    A focused <a href="global.html#describe">`describe`</a>
+
+If suites or specs are focused, only those that are focused will be executed
 </div>
 
 
@@ -2481,7 +2492,9 @@
 
 
 <div class="description">
-    A focused <a href="global.html#it">`it`</a>If suites or specs are focused, only those that are focused will be executed.
+    A focused <a href="global.html#it">`it`</a>
+
+If suites or specs are focused, only those that are focused will be executed.
 </div>
 
 
@@ -2967,7 +2980,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Backend_routes_accounts.mjs.html">Backend/routes/accounts.mjs</a>, <a href="Backend_routes_accounts.mjs.html#line36">line 36</a>
+        <a href="Backend_routes_accounts.mjs.html">Backend/routes/accounts.mjs</a>, <a href="Backend_routes_accounts.mjs.html#line37">line 37</a>
     </li></ul></dd>
     
 
@@ -3009,7 +3022,9 @@
 
 
 <div class="description">
-    Define a single spec. A spec should contain one or more <a href="global.html#expect">expectations</a> that test the state of the code.A spec whose expectations all succeed will be passing and a spec with any failures will fail.
+    Define a single spec. A spec should contain one or more <a href="global.html#expect">expectations</a> that test the state of the code.
+
+A spec whose expectations all succeed will be passing and a spec with any failures will fail.
 </div>
 
 
@@ -4286,7 +4301,9 @@
 
 
 <div class="description">
-    A temporarily disabled <a href="global.html#describe">`describe`</a>Specs within an `xdescribe` will be marked pending and not executed
+    A temporarily disabled <a href="global.html#describe">`describe`</a>
+
+Specs within an `xdescribe` will be marked pending and not executed
 </div>
 
 
@@ -4444,7 +4461,9 @@
 
 
 <div class="description">
-    A temporarily disabled <a href="global.html#it">`it`</a>The spec will report as `pending` and will not be executed.
+    A temporarily disabled <a href="global.html#it">`it`</a>
+
+The spec will report as `pending` and will not be executed.
 </div>
 
 
@@ -4853,7 +4872,10 @@
 
 
 <div class="description">
-    Callback passed to parts of the Jasmine base interface.By default Jasmine assumes this function completes synchronously.If you have code that you need to test asynchronously, you can declare that you receive a `done` callback, return a Promise, or use the `async` keyword if it is supported in your environment.
+    Callback passed to parts of the Jasmine base interface.
+
+By default Jasmine assumes this function completes synchronously.
+If you have code that you need to test asynchronously, you can declare that you receive a `done` callback, return a Promise, or use the `async` keyword if it is supported in your environment.
 </div>
 
 
@@ -5855,7 +5877,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Nov 24 2018 01:37:20 GMT-0600 (Central Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 26 2018 19:12:15 GMT+0000 (UTC)
 </footer>
 
 <script> prettyPrint(); </script>
