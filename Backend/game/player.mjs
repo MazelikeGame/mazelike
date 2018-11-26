@@ -4,6 +4,7 @@ import PlayerCommon from '../../Frontend/game/common/player';
 import PlayerModel from '../models/player';
 import LobbyModel from '../models/lobby';
 import UserModel from '../models/user';
+import ItemBackend from './item.mjs';
 
 /** @module backend/game/player */
 
@@ -20,6 +21,7 @@ export default class Player extends PlayerCommon {
       this.x = this._confirmedX = spawn.x;
       this.y = this._confirmedY = spawn.y;
     } while(!this.spriteIsOnMap());
+    ItemBackend.spawnRandomItem(this.floor, this.x, this.y);
   }
 
   /**

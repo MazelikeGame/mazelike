@@ -1,6 +1,6 @@
 /** @module backend/game/Item */
-import ItemCommon from '../../Frontend/game/common/item';
-import ItemModel from '../models/item';
+import ItemCommon from '../../Frontend/game/common/item.mjs';
+import ItemModel from '../models/item.mjs';
 
 export default class Item extends ItemCommon {
   static async load(floor) {
@@ -64,9 +64,25 @@ export default class Item extends ItemCommon {
   toJSON() {
     return {
       id: this.id,
+      spriteName: this.spriteName,
+      spriteSize: this.spriteSize,
+      movementSpeed: this.movementSpeed,
+      attackSpeed: this.attackSpeed,
+      attack: this.attack,
+      defence: this.defence,
+      range: this.range,
       x: this.x,
       y: this.y,
       isOnFloor: this.isOnFloor
     };
+  }
+
+  static spawnRandomItem(floor, x, y) {
+    let newItem = new Item(
+      'Iron Dagger',
+      32
+    );
+    newItem.setCoordinates(x, y);
+    floor.items.push(newItem);
   }
 }

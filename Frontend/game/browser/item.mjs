@@ -1,5 +1,5 @@
 /* global PIXI */
-import ItemCommon from '../common/item';
+import ItemCommon from '../common/item.mjs';
 
 /** @module Item */
 
