@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function(queryInterface, Sequelize) {
-    return [
+    return Promise.all([
       queryInterface.addColumn(
         'users',
         'resetPasswordToken',
@@ -21,12 +21,12 @@ module.exports = {
           defaultValue: null
         }
       )
-    ];
+    ]);
   },
   down: function(queryInterface, Sequelize) {
-    return [
+    return Promise.all([
       queryInterface.removeColumn('users', 'resetPasswordToken'),
       queryInterface.removeColumn('users', 'resetPasswordExpires')
-    ];
+    ]);
   }
 };
