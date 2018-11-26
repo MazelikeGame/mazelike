@@ -3,6 +3,10 @@ import sql from '../sequelize';
 import ItemDefinition from './itemDefinition';
 
 let Item = sql.define('items', {
+  floorId: {
+    type: Sequelize.STRING,
+    allowNull: true
+  },
   x: {
     type: Sequelize.INTEGER,
     allowNull: true
@@ -14,3 +18,5 @@ let Item = sql.define('items', {
 });
 
 Item.belongsTo(ItemDefinition, { foreignKey: 'fkDefinition' });
+
+export default Item;
