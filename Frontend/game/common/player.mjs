@@ -52,7 +52,7 @@ export default class PlayerCommon {
     this.size = 1; // used with monster collision checking, acts as a size multiplier
     this.speed = 400;
     this.attackAngle = Math.PI / 4;
-    this.range = 50;
+    this.range = 100;
   }
 
   /**
