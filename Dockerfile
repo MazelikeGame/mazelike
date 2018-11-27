@@ -9,5 +9,6 @@ COPY . .
 
 VOLUME /data
 EXPOSE 3000
+EXPOSE 3001
 
 ENTRYPOINT ["/bin/ash", "scripts/mazelike.sh"]
