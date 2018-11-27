@@ -35,6 +35,7 @@ export default class PlayerCommon {
   constructor(name, hp, spriteName, floor) {
     this.name = name;
     this.hp = hp;
+    this.hpMax = hp;
     this.alive = true;
     this.x = 0;
     this.y = 0;

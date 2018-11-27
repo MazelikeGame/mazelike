@@ -99,11 +99,13 @@ export default class PlayerList {
     this.playerBoxes.forEach((value, key) => {
       let name = key;
       let hp = 0;
+      let hpMax = 0;
 
       for(let player of this.listOfPlayers) {
         if(key === player.name) {
           name = player.name;
           hp = player.getHp();
+          hpMax = player.hpMax;
           break;
         }
       }
@@ -127,7 +129,7 @@ export default class PlayerList {
       //Health bar green
       hpBox.greenBar.clear();
       hpBox.greenBar.beginFill(0x7CFC00);
-      hpBox.greenBar.drawRect(0, 0, hp >= 0 ? hp : 0, 10);
+      hpBox.greenBar.drawRect(0, 0, hp >= 0 ? hp / hpMax * 100 : 0, 10);
       hpBox.greenBar.position.set(200, 15 + (index * offset));//eslint-disable-line
       hpBox.greenBar.endFill();
 
