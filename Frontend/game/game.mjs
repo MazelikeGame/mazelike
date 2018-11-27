@@ -10,6 +10,7 @@ import MobileControls from "./browser/mobile-controls.mjs";
 
 let msgEl = document.querySelector(".msg");
 let msgParentEl = document.querySelector(".msg-parent");
+let msgHeader = document.querySelector(".msg-header");
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
@@ -173,7 +174,7 @@ async function setup() {
     gameRunning
   ]);
 
-  msgParentEl.remove();
+  msgParentEl.style.display = "none";
 
   // don't run monster logic multiplayer game (for now)
   if(!gameId) {
@@ -206,6 +207,19 @@ async function setup() {
       // switch following users by pressing up and down
       controls.bind(spectatorHandler.bind(null, floor), () => {});
       window.addEventListener("keydown", spectatorHandler.bind(null, floor));
+      // show you died
+      msgHeader.innerText = "You died";
+      msgEl.innerHTML = "";
+      msgParentEl.style.display = "";
+
+      let a = document.createElement("a");
+      a.href = "#";
+      a.innerText = "Spectate";
+      msgEl.appendChild(a);
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        msgParentEl.style.display = "none";
+      });
     }
 
     // follow a specific player in spectator mode
@@ -216,6 +230,18 @@ async function setup() {
       } else if(floor.players.length) {
         floor.followingUser = floor.players[0].name;
       }
+    }
+
+    // show game over
+    if(floor.players.length === 0 && msgHeader.innerText !== "Game over") {
+      msgHeader.innerText = "Game over";
+      msgEl.innerHTML = "";
+      msgParentEl.style.display = "";
+
+      let a = document.createElement("a");
+      a.href = "/account/dashboard";
+      a.innerText = "Dashboard";
+      msgEl.appendChild(a);
     }
     
     let player = getPlayer(floor, username);
