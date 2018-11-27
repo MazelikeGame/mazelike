@@ -42,7 +42,7 @@ export default class PlayerCommon {
     this.vy = 0;
     this.spriteName = spriteName;
     this.floor = floor;
-    this.damage = 100000;
+    this.damage = 10;
     this.speed = 15;
     this.input = new Set();
     this._nextId = 0;
