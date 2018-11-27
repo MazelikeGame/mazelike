@@ -67,6 +67,12 @@ export default async function main(env, httpd) {
     }
 
     sock.emit("set-username", sock.user.username);
+
+    sock.on("disconnect", () => {
+      //Player has left and need to update the list of players.
+      sock.broadcast.emit("update-playerlist", sock.user.username);
+    });
+
     saveHandler(sock, floor);
     movementHandler(sock, floor, io);
 

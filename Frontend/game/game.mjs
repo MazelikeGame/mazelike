@@ -19,6 +19,9 @@ let app = new PIXI.Application({
   antialias: true
 });
 
+let disconnected = new DisconnectMessage("Disconnected from server!");
+let playerList = new PlayerList();
+
 document.body.appendChild(app.view);
 
 // make the game fill the window
@@ -28,6 +31,7 @@ app.renderer.autoResize = true;
 
 window.onresize = () => {
   app.renderer.resize(innerWidth, innerHeight);
+  disconnected.resize();
 };
 
 window.onresize();
@@ -117,8 +121,7 @@ async function setup() {
   msgEl.innerText = "Loading game";
   let floor;
 
-  let masterSock = io(location.origin); //Transition this to the game server
-  masterSock.emit("ready", gameId);
+  console.log(`User: ${username}`); // eslint-disable-line
 
   if(gameId) {
     floor = await Floor.load(gameId, 0, sock, username);
@@ -140,10 +143,6 @@ async function setup() {
     fps = new FpsCounter();
     app.stage.addChild(fps.sprite);
   }
-
-  masterSock.on("player-list", (players) => {
-    app.stage.addChild(new PlayerList(players, floor).render());
-  });
 
   let controls = new MobileControls();
   app.stage.addChild(controls.sprite);
@@ -191,9 +190,16 @@ async function setup() {
   }
 
   sock.on("disconnect", () => {
-    new DisconnectMessage("Disconnected!");
-    app.stage.addChild(new DisconnectMessage("Disconnected from server!").render());
+    app.stage.addChild(disconnected.render());
   });
+
+  sock.on("update-playerlist", (player) => {
+    playerList.disconnectPlayer(player); //Update player list
+  });
+
+  playerList.floor = floor;
+  playerList.listOfPlayers = floor.players;
+  app.stage.addChild(playerList.render()); //Draw the player list
 
   let isSpectator = false;
   app.ticker.add(() => {
@@ -252,6 +258,7 @@ async function setup() {
 
     floor.update();
     controls.update();
+    playerList.update();
 
     if(fps) {
       fps.update();
