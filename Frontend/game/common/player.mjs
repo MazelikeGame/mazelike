@@ -34,7 +34,7 @@ export default class PlayerCommon {
    */
   constructor(name, hp, spriteName, floor) {
     this.name = name;
-    this.hp = 10000; //hp;
+    this.hp = hp;
     this.alive = true;
     this.x = 0;
     this.y = 0;
@@ -50,8 +50,8 @@ export default class PlayerCommon {
     this._frames = [];
     this.size = 1; // used with monster collision checking, acts as a size multiplier
     this.speed = 400;
-    this.attackAngle = 2 * Math.PI;
-    this.range = 300;
+    this.attackAngle = Math.PI / 4;
+    this.range = 50;
   }
 
   /**
@@ -239,7 +239,7 @@ export default class PlayerCommon {
       let monsterAngle = this._atan(monster.x - this.x, monster.y - this.y);
 
       // check if the monster is in range
-      if(this.range <= monsterDist && Math.abs(attackAngle - monsterAngle) <= this.attackAngle / 2) {
+      if(monsterDist <= this.range && Math.abs(attackAngle - monsterAngle) <= this.attackAngle / 2) {
         this.attack(monster);
       }
     }
