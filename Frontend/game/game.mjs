@@ -109,6 +109,10 @@ async function setup() {
     addr = location.host;
   }
 
+  if(addr[0] === ":") {
+    addr = location.hostname + addr;
+  }
+
   let sock = io(`${location.protocol}//${addr}`, {
     path: `/socket/${gameId}`
   });
