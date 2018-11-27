@@ -39,6 +39,7 @@ function breakUpFrame(frame) {
     let first = Object.assign({}, frame);
     first.end = first.start + MAX_FRAME_LENGTH;
     frame.start = first.end;
+    first.attacking = false;
     frames.push(first);
   }
 

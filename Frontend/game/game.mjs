@@ -53,6 +53,20 @@ const addArrowKeyListener = (floor, controls, username) => {
   controls.bind(handleKey.bind(null, "down"), handleKey.bind(null, "up"));
   window.addEventListener("keydown", handleKey.bind(null, "down"));
   window.addEventListener('keyup', handleKey.bind(null, "up"));
+
+  window.addEventListener("mousemove", (e) => {
+    let player = getPlayer(floor, username);
+    if(player) {
+      player.handleMouse(false, e.clientX + player.floor._viewportX, e.clientY + player.floor._viewportY);
+    }
+  });
+
+  window.addEventListener("click", (e) => {
+    let player = getPlayer(floor, username);
+    if(player) {
+      player.handleMouse(true, e.clientX + player.floor._viewportX, e.clientY + player.floor._viewportY);
+    }
+  });
 };
 
 /**
@@ -178,6 +192,7 @@ async function setup() {
     gameRunning
   ]);
 
+  document.body.classList.add("crosshair");
   msgParentEl.style.display = "none";
 
   // don't run monster logic multiplayer game (for now)
@@ -205,6 +220,7 @@ async function setup() {
   app.ticker.add(() => {
     // spectator mode
     if(!isSpectator && !getPlayer(floor, username)) {
+      document.body.classList.remove("crosshair");
       controls.becomeSpectator();
       isSpectator = true;
       floor.followingUser = floor.players[0] && floor.players[0].name;
@@ -228,6 +244,7 @@ async function setup() {
 
     // follow a specific player in spectator mode
     if(isSpectator) {
+      document.body.classList.remove("crosshair");
       let following = getPlayer(floor, floor.followingUser);
       if(following) {
         floor.setViewport(following.x, following.y);

@@ -9,7 +9,8 @@ const KEYS = {
   downArrow: 40,
   s: 83,
   leftArrow: 37,
-  a: 65
+  a: 65,
+  space: 32
 };
 
 // map w to up, d to right, etc
@@ -33,7 +34,7 @@ export default class PlayerCommon {
    */
   constructor(name, hp, spriteName, floor) {
     this.name = name;
-    this.hp = hp;
+    this.hp = 10000; //hp;
     this.alive = true;
     this.x = 0;
     this.y = 0;
@@ -41,7 +42,7 @@ export default class PlayerCommon {
     this.vy = 0;
     this.spriteName = spriteName;
     this.floor = floor;
-    this.damage = 10;
+    this.damage = 100000;
     this.speed = 15;
     this.input = new Set();
     this._nextId = 0;
@@ -49,6 +50,8 @@ export default class PlayerCommon {
     this._frames = [];
     this.size = 1; // used with monster collision checking, acts as a size multiplier
     this.speed = 400;
+    this.attackAngle = 2 * Math.PI;
+    this.range = 300;
   }
 
   /**
@@ -113,6 +116,22 @@ export default class PlayerCommon {
     if(this.input.has(KEYS.leftArrow)) {
       this.vx -= 1;
     }
+
+    if(type === "down" && e.keyCode === KEYS.space) {
+      this._attacking = true;
+    }
+  }
+
+  /**
+   * Handle mouse positions
+   */
+  handleMouse(clicking, x, y) {
+    if(clicking) {
+      this._attacking = true;
+    }
+
+    this._targetX = x;
+    this._targetY = y;
   }
 
   /**
@@ -125,14 +144,25 @@ export default class PlayerCommon {
       start: this._lastFrameSent,
       end: now,
       vx: this.vx,
-      vy: this.vy
+      vy: this.vy,
+      attacking: this._attacking,
+      targetX: this._targetX,
+      targetY: this._targetY
     };
 
+    // TODO: attack animation here
+
     this._lastFrameSent = now;
-    if(this.vx || this.vy) {
+    if(this.vx || this.vy || this._isAttacking()) {
       this._frames.push(frame);
       this.floor.sock.emit("player-frame", frame);
     }
+
+    this._attacking = false;
+  }
+
+  _isAttacking() {
+    return this._attacking && this._targetX && this._targetY;
   }
 
   /**
@@ -169,8 +199,50 @@ export default class PlayerCommon {
       }
 
       ml.logger.debug(`Player ${this.name} moving from (${this._confirmedX}, ${this._confirmedY}) to (${this.x}, ${this.y})`, ml.tags.player);
+
+      if(typeof window === "undefined") {
+        this.processAttack(frame);
+      }
     });
     /* eslint-enable complexity */
+  }
+
+  _atan(relativeX, relativeY) {
+    let attackAngle = Math.atan(relativeY / relativeX);
+
+    // deal with the fact atan has a limited range and / 0
+    if(isNaN(attackAngle)) { // x == 0
+      attackAngle = relativeY > 0 ? Math.PI / 2 : -Math.PI / 2;
+    } else if(relativeX < 0) {
+      attackAngle += Math.PI;
+    } else if(attackAngle < 0) {
+      attackAngle += 2 * Math.PI;
+    }
+
+    return attackAngle;
+  }
+
+  /**
+   * Process an attack frame
+   */
+  processAttack(frame) {
+    if(!frame.attacking) {
+      return;
+    }
+
+    let attackAngle = this._atan(frame.targetX - this.x, frame.targetY - this.y);
+    ml.logger.debug(`Player ${this.name} attacking at angle ${attackAngle}`, ml.tags.player);
+
+    for(let monster of this.floor.monsters) {
+      // eslint-disable-next-line
+      let monsterDist = Math.sqrt((monster.x - this.x) ** 2 + (monster.y - this.y) ** 2);
+      let monsterAngle = this._atan(monster.x - this.x, monster.y - this.y);
+
+      // check if the monster is in range
+      if(this.range <= monsterDist && Math.abs(attackAngle - monsterAngle) <= this.attackAngle / 2) {
+        this.attack(monster);
+      }
+    }
   }
 
   /**
@@ -217,10 +289,10 @@ export default class PlayerCommon {
 
   /** 
    * Player attacks monster
-   * @param {*} monsterID id for player that monster is attacking
+   * @param {*} monster The monster to attack
    */
-  attack(monsterID) {
-    this.floor.monsters[monsterID].beAttacked(this.damage);
+  attack(monster) {
+    monster.beAttacked(this.damage);
   }
 }
 PlayerCommon.SPRITE_SIZE = 48;

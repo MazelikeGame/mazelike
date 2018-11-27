@@ -118,7 +118,9 @@ export default class Player extends PlayerCommon {
       _confirmedId: this._confirmedId,
       _lastFrame: this._lastFrame,
       _confirmedX: this._confirmedX,
-      _confirmedY: this._confirmedY
+      _confirmedY: this._confirmedY,
+      attackAngle: this.attackAngle,
+      range: this.range
     };
   }
 
