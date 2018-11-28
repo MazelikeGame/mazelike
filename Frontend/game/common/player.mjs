@@ -1,3 +1,5 @@
+import MonsterCommon from "./monster.mjs";
+
 /* global ml */
 /** @module PlayerCommon */
 
@@ -33,7 +35,7 @@ export default class PlayerCommon {
    */
   constructor(name, hp, spriteName, floor) {
     this.name = name;
-    this.hp = hp;
+    this.hp = 1000; //todo hp
     this.alive = true;
     this.x = 0;
     this.y = 0;
@@ -162,8 +164,10 @@ export default class PlayerCommon {
       let prev = this.getPosition();
       this.x += frame.vx * duration;
       this.y += frame.vy * duration;
-
-      if(!this.spriteIsOnMap()) {
+      
+      // todo wip
+      if(!this.spriteIsOnMap() || this.collisionEntities(this.floor.monsters, MonsterCommon.SPRITE_SIZE) !== -1
+      || this.collisionEntities(this.floor.players, this.SPRITE_SIZE) !== -1) {
         this.x = prev.x;
         this.y = prev.y;
       }
@@ -172,6 +176,45 @@ export default class PlayerCommon {
     });
     /* eslint-enable complexity */
   }
+
+  /* eslint-disable complexity, no-mixed-operators */
+  /**
+   * Checks to see if there's a monster colliding with this monster.
+   * Compares corners of each sprite to do so.
+   * @returns {boolean}
+   */
+  collisionEntities(entities, spriteSize) {
+    let x = -1;
+    let y = -1;
+    for(let entity of entities) {
+      if(this.id !== entity.id) {
+        for(let j = 0; j < 4; j++) { // four corners to check for each sprite
+          if(j === 0) { // upper left corner
+            x = entity.x;
+            y = entity.y;
+          } else if(j === 1) { // upper right corner
+            x = entity.x + spriteSize * entity.size;
+            y = entity.y;
+          } else if(j === 1) { // lower right corner
+            x = entity.x + spriteSize * entity.size;
+            y = entity.y + spriteSize * entity.size;
+          } else if(j === 1) { // lower left corner
+            x = entity.x;
+            y = entity.y + spriteSize * entity.size;
+          }
+          if(x >= this.x && x <= this.x + spriteSize * entity.size) { // within x bounds
+            if(y >= this.y && y <= this.y + spriteSize * entity.size) { // and within y bounds
+              let index = entities.indexOf(entity);
+              ml.logger.debug(`Player ${this.id} at (${this.x}, ${this.y}) collided with entity ${index} at (${entity.x}, ${entity.y})`, ml.tags.monster);
+              return index;
+            }
+          }
+        }
+      }
+    }
+    return -1; // indicate no collision
+  }
+  /* eslint-disable complexity, no-mixed-operators */
 
   /**
    * Drop all confirmed frames
