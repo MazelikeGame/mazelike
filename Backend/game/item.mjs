@@ -1,6 +1,11 @@
 /** @module backend/game/Item */
+import fs from 'fs';
+import util from 'util';
+
 import ItemCommon from '../../Frontend/game/common/item.mjs';
 import ItemModel from '../models/item.mjs';
+
+const readFile = util.promisify(fs.readFile);
 
 export default class Item extends ItemCommon {
   static async load(floor) {
@@ -77,11 +82,20 @@ export default class Item extends ItemCommon {
     };
   }
 
-  static spawnRandomItem(floor, x, y) {
+  /* Temporary. See TODO in frontend/game/browser/item */
+  static async spawnRandomItem(floor, x, y) {
+    let rawDefs = await readFile('Backend/game/item-definitions/item-definitions.json', 'utf-8');
+    let itemDefs = JSON.parse(rawDefs).itemDefinitions;
+    let randomItem = itemDefs[Math.floor(Math.random() * itemDefs.length)];
     let newItem = new Item(
       floor,
-      'Iron Dagger',
-      32
+      randomItem.spriteName,
+      randomItem.spriteSize,
+      randomItem.movementSpeed,
+      randomItem.attackSpeed,
+      randomItem.attack,
+      randomItem.defence,
+      randomItem.range
     );
     newItem.setCoordinates(x, y);
     floor.items.push(newItem);

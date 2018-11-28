@@ -5,7 +5,23 @@ import ItemCommon from '../common/item.mjs';
 
 export default class Item extends ItemCommon {
   createSprite() {
-    this.sprite = new PIXI.Sprite(PIXI.loader.resources.shortWep.textures[this.spriteName]);
+    /* Temporary. TODO: Add itemType attr to item or create classes that extend Item */
+    switch(this.spriteName) {
+    case 'Iron Dagger':
+      this.sprite = new PIXI.Sprite(PIXI.loader.resources.shortWep.textures[this.spriteName]);
+      break;
+    case 'Wooden Shield':
+      this.sprite = new PIXI.Sprite(PIXI.loader.resources.shield.textures[this.spriteName]);
+      break;
+    case 'Iron Full Helm':
+      this.sprite = new PIXI.Sprite(PIXI.loader.resources.hat.textures[this.spriteName]);
+      break;
+    case 'Iron Boots':
+      this.sprite = new PIXI.Sprite(PIXI.loader.resources.boot.textures[this.spriteName]);
+      break;
+    default:
+      break;
+    }
     if(this.isOnFloor) {
       this.sprite.position.set(this.x, this.y);
     }
