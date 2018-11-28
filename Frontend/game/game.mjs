@@ -61,7 +61,7 @@ const addArrowKeyListener = (floor, controls, username) => {
     }
   });
 
-  window.addEventListener("click", (e) => {
+  window.addEventListener("pointerdown", (e) => {
     let player = getPlayer(floor, username);
     if(player) {
       player.handleMouse(true, e.clientX + player.floor._viewportX, e.clientY + player.floor._viewportY);
