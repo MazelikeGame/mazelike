@@ -4,8 +4,8 @@ import ItemCommon from '../common/item.mjs';
 /** @module Item */
 
 export default class Item extends ItemCommon {
+  /* Temporary. TODO: Add itemType attr to item or create classes that extend Item */
   createSprite() {
-    /* Temporary. TODO: Add itemType attr to item or create classes that extend Item */
     switch(this.spriteName) {
     case 'Iron Dagger':
       this.sprite = new PIXI.Sprite(PIXI.loader.resources.shortWep.textures[this.spriteName]);

@@ -98,6 +98,8 @@ export default class Item extends ItemCommon {
       randomItem.range
     );
     newItem.setCoordinates(x, y);
+    newItem.isOnFloor = true;
     floor.items.push(newItem);
+    ml.logger.verbose(`Spawning item ${newItem.spriteName} at (${newItem.x}, ${newItem.y})`, ml.tags.item);
   }
 }

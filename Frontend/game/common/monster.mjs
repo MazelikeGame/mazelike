@@ -217,18 +217,19 @@ export default class MonsterCommon {
     if(this.hp <= 0) {
       this.die();
     }
-    ml.logger.verbose(`Monster ${this.id} was attached with ${hp} damage (hp: ${this.hp})`, ml.tags.monster);
+    ml.logger.verbose(`Monster ${this.id} was attacked with ${hp} damage (hp: ${this.hp})`, ml.tags.monster);
   }
 
-  /** 
+  /**
    * Monster attacks PC
    * @param {*} playerID id for player that monster is attacking
    */
   attack(playerID) {
+    this.die();
     this.floor.players[playerID].beAttacked(this.damage);
   }
 
-  /** 
+  /**
    * Places monster in a random "room" with no other monsters.
    */
   placeInRandomRoom() {
