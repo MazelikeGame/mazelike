@@ -1,15 +1,22 @@
 /* eslint-disable complexity */
+/* global ml */
 import dockerApi from "node-docker-api";
 import fs from "fs";
+import util from "util";
 
 const ENV_NAMES = [
   "DB",
   "NODE_ENV"
 ];
 
+if(!process.env.EXTERN_PUBLIC_DIR && process.env.CLUSTER_MANAGER === "docker") {
+  ml.logger.error(`The environment variable EXTERN_PUBLIC_DIR must point to the folder mapped to /data`);
+  process.exit(0);
+}
+
 const VERSION = fs.readFileSync("VERSION", "utf8").trim();
 const IMAGE_NAME = process.env.IMAGE_NAME || `ryan3r/mazelike:${VERSION}`;
-const ADDRESS = process.env.EXTERN_ADDRESS;
+const ADDRESS = process.env.EXTERN_ADDRESS || "";
 const STARTING_PORT = +process.env.STARTING_PORT || 5900;
 const ENDING_PORT = +process.env.ENDING_PORT || 5999;
 
@@ -32,22 +39,23 @@ export async function spawnGame(gameEnv = {}) {
   let hostname = `mazelike-${gameEnv.gameId}`;
   let port = pickPort();
 
+  ml.logger.debug(`Using port ${port} for game server`, ml.tags.manager);
   inUsePorts.add(port);
   portMap.set(gameEnv.gameId, port);
-  envArray.push(`MAZELIKE_port=${port}`);
+  envArray.push(`MAZELIKE_port=3000`);
 
   let container = await docker.container.create({
     name: hostname,
     Hostname: hostname,
     Image: IMAGE_NAME,
-    Cmd: ["-g", "-v", "-d"],
+    Cmd: ["-g", "-d"],
     Env: envArray,
     ExposedPorts: {
-      [`${port}/tcp`]: {}
+      [`3000/tcp`]: {}
     },
     HostConfig: {
       PortBindings: {
-        [`${port}/tcp`]: [{
+        [`3000/tcp`]: [{
           HostPort: `${port}`
         }]
       },
@@ -86,11 +94,13 @@ function pickPort() {
 async function waitForClose(container, port, gameId) {
   await container.wait();
   await container.delete({ force: true });
+  ml.logger.debug(`Game server deleted ${gameId} (${port})`, ml.tags.manager);
   inUsePorts.delete(port);
   portMap.delete(gameId);
 }
 
 export function getGameAddr(gameId) {
+  ml.logger.debug(`Get address for ${gameId} (${util.inspect(portMap)})`, ml.tags.manager);
   return `${ADDRESS}:${portMap.get(gameId)}`;
 }
 
@@ -101,6 +111,7 @@ async function startContainer(container, gameId, gameEnv) {
     // check if the port is already being used
     if(err.message.indexOf("address already in use") !== -1 ||
         err.message.indexOf("port is already allocated") !== -1) {
+      ml.logger.debug(`Port for ${gameId} is already in use`, ml.tags.manager);
       portMap.delete(gameId);
       await container.delete();
 
