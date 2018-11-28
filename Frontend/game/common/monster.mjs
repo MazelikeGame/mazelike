@@ -245,6 +245,8 @@ export default class MonsterCommon {
     this.y = this.floor.map.rooms[this.initialRoom].y + randomDiffY;
     if(!this.spriteIsOnMap())
       this.placeInRandomRoom();
+    if(this.type === "boss" && this.floor.map.rooms[this.initialRoom].height === this.floor.map.rooms[this.initialRoom].width)
+      this.placeInRandomRoom();
   }
 
   /**
