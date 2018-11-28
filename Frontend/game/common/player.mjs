@@ -25,9 +25,6 @@ const MAPPINGS = {
   [KEYS.a]: KEYS.leftArrow
 };
 
-// the minimum time between attacks
-const ATTACK_TIME = 750;
-
 /**
  * The player class.
  */
@@ -42,7 +39,7 @@ export default class PlayerCommon {
   constructor(name, hp, spriteName, floor) {
     this.name = name;
     this.hp = hp;
-    this.hpMax = hp;
+    this.hpMax = 100;
     this.alive = true;
     this.x = 0;
     this.y = 0;
@@ -179,7 +176,9 @@ export default class PlayerCommon {
       targetY: this._mouseAttack ? this._targetY : this.y + this.vyAttack
     };
 
-    // TODO: attack animation here
+    if(this.animateAttack && this._isAttacking()) {
+      this.animateAttack(this._atan(frame.targetX - this.x, frame.targetY - this.y));
+    }
 
     this._lastFrameSent = now;
     if(this.vx || this.vy || this._isAttacking()) {
@@ -198,7 +197,7 @@ export default class PlayerCommon {
   _isAttacking() {
     // eslint-disable-next-line
     return this._attacking && ((this._targetX && this._targetY) || !this._mouseAttack) &&
-      Date.now() - this._lastAttack > ATTACK_TIME;
+      Date.now() - this._lastAttack > PlayerCommon.ATTACK_TIME;
   }
 
   /**
@@ -267,7 +266,7 @@ export default class PlayerCommon {
       return;
     }
 
-    if(frame.start - this._lastAttack < ATTACK_TIME || frame.start < this._lastAttack) {
+    if(frame.start - this._lastAttack < PlayerCommon.ATTACK_TIME || frame.start < this._lastAttack) {
       ml.logger.debug(`Reject attack request ${frame.start} ${this._lastAttack}`, ml.tags.player);
       return;
     }
@@ -341,3 +340,6 @@ export default class PlayerCommon {
   }
 }
 PlayerCommon.SPRITE_SIZE = 48;
+
+// the minimum time between attacks
+PlayerCommon.ATTACK_TIME = 187;

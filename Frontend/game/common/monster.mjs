@@ -174,7 +174,7 @@ export default class MonsterCommon {
         this.y = prevy;
         this.collision = true;
         let currentTime = new Date().getTime();
-        if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
+        if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 187) { // attacks max evey 0.75 seconds
           this.lastAttackTime = currentTime;
           this.attack(collisionPlayer);
         }

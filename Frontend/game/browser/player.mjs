@@ -16,6 +16,7 @@ export default class Player extends PlayerCommon {
     
     this.tinted = -1;
     this.hpDamageTaken = -1;
+    this._attackSprite = new PIXI.Graphics();
   }
 
   /**
@@ -79,6 +80,7 @@ export default class Player extends PlayerCommon {
         this.hpNotificationSprite.setText();
       }
     }
+    this._attackFrame(this.x - viewX, this.y - viewY);
   }
 
   /**
@@ -134,6 +136,43 @@ export default class Player extends PlayerCommon {
     if(oldHP !== this.hp) {
       this.tinted = new Date().getTime();
       this.hpDamageTaken = oldHP - this.hp;
+    }
+  }
+
+  /**
+   * Start the attack animation
+   */
+  animateAttack(attackingAt) {
+    this._attackingAt = attackingAt;
+    this._attackStart = Date.now();
+  }
+
+  /**
+   * Render a single frame in the attack animation
+   */
+  _attackFrame(x, y) {
+    if(this._attackingAt !== undefined) {
+      this.floor.sprite.removeChild(this._attackSprite);
+
+      let percComplete = (Date.now() - this._attackStart) / PlayerCommon.ATTACK_TIME;
+      let start = this._attackingAt - (this.attackAngle / 2) + (this.attackAngle * percComplete) - (Math.PI / 32);
+      let end = start + (Math.PI / 16);
+
+      if(percComplete > 1) {
+        this._attackingAt = undefined;
+        return;
+      }
+
+      this._attackSprite = new PIXI.Graphics();
+      this.floor.sprite.addChild(this._attackSprite);
+
+      this._attackSprite.moveTo(0, 0);
+      this._attackSprite.beginFill(0xcccccc);
+      this._attackSprite.lineStyle(0, 0x0);
+      this._attackSprite.arc(0, 0, this.range, start, end);
+      this._attackSprite.lineTo(0, 0);
+      this._attackSprite.alpha = 0.8;
+      this._attackSprite.position.set(x + (PlayerCommon.SPRITE_SIZE / 2), y + (PlayerCommon.SPRITE_SIZE / 2));
     }
   }
 }
