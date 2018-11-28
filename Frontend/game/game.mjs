@@ -194,6 +194,7 @@ async function setup() {
 
   document.body.classList.add("crosshair");
   msgParentEl.style.display = "none";
+  document.querySelector(".tip").remove();
 
   // don't run monster logic multiplayer game (for now)
   if(!gameId) {

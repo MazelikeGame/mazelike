@@ -10,7 +10,11 @@ const KEYS = {
   s: 83,
   leftArrow: 37,
   a: 65,
-  space: 32
+  space: 32,
+  i: 73,
+  j: 74,
+  k: 75,
+  l: 76
 };
 
 // map w to up, d to right, etc
@@ -20,6 +24,9 @@ const MAPPINGS = {
   [KEYS.s]: KEYS.downArrow,
   [KEYS.a]: KEYS.leftArrow
 };
+
+// the minimum time between attacks
+const ATTACK_TIME = 750;
 
 /**
  * The player class.
@@ -48,6 +55,7 @@ export default class PlayerCommon {
     this.input = new Set();
     this._nextId = 0;
     this._lastFrame = Date.now();
+    this._lastAttack = Date.now();
     this._frames = [];
     this.size = 1; // used with monster collision checking, acts as a size multiplier
     this.speed = 400;
@@ -118,8 +126,26 @@ export default class PlayerCommon {
       this.vx -= 1;
     }
 
-    if(type === "down" && e.keyCode === KEYS.space) {
+    // attack direction x and y
+    this.vxAttack = 0;
+    this.vyAttack = 0;
+
+    if(this.input.has(KEYS.i)) {
+      this.vyAttack -= 1;
+    }
+    if(this.input.has(KEYS.k)) {
+      this.vyAttack += 1;
+    }
+    if(this.input.has(KEYS.l)) {
+      this.vxAttack += 1;
+    }
+    if(this.input.has(KEYS.j)) {
+      this.vxAttack -= 1;
+    }
+
+    if(this.vxAttack || this.vyAttack) {
       this._attacking = true;
+      this._mouseAttack = false;
     }
   }
 
@@ -129,6 +155,7 @@ export default class PlayerCommon {
   handleMouse(clicking, x, y) {
     if(clicking) {
       this._attacking = true;
+      this._mouseAttack = true;
     }
 
     this._targetX = x;
@@ -138,6 +165,7 @@ export default class PlayerCommon {
   /**
    * Send an input frame to the server
    */
+  /* eslint-disable complexity */
   sendFrame() {
     let now = Date.now();
     let frame = {
@@ -147,8 +175,8 @@ export default class PlayerCommon {
       vx: this.vx,
       vy: this.vy,
       attacking: this._attacking,
-      targetX: this._targetX,
-      targetY: this._targetY
+      targetX: this._mouseAttack ? this._targetX : this.x + this.vxAttack,
+      targetY: this._mouseAttack ? this._targetY : this.y + this.vyAttack
     };
 
     // TODO: attack animation here
@@ -157,13 +185,20 @@ export default class PlayerCommon {
     if(this.vx || this.vy || this._isAttacking()) {
       this._frames.push(frame);
       this.floor.sock.emit("player-frame", frame);
+
+      if(this._isAttacking()) {
+        this._lastAttack = now;
+      }
     }
 
     this._attacking = false;
   }
+  /* eslint-enable complexity */
 
   _isAttacking() {
-    return this._attacking && this._targetX && this._targetY;
+    // eslint-disable-next-line
+    return this._attacking && ((this._targetX && this._targetY) || !this._mouseAttack) &&
+      Date.now() - this._lastAttack > ATTACK_TIME;
   }
 
   /**
@@ -226,10 +261,18 @@ export default class PlayerCommon {
   /**
    * Process an attack frame
    */
+  /* eslint-disable complexity */
   processAttack(frame) {
     if(!frame.attacking) {
       return;
     }
+
+    if(frame.start - this._lastAttack < ATTACK_TIME || frame.start < this._lastAttack) {
+      ml.logger.debug(`Reject attack request ${frame.start} ${this._lastAttack}`, ml.tags.player);
+      return;
+    }
+
+    this._lastAttack = frame.start;
 
     let attackAngle = this._atan(frame.targetX - this.x, frame.targetY - this.y);
     ml.logger.debug(`Player ${this.name} attacking at angle ${attackAngle}`, ml.tags.player);
@@ -245,6 +288,7 @@ export default class PlayerCommon {
       }
     }
   }
+  /* eslint-enable complexity */
 
   /**
    * Drop all confirmed frames
