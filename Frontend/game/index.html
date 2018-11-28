@@ -29,6 +29,9 @@
         height: 100%;
         position: fixed;
         z-index: 99;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       h1 {
@@ -40,15 +43,17 @@
         background: #fff;
         width: 500px;
         padding: 10px;
-        margin: 20px auto;
         border-radius: 7px;
       }
 
       @media all and (max-width: 500px) {
+        .lightbox {
+          display: block;
+        }
+
         .popup {
-          margin: 0px;
           border-radius: 0px;
-          width: 100%;
+          width: calc(100% - 20px);
         }
       }
 
