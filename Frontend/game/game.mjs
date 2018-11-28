@@ -115,7 +115,16 @@ function getPlayer(floor, username) {
   });
 }
 
+let readyToPlay = new Promise((resolve) => {
+  document.querySelector(".ready").addEventListener("click", () => {
+    document.querySelector(".pregame").remove();
+    document.querySelector(".ingame").style.display = "";
+    resolve();
+  });
+});
+
 async function setup() {
+  await readyToPlay;
   msgEl.innerText = "Connecting to the game server";
   let addr = await (await fetch(`/game/addr/${gameId}`)).text();
 
@@ -194,7 +203,6 @@ async function setup() {
 
   document.body.classList.add("crosshair");
   msgParentEl.style.display = "none";
-  document.querySelector(".tip").remove();
 
   // don't run monster logic multiplayer game (for now)
   if(!gameId) {
@@ -221,6 +229,7 @@ async function setup() {
   app.ticker.add(() => {
     // spectator mode
     if(!isSpectator && !getPlayer(floor, username)) {
+      document.body.classList.add("dead");
       document.body.classList.remove("crosshair");
       controls.becomeSpectator();
       isSpectator = true;
@@ -245,7 +254,6 @@ async function setup() {
 
     // follow a specific player in spectator mode
     if(isSpectator) {
-      document.body.classList.remove("crosshair");
       let following = getPlayer(floor, floor.followingUser);
       if(following) {
         floor.setViewport(following.x, following.y);
@@ -256,6 +264,8 @@ async function setup() {
 
     // show game over
     if(floor.players.length === 0 && msgHeader.innerText !== "Game over") {
+      document.body.classList.remove("crosshair");
+      document.body.classList.add("dead");
       msgHeader.innerText = "Game over";
       msgEl.innerHTML = "";
       msgParentEl.style.display = "";
