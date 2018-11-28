@@ -152,7 +152,7 @@ export default class Player extends PlayerCommon {
    */
   _attackFrame(x, y) {
     if(this._attackingAt !== undefined) {
-      this.floor.sprite.removeChild(this._attackSprite);
+      this.floor.attackSprites.removeChild(this._attackSprite);
 
       let percComplete = (Date.now() - this._attackStart) / PlayerCommon.ATTACK_TIME;
       let start = this._attackingAt - (this.attackAngle / 2) + (this.attackAngle * percComplete) - (Math.PI / 32);
@@ -164,7 +164,7 @@ export default class Player extends PlayerCommon {
       }
 
       this._attackSprite = new PIXI.Graphics();
-      this.floor.sprite.addChild(this._attackSprite);
+      this.floor.attackSprites.addChild(this._attackSprite);
 
       this._attackSprite.moveTo(0, 0);
       this._attackSprite.beginFill(0xcccccc);
