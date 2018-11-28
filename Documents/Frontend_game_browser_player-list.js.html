@@ -27,12 +27,19 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/*global PIXI*/
+
+/**
+ * A list of players that displays information about each player.
+ */
 export default class PlayerList {
 
-  constructor(listOfPlayers, floor) {
-    this.listOfPlayers = listOfPlayers;
-    this.floor = floor;
+  constructor() {
+    this.floor = null;
+    this.listOfPlayers = [];
+
     this.graphics = new PIXI.Graphics();
+    this.playerBoxes = new Map();
+    this.hpBoxes = new Map();
   }
 
   /**
@@ -40,7 +47,7 @@ export default class PlayerList {
    */
   render() {
     this.listOfPlayers.forEach((player, index) => {
-      this.drawPlayerInfo(index, player, 100); //In the future change the health here.
+      this.drawPlayerInfo(index, player); //change this to match player.getHp() in the future
     });
 
     return this.graphics;
@@ -48,21 +55,22 @@ export default class PlayerList {
 
   /**
    * Draws the player's information to the player list.
-   * @param {string} playerName 
-   * @param {int} playerHP 
+   * @param {int} id the index of the player
+   * @param {string} player the player being drawn
    */
-  drawPlayerInfo(id, playerName, playerHP) {  
+  drawPlayerInfo(id, player) {  
+    let playerBox = new PIXI.Graphics();
     let offset = 40; //Space between each player information box.
 
     //Black background
     let outline = new PIXI.Graphics();
     outline.beginFill(0x000000);
-    outline.fillAlpha = this.floor.followingUser === playerName ? 0.85 : 0.7;
+    outline.fillAlpha = this.floor.followingUser === player.name ? 0.85 : 0.7;
     outline.lineStyle(2, 0xFFFFFFF, 1);
     outline.drawRect(0, 0, 300, 30);
     outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
     outline.endFill();
-    this.graphics.addChild(outline);
+    playerBox.addChild(outline);
 
     this._playerNameStyle = new PIXI.TextStyle({
       fill: "#fff",
@@ -70,9 +78,9 @@ export default class PlayerList {
     });
     
     //Player name
-    let player = new PIXI.Text(this.checkNameLength(playerName), this._playerNameStyle);
-    player.position.set(35, 15 + (id * offset)); //eslint-disable-line
-    this.graphics.addChild(player);
+    let playerName = new PIXI.Text(this.checkNameLength(player.name), this._playerNameStyle);
+    playerName.position.set(35, 15 + (id * offset)); //eslint-disable-line
+    playerBox.addChild(playerName);
 
     //Health bar red
     let healthRedBar = new PIXI.Graphics();
@@ -81,31 +89,100 @@ export default class PlayerList {
     healthRedBar.position.set(200, 15 + (id * offset)); //eslint-disable-line
     healthRedBar.endFill();
 
-    this.graphics.addChild(healthRedBar);
+    playerBox.addChild(healthRedBar);
 
     //Health bar green
     let healthGreenBar = new PIXI.Graphics();
     healthGreenBar.beginFill(0x7CFC00);
-    healthGreenBar.drawRect(0, 0, playerHP, 10);
+    healthGreenBar.drawRect(0, 0, player.getHp(), 10);
     healthGreenBar.position.set(200, 15 + (id * offset));//eslint-disable-line
     healthGreenBar.endFill();
 
-    this.graphics.addChild(healthGreenBar);
+    playerBox.addChild(healthGreenBar);
 
-    //Health Text (Health: 100)
+    //Health Text
     this._hpTextStyle = new PIXI.TextStyle({
       fill: "#FFFFFF",
       fontSize: 12
     });
 
-    let healthText = new PIXI.Text("Health: " + playerHP, this._hpTextStyle); //eslint-disable-line
+    let healthText = new PIXI.Text(`Health: ${player.getHp()}`, this._hpTextStyle);
     healthText.position.set(200, 25 + (id * offset)); //eslint-disable-line
-    this.graphics.addChild(healthText);
+    playerBox.addChild(healthText);
+
+    this.graphics.addChild(playerBox);
+    this.playerBoxes.set(player.name, playerBox); //Stores the playerBox for future access accessible by username.
+    this.hpBoxes.set(player.name, {
+      text: healthText,
+      greenBar: healthGreenBar,
+      redBar: healthRedBar
+    });
+  }
+
+  /**
+   * Updates the player list for each player.
+   */
+  update() { 
+    let index = 0;
+    this.playerBoxes.forEach((value, key) => {
+      let name = key;
+      let hp = 0;
+
+      for(let player of this.listOfPlayers) {
+        if(key === player.name) {
+          name = player.name;
+          hp = player.getHp();
+          break;
+        }
+      }
+
+      let offset = 40; //Space between each player information box.
+      let hpBox = this.hpBoxes.get(name);
+      
+      if(hp &lt;= 0) {
+        hpBox.text.text = `DEAD`;
+      } else {
+        hpBox.text.text = `Health: ${hp}`;
+      }
+
+      //Health bar red
+      hpBox.redBar.clear();
+      hpBox.redBar.beginFill(0xFF0000);
+      hpBox.redBar.drawRect(0, 0, 100, 10);
+      hpBox.redBar.position.set(200, 15 + (index * offset)); //eslint-disable-line
+      hpBox.redBar.endFill();
+
+      //Health bar green
+      hpBox.greenBar.clear();
+      hpBox.greenBar.beginFill(0x7CFC00);
+      hpBox.greenBar.drawRect(0, 0, hp >= 0 ? hp : 0, 10);
+      hpBox.greenBar.position.set(200, 15 + (index * offset));//eslint-disable-line
+      hpBox.greenBar.endFill();
+
+      index++;
+    });
+  }
+  
+  /**
+   * Removes the player from the list
+   * @param {string} username 
+   */
+  removePlayer(username) {
+    this.listOfPlayers.splice(this.listOfPlayers.indexOf(username), 1);
+  }
+
+  /**
+   * Updates the player list to show a player disconnected.
+   * @param {string} username 
+   */
+  disconnectPlayer(username) {
+    let tempPlayerBox = this.playerBoxes.get(username);
+    tempPlayerBox.alpha = 0.35;
   }
 
   /**
    * Checks the player's name length.
-   * @param {string} playerName 
+   * @param {string} playerName the name of player you want to check
    */
   checkNameLength(playerName) {
     if(playerName.length >= 18) {
@@ -114,8 +191,7 @@ export default class PlayerList {
 
     return playerName;
   }
-}
-</code></pre>
+}</code></pre>
         </article>
     </section>
 
@@ -125,13 +201,13 @@ export default class PlayerList {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#disconnectPlayer">disconnectPlayer</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#removePlayer">removePlayer</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 26 2018 19:12:14 GMT+0000 (UTC)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Nov 27 2018 22:05:59 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

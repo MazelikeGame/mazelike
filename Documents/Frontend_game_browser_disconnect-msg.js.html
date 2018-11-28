@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Frontend/game/common/game-map/corridor.mjs</title>
+    <title>JSDoc: Source: Frontend/game/browser/disconnect-msg.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Frontend/game/common/game-map/corridor.mjs</h1>
+    <h1 class="page-title">Source: Frontend/game/browser/disconnect-msg.js</h1>
 
     
 
@@ -26,80 +26,57 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** @module common/game-map/Corridor */
-import {MIN_SIZE} from "./game-map-const.mjs";
-
-/**
- * A corridor in the maze
- * @prop {number} x The x coordinate for the corridor to start
- * @prop {number} y The y coordinate for the corridor to start
- * @prop {number} width The width of the corridor
- * @prop {number} height The height of the corridor
- * @prop {number} weight The weight to use for graph algorithms
- * @prop {string} type Always corridor
- */
-export default class Corridor {
-  /**
-   * &lt;span style="color: red;">Constructor is private.&lt;/span>
-   * See Room or GameMap.getRect for instances of Corridor.
-   * @private
-   * @param x 
-   * @param y 
-   * @param width 
-   * @param height 
-   * @param mapParams 
-   */
-  constructor(x, y, width, height, mapParams) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this._params = mapParams;
-    this.weight = this.width === this._params.corridorSize ? this.height : this.width;
-    this.type = "corridor";
+            <pre class="prettyprint source linenums"><code>/*global PIXI*/
+export default class DiconnectMessage {
+  constructor(msg) {
+    this.msg = msg;
+    this.graphics = new PIXI.Graphics();
+    this.disconnectBox = new PIXI.Graphics();
   }
 
   /**
-   * Clone this edge with the room as room
-   * @private
+   * Renders the disconnect message.
    */
-  _to(room) {
-    let clone = Object.create(Corridor.prototype);
-    clone.room = room;
-    return Object.assign(clone, this);
+  render() {
+    this.draw();
+    return this.graphics;
   }
 
   /**
-   * Convert the corridor to json
-   * @private
+   * Resizes the disconnect box when the window is resized.
    */
-  toJSON() {
-    return {
-      x: this.x / MIN_SIZE,
-      y: this.y / MIN_SIZE,
-      w: this.width / MIN_SIZE,
-      h: this.height / MIN_SIZE,
-      r: this._rendererName
-    };
+  resize() {
+    this.disconnectBox.position.set(window.innerWidth - 310, 10); //eslint-disable-line
   }
 
   /**
-   * Convert json into a Corridor
-   * @private
+   * Creates the elements of the disconnect message in PIXI.
    */
-  static _parse(json, mapParams) {
-    let corridor = new Corridor(
-      json.x * MIN_SIZE,
-      json.y * MIN_SIZE,
-      json.w * MIN_SIZE,
-      json.h * MIN_SIZE,
-      mapParams
-    );
+  draw() {  
+    //Black background with white border
+    let outline = new PIXI.Graphics();
+    outline.beginFill(0x000000);
+    outline.fillAlpha = 0.75;
+    outline.lineStyle(2, 0xFFFFFFF, 1);
+    outline.drawRect(0, 0, 300, 30);
+    outline.position.set(0, 0); //eslint-disable-line
+    outline.endFill();
+    this.disconnectBox.addChild(outline);
 
-    corridor._rendererName = json.r;
-    return corridor;
+    this._disconnectMessageStyle = new PIXI.TextStyle({
+      fill: "#fff",
+      fontSize: 16
+    });
+    
+    //Disconnect Message
+    let msg = new PIXI.Text(this.msg, this._disconnectMessageStyle);
+    msg.position.set(15, 5); //eslint-disable-line
+    this.disconnectBox.addChild(msg);
+    this.graphics.addChild(this.disconnectBox);
   }
-}</code></pre>
+
+}
+</code></pre>
         </article>
     </section>
 

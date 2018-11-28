@@ -112,9 +112,7 @@
 
 
 <div class="description">
-    Run some shared teardown once after all of the specs in the <a href="global.html#describe">describe</a> are run.
-
-_Note:_ Be careful, sharing the teardown from a afterAll makes it easy to accidentally leak state between your specs so that they erroneously pass or fail.
+    Run some shared teardown once after all of the specs in the <a href="global.html#describe">describe</a> are run._Note:_ Be careful, sharing the teardown from a afterAll makes it easy to accidentally leak state between your specs so that they erroneously pass or fail.
 </div>
 
 
@@ -598,9 +596,7 @@ _Note:_ Be careful, sharing the teardown from a afterAll makes it easy to accide
 
 
 <div class="description">
-    Run some shared setup once before all of the specs in the <a href="global.html#describe">describe</a> are run.
-
-_Note:_ Be careful, sharing the setup from a beforeAll makes it easy to accidentally leak state between your specs so that they erroneously pass or fail.
+    Run some shared setup once before all of the specs in the <a href="global.html#describe">describe</a> are run._Note:_ Be careful, sharing the setup from a beforeAll makes it easy to accidentally leak state between your specs so that they erroneously pass or fail.
 </div>
 
 
@@ -1328,7 +1324,7 @@ _Note:_ Be careful, sharing the setup from a beforeAll makes it easy to accident
 
             
 
-            <td class="description last"></td>
+            <td class="description last">the name of player you want to check</td>
         </tr>
 
     
@@ -1369,7 +1365,7 @@ _Note:_ Be careful, sharing the setup from a beforeAll makes it easy to accident
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_player-list.js.html">Frontend/game/browser/player-list.js</a>, <a href="Frontend_game_browser_player-list.js.html#line82">line 82</a>
+        <a href="Frontend_game_browser_player-list.js.html">Frontend/game/browser/player-list.js</a>, <a href="Frontend_game_browser_player-list.js.html#line159">line 159</a>
     </li></ul></dd>
     
 
@@ -1411,9 +1407,7 @@ _Note:_ Be careful, sharing the setup from a beforeAll makes it easy to accident
 
 
 <div class="description">
-    Create a group of specs (often called a suite).
-
-Calls to `describe` can be nested within other calls to compose your suite as a tree.
+    Create a group of specs (often called a suite).Calls to `describe` can be nested within other calls to compose your suite as a tree.
 </div>
 
 
@@ -1693,7 +1687,7 @@ Calls to `describe` can be nested within other calls to compose your suite as a 
     
 
     
-    <h4 class="name" id="drawPlayerInfo"><span class="type-signature"></span>drawPlayerInfo<span class="signature">(playerName, playerHP)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="disconnectPlayer"><span class="type-signature"></span>disconnectPlayer<span class="signature">(username)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1701,7 +1695,7 @@ Calls to `describe` can be nested within other calls to compose your suite as a 
 
 
 <div class="description">
-    Draws the player's information to the player list.
+    Updates the player list to show a player disconnected.
 </div>
 
 
@@ -1737,36 +1731,13 @@ Calls to `describe` can be nested within other calls to compose your suite as a 
 
         <tr>
             
-                <td class="name"><code>playerName</code></td>
+                <td class="name"><code>username</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>playerHP</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">int</span>
 
 
             
@@ -1817,7 +1788,251 @@ Calls to `describe` can be nested within other calls to compose your suite as a 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_player-list.js.html">Frontend/game/browser/player-list.js</a>, <a href="Frontend_game_browser_player-list.js.html#line26">line 26</a>
+        <a href="Frontend_game_browser_player-list.js.html">Frontend/game/browser/player-list.js</a>, <a href="Frontend_game_browser_player-list.js.html#line150">line 150</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="draw"><span class="type-signature"></span>draw<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates the elements of the disconnect message in PIXI.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_disconnect-msg.js.html">Frontend/game/browser/disconnect-msg.js</a>, <a href="Frontend_game_browser_disconnect-msg.js.html#line27">line 27</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="drawPlayerInfo"><span class="type-signature"></span>drawPlayerInfo<span class="signature">(id, player)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Draws the player's information to the player list.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the index of the player</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>player</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the player being drawn</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_player-list.js.html">Frontend/game/browser/player-list.js</a>, <a href="Frontend_game_browser_player-list.js.html#line33">line 33</a>
     </li></ul></dd>
     
 
@@ -2012,10 +2227,7 @@ Calls to `describe` can be nested within other calls to compose your suite as a 
 
 
 <div class="description">
-    Create an asynchronous expectation for a spec. Note that the matchers
-that are provided by an asynchronous expectation all return promises
-which must be either returned from the spec or waited for using `await`
-in order for Jasmine to associate them with the correct spec.
+    Create an asynchronous expectation for a spec. Note that the matchersthat are provided by an asynchronous expectation all return promiseswhich must be either returned from the spec or waited for using `await`in order for Jasmine to associate them with the correct spec.
 </div>
 
 
@@ -2325,9 +2537,7 @@ in order for Jasmine to associate them with the correct spec.
 
 
 <div class="description">
-    A focused <a href="global.html#describe">`describe`</a>
-
-If suites or specs are focused, only those that are focused will be executed
+    A focused <a href="global.html#describe">`describe`</a>If suites or specs are focused, only those that are focused will be executed
 </div>
 
 
@@ -2492,9 +2702,7 @@ If suites or specs are focused, only those that are focused will be executed
 
 
 <div class="description">
-    A focused <a href="global.html#it">`it`</a>
-
-If suites or specs are focused, only those that are focused will be executed.
+    A focused <a href="global.html#it">`it`</a>If suites or specs are focused, only those that are focused will be executed.
 </div>
 
 
@@ -3022,9 +3230,7 @@ If suites or specs are focused, only those that are focused will be executed.
 
 
 <div class="description">
-    Define a single spec. A spec should contain one or more <a href="global.html#expect">expectations</a> that test the state of the code.
-
-A spec whose expectations all succeed will be passing and a spec with any failures will fail.
+    Define a single spec. A spec should contain one or more <a href="global.html#expect">expectations</a> that test the state of the code.A spec whose expectations all succeed will be passing and a spec with any failures will fail.
 </div>
 
 
@@ -3397,6 +3603,227 @@ A spec whose expectations all succeed will be passing and a spec with any failur
     
 
     
+    <h4 class="name" id="removePlayer"><span class="type-signature"></span>removePlayer<span class="signature">(username)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Removes the player from the list
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>username</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_player-list.js.html">Frontend/game/browser/player-list.js</a>, <a href="Frontend_game_browser_player-list.js.html#line142">line 142</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="render"><span class="type-signature"></span>render<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Renders the disconnect message.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_disconnect-msg.js.html">Frontend/game/browser/disconnect-msg.js</a>, <a href="Frontend_game_browser_disconnect-msg.js.html#line12">line 12</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="render"><span class="type-signature"></span>render<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
@@ -3449,7 +3876,93 @@ A spec whose expectations all succeed will be passing and a spec with any failur
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_browser_player-list.js.html">Frontend/game/browser/player-list.js</a>, <a href="Frontend_game_browser_player-list.js.html#line13">line 13</a>
+        <a href="Frontend_game_browser_player-list.js.html">Frontend/game/browser/player-list.js</a>, <a href="Frontend_game_browser_player-list.js.html#line20">line 20</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="resize"><span class="type-signature"></span>resize<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Resizes the disconnect box when the window is resized.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_disconnect-msg.js.html">Frontend/game/browser/disconnect-msg.js</a>, <a href="Frontend_game_browser_disconnect-msg.js.html#line20">line 20</a>
     </li></ul></dd>
     
 
@@ -4215,6 +4728,92 @@ A spec whose expectations all succeed will be passing and a spec with any failur
 
 
 <div class="description">
+    Updates the player list for each player.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_player-list.js.html">Frontend/game/browser/player-list.js</a>, <a href="Frontend_game_browser_player-list.js.html#line97">line 97</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
     Update the position of the controls
 </div>
 
@@ -4301,9 +4900,7 @@ A spec whose expectations all succeed will be passing and a spec with any failur
 
 
 <div class="description">
-    A temporarily disabled <a href="global.html#describe">`describe`</a>
-
-Specs within an `xdescribe` will be marked pending and not executed
+    A temporarily disabled <a href="global.html#describe">`describe`</a>Specs within an `xdescribe` will be marked pending and not executed
 </div>
 
 
@@ -4461,9 +5058,7 @@ Specs within an `xdescribe` will be marked pending and not executed
 
 
 <div class="description">
-    A temporarily disabled <a href="global.html#it">`it`</a>
-
-The spec will report as `pending` and will not be executed.
+    A temporarily disabled <a href="global.html#it">`it`</a>The spec will report as `pending` and will not be executed.
 </div>
 
 
@@ -4872,10 +5467,7 @@ The spec will report as `pending` and will not be executed.
 
 
 <div class="description">
-    Callback passed to parts of the Jasmine base interface.
-
-By default Jasmine assumes this function completes synchronously.
-If you have code that you need to test asynchronously, you can declare that you receive a `done` callback, return a Promise, or use the `async` keyword if it is supported in your environment.
+    Callback passed to parts of the Jasmine base interface.By default Jasmine assumes this function completes synchronously.If you have code that you need to test asynchronously, you can declare that you receive a `done` callback, return a Promise, or use the `async` keyword if it is supported in your environment.
 </div>
 
 
@@ -5871,13 +6463,13 @@ If you have code that you need to test asynchronously, you can declare that you 
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#disconnectPlayer">disconnectPlayer</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#removePlayer">removePlayer</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 26 2018 19:12:15 GMT+0000 (UTC)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Nov 27 2018 22:05:59 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

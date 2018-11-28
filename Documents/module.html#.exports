@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Frontend/game/common/game-map/corridor.mjs</title>
+    <title>JSDoc: Class: exports</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,91 +17,135 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Frontend/game/common/game-map/corridor.mjs</h1>
+    <h1 class="page-title">Class: exports</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/** @module common/game-map/Corridor */
-import {MIN_SIZE} from "./game-map-const.mjs";
+        <h2><span class="attribs"><span class="type-signature"></span></span>exports<span class="signature">()</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">A list of players that displays information about each player.</div>
+        
+    
+</header>
 
-/**
- * A corridor in the maze
- * @prop {number} x The x coordinate for the corridor to start
- * @prop {number} y The y coordinate for the corridor to start
- * @prop {number} width The width of the corridor
- * @prop {number} height The height of the corridor
- * @prop {number} weight The weight to use for graph algorithms
- * @prop {string} type Always corridor
- */
-export default class Corridor {
-  /**
-   * &lt;span style="color: red;">Constructor is private.&lt;/span>
-   * See Room or GameMap.getRect for instances of Corridor.
-   * @private
-   * @param x 
-   * @param y 
-   * @param width 
-   * @param height 
-   * @param mapParams 
-   */
-  constructor(x, y, width, height, mapParams) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this._params = mapParams;
-    this.weight = this.width === this._params.corridorSize ? this.height : this.width;
-    this.type = "corridor";
-  }
+<article>
+    <div class="container-overview">
+    
+        
 
-  /**
-   * Clone this edge with the room as room
-   * @private
-   */
-  _to(room) {
-    let clone = Object.create(Corridor.prototype);
-    clone.room = room;
-    return Object.assign(clone, this);
-  }
+    
+    <h2>Constructor</h2>
+    
 
-  /**
-   * Convert the corridor to json
-   * @private
-   */
-  toJSON() {
-    return {
-      x: this.x / MIN_SIZE,
-      y: this.y / MIN_SIZE,
-      w: this.width / MIN_SIZE,
-      h: this.height / MIN_SIZE,
-      r: this._rendererName
-    };
-  }
+    
+    <h4 class="name" id=".exports"><span class="type-signature"></span>new exports<span class="signature">()</span><span class="type-signature"></span></h4>
+    
 
-  /**
-   * Convert json into a Corridor
-   * @private
-   */
-  static _parse(json, mapParams) {
-    let corridor = new Corridor(
-      json.x * MIN_SIZE,
-      json.y * MIN_SIZE,
-      json.w * MIN_SIZE,
-      json.h * MIN_SIZE,
-      mapParams
-    );
+    
 
-    corridor._rendererName = json.r;
-    return corridor;
-  }
-}</code></pre>
-        </article>
-    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_player-list.js.html">Frontend/game/browser/player-list.js</a>, <a href="Frontend_game_browser_player-list.js.html#line6">line 6</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
