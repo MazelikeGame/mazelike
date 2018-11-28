@@ -10,7 +10,8 @@ export default class Item {
    * @param {int} defence - Default value is 0. Bonus to defence applied to player.
    * @param {int} range - Default value is 0. Bonus to range applied to player.
    */
-  constructor(spriteName, spriteSize, movementSpeed = 0, attackSpeed = 0, attack = 0, defence = 0, range = 0) {
+  constructor(floor, spriteName, spriteSize, movementSpeed = 0, attackSpeed = 0, attack = 0, defence = 0, range = 0) {
+    this.floor = floor;
     this.spriteName = spriteName;
     this.spriteSize = spriteSize;
     this.movementSpeed = movementSpeed;

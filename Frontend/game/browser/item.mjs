@@ -5,9 +5,9 @@ import ItemCommon from '../common/item.mjs';
 
 export default class Item extends ItemCommon {
   createSprite() {
-    this.sprite = new PIXI.sprite(PIXI.loader.resources.player.textures[this.spriteName]);
+    this.sprite = new PIXI.Sprite(PIXI.loader.resources.shortWep.textures[this.spriteName]);
     if(this.isOnFloor) {
-      this.srpite.position.set(this.x, this.y);
+      this.sprite.position.set(this.x, this.y);
     }
     this.sprite.width = this.sprite.height = this.spriteSize;
     this.floor.itemSprites.addChild(this.sprite);
@@ -19,7 +19,9 @@ export default class Item extends ItemCommon {
    * @param viewY
    */
   update(viewX, viewY) {
-    this.sprite.position.set(this.x - viewX, this.y - viewY);
+    if(this.isOnFloor) {
+      this.sprite.position.set(this.x - viewX, this.y - viewY);
+    }
   }
 
   handleState(state) {

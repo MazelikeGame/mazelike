@@ -79,6 +79,7 @@ export default class Item extends ItemCommon {
 
   static spawnRandomItem(floor, x, y) {
     let newItem = new Item(
+      floor,
       'Iron Dagger',
       32
     );

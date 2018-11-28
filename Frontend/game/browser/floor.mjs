@@ -196,6 +196,7 @@ export default class Floor extends FloorCommon {
     });
     this._diffState('id', 'id', this.items, state.items, (raw) => {
       let item = new Item(
+        this,
         raw.spriteName,
         raw.spriteSize,
         raw.movementSpeed,
@@ -204,8 +205,9 @@ export default class Floor extends FloorCommon {
         raw.defence,
         raw.range
       );
+      item.handleState(raw);
       if(raw.isOnFloor) {
-        item.setPosition(raw.x, raw.y);
+        item.setCoordinates(raw.x, raw.y);
         item.createSprite();
       }
       return item;

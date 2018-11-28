@@ -103,6 +103,7 @@ export default class Floor extends FloorCommon {
     io.emit("state", {
       monsters: this.monsters,
       players: this.players,
+      items: this.items,
       isGameRunning
     });
   }
