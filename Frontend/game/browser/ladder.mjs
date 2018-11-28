@@ -14,12 +14,12 @@ export default class Ladder {
     this.sprite.height = 48;
   }
 
-  set setX(x) {
+  set x(x) {
     this.x = x;
     this.sprite.x = x;
   }
 
-  set setY(y) {
+  set y(y) {
     this.y = y;
     this.sprite.y = y;
   }
