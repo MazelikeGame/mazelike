@@ -116,9 +116,11 @@ export default class Floor extends FloorCommon {
     }
 
     this.ladder.setPosition(spawn.x, spawn.y);
-    this.sprite.addChild(this.ladder.sprite);
+
     this.sprite.addChild(this.playerSprites);
     this.sprite.addChild(this.monsterSprites);
+    this.sprite.addChild(this.ladder.sprite);
+
   }
 
   /**
