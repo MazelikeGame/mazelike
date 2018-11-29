@@ -1,4 +1,4 @@
-/* eslint-disable complexity,no-extra-parens,no-mixed-operators,consistent-return */
+/* eslint-disable complexity,no-mixed-operators,consistent-return */
 /* global PIXI */
 /** @module browser/GameMap */
 import GameMapCommon from "../common/game-map/game-map.mjs";

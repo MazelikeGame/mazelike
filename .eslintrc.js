@@ -11,7 +11,6 @@ module.exports = {
     node: true
   },
   rules: {
-    'no-extra-parens': 'error',
     'no-template-curly-in-string': 'error',
     'no-label-var': 'error',
     'no-shadow': 'error',
