@@ -155,8 +155,10 @@ export default class PlayerCommon {
       this._mouseAttack = true;
     }
 
-    this._targetX = x;
-    this._targetY = y;
+    /* eslint-disable no-extra-parens */
+    this._targetX = x - (PlayerCommon.SPRITE_SIZE / 2);
+    this._targetY = y - (PlayerCommon.SPRITE_SIZE / 2);
+    /* eslint-enable no-extra-parens */
   }
 
   /**
