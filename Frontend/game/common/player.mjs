@@ -179,7 +179,7 @@ export default class PlayerCommon {
     };
 
     if(this.animateAttack && this._isAttacking()) {
-      this.animateAttack(this._atan(frame.targetX - this.x, frame.targetY - this.y));
+      this.animateAttack(Math.atan2(frame.targetY - this.y, frame.targetX - this.x));
     }
 
     this._lastFrameSent = now;
@@ -244,11 +244,6 @@ export default class PlayerCommon {
     /* eslint-enable complexity */
   }
 
-  _atan(relativeX, relativeY) {
-    // eslint-disable-next-line
-    return Math.atan2(relativeY, relativeX);
-  }
-
   /**
    * Process an attack frame
    */
@@ -265,13 +260,13 @@ export default class PlayerCommon {
 
     this._lastAttack = frame.start;
 
-    let attackAngle = this._atan(frame.targetX - this.x, frame.targetY - this.y);
+    let attackAngle = Math.atan2(frame.targetY - this.y, frame.targetX - this.x);
     ml.logger.debug(`Player ${this.name} attacking at angle ${attackAngle}`, ml.tags.player);
 
     for(let monster of this.floor.monsters) {
       // eslint-disable-next-line
       let monsterDist = Math.sqrt((monster.x - this.x) ** 2 + (monster.y - this.y) ** 2);
-      let monsterAngle = this._atan(monster.x - this.x, monster.y - this.y);
+      let monsterAngle = Math.atan2(monster.y - this.y, monster.x - this.x);
 
       // check if the monster is in range
       if(monsterDist <= this.range && Math.abs(attackAngle - monsterAngle) <= this.attackAngle / 2) {
