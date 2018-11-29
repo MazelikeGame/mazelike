@@ -4,6 +4,7 @@ import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
 import Monster from "./monster.mjs";
 import Player from './player';
+import Ladder from "./ladder.mjs";
 
 export default class Floor extends FloorCommon {
   /**
@@ -16,7 +17,8 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
     floor.map = GameMap.generate(map);
     floor.generateMonsters();
-
+    this.ladder = new Ladder(floor);
+    
     return floor;
   }
 
