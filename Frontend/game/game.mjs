@@ -272,5 +272,4 @@ PIXI.loader
   .add("dog", "DawnLike/Characters/dog.json")
   .add("demon", "DawnLike/Characters/demon.json")
   .add("player", "DawnLike/Characters/player.json")
-  .add("ladder", "DawnLike/ladder.png")
   .load(setup);

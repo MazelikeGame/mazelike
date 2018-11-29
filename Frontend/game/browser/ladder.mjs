@@ -4,23 +4,21 @@
  * The ladder
  */
 export default class Ladder {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.spriteName = "ladder";
-    this.sprite = new PIXI.Sprite(PIXI.loader.resources.player.textures[this.spriteName]);
+  
+  constructor() {
+    this.x = 0;
+    this.y = 0;
+    this.sprite = new PIXI.Sprite.fromImage('DawnLike/Objects/ladder.png');
     this.sprite.position.set(this.x, this.y);
-    this.sprite.width = 48;
-    this.sprite.height = 48;
   }
 
-  set x(x) {
+  setPosition(x, y) {
     this.x = x;
-    this.sprite.x = x;
+    this.y = y;
+    this.sprite.position.set(this.x, this.y);
   }
 
-  set y(y) {
-    this.y = y;
-    this.sprite.y = y;
+  update(viewX, viewY) {
+    this.sprite.position.set(this.x - viewX, this.y - viewY);
   }
 }
