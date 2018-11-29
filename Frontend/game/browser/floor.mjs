@@ -23,6 +23,7 @@ export default class Floor extends FloorCommon {
     this.playerSprites = new PIXI.Container();
 
     this.ladder = new Ladder();
+    this.ladderSprite = this.ladder.sprite;
   }
 
   /**
@@ -114,7 +115,6 @@ export default class Floor extends FloorCommon {
       this.players[i].createSprite();
     }
 
-    console.log(this);
     this.ladder.setPosition(spawn.x, spawn.y);
     this.sprite.addChild(this.ladder.sprite);
     this.sprite.addChild(this.playerSprites);

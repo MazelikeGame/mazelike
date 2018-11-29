@@ -1,17 +1,6 @@
-/*global PIXI*/
+import LadderCommon from "../common/ladder.mjs";
 
-/**
- * The ladder
- */
-export default class Ladder {
-  
-  constructor() {
-    this.x = 0;
-    this.y = 0;
-    this.sprite = new PIXI.Sprite.fromImage('DawnLike/Objects/ladder.png');
-    this.sprite.position.set(this.x, this.y);
-  }
-
+export default class Ladder extends LadderCommon {
   setPosition(x, y) {
     this.x = x;
     this.y = y;
