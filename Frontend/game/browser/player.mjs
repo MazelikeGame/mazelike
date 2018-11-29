@@ -1,4 +1,4 @@
-/* eslint-disable no-extra-parens, max-len, complexity, prefer-template */
+/* eslint-disable max-len, complexity, prefer-template */
 /* global PIXI */
 import PlayerCommon from "../common/player.mjs";
 import interpolate from "../common/interpolator.mjs";
@@ -142,8 +142,7 @@ export default class Player extends PlayerCommon {
   /**
    * Start the attack animation
    */
-  animateAttack(attackingAt, type) {
-    this._attackType = type;
+  animateAttack(attackingAt) {
     this._attackingAt = attackingAt;
     this._attackStart = Date.now();
   }

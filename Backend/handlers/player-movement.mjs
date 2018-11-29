@@ -1,5 +1,3 @@
-/* eslint-disable no-extra-parens */
-
 const GRACE_PERIOD = 100;
 const MAX_FRAME_LENGTH = 50; /* # of ms between frames at 20 fps */
 

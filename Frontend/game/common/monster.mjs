@@ -1,5 +1,5 @@
 /* global ml */
-/* eslint-disable no-extra-parens,max-len,curly,complexity,prefer-template, no-warning-comments, no-mixed-operators */
+/* eslint-disable max-len,curly,complexity,prefer-template, no-warning-comments, no-mixed-operators */
 /** @module Monster */
 
 // The maximum amount of ms we want a monster to walk for

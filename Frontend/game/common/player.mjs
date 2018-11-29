@@ -1,5 +1,6 @@
 /* global ml */
 /** @module PlayerCommon */
+import Monster from "./monster.mjs";
 
 const KEYS = {
   upArrow: 38,
@@ -58,6 +59,8 @@ export default class PlayerCommon {
     this.speed = 400;
     this.attackAngle = Math.PI / 4;
     this.range = 100;
+
+    this._attackType = "rectangle";
   }
 
   /**
@@ -155,10 +158,8 @@ export default class PlayerCommon {
       this._mouseAttack = true;
     }
 
-    /* eslint-disable no-extra-parens */
     this._targetX = x - (PlayerCommon.SPRITE_SIZE / 2);
     this._targetY = y - (PlayerCommon.SPRITE_SIZE / 2);
-    /* eslint-enable no-extra-parens */
   }
 
   /**
@@ -264,17 +265,145 @@ export default class PlayerCommon {
     ml.logger.debug(`Player ${this.name} attacking at angle ${attackAngle}`, ml.tags.player);
 
     for(let monster of this.floor.monsters) {
-      // eslint-disable-next-line
-      let monsterDist = Math.sqrt((monster.x - this.x) ** 2 + (monster.y - this.y) ** 2);
-      let monsterAngle = Math.atan2(monster.y - this.y, monster.x - this.x);
+      if(this._attackType === "rectangle") {
+        if(this._isHittingRect(attackAngle, monster)) {
+          this.attack(monster);
+        }
+      } else {
+        // eslint-disable-next-line
+        let monsterDist = Math.sqrt((monster.x - this.x) ** 2 + (monster.y - this.y) ** 2);
+        let monsterAngle = Math.atan2(monster.y - this.y, monster.x - this.x);
 
-      // check if the monster is in range
-      if(monsterDist <= this.range && Math.abs(attackAngle - monsterAngle) <= this.attackAngle / 2) {
-        this.attack(monster);
+        // check if the monster is in range
+        if(monsterDist <= this.range && Math.abs(attackAngle - monsterAngle) <= this.attackAngle / 2) {
+          this.attack(monster);
+        }
       }
     }
   }
+
+  /**
+   * Check if the attack line is hitting a monster
+   */
+  _isHittingRect(attackAngle, monster) {
+    let targetStart = {
+      x: this.x + (PlayerCommon.SPRITE_SIZE / 2),
+      y: this.y + (PlayerCommon.SPRITE_SIZE / 2)
+    };
+
+    let targetEnd = {
+      x: targetStart.x + (this.range * Math.cos(attackAngle)),
+      y: targetStart.y + (this.range * Math.sin(attackAngle))
+    };
+
+    // corrners of the monster hit box
+    let monsterPoints = [
+      { x: monster.x, y: monster.y },
+      { x: monster.x + Monster.SPRITE_SIZE, y: monster.y },
+      { x: monster.x, y: monster.y + Monster.SPRITE_SIZE },
+      { x: monster.x + Monster.SPRITE_SIZE, y: monster.y + Monster.SPRITE_SIZE }
+    ];
+
+    // check if the attack line intersects with the monster's hit box
+    if(this.instersects(targetStart, targetEnd, monsterPoints[0], monsterPoints[1])) {
+      return true;
+    }
+
+    if(this.instersects(targetStart, targetEnd, monsterPoints[0], monsterPoints[2])) {
+      return true;
+    }
+
+    if(this.instersects(targetStart, targetEnd, monsterPoints[3], monsterPoints[1])) {
+      return true;
+    }
+
+    if(this.instersects(targetStart, targetEnd, monsterPoints[3], monsterPoints[2])) {
+      return true;
+    }
+
+    return false;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  // The following code is from Geeks for Geeks                                //
+  // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/ //
+  ///////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Check if iPoint is on the line formed by point1 and point2
+   * @param point1 
+   * @param point2 
+   * @param iPoint 
+   */
+  _isOnLine(point1, point2, iPoint) { 
+    return Math.min(point1.x, point2.x) <= iPoint.x && iPoint.x <= Math.max(point1.x, point2.x) && 
+      Math.min(point1.y, point2.y) <= iPoint.y && iPoint.y <= Math.max(point1.y, point2.y);
+  } 
+
+  /**
+   * Determine the orientation of three points
+   * @param p 
+   * @param q 
+   * @param r 
+   */
+  _getOrientation(p, q, r) { 
+    // Algorithm from https://www.geeksforgeeks.org/orientation-3-ordered-points/
+    // eslint-disable-next-line
+    let val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y); 
+
+    if(val === 0) {
+      return "colinear";
+    }
+
+    return val > 0 ? "clockwise" : "counterclockwise";
+  }
+
+  /**
+   * Check if two points intersect
+   * @param line1p1 
+   * @param line1p2 
+   * @param line2p1 
+   * @param line2p2 
+   */
+  instersects(line1p1, line1p2, line2p1, line2p2) { 
+    let o1 = this._getOrientation(line1p1, line2p1, line1p2); 
+    let o2 = this._getOrientation(line1p1, line2p1, line2p2); 
+    let o3 = this._getOrientation(line1p2, line2p2, line1p1); 
+    let o4 = this._getOrientation(line1p2, line2p2, line2p1); 
+
+    // General case (intersecting non-parallel)
+    if(o1 !== o2 && o3 !== o4) {
+      return true;
+    }
+
+    // Special Cases (colinear aka all parallel)
+    // line1p1, line2p1q1 and line1p2 are colinear and line1p2 lies on segment line1p1 line2p1 
+    if(o1 === "colinear" && this._isOnLine(line1p1, line1p2, line2p1)) {
+      return true;
+    }
+
+    // line1p1, line2p1 and line2p2 are colinear and line2p2 lies on segment line1p1 line2p1 
+    if(o2 === "colinear" && this._isOnLine(line1p1, line2p2, line2p1)) {
+      return true;
+    }
+
+    // line1p2, line2p2 and line1p1 are colinear and line1p1 lies on segment line1p line2p2 
+    if(o3 === "colinear" && this._isOnLine(line1p2, line1p1, line2p2)) {
+      return true;
+    }
+
+    // linep2, line2p2 and line2p1 are colinear and line2p1 lies on segment linep2 line2p2 
+    if(o4 === "colinear" && this._isOnLine(line2p2, line2p1, line2p1)) {
+      return true;
+    }
+
+    return false; // Doesn't fall in any of the above cases 
+  }
+
   /* eslint-enable complexity */
+  ///////////////////////////////////////////////////////////////////////////////
+  // End of code from Geeks for Geeks                                          //
+  ///////////////////////////////////////////////////////////////////////////////
 
   /**
    * Drop all confirmed frames
