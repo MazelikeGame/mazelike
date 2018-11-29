@@ -31,6 +31,7 @@
     "sequelize": "^4.38.1",
     "sequelize-cli": "^4.1.1",
     "socket.io": "^2.1.1",
+    "spdy": "^4.0.0",
     "sqlite3": "^3.0.0",
     "winston": "^3.1.0"
   },

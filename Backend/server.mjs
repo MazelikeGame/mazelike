@@ -1,7 +1,7 @@
 /* global ml */
 import fs from "fs";
 import http from "http";
-import https from "https";
+import spdy from "spdy";
 
 const PRIVKEY = process.env.KEY_FILE || "/data/certs/privkey.pem";
 const CERT = process.env.CERT_FILE || "/data/certs/cert.pem";
@@ -12,7 +12,9 @@ let httpsOpts;
 if(fs.existsSync(PRIVKEY) && fs.existsSync(CERT)) {
   httpsOpts = {
     key: fs.readFileSync(PRIVKEY),
-    cert: fs.readFileSync(CERT)
+    cert: fs.readFileSync(CERT),
+    protocols: ["h2", "http/1.1"],
+    plain: false
   };
 
   // Redirect insecure requests
@@ -39,7 +41,7 @@ export function createServer(app) {
       });
     }
 
-    return https.createServer(httpsOpts, app);
+    return spdy.createServer(httpsOpts, app);
   }
 
   return http.createServer(app);
