@@ -5,6 +5,8 @@
     <base href="/game/"/>
     <link rel="icon" href="/img/m main.png"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <link rel="manifest" href="/manifest.json"/>
+    <script src="/scripts/common.js"></script>
     <style>
       * {
         margin: 0px;
@@ -69,7 +71,6 @@
 
       .ready-align {
         display: flex;
-        justify-content: flex-end;
       }
 
       button {
@@ -92,6 +93,12 @@
       .dead a {
         color: #fff;
       }
+
+      .fullscreen-box {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+      }
     </style>
   </head>
   <body>
@@ -108,6 +115,10 @@
             <p>--- Backstory HERE ---</p>
             <p class="tip">TIP: You can use ijkl to attack (i is up, k is down, j is left, l is right) or you can use the mouse</p>
             <div class="ready-align">
+              <div class="fullscreen-box">
+                  <input type="checkbox" class="fullscreen" id="fullscreen"/>
+                  <label for="fullscreen">Fullscreen</label>
+              </div>
               <button class="ready">Play</button>
             </div>
           </div>

@@ -11,6 +11,7 @@ import MobileControls from "./browser/mobile-controls.mjs";
 let msgEl = document.querySelector(".msg");
 let msgParentEl = document.querySelector(".msg-parent");
 let msgHeader = document.querySelector(".msg-header");
+let fullscreenEl = document.querySelector(".fullscreen");
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
@@ -119,9 +120,25 @@ let readyToPlay = new Promise((resolve) => {
   document.querySelector(".ready").addEventListener("click", () => {
     document.querySelector(".pregame").remove();
     document.querySelector(".ingame").style.display = "";
+
+    // Enter fullscreen
+    if(fullscreenEl.checked) {
+      if(document.body.webkitRequestFullScreen) {
+        document.body.webkitRequestFullScreen();
+      } else if(document.body.requestFullScreen) {
+        document.body.requestFullScreen();
+      }
+    }
+
+    localStorage.fullscreen = fullscreenEl.checked;
+
     resolve();
   });
 });
+
+// eslint-disable-next-line
+window.localStorage || (window.localStorage = {});
+fullscreenEl.checked = localStorage.fullscreen !== "false";
 
 async function setup() {
   await readyToPlay;
@@ -272,6 +289,15 @@ async function setup() {
       a.href = "/account/dashboard";
       a.innerText = "Dashboard";
       msgEl.appendChild(a);
+
+      // Exit fullscreen
+      if(localStorage.fullscreen) {
+        if(document.documentElement.webkitExitFullScreen) {
+          document.documentElement.webkitExitFullScreen();
+        } else if(document.documentElement.exitFullScreen) {
+          document.documentElement.exitFullScreen();
+        }
+      }
     }
     
     let player = getPlayer(floor, username);
