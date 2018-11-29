@@ -164,7 +164,7 @@ export default class Player extends PlayerCommon {
       this._attackSprite = new PIXI.Graphics();
       this.floor.attackSprites.addChild(this._attackSprite);
 
-      if(this._attackType === "rectangle") {
+      if(this.attackType === "rectangle") {
         this._attackFrameRect(x, y, percComplete);
       } else {
         this._attackFrameArc(x, y, percComplete);

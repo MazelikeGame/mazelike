@@ -39,8 +39,8 @@ export default class PlayerCommon {
    */
   constructor(name, hp, spriteName, floor) {
     this.name = name;
-    this.hp = 100000;//hp;
-    this.hpMax = 100000;
+    this.hp = 100;
+    this.hpMax = 100;
     this.alive = true;
     this.x = 0;
     this.y = 0;
@@ -59,8 +59,6 @@ export default class PlayerCommon {
     this.speed = 400;
     this.attackAngle = Math.PI / 4;
     this.range = 100;
-
-    this._attackType = "rectangle";
   }
 
   /**
@@ -265,7 +263,7 @@ export default class PlayerCommon {
     ml.logger.debug(`Player ${this.name} attacking at angle ${attackAngle}`, ml.tags.player);
 
     for(let monster of this.floor.monsters) {
-      if(this._attackType === "rectangle") {
+      if(this.attackType === "rectangle") {
         if(this._isHittingRect(attackAngle, monster)) {
           this.attack(monster);
         }
@@ -366,10 +364,10 @@ export default class PlayerCommon {
    * @param line2p2 
    */
   instersects(line1p1, line1p2, line2p1, line2p2) { 
-    let o1 = this._getOrientation(line1p1, line2p1, line1p2); 
-    let o2 = this._getOrientation(line1p1, line2p1, line2p2); 
-    let o3 = this._getOrientation(line1p2, line2p2, line1p1); 
-    let o4 = this._getOrientation(line1p2, line2p2, line2p1); 
+    let o1 = this._getOrientation(line1p1, line1p2, line2p1); 
+    let o2 = this._getOrientation(line1p1, line1p2, line2p2); 
+    let o3 = this._getOrientation(line2p1, line2p2, line1p1); 
+    let o4 = this._getOrientation(line2p1, line2p2, line1p2); 
 
     // General case (intersecting non-parallel)
     if(o1 !== o2 && o3 !== o4) {
@@ -377,23 +375,23 @@ export default class PlayerCommon {
     }
 
     // Special Cases (colinear aka all parallel)
-    // line1p1, line2p1q1 and line1p2 are colinear and line1p2 lies on segment line1p1 line2p1 
+    // line1p1, line1p2q1 and line2p1 are colinear and line2p1 lies on segment line1p1 line1p2 
     if(o1 === "colinear" && this._isOnLine(line1p1, line1p2, line2p1)) {
       return true;
     }
 
-    // line1p1, line2p1 and line2p2 are colinear and line2p2 lies on segment line1p1 line2p1 
-    if(o2 === "colinear" && this._isOnLine(line1p1, line2p2, line2p1)) {
+    // line1p1, line1p2 and line2p2 are colinear and line2p2 lies on segment line1p1 line1p2 
+    if(o2 === "colinear" && this._isOnLine(line1p1, line1p2, line2p2)) {
       return true;
     }
 
-    // line1p2, line2p2 and line1p1 are colinear and line1p1 lies on segment line1p line2p2 
-    if(o3 === "colinear" && this._isOnLine(line1p2, line1p1, line2p2)) {
+    // line2p1, line2p2 and line1p1 are colinear and line1p1 lies on segment line1p line2p2 
+    if(o3 === "colinear" && this._isOnLine(line2p1, line2p2, line1p1)) {
       return true;
     }
 
-    // linep2, line2p2 and line2p1 are colinear and line2p1 lies on segment linep2 line2p2 
-    if(o4 === "colinear" && this._isOnLine(line2p2, line2p1, line2p1)) {
+    // linep2, line2p2 and line1p2 are colinear and line1p2 lies on segment linep2 line2p2 
+    if(o4 === "colinear" && this._isOnLine(line2p1, line1p2, line1p2)) {
       return true;
     }
 
