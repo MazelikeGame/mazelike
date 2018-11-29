@@ -144,8 +144,6 @@ async function setup() {
   msgEl.innerText = "Loading game";
   let floor;
 
-  console.log(`User: ${username}`); // eslint-disable-line
-
   if(gameId) {
     floor = await Floor.load(gameId, 0, sock, username);
   } else {

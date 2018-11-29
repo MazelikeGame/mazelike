@@ -142,7 +142,8 @@ export default class Player extends PlayerCommon {
   /**
    * Start the attack animation
    */
-  animateAttack(attackingAt) {
+  animateAttack(attackingAt, type) {
+    this._attackType = type;
     this._attackingAt = attackingAt;
     this._attackStart = Date.now();
   }
@@ -155,8 +156,6 @@ export default class Player extends PlayerCommon {
       this.floor.attackSprites.removeChild(this._attackSprite);
 
       let percComplete = (Date.now() - this._attackStart) / PlayerCommon.ATTACK_TIME;
-      let start = this._attackingAt - (this.attackAngle / 2) + (this.attackAngle * percComplete) - (Math.PI / 32);
-      let end = start + (Math.PI / 16);
 
       if(percComplete > 1) {
         this._attackingAt = undefined;
@@ -166,13 +165,44 @@ export default class Player extends PlayerCommon {
       this._attackSprite = new PIXI.Graphics();
       this.floor.attackSprites.addChild(this._attackSprite);
 
-      this._attackSprite.moveTo(0, 0);
-      this._attackSprite.beginFill(0xcccccc);
-      this._attackSprite.lineStyle(0, 0x0);
-      this._attackSprite.arc(0, 0, this.range, start, end);
-      this._attackSprite.lineTo(0, 0);
-      this._attackSprite.alpha = 0.8;
-      this._attackSprite.position.set(x + (PlayerCommon.SPRITE_SIZE / 2), y + (PlayerCommon.SPRITE_SIZE / 2));
+      if(this._attackType === "rectangle") {
+        this._attackFrameRect(x, y, percComplete);
+      } else {
+        this._attackFrameArc(x, y, percComplete);
+      }
     }
+  }
+
+  /**
+   * Render a single frame in the attack arc animation
+   */
+  _attackFrameArc(x, y, percComplete) {
+    let start = this._attackingAt - (this.attackAngle / 2) + (this.attackAngle * percComplete) - (Math.PI / 32);
+    let end = start + (Math.PI / 16);
+
+    this._attackSprite.moveTo(0, 0);
+    this._attackSprite.beginFill(this._attackColor || 0xcccccc);
+    this._attackSprite.lineStyle(0, 0x0);
+    this._attackSprite.arc(0, 0, this.range, start, end);
+    this._attackSprite.lineTo(0, 0);
+    this._attackSprite.alpha = 0.8;
+    this._attackSprite.position.set(x + (PlayerCommon.SPRITE_SIZE / 2), y + (PlayerCommon.SPRITE_SIZE / 2));
+  }
+
+  /**
+   * Render a single frame in the attack rect animation
+   */
+  _attackFrameRect(x, y, percComplete) {
+    let offset = PlayerCommon.SPRITE_SIZE / 2;
+    this._attackSprite.position.set(x + offset, y + offset);
+    this._attackSprite.lineStyle(7, this._attackColor || 0xcccccc);
+    this._attackSprite.alpha = 0.7;
+
+    let length = this.range * percComplete;
+    this._attackSprite.moveTo(0, 0);
+    this._attackSprite.lineTo(
+      length * Math.cos(this._attackingAt),
+      length * Math.sin(this._attackingAt)
+    );
   }
 }

@@ -38,8 +38,8 @@ export default class PlayerCommon {
    */
   constructor(name, hp, spriteName, floor) {
     this.name = name;
-    this.hp = hp;
-    this.hpMax = 100;
+    this.hp = 100000;//hp;
+    this.hpMax = 100000;
     this.alive = true;
     this.x = 0;
     this.y = 0;
@@ -245,18 +245,8 @@ export default class PlayerCommon {
   }
 
   _atan(relativeX, relativeY) {
-    let attackAngle = Math.atan(relativeY / relativeX);
-
-    // deal with the fact atan has a limited range and / 0
-    if(isNaN(attackAngle)) { // x == 0
-      attackAngle = relativeY > 0 ? Math.PI / 2 : -Math.PI / 2;
-    } else if(relativeX < 0) {
-      attackAngle += Math.PI;
-    } else if(attackAngle < 0) {
-      attackAngle += 2 * Math.PI;
-    }
-
-    return attackAngle;
+    // eslint-disable-next-line
+    return Math.atan2(relativeY, relativeX);
   }
 
   /**
