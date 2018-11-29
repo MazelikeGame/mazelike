@@ -51,7 +51,7 @@ export default class MobileControls {
    * Update the position of the controls
    */
   update() {
-    this.sprite.x = innerWidth - (this.sprite.width / 2) - 10;
+    this.sprite.x = 10 + (this.sprite.width / 2);
     this.sprite.y = innerHeight - this.sprite.height - 10;
   }
 
