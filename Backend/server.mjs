@@ -3,8 +3,8 @@ import fs from "fs";
 import http from "http";
 import https from "https";
 
-const PRIVKEY = "/data/certs/privkey.pem";
-const CERT = "/data/certs/cert.pem";
+const PRIVKEY = process.env.KEY_FILE || "/data/certs/privkey.pem";
+const CERT = process.env.CERT_FILE || "/data/certs/cert.pem";
 
 let httpsOpts;
 
