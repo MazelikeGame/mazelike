@@ -86,7 +86,6 @@ export default class GameMap {
     map._initParams(params);
 
     map.generateMap(map.generateMaze());
-
     return map;
   }
 
@@ -176,6 +175,8 @@ export default class GameMap {
     for(let i = 0; i < raw.rooms.length; ++i) {
       map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i], map._params));
     }
+
+    map.ladder = raw.ladder;
 
     return map;
   }
