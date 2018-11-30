@@ -71,7 +71,8 @@ export default class Floor extends FloorCommon {
     return Promise.all([
       this.map.save(this.id),
       Monster.saveAll(this, create),
-      Player.saveAll(this)
+      Player.saveAll(this),
+      Item.saveAll(this)
     ]);
   }
 

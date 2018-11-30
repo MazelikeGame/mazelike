@@ -7,7 +7,10 @@
       "attackSpeed":6,
       "attack":20,
       "defence":1,
-      "range":1
+      "range":1,
+      "accuracy": 30,
+      "attackStyle": "melee",
+      "category": "shortWep"
     },
     {
       "spriteName":"Wooden Shield",
@@ -16,7 +19,10 @@
       "attackSpeed":0,
       "attack":0,
       "defence":10,
-      "range":1
+      "range":1,
+      "accuracy": 0,
+      "attackStyle": null,
+      "category": "shield"
     },
     {
       "spriteName":"Iron Full Helm",
@@ -25,7 +31,10 @@
       "attackSpeed":0,
       "attack":0,
       "defence":15,
-      "range":0
+      "range":0,
+      "accuracy": 0,
+      "attackStyle": null,
+      "category": "hat"
     },
     {
       "spriteName":"Iron Boots",
@@ -34,7 +43,10 @@
       "attackSpeed":0,
       "attack":0,
       "defence":3,
-      "range":0
+      "range":0,
+      "accuracy": 0,
+      "attackStyle": null,
+      "category": "boot"
     }
   ]
 }

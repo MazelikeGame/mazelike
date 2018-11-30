@@ -4,21 +4,38 @@ export default class Item {
   /**
    * @param {string} spriteName - Required. Name of the sprite.
    * @param {int} spriteSize - Required. Size of the sprite.
-   * @param {int} movementSpeed - Default value is 0. Bonus to movementSpeed applied to player.
-   * @param {int} attackSpeed - Default value is 0. Bonus to attackSpeed applied to player.
-   * @param {int} attack - Default value is 0. Bonus to attack applied to player.
-   * @param {int} defence - Default value is 0. Bonus to defence applied to player.
-   * @param {int} range - Default value is 0. Bonus to range applied to player.
+   * @param {int} movementSpeed - Bonus to movementSpeed applied to player.
+   * @param {int} attackSpeed - Bonus to attackSpeed applied to player.
+   * @param {int} attack - Bonus to attack applied to player.
+   * @param {int} defence - Bonus to defence applied to player.
+   * @param {int} range - Bonus to range applied to player.
    */
-  constructor(floor, spriteName, spriteSize, movementSpeed = 0, attackSpeed = 0, attack = 0, defence = 0, range = 0) {
+  constructor(
+    floor,
+    spriteName,
+    spriteSize,
+    movementSpeed,
+    attackSpeed,
+    attack,
+    defence,
+    range,
+    id,
+    category,
+    accuracy,
+    attackStyle
+  ) {
     this.floor = floor;
     this.spriteName = spriteName;
     this.spriteSize = spriteSize;
-    this.movementSpeed = movementSpeed;
+    this.movementSpeed = movementSpeed || 0;
     this.attackSpeed = attackSpeed;
     this.attack = attack;
     this.defence = defence;
     this.range = range;
+    this.id = id;
+    this.category = category;
+    this.accruacy = accuracy;
+    this.attackStyle = attackStyle;
     this.x = null;
     this.y = null;
     this.isOnFloor = false;

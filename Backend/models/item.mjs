@@ -1,6 +1,5 @@
 import Sequelize from 'sequelize';
 import sql from '../sequelize';
-import ItemDefinition from './itemDefinition';
 
 let Item = sql.define('items', {
   floorId: {
@@ -15,8 +14,10 @@ let Item = sql.define('items', {
     type: Sequelize.INTEGER,
     allowNull: true
   },
+  spriteName: {
+    type: Sequelize.STRING,
+    allowNull: false
+  }
 });
-
-Item.belongsTo(ItemDefinition, { foreignKey: 'fkDefinition' });
 
 export default Item;

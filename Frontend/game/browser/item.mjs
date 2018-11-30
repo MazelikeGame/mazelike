@@ -4,29 +4,31 @@ import ItemCommon from '../common/item.mjs';
 /** @module Item */
 
 export default class Item extends ItemCommon {
-  /* Temporary. TODO: Add itemType attr to item or create classes that extend Item */
+  /**
+   * Generate sprite for a specific item. Sets the position for the sprite if the
+   * item is on the floor.
+   */
   createSprite() {
-    switch(this.spriteName) {
-    case 'Iron Dagger':
-      this.sprite = new PIXI.Sprite(PIXI.loader.resources.shortWep.textures[this.spriteName]);
-      break;
-    case 'Wooden Shield':
-      this.sprite = new PIXI.Sprite(PIXI.loader.resources.shield.textures[this.spriteName]);
-      break;
-    case 'Iron Full Helm':
-      this.sprite = new PIXI.Sprite(PIXI.loader.resources.hat.textures[this.spriteName]);
-      break;
-    case 'Iron Boots':
-      this.sprite = new PIXI.Sprite(PIXI.loader.resources.boot.textures[this.spriteName]);
-      break;
-    default:
-      break;
-    }
+    this.sprite = new PIXI.Sprite(PIXI.loader.resources[this.category].textures[this.spriteName]);
     if(this.isOnFloor) {
       this.sprite.position.set(this.x, this.y);
     }
     this.sprite.width = this.sprite.height = this.spriteSize;
     this.floor.itemSprites.addChild(this.sprite);
+
+    // would be nice to consolidate to a function. currently not working
+    // this._textStyle = new PIXI.TextStyle({
+    //   fill: '#fff',
+    //   fontSize: 17
+    // });
+    // this.itemNameSprite = new PIXI.Text(this.spriteName, this._textStyle);
+    // /* eslint-disable-next-line no-extra-parens */
+    // this.itemNameSpriteOffset = (this.sprite.width / 2) - (this.itemNameSprite.width / 2);
+    // this.itemNameSprite.position.set(
+    //   this.sprite.position.x + this.itemNameSpriteOffset,
+    //   this.sprite.position.y - 15
+    // );
+    // this.floor.itemSprites.addChild(this.itemNameSprite);
   }
 
   /**
@@ -40,18 +42,17 @@ export default class Item extends ItemCommon {
     }
   }
 
+  /**
+   * Handle state updates from the server
+   */
   handleState(state) {
     Object.assign(this, state);
   }
 
   /**
-   * Remove an item from the itemSprites
+   * Remove an item sprite from the list of itemSprites
    */
   remove() {
     this.floor.itemSprites.removeChild(this.sprite);
-  }
-
-  _positionsEqual(pos) {
-    return this.x === pos.x && this.y === pos.y;
   }
 }

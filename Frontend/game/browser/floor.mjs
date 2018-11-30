@@ -108,18 +108,18 @@ export default class Floor extends FloorCommon {
     this._mapRenderer = this.map.createRenderer();
     this.sprite.addChild(this._mapRenderer.sprite);
 
-    for(let i = 0; i < this.monsters.length; i++) {
-      this.monsters[i].createSprite();
+    for(let monster of this.monsters) {
+      monster.createSprite();
     }
-    for(let i = 0; i < this.players.length; ++i) {
-      this.players[i].createSprite();
+    for(let player of this.players) {
+      player.createSprite();
     }
-    for(let i = 0; i < this.items.length; ++i) {
-      this.items[i].createSprite();
+    for(let item of this.items) {
+      item.createSprite();
     }
+    this.sprite.addChild(this.itemSprites);
     this.sprite.addChild(this.playerSprites);
     this.sprite.addChild(this.monsterSprites);
-    this.sprite.addChild(this.itemSprites);
   }
 
   /**
@@ -203,7 +203,9 @@ export default class Floor extends FloorCommon {
         raw.attackSpeed,
         raw.attack,
         raw.defence,
-        raw.range
+        raw.range,
+        raw.id,
+        raw.category
       );
       item.handleState(raw);
       if(raw.isOnFloor) {
