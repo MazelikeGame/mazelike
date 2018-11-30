@@ -5,6 +5,7 @@ import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
 import Player from "./player.mjs";
 import Monster from "./monster.mjs";
+import Ladder from "./ladder.mjs";
 
 export default class Floor extends FloorCommon {
   constructor(gameId, floorIdx, sock, username) {
@@ -20,6 +21,8 @@ export default class Floor extends FloorCommon {
 
     this.players = [];
     this.playerSprites = new PIXI.Container();
+
+    this.ladder = new Ladder();
   }
 
   /**
@@ -114,15 +117,17 @@ export default class Floor extends FloorCommon {
       this.players[i].createSprite();
     }
     
-    /*
-    this.map.ladder.x = spawn.x;
-    this.map.ladder.y = spawn.y;*/
+    
+    this.ladder.x = spawn.x;
+    this.ladder.y = spawn.y;
 
+    this.map.ladder = this.ladder;
+    
     console.log(this.map);
  
     this.sprite.addChild(this.playerSprites);
     this.sprite.addChild(this.monsterSprites);
-    //this.sprite.addChild(this.ladder.sprite);
+    this.sprite.addChild(this.ladder.sprite);
 
   }
 
@@ -143,7 +148,7 @@ export default class Floor extends FloorCommon {
       this._viewportY + innerHeight
     );
 
-    //this.ladder.update(this._viewportX, this._viewportY);
+    this.ladder.update(this._viewportX, this._viewportY);
   }
 
   /**
