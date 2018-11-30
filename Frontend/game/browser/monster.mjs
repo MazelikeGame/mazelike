@@ -31,7 +31,7 @@ export default class Monster extends MonsterCommon {
     this.hpNotificationSprite = new PIXI.Text("", this._textStyle2);
     this.hpNotificationSpriteOffset = (this.sprite.width / 2) - (this.hpNotificationSprite.width / 2);
     this.hpNotificationSprite.position.set(this.sprite.position.x + this.hpNotificationSpriteOffset, this.sprite.position.y - 40);
-    this.floor.playerSprites.addChild(this.hpNotificationSprite);
+    this.floor.monsterSprites.addChild(this.hpNotificationSprite);
   }
 
   /**
@@ -84,7 +84,7 @@ export default class Monster extends MonsterCommon {
    */
   remove() {
     this.floor.monsterSprites.removeChild(this.sprite);
-    this.floor.playerSprites.removeChild(this.hpNotificationSprite);
+    this.floor.monsterSprites.removeChild(this.hpNotificationSprite);
   }
   
   /**
