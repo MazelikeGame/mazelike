@@ -1,5 +1,5 @@
 /* global ml */
-/* eslint-disable no-extra-parens,max-len,curly,complexity,prefer-template, no-warning-comments, no-mixed-operators */
+/* eslint-disable max-len,curly,complexity,prefer-template, no-warning-comments, no-mixed-operators */
 /** @module Monster */
 
 // The maximum amount of ms we want a monster to walk for
@@ -174,7 +174,7 @@ export default class MonsterCommon {
         this.y = prevy;
         this.collision = true;
         let currentTime = new Date().getTime();
-        if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
+        if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 187) { // attacks max evey 0.75 seconds
           this.lastAttackTime = currentTime;
           this.attack(collisionPlayer);
         }
@@ -275,10 +275,10 @@ export default class MonsterCommon {
           } else if(j === 1) { // upper right corner
             x = entity.x + spriteSize * entity.size;
             y = entity.y;
-          } else if(j === 1) { // lower right corner
+          } else if(j === 2) { // lower right corner
             x = entity.x + spriteSize * entity.size;
             y = entity.y + spriteSize * entity.size;
-          } else if(j === 1) { // lower left corner
+          } else if(j === 3) { // lower left corner
             x = entity.x;
             y = entity.y + spriteSize * entity.size;
           }

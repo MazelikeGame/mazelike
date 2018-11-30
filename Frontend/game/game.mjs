@@ -11,6 +11,7 @@ import MobileControls from "./browser/mobile-controls.mjs";
 let msgEl = document.querySelector(".msg");
 let msgParentEl = document.querySelector(".msg-parent");
 let msgHeader = document.querySelector(".msg-header");
+let fullscreenEl = document.querySelector(".fullscreen");
 
 let gameIdMatch = location.pathname.match(/\/game\/(.+?)(?:\?|\/|$)/);
 let gameId = gameIdMatch && gameIdMatch[1];
@@ -53,6 +54,20 @@ const addArrowKeyListener = (floor, controls, username) => {
   controls.bind(handleKey.bind(null, "down"), handleKey.bind(null, "up"));
   window.addEventListener("keydown", handleKey.bind(null, "down"));
   window.addEventListener('keyup', handleKey.bind(null, "up"));
+
+  window.addEventListener("mousemove", (e) => {
+    let player = getPlayer(floor, username);
+    if(player) {
+      player.handleMouse(false, e.clientX + player.floor._viewportX, e.clientY + player.floor._viewportY);
+    }
+  });
+
+  window.addEventListener("pointerdown", (e) => {
+    let player = getPlayer(floor, username);
+    if(player) {
+      player.handleMouse(true, e.clientX + player.floor._viewportX, e.clientY + player.floor._viewportY);
+    }
+  });
 };
 
 /**
@@ -101,7 +116,32 @@ function getPlayer(floor, username) {
   });
 }
 
+let readyToPlay = new Promise((resolve) => {
+  document.querySelector(".ready").addEventListener("click", () => {
+    document.querySelector(".pregame").remove();
+    document.querySelector(".ingame").style.display = "";
+
+    // Enter fullscreen
+    if(fullscreenEl.checked) {
+      if(document.body.webkitRequestFullScreen) {
+        document.body.webkitRequestFullScreen();
+      } else if(document.body.requestFullScreen) {
+        document.body.requestFullScreen();
+      }
+    }
+
+    localStorage.fullscreen = fullscreenEl.checked;
+
+    resolve();
+  });
+});
+
+// eslint-disable-next-line
+window.localStorage || (window.localStorage = {});
+fullscreenEl.checked = localStorage.fullscreen !== "false";
+
 async function setup() {
+  await readyToPlay;
   msgEl.innerText = "Connecting to the game server";
   let addr = await (await fetch(`/game/addr/${gameId}`)).text();
 
@@ -120,8 +160,6 @@ async function setup() {
   let username = await getUsername(sock);
   msgEl.innerText = "Loading game";
   let floor;
-
-  console.log(`User: ${username}`); // eslint-disable-line
 
   if(gameId) {
     floor = await Floor.load(gameId, 0, sock, username);
@@ -178,6 +216,7 @@ async function setup() {
     gameRunning
   ]);
 
+  document.body.classList.add("crosshair");
   msgParentEl.style.display = "none";
 
   // don't run monster logic multiplayer game (for now)
@@ -205,6 +244,8 @@ async function setup() {
   app.ticker.add(() => {
     // spectator mode
     if(!isSpectator && !getPlayer(floor, username)) {
+      document.body.classList.add("dead");
+      document.body.classList.remove("crosshair");
       controls.becomeSpectator();
       isSpectator = true;
       floor.followingUser = floor.players[0] && floor.players[0].name;
@@ -238,6 +279,8 @@ async function setup() {
 
     // show game over
     if(floor.players.length === 0 && msgHeader.innerText !== "Game over") {
+      document.body.classList.remove("crosshair");
+      document.body.classList.add("dead");
       msgHeader.innerText = "Game over";
       msgEl.innerHTML = "";
       msgParentEl.style.display = "";
@@ -246,6 +289,15 @@ async function setup() {
       a.href = "/account/dashboard";
       a.innerText = "Dashboard";
       msgEl.appendChild(a);
+
+      // Exit fullscreen
+      if(localStorage.fullscreen) {
+        if(document.documentElement.webkitExitFullScreen) {
+          document.documentElement.webkitExitFullScreen();
+        } else if(document.documentElement.exitFullScreen) {
+          document.documentElement.exitFullScreen();
+        }
+      }
     }
     
     let player = getPlayer(floor, username);

@@ -3,6 +3,7 @@
 import dockerApi from "node-docker-api";
 import fs from "fs";
 import util from "util";
+import {appPort} from "../server";
 
 const ENV_NAMES = [
   "DB",
@@ -42,7 +43,7 @@ export async function spawnGame(gameEnv = {}) {
   ml.logger.debug(`Using port ${port} for game server`, ml.tags.manager);
   inUsePorts.add(port);
   portMap.set(gameEnv.gameId, port);
-  envArray.push(`MAZELIKE_port=3000`);
+  envArray.push(`MAZELIKE_port=${appPort}`);
 
   let container = await docker.container.create({
     name: hostname,
@@ -51,11 +52,11 @@ export async function spawnGame(gameEnv = {}) {
     Cmd: ["-g", "-d"],
     Env: envArray,
     ExposedPorts: {
-      [`3000/tcp`]: {}
+      [`${appPort}/tcp`]: {}
     },
     HostConfig: {
       PortBindings: {
-        [`3000/tcp`]: [{
+        [`${appPort}/tcp`]: [{
           HostPort: `${port}`
         }]
       },
