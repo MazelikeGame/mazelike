@@ -16,7 +16,12 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
     floor.map = GameMap.generate(map);
     floor.generateMonsters();
-    floor.map.ladder.x = 5;
+    
+    let randomRoom = floor.map.rooms[Math.floor(Math.random() * floor.map.rooms.length)];
+    floor.map.ladder.x = randomRoom.x;
+    floor.map.ladder.y = randomRoom.y;
+
+    console.log(randomRoom);
     return floor;
   }
 

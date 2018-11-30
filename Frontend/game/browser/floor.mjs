@@ -118,12 +118,8 @@ export default class Floor extends FloorCommon {
     }
     
     
-    this.ladder.x = spawn.x;
-    this.ladder.y = spawn.y;
-
-    this.map.ladder = this.ladder;
-    
-    console.log(this.map);
+    this.ladder.x = this.map.ladder.x;
+    this.ladder.y = this.map.ladder.y;
  
     this.sprite.addChild(this.playerSprites);
     this.sprite.addChild(this.monsterSprites);
