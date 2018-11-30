@@ -1,5 +1,5 @@
 /* global ml */
-/* eslint-disable max-len,curly,complexity,prefer-template, no-warning-comments, no-mixed-operators */
+/* eslint-disable max-len,curly,complexity,prefer-template, no-mixed-operators */
 /** @module Monster */
 
 // The maximum amount of ms we want a monster to walk for
@@ -98,8 +98,8 @@ export default class MonsterCommon {
     this.targetAquired = false;
     let minDist = -1;
     for(let player of this.floor.players) {
-      if(this.canSee(player.x, player.y) && this.canSee(player.x + player.SPRITE_SIZE * this.size, player.y + player.SPRITE_SIZE * this.size) &&
-         this.canSee(player.x + player.SPRITE_SIZE * this.size, player.y) && this.canSee(player.x, player.y + player.SPRITE_SIZE * this.size)) {
+      if(this.canSee(player.x, player.y) && this.canSee(player.x + player.SPRITE_SIZE * player.size, player.y + player.SPRITE_SIZE * player.size) &&
+         this.canSee(player.x + player.SPRITE_SIZE * player.size, player.y) && this.canSee(player.x, player.y + player.SPRITE_SIZE * player.size)) {
         this.targetAquired = true;
         if(this.findDistance(player.x, player.y) < minDist || minDist === -1) {
           this.targetx = player.x;
@@ -141,6 +141,12 @@ export default class MonsterCommon {
       // eslint-disable-next-line
       dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
     } while(!this.spriteIsOnMap() && dist > 0 && --count > 0);
+
+    // Directly moves stubborn monsters back onto the map.
+    while(!this.spriteIsOnMap() && --count > 0) {
+      this.x -= Math.cos(theta);
+      this.y -= Math.sin(theta);
+    }
 
     this.targetx = Math.floor(this.x);
     this.targety = Math.floor(this.y);

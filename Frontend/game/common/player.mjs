@@ -230,9 +230,7 @@ export default class PlayerCommon {
       this.x += frame.vx * duration;
       this.y += frame.vy * duration;
       
-      // todo wip
-      if(!this.spriteIsOnMap() || this.collisionEntities(this.floor.monsters, Monster.SPRITE_SIZE) !== -1
-      || this.collisionEntities(this.floor.players, this.SPRITE_SIZE) !== -1) {
+      if(!this.spriteIsOnMap() || this.collisionEntities(this.floor.monsters, Monster.SPRITE_SIZE) !== -1) {
         this.x = prev.x;
         this.y = prev.y;
       }
