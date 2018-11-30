@@ -20,8 +20,6 @@ export default class Floor extends FloorCommon {
 
     this.players = [];
     this.playerSprites = new PIXI.Container();
-
-    this.ladder = null;
   }
 
   /**
@@ -115,8 +113,6 @@ export default class Floor extends FloorCommon {
     for(let i = 0; i < this.players.length; ++i) {
       this.players[i].createSprite();
     }
-    console.log("----MONSTERS----");
-    console.log(this.monsters);
 
     this.sprite.addChild(this.playerSprites);
     this.sprite.addChild(this.monsterSprites);
