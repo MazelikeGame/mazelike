@@ -27,7 +27,7 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/* global ml */
-/* eslint-disable no-extra-parens,max-len,curly,complexity,prefer-template, no-warning-comments, no-mixed-operators */
+/* eslint-disable max-len,curly,complexity,prefer-template, no-warning-comments, no-mixed-operators */
 /** @module Monster */
 
 // The maximum amount of ms we want a monster to walk for
@@ -37,7 +37,7 @@ import PlayerCommon from "./player.mjs";
 import interpolate from "./interpolator.mjs";
 
 export default class MonsterCommon {
-  
+
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
     this.name = name_in;
     this.hp = hp_in;
@@ -65,10 +65,10 @@ export default class MonsterCommon {
     }
   }
 
-  /** 
+  /**
    * Returns true if monster can see given pixel coordinate.
-   * @param x 
-   * @param y 
+   * @param x
+   * @param y
    */
   canSee(x, y) {
     let x1 = -1, x2 = -1, y1 = -1, y2 = -1;
@@ -99,7 +99,7 @@ export default class MonsterCommon {
         for(let k = y1; k &lt;= y2; k += 20) {
           if(!this.floor.map.isOnMap(j, k)) {
             return false;
-          }  
+          }
         }
       }
     }
@@ -108,8 +108,8 @@ export default class MonsterCommon {
 
   /**
    * Finds distance between monster and coodinate.
-   * @param x 
-   * @param y 
+   * @param x
+   * @param y
    * @return {double}
    */
   findDistance(x, y) {
@@ -139,7 +139,7 @@ export default class MonsterCommon {
     return minDist !== -1;
   }
 
-  /**  
+  /**
    * Monster moves to an adjacent, unoccupied location.
    */
   wander() {
@@ -161,7 +161,7 @@ export default class MonsterCommon {
       // eslint-disable-next-line
       dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
     } while(this.spriteIsOnMap() &amp;&amp; dist &lt; targetDist &amp;&amp; --count > 0);
-    
+
     // Back up until we are back on the map
     do {
       this.x -= Math.cos(theta);
@@ -202,7 +202,7 @@ export default class MonsterCommon {
         this.y = prevy;
         this.collision = true;
         let currentTime = new Date().getTime();
-        if(collisionPlayer !== -1 &amp;&amp; currentTime - this.lastAttackTime >= 750) { // attacks max evey 0.75 seconds
+        if(collisionPlayer !== -1 &amp;&amp; currentTime - this.lastAttackTime >= 187) { // attacks max evey 0.75 seconds
           this.lastAttackTime = currentTime;
           this.attack(collisionPlayer);
         }
@@ -212,7 +212,7 @@ export default class MonsterCommon {
     }
   }
 
-  /** 
+  /**
    * Moves monster.
    * If PC has been seen, move strategically towards last seen location.
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
@@ -236,7 +236,7 @@ export default class MonsterCommon {
     }
   }
 
-  /** 
+  /**
    * Player attacks Monster
    * @param {*} hp health points that the monster's health decrements by
    */
@@ -245,10 +245,10 @@ export default class MonsterCommon {
     if(this.hp &lt;= 0) {
       this.die();
     }
-    ml.logger.verbose(`Monster ${this.id} was attached with ${hp} damage (hp: ${this.hp})`, ml.tags.monster);
+    ml.logger.verbose(`Monster ${this.id} was attacked with ${hp} damage (hp: ${this.hp})`, ml.tags.monster);
   }
 
-  /** 
+  /**
    * Monster attacks PC
    * @param {*} playerID id for player that monster is attacking
    */
@@ -256,7 +256,7 @@ export default class MonsterCommon {
     this.floor.players[playerID].beAttacked(this.damage);
   }
 
-  /** 
+  /**
    * Places monster in a random "room" with no other monsters.
    */
   placeInRandomRoom() {
@@ -267,9 +267,9 @@ export default class MonsterCommon {
         this.placeInRandomRoom();
       }
     }
-    let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].width); 
+    let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].width);
     this.x = this.floor.map.rooms[this.initialRoom].x + randomDiffX;
-    let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].height); 
+    let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].height);
     this.y = this.floor.map.rooms[this.initialRoom].y + randomDiffY;
     if(!this.spriteIsOnMap())
       this.placeInRandomRoom();
@@ -280,7 +280,7 @@ export default class MonsterCommon {
    * @returns {boolean}
    */
   spriteIsOnMap() {
-    return this.floor.map.isOnMap(this.x, this.y) &amp;&amp; this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y) 
+    return this.floor.map.isOnMap(this.x, this.y) &amp;&amp; this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y)
     &amp;&amp; this.floor.map.isOnMap(this.x, this.y + MonsterCommon.SPRITE_SIZE * this.size) &amp;&amp; this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y + MonsterCommon.SPRITE_SIZE * this.size);
   }
 
@@ -330,7 +330,8 @@ export default class MonsterCommon {
   }
 }
 
-MonsterCommon.SPRITE_SIZE = 48;</code></pre>
+MonsterCommon.SPRITE_SIZE = 48;
+</code></pre>
         </article>
     </section>
 
@@ -340,13 +341,13 @@ MonsterCommon.SPRITE_SIZE = 48;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_Item.html">backend/game/Item</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Item.html">Item</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Item.html">Item</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#disconnectPlayer">disconnectPlayer</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#removePlayer">removePlayer</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 26 2018 19:12:15 GMT+0000 (UTC)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Nov 30 2018 10:48:49 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

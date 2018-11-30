@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Backend/session-store.mjs</title>
+    <title>JSDoc: Module: backend/game/Item</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,97 +17,214 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Backend/session-store.mjs</h1>
+    <h1 class="page-title">Module: backend/game/Item</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>import sql from "./sequelize";
-import Sequelize from "sequelize";
-import expressSession from "express-session";
+        
+    
+</header>
 
-// define a model for the sessions
-let Session = sql.define("sessions", {
-  id: {
-    primaryKey: true,
-    type: Sequelize.STRING
-  },
-  session: Sequelize.JSON
-});
+<article>
+    <div class="container-overview">
+    
+        
 
-/**
- * Get a session from the db
- * @param sid The session id
- */
-async function get(sid) {
-  let dbSession = await Session.findByPk(sid);
+        
+    
+    </div>
 
-  return dbSession &amp;&amp; dbSession.session;
-}
+    
 
-/**
- * Store a session in the db
- * @param sid The session id
- * @param session The session data
- */
-async function set(sid, session) {
-  let dbSession = await Session.findByPk(sid);
+    
 
-  if(dbSession) {
-    dbSession.update({
-      session
-    });
-  } else {
-    Session.create({
-      id: sid,
-      session
-    });
-  }
-}
+    
 
-/**
- * Destroy a session
- * @param sid The session id
- */
-async function destroy(sid) {
-  let dbSession = await Session.findByPk(sid);
+    
 
-  if(dbSession) {
-    await dbSession.destroy();
-  }
-}
+    
 
-/**
- * Convert a function that returns a promise into a function that
- * calls a callback
- * @param fn 
- */
-function callbackify(fn) {
-  return async(...args) => {
-    let callback = args.pop();
+    
 
-    try {
-      callback(null, await fn(...args));
-    } catch(err) {
-      callback(err);
-    }
-  };
-}
+    
 
-// Create the session store for express-session
-let sessionStore = Object.assign(new expressSession.Store(), {
-  get: callbackify(get),
-  set: callbackify(set),
-  destroy: callbackify(destroy)
-});
+    
+        <h3 class="subsection-title">Methods</h3>
 
-export default sessionStore;</code></pre>
-        </article>
-    </section>
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".saveAll"><span class="type-signature">(async, static) </span>saveAll<span class="signature">(floor, create)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Saves items to the database.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>floor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Floor</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The floor the items are on</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>create</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Create new item rows</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Backend_game_item.mjs.html">Backend/game/item.mjs</a>, <a href="Backend_game_item.mjs.html#line49">line 49</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

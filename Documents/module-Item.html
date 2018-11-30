@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: module:common/game-map/Room</title>
+    <title>JSDoc: Class: module:Item</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: module:common/game-map/Room</h1>
+    <h1 class="page-title">Class: module:Item</h1>
 
     
 
@@ -28,9 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>module:common/game-map/Room<span class="signature">(i, x, y, width, height, mapParams)</span><span class="type-signature"></span></h2>
-        
-            <div class="class-description">A room in the maze</div>
+        <h2><span class="attribs"><span class="type-signature"></span></span>module:Item<span class="signature">(floor, spriteName, spriteSize, movementSpeed, attackSpeed, attack, defence, range, id, category, accuracy, attackStyle)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,20 +39,14 @@
         
 
     
-    <h2>Constructor</h2>
+
+    
+    <h4 class="name" id="module:Item"><span class="type-signature"></span>new module:Item<span class="signature">(floor, spriteName, spriteSize, movementSpeed, attackSpeed, attack, defence, range, id, category, accuracy, attackStyle)</span><span class="type-signature"></span></h4>
     
 
     
-    <h4 class="name" id="module:common/game-map/Room"><span class="type-signature"></span>new module:common/game-map/Room<span class="signature">(i, x, y, width, height, mapParams)</span><span class="type-signature"></span></h4>
-    
-
-    
 
 
-
-<div class="description">
-    <span style="color: red;">Constructor is private.</span>See GameMap.rooms or GameMap.getRect for instances of Room.
-</div>
 
 
 
@@ -89,152 +81,13 @@
 
         <tr>
             
-                <td class="name"><code>i</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The index of the room</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>y</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>mapParams</code></td>
-            
-
-            <td class="type">
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>floor</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">floor</span>
 
 
             
@@ -244,83 +97,14 @@
 
             
 
-            <td class="description last">X coordinate of the room</td>
+            <td class="description last">Floor that this item exists on</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>y</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Y coordinate of the room</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Width coordinate of the room</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Height coordinate of the room</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>spriteName</code></td>
             
 
             <td class="type">
@@ -336,12 +120,244 @@
 
             
 
-            <td class="description last">Always room</td>
+            <td class="description last">Name of the sprite.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>spriteSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Size of the sprite.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>movementSpeed</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Bonus to movementSpeed applied to player.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>attackSpeed</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Bonus to attackSpeed applied to player.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>attack</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Bonus to attack applied to player.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>defence</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Bonus to defence applied to player.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>range</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Bonus to range applied to player.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>category</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The resource category for the sprite</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>accuracy</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Angle or width of the semi-circle or rectangle for attacking</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>attackStyle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Could be ranged or melee, or null if not a weapon</td>
         </tr>
 
     
     </tbody>
 </table>
+
+
 
 
 
@@ -375,7 +391,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_game-map_room.mjs.html">Frontend/game/common/game-map/room.mjs</a>, <a href="Frontend_game_common_game-map_room.mjs.html#line13">line 13</a>
+        <a href="Frontend_game_common_item.mjs.html">Frontend/game/common/item.mjs</a>, <a href="Frontend_game_common_item.mjs.html#line18">line 18</a>
     </li></ul></dd>
     
 
@@ -419,18 +435,33 @@
     
 
     
-        <h3 class="subsection-title">Members</h3>
+
+    
+        <h3 class="subsection-title">Methods</h3>
 
         
             
-<h4 class="name" id="above"><span class="type-signature"></span>above<span class="type-signature"></span></h4>
 
+    
+
+    
+    <h4 class="name" id="createSprite"><span class="type-signature"></span>createSprite<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
 
 
 
 <div class="description">
-    Get the room above this one (if one exists)
+    Generate sprite for a specific item. Sets the position for the sprite if the
+item is on the floor.
 </div>
+
+
+
+
+
+
 
 
 
@@ -467,7 +498,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_game-map_room.mjs.html">Frontend/game/common/game-map/room.mjs</a>, <a href="Frontend_game_common_game-map_room.mjs.html#line74">line 74</a>
+        <a href="Frontend_game_browser_item.mjs.html">Frontend/game/browser/item.mjs</a>, <a href="Frontend_game_browser_item.mjs.html#line11">line 11</a>
     </li></ul></dd>
     
 
@@ -483,16 +514,40 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
         
             
-<h4 class="name" id="below"><span class="type-signature"></span>below<span class="type-signature"></span></h4>
 
+    
+
+    
+    <h4 class="name" id="getPosition"><span class="type-signature"></span>getPosition<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
+    
+
+    
 
 
 
 <div class="description">
-    Get the room below this one (if one exists)
+    Get the position of the item. Returns null if not on the floor or in a player's inventory
 </div>
+
+
+
+
+
+
 
 
 
@@ -529,7 +584,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_game-map_room.mjs.html">Frontend/game/common/game-map/room.mjs</a>, <a href="Frontend_game_common_game-map_room.mjs.html#line82">line 82</a>
+        <a href="Frontend_game_common_item.mjs.html">Frontend/game/common/item.mjs</a>, <a href="Frontend_game_common_item.mjs.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -545,16 +600,58 @@
 
 
 
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
         
             
-<h4 class="name" id="corridors"><span class="type-signature"></span>corridors<span class="type-signature"></span></h4>
 
+    
+
+    
+    <h4 class="name" id="getSpriteSize"><span class="type-signature"></span>getSpriteSize<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
 
 
 
 <div class="description">
-    All corridors connected to this room
+    Get the size of the sprite for this item.
 </div>
+
+
+
+
+
+
 
 
 
@@ -591,7 +688,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_game-map_room.mjs.html">Frontend/game/common/game-map/room.mjs</a>, <a href="Frontend_game_common_game-map_room.mjs.html#line50">line 50</a>
+        <a href="Frontend_game_common_item.mjs.html">Frontend/game/common/item.mjs</a>, <a href="Frontend_game_common_item.mjs.html#line74">line 74</a>
     </li></ul></dd>
     
 
@@ -607,16 +704,40 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
         
             
-<h4 class="name" id="left"><span class="type-signature"></span>left<span class="type-signature"></span></h4>
 
+    
+
+    
+    <h4 class="name" id="handleState"><span class="type-signature"></span>handleState<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
 
 
 
 <div class="description">
-    Get the room to the left of this one (if one exists)
+    Handle state updates from the server
 </div>
+
+
+
+
+
+
 
 
 
@@ -653,7 +774,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_game-map_room.mjs.html">Frontend/game/common/game-map/room.mjs</a>, <a href="Frontend_game_common_game-map_room.mjs.html#line58">line 58</a>
+        <a href="Frontend_game_browser_item.mjs.html">Frontend/game/browser/item.mjs</a>, <a href="Frontend_game_browser_item.mjs.html#line48">line 48</a>
     </li></ul></dd>
     
 
@@ -669,16 +790,40 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
         
             
-<h4 class="name" id="right"><span class="type-signature"></span>right<span class="type-signature"></span></h4>
 
+    
+
+    
+    <h4 class="name" id="remove"><span class="type-signature"></span>remove<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
 
 
 
 <div class="description">
-    Get the room to the right of this one (if one exists)
+    Remove an item sprite from the list of itemSprites
 </div>
+
+
+
+
+
+
 
 
 
@@ -715,7 +860,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Frontend_game_common_game-map_room.mjs.html">Frontend/game/common/game-map/room.mjs</a>, <a href="Frontend_game_common_game-map_room.mjs.html#line66">line 66</a>
+        <a href="Frontend_game_browser_item.mjs.html">Frontend/game/browser/item.mjs</a>, <a href="Frontend_game_browser_item.mjs.html#line55">line 55</a>
     </li></ul></dd>
     
 
@@ -731,9 +876,325 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
         
+            
+
     
 
+    
+    <h4 class="name" id="setCoordinates"><span class="type-signature"></span>setCoordinates<span class="signature">(x, y)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Set coordinates for this item
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">new x-coordiante,</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">new y-coordinate</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_common_item.mjs.html">Frontend/game/common/item.mjs</a>, <a href="Frontend_game_common_item.mjs.html#line65">line 65</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(viewX, viewY)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Update the sprite's position for all items on the floor
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>viewX</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>viewY</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Frontend_game_browser_item.mjs.html">Frontend/game/browser/item.mjs</a>, <a href="Frontend_game_browser_item.mjs.html#line39">line 39</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     
 
     

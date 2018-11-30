@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Frontend/game/browser/player-list.js</title>
+    <title>JSDoc: Source: Frontend/game/browser/disconnect-msg.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Frontend/game/browser/player-list.js</h1>
+    <h1 class="page-title">Source: Frontend/game/browser/disconnect-msg.js</h1>
 
     
 
@@ -27,173 +27,56 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/*global PIXI*/
-
-/**
- * A list of players that displays information about each player.
- */
-export default class PlayerList {
-
-  constructor() {
-    this.floor = null;
-    this.listOfPlayers = [];
-
+export default class DiconnectMessage {
+  constructor(msg) {
+    this.msg = msg;
     this.graphics = new PIXI.Graphics();
-    this.playerBoxes = new Map();
-    this.hpBoxes = new Map();
+    this.disconnectBox = new PIXI.Graphics();
   }
 
   /**
-   * Renders the player list.
+   * Renders the disconnect message.
    */
   render() {
-    this.listOfPlayers.forEach((player, index) => {
-      this.drawPlayerInfo(index, player); //change this to match player.getHp() in the future
-    });
-
+    this.draw();
     return this.graphics;
   }
 
   /**
-   * Draws the player's information to the player list.
-   * @param {int} id the index of the player
-   * @param {string} player the player being drawn
+   * Resizes the disconnect box when the window is resized.
    */
-  drawPlayerInfo(id, player) {  
-    let playerBox = new PIXI.Graphics();
-    let offset = 40; //Space between each player information box.
+  resize() {
+    this.disconnectBox.position.set(window.innerWidth - 310, 10); //eslint-disable-line
+  }
 
-    //Black background
+  /**
+   * Creates the elements of the disconnect message in PIXI.
+   */
+  draw() {  
+    //Black background with white border
     let outline = new PIXI.Graphics();
     outline.beginFill(0x000000);
-    outline.fillAlpha = this.floor.followingUser === player.name ? 0.85 : 0.7;
+    outline.fillAlpha = 0.75;
     outline.lineStyle(2, 0xFFFFFFF, 1);
     outline.drawRect(0, 0, 300, 30);
-    outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
+    outline.position.set(0, 0); //eslint-disable-line
     outline.endFill();
-    playerBox.addChild(outline);
+    this.disconnectBox.addChild(outline);
 
-    this._playerNameStyle = new PIXI.TextStyle({
+    this._disconnectMessageStyle = new PIXI.TextStyle({
       fill: "#fff",
       fontSize: 16
     });
     
-    //Player name
-    let playerName = new PIXI.Text(this.checkNameLength(player.name), this._playerNameStyle);
-    playerName.position.set(35, 15 + (id * offset)); //eslint-disable-line
-    playerBox.addChild(playerName);
-
-    //Health bar red
-    let healthRedBar = new PIXI.Graphics();
-    healthRedBar.beginFill(0xFF0000);
-    healthRedBar.drawRect(0, 0, 100, 10);
-    healthRedBar.position.set(200, 15 + (id * offset)); //eslint-disable-line
-    healthRedBar.endFill();
-
-    playerBox.addChild(healthRedBar);
-
-    //Health bar green
-    let healthGreenBar = new PIXI.Graphics();
-    healthGreenBar.beginFill(0x7CFC00);
-    healthGreenBar.drawRect(0, 0, player.getHp(), 10);
-    healthGreenBar.position.set(200, 15 + (id * offset));//eslint-disable-line
-    healthGreenBar.endFill();
-
-    playerBox.addChild(healthGreenBar);
-
-    //Health Text
-    this._hpTextStyle = new PIXI.TextStyle({
-      fill: "#FFFFFF",
-      fontSize: 12
-    });
-
-    let healthText = new PIXI.Text(`Health: ${player.getHp()}`, this._hpTextStyle);
-    healthText.position.set(200, 25 + (id * offset)); //eslint-disable-line
-    playerBox.addChild(healthText);
-
-    this.graphics.addChild(playerBox);
-    this.playerBoxes.set(player.name, playerBox); //Stores the playerBox for future access accessible by username.
-    this.hpBoxes.set(player.name, {
-      text: healthText,
-      greenBar: healthGreenBar,
-      redBar: healthRedBar
-    });
+    //Disconnect Message
+    let msg = new PIXI.Text(this.msg, this._disconnectMessageStyle);
+    msg.position.set(15, 5); //eslint-disable-line
+    this.disconnectBox.addChild(msg);
+    this.graphics.addChild(this.disconnectBox);
   }
 
-  /**
-   * Updates the player list for each player.
-   */
-  update() { 
-    let index = 0;
-    this.playerBoxes.forEach((value, key) => {
-      let name = key;
-      let hp = 0;
-      let hpMax = 0;
-
-      for(let player of this.listOfPlayers) {
-        if(key === player.name) {
-          name = player.name;
-          hp = player.getHp();
-          hpMax = player.hpMax;
-          break;
-        }
-      }
-
-      let offset = 40; //Space between each player information box.
-      let hpBox = this.hpBoxes.get(name);
-      
-      if(hp &lt;= 0) {
-        hpBox.text.text = `DEAD`;
-      } else {
-        hpBox.text.text = `Health: ${hp}`;
-      }
-
-      //Health bar red
-      hpBox.redBar.clear();
-      hpBox.redBar.beginFill(0xFF0000);
-      hpBox.redBar.drawRect(0, 0, 100, 10);
-      hpBox.redBar.position.set(200, 15 + (index * offset)); //eslint-disable-line
-      hpBox.redBar.endFill();
-
-      //Health bar green
-      hpBox.greenBar.clear();
-      hpBox.greenBar.beginFill(0x7CFC00);
-      hpBox.greenBar.drawRect(0, 0, hp >= 0 ? hp / hpMax * 100 : 0, 10);
-      hpBox.greenBar.position.set(200, 15 + (index * offset));//eslint-disable-line
-      hpBox.greenBar.endFill();
-
-      index++;
-    });
-  }
-  
-  /**
-   * Removes the player from the list
-   * @param {string} username 
-   */
-  removePlayer(username) {
-    this.listOfPlayers.splice(this.listOfPlayers.indexOf(username), 1);
-  }
-
-  /**
-   * Updates the player list to show a player disconnected.
-   * @param {string} username 
-   */
-  disconnectPlayer(username) {
-    let tempPlayerBox = this.playerBoxes.get(username);
-    tempPlayerBox.alpha = 0.35;
-  }
-
-  /**
-   * Checks the player's name length.
-   * @param {string} playerName the name of player you want to check
-   */
-  checkNameLength(playerName) {
-    if(playerName.length >= 18) {
-      playerName = playerName.substring(0, 18) + "..."; //eslint-disable-line
-    }
-
-    return playerName;
-  }
-}</code></pre>
+}
+</code></pre>
         </article>
     </section>
 

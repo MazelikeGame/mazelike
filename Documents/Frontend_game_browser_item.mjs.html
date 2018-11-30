@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Backend/session-store.mjs</title>
+    <title>JSDoc: Source: Frontend/game/browser/item.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Backend/session-store.mjs</h1>
+    <h1 class="page-title">Source: Frontend/game/browser/item.mjs</h1>
 
     
 
@@ -26,86 +26,65 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import sql from "./sequelize";
-import Sequelize from "sequelize";
-import expressSession from "express-session";
+            <pre class="prettyprint source linenums"><code>/* global PIXI */
+import ItemCommon from '../common/item.mjs';
 
-// define a model for the sessions
-let Session = sql.define("sessions", {
-  id: {
-    primaryKey: true,
-    type: Sequelize.STRING
-  },
-  session: Sequelize.JSON
-});
+/** @module Item */
 
-/**
- * Get a session from the db
- * @param sid The session id
- */
-async function get(sid) {
-  let dbSession = await Session.findByPk(sid);
-
-  return dbSession &amp;&amp; dbSession.session;
-}
-
-/**
- * Store a session in the db
- * @param sid The session id
- * @param session The session data
- */
-async function set(sid, session) {
-  let dbSession = await Session.findByPk(sid);
-
-  if(dbSession) {
-    dbSession.update({
-      session
-    });
-  } else {
-    Session.create({
-      id: sid,
-      session
-    });
-  }
-}
-
-/**
- * Destroy a session
- * @param sid The session id
- */
-async function destroy(sid) {
-  let dbSession = await Session.findByPk(sid);
-
-  if(dbSession) {
-    await dbSession.destroy();
-  }
-}
-
-/**
- * Convert a function that returns a promise into a function that
- * calls a callback
- * @param fn 
- */
-function callbackify(fn) {
-  return async(...args) => {
-    let callback = args.pop();
-
-    try {
-      callback(null, await fn(...args));
-    } catch(err) {
-      callback(err);
+export default class Item extends ItemCommon {
+  /**
+   * Generate sprite for a specific item. Sets the position for the sprite if the
+   * item is on the floor.
+   */
+  createSprite() {
+    this.sprite = new PIXI.Sprite(PIXI.loader.resources[this.category].textures[this.spriteName]);
+    if(this.isOnFloor) {
+      this.sprite.position.set(this.x, this.y);
     }
-  };
+    this.sprite.width = this.sprite.height = this.spriteSize;
+    this.floor.itemSprites.addChild(this.sprite);
+
+    // would be nice to consolidate to a function. currently not working
+    // this._textStyle = new PIXI.TextStyle({
+    //   fill: '#fff',
+    //   fontSize: 17
+    // });
+    // this.itemNameSprite = new PIXI.Text(this.spriteName, this._textStyle);
+    // /* eslint-disable-next-line no-extra-parens */
+    // this.itemNameSpriteOffset = (this.sprite.width / 2) - (this.itemNameSprite.width / 2);
+    // this.itemNameSprite.position.set(
+    //   this.sprite.position.x + this.itemNameSpriteOffset,
+    //   this.sprite.position.y - 15
+    // );
+    // this.floor.itemSprites.addChild(this.itemNameSprite);
+  }
+
+  /**
+   * Update the sprite's position for all items on the floor
+   * @param viewX
+   * @param viewY
+   */
+  update(viewX, viewY) {
+    if(this.isOnFloor) {
+      this.sprite.position.set(this.x - viewX, this.y - viewY);
+    }
+  }
+
+  /**
+   * Handle state updates from the server
+   */
+  handleState(state) {
+    Object.assign(this, state);
+  }
+
+  /**
+   * Remove an item sprite from the list of itemSprites
+   */
+  remove() {
+    this.floor.itemSprites.removeChild(this.sprite);
+  }
 }
-
-// Create the session store for express-session
-let sessionStore = Object.assign(new expressSession.Store(), {
-  get: callbackify(get),
-  set: callbackify(set),
-  destroy: callbackify(destroy)
-});
-
-export default sessionStore;</code></pre>
+</code></pre>
         </article>
     </section>
 

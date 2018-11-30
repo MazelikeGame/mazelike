@@ -26,7 +26,7 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/* eslint-disable no-extra-parens, max-len, complexity, prefer-template */
+            <pre class="prettyprint source linenums"><code>/* eslint-disable max-len, complexity, prefer-template */
 /* global PIXI */
 import PlayerCommon from "../common/player.mjs";
 import interpolate from "../common/interpolator.mjs";
@@ -44,6 +44,7 @@ export default class Player extends PlayerCommon {
     
     this.tinted = -1;
     this.hpDamageTaken = -1;
+    this._attackSprite = new PIXI.Graphics();
   }
 
   /**
@@ -107,6 +108,7 @@ export default class Player extends PlayerCommon {
         this.hpNotificationSprite.setText();
       }
     }
+    this._attackFrame(this.x - viewX, this.y - viewY);
   }
 
   /**
@@ -164,6 +166,72 @@ export default class Player extends PlayerCommon {
       this.hpDamageTaken = oldHP - this.hp;
     }
   }
+
+  /**
+   * Start the attack animation
+   */
+  animateAttack(attackingAt) {
+    this._attackingAt = attackingAt;
+    this._attackStart = Date.now();
+  }
+
+  /**
+   * Render a single frame in the attack animation
+   */
+  _attackFrame(x, y) {
+    if(this._attackingAt !== undefined) {
+      this.floor.attackSprites.removeChild(this._attackSprite);
+
+      let percComplete = (Date.now() - this._attackStart) / PlayerCommon.ATTACK_TIME;
+
+      if(percComplete > 1) {
+        this._attackingAt = undefined;
+        return;
+      }
+
+      this._attackSprite = new PIXI.Graphics();
+      this.floor.attackSprites.addChild(this._attackSprite);
+
+      if(this.attackType === "rectangle") {
+        this._attackFrameRect(x, y, percComplete);
+      } else {
+        this._attackFrameArc(x, y, percComplete);
+      }
+    }
+  }
+
+  /**
+   * Render a single frame in the attack arc animation
+   */
+  _attackFrameArc(x, y, percComplete) {
+    let start = this._attackingAt - (this.attackAngle / 2) + (this.attackAngle * percComplete) - (Math.PI / 32);
+    let end = start + (Math.PI / 16);
+
+    this._attackSprite.moveTo(0, 0);
+    this._attackSprite.beginFill(this._attackColor || 0xcccccc);
+    this._attackSprite.lineStyle(0, 0x0);
+    this._attackSprite.arc(0, 0, this.range, start, end);
+    this._attackSprite.lineTo(0, 0);
+    this._attackSprite.alpha = 0.8;
+    this._attackSprite.position.set(x + (PlayerCommon.SPRITE_SIZE / 2), y + (PlayerCommon.SPRITE_SIZE / 2));
+  }
+
+  /**
+   * Render a single frame in the attack rect animation
+   */
+  _attackFrameRect(x, y, percComplete) {
+    let offset = PlayerCommon.SPRITE_SIZE / 2;
+    this._attackSprite.position.set(x + offset, y + offset);
+    this._attackSprite.lineStyle(7, this._attackColor || 0xcccccc);
+    this._attackSprite.alpha = 0.7;
+
+    let length = this.range * percComplete;
+    this._attackSprite.moveTo(0, 0);
+    this._attackSprite.lineTo(
+      length * Math.cos(this._attackingAt),
+      length * Math.sin(this._attackingAt)
+    );
+  }
 }
 </code></pre>
         </article>
@@ -175,13 +243,13 @@ export default class Player extends PlayerCommon {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_Item.html">backend/game/Item</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Item.html">Item</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Item.html">Item</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#disconnectPlayer">disconnectPlayer</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#removePlayer">removePlayer</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 26 2018 19:12:15 GMT+0000 (UTC)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Nov 30 2018 10:48:49 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

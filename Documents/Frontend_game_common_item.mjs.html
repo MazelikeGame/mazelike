@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Backend/session-store.mjs</title>
+    <title>JSDoc: Source: Frontend/game/common/item.mjs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Backend/session-store.mjs</h1>
+    <h1 class="page-title">Source: Frontend/game/common/item.mjs</h1>
 
     
 
@@ -26,86 +26,84 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import sql from "./sequelize";
-import Sequelize from "sequelize";
-import expressSession from "express-session";
+            <pre class="prettyprint source linenums"><code>/** @module Item **/
 
-// define a model for the sessions
-let Session = sql.define("sessions", {
-  id: {
-    primaryKey: true,
-    type: Sequelize.STRING
-  },
-  session: Sequelize.JSON
-});
-
-/**
- * Get a session from the db
- * @param sid The session id
- */
-async function get(sid) {
-  let dbSession = await Session.findByPk(sid);
-
-  return dbSession &amp;&amp; dbSession.session;
-}
-
-/**
- * Store a session in the db
- * @param sid The session id
- * @param session The session data
- */
-async function set(sid, session) {
-  let dbSession = await Session.findByPk(sid);
-
-  if(dbSession) {
-    dbSession.update({
-      session
-    });
-  } else {
-    Session.create({
-      id: sid,
-      session
-    });
+export default class Item {
+  /**
+   * @param {floor} floor - Floor that this item exists on
+   * @param {string} spriteName - Name of the sprite.
+   * @param {int} spriteSize - Size of the sprite.
+   * @param {int} movementSpeed - Bonus to movementSpeed applied to player.
+   * @param {int} attackSpeed - Bonus to attackSpeed applied to player.
+   * @param {int} attack - Bonus to attack applied to player.
+   * @param {int} defence - Bonus to defence applied to player.
+   * @param {int} range - Bonus to range applied to player.
+   * @param {int} id
+   * @param {string} category - The resource category for the sprite
+   * @param {int} accuracy - Angle or width of the semi-circle or rectangle for attacking
+   * @param {string} attackStyle - Could be ranged or melee, or null if not a weapon
+   */
+  constructor(
+    floor,
+    spriteName,
+    spriteSize,
+    movementSpeed,
+    attackSpeed,
+    attack,
+    defence,
+    range,
+    id,
+    category,
+    accuracy,
+    attackStyle
+  ) {
+    this.floor = floor;
+    this.spriteName = spriteName;
+    this.spriteSize = spriteSize;
+    this.movementSpeed = movementSpeed;
+    this.attackSpeed = attackSpeed;
+    this.attack = attack;
+    this.defence = defence;
+    this.range = range;
+    this.id = id;
+    this.category = category;
+    this.accruacy = accuracy;
+    this.attackStyle = attackStyle;
+    this.x = null;
+    this.y = null;
+    this.isOnFloor = false;
   }
-}
 
-/**
- * Destroy a session
- * @param sid The session id
- */
-async function destroy(sid) {
-  let dbSession = await Session.findByPk(sid);
-
-  if(dbSession) {
-    await dbSession.destroy();
-  }
-}
-
-/**
- * Convert a function that returns a promise into a function that
- * calls a callback
- * @param fn 
- */
-function callbackify(fn) {
-  return async(...args) => {
-    let callback = args.pop();
-
-    try {
-      callback(null, await fn(...args));
-    } catch(err) {
-      callback(err);
+  /**
+   * Get the position of the item. Returns null if not on the floor or in a player's inventory
+   * @return {object}
+   */
+  getPosition() {
+    if(!this.isOnFloor) {
+      return null;
     }
-  };
+    return { x: this.x, y: this.y };
+  }
+
+  /**
+   * Set coordinates for this item
+   * @param {int} x - new x-coordiante,
+   * @param {int} y - new y-coordinate
+   */
+  setCoordinates(x, y) {
+    this.x = x;
+    this.y = y;
+    this.isOnFloor = true;
+  }
+
+  /**
+   * Get the size of the sprite for this item.
+   */
+  getSpriteSize() {
+    return this.spriteSize;
+  }
 }
-
-// Create the session store for express-session
-let sessionStore = Object.assign(new expressSession.Store(), {
-  get: callbackify(get),
-  set: callbackify(set),
-  destroy: callbackify(destroy)
-});
-
-export default sessionStore;</code></pre>
+</code></pre>
         </article>
     </section>
 

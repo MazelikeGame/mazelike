@@ -2,13 +2,18 @@
 
 export default class Item {
   /**
-   * @param {string} spriteName - Required. Name of the sprite.
-   * @param {int} spriteSize - Required. Size of the sprite.
+   * @param {floor} floor - Floor that this item exists on
+   * @param {string} spriteName - Name of the sprite.
+   * @param {int} spriteSize - Size of the sprite.
    * @param {int} movementSpeed - Bonus to movementSpeed applied to player.
    * @param {int} attackSpeed - Bonus to attackSpeed applied to player.
    * @param {int} attack - Bonus to attack applied to player.
    * @param {int} defence - Bonus to defence applied to player.
    * @param {int} range - Bonus to range applied to player.
+   * @param {int} id
+   * @param {string} category - The resource category for the sprite
+   * @param {int} accuracy - Angle or width of the semi-circle or rectangle for attacking
+   * @param {string} attackStyle - Could be ranged or melee, or null if not a weapon
    */
   constructor(
     floor,
@@ -27,7 +32,7 @@ export default class Item {
     this.floor = floor;
     this.spriteName = spriteName;
     this.spriteSize = spriteSize;
-    this.movementSpeed = movementSpeed || 0;
+    this.movementSpeed = movementSpeed;
     this.attackSpeed = attackSpeed;
     this.attack = attack;
     this.defence = defence;
