@@ -116,8 +116,7 @@ export default class Floor extends FloorCommon {
     for(let i = 0; i < this.players.length; ++i) {
       this.players[i].createSprite();
     }
-    
-    
+
     this.ladder.x = this.map.ladder.x;
     this.ladder.y = this.map.ladder.y;
  
