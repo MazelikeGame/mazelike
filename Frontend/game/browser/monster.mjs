@@ -1,4 +1,4 @@
-/* eslint-disable max-len,curly,complexity,prefer-template, no-warning-comments */
+/* eslint-disable max-len,curly,complexity,prefer-template */
 /* global PIXI */
 /** @module Monster */
 
@@ -20,6 +20,18 @@ export default class Monster extends MonsterCommon {
     this.sprite.height = MonsterCommon.SPRITE_SIZE * this.size;
     this.floor.monsterSprites.addChild(this.sprite);
     this.regularTint = this.sprite.tint;
+  
+    this._textStyle2 = new PIXI.TextStyle({
+      fill: "#ff0000",
+      fontSize: 24,
+      fontFamily: "Tahoma",
+      fontWeight: "bold"
+    });
+
+    this.hpNotificationSprite = new PIXI.Text("", this._textStyle2);
+    this.hpNotificationSpriteOffset = (this.sprite.width / 2) - (this.hpNotificationSprite.width / 2);
+    this.hpNotificationSprite.position.set(this.sprite.position.x + this.hpNotificationSpriteOffset, this.sprite.position.y - 40);
+    this.floor.monsterSprites.addChild(this.hpNotificationSprite);
   }
 
   /**
@@ -29,17 +41,30 @@ export default class Monster extends MonsterCommon {
    */
   update(viewX, viewY) {
     let now = Date.now();
+    let prevx = this.x;
+    let prevy = this.y;
     this.move(this._lastMove - now);
     this._lastMove = now;
     this.sprite.position.set(this.x - viewX, this.y - viewY);
+    this.hpNotificationSprite.position.set(this.x - viewX + this.hpNotificationSpriteOffset, this.y - viewY - 25);
     if(this.tinted !== -1) {
       if(this.sprite.tint === this.regularTint) {
         this.tint();
+        this.hpDamageTaken = Math.abs(this.hpDamageTaken) * -1;
+        this.hpNotificationSprite.setText(this.hpDamageTaken);
+        this.hpNotificationSpriteOffset = (this.sprite.width / 2) - (this.hpNotificationSprite.width / 2);
       }
-      if(new Date().getTime() - this.tinted > 100) {
+      if(new Date().getTime() - this.tinted > 200) {
         this.tinted = -1;
         this.untint();
+        this.hpNotificationSprite.setText();
       }
+    }
+    if(this.collisionEntities(this.floor.monsters, this.SPRITE_SIZE) >= -1 || this.collisionEntities(this.floor.players, this.floor.players[0].SPRITE_SIZE) >= -1) {
+      this.x = prevx;
+      this.y = prevy;
+      this.sprite.position.set(this.x - viewX, this.y - viewY);
+      this.hpNotificationSprite.position.set(this.x - viewX + this.hpNotificationSpriteOffset, this.y - viewY - 25);
     }
   }
 
@@ -58,6 +83,7 @@ export default class Monster extends MonsterCommon {
     }
     if(oldHP !== this.hp) {
       this.tinted = new Date().getTime();
+      this.hpDamageTaken = oldHP - this.hp;
     }
   }
 
@@ -67,6 +93,7 @@ export default class Monster extends MonsterCommon {
    */
   remove() {
     this.floor.monsterSprites.removeChild(this.sprite);
+    this.floor.monsterSprites.removeChild(this.hpNotificationSprite);
   }
   
   /**
@@ -82,7 +109,7 @@ export default class Monster extends MonsterCommon {
   }
 
   /**
-   * Tints player's sprite red. TODO need to test once players can attack.
+   * Tints player's sprite red.
    */
   tint() {
     this.tinted = new Date().getTime();

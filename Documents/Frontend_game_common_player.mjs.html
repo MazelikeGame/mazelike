@@ -28,6 +28,7 @@
         <article>
             <pre class="prettyprint source linenums"><code>/* global ml */
 /** @module PlayerCommon */
+import Monster from "./monster.mjs";
 
 const KEYS = {
   upArrow: 38,
@@ -37,7 +38,12 @@ const KEYS = {
   downArrow: 40,
   s: 83,
   leftArrow: 37,
-  a: 65
+  a: 65,
+  space: 32,
+  i: 73,
+  j: 74,
+  k: 75,
+  l: 76
 };
 
 // map w to up, d to right, etc
@@ -60,8 +66,9 @@ export default class PlayerCommon {
    * @param {floor} floor - The floor this player is on.
    */
   constructor(name, hp, spriteName, floor) {
-    this.name = name;
-    this.hp = hp;
+    this.name = name; 
+    this.hp = 100;
+    this.hpMax = 100;
     this.alive = true;
     this.x = 0;
     this.y = 0;
@@ -74,9 +81,12 @@ export default class PlayerCommon {
     this.input = new Set();
     this._nextId = 0;
     this._lastFrame = Date.now();
+    this._lastAttack = Date.now();
     this._frames = [];
     this.size = 1; // used with monster collision checking, acts as a size multiplier
     this.speed = 400;
+    this.attackAngle = Math.PI / 4;
+    this.range = 100;
   }
 
   /**
@@ -141,11 +151,47 @@ export default class PlayerCommon {
     if(this.input.has(KEYS.leftArrow)) {
       this.vx -= 1;
     }
+
+    // attack direction x and y
+    this.vxAttack = 0;
+    this.vyAttack = 0;
+
+    if(this.input.has(KEYS.i)) {
+      this.vyAttack -= 1;
+    }
+    if(this.input.has(KEYS.k)) {
+      this.vyAttack += 1;
+    }
+    if(this.input.has(KEYS.l)) {
+      this.vxAttack += 1;
+    }
+    if(this.input.has(KEYS.j)) {
+      this.vxAttack -= 1;
+    }
+
+    if(this.vxAttack || this.vyAttack) {
+      this._attacking = true;
+      this._mouseAttack = false;
+    }
+  }
+
+  /**
+   * Handle mouse positions
+   */
+  handleMouse(clicking, x, y) {
+    if(clicking) {
+      this._attacking = true;
+      this._mouseAttack = true;
+    }
+
+    this._targetX = x - (PlayerCommon.SPRITE_SIZE / 2);
+    this._targetY = y - (PlayerCommon.SPRITE_SIZE / 2);
   }
 
   /**
    * Send an input frame to the server
    */
+  /* eslint-disable complexity */
   sendFrame() {
     let now = Date.now();
     let frame = {
@@ -153,14 +199,34 @@ export default class PlayerCommon {
       start: this._lastFrameSent,
       end: now,
       vx: this.vx,
-      vy: this.vy
+      vy: this.vy,
+      attacking: this._attacking,
+      targetX: this._mouseAttack ? this._targetX : this.x + this.vxAttack,
+      targetY: this._mouseAttack ? this._targetY : this.y + this.vyAttack
     };
 
+    if(this.animateAttack &amp;&amp; this._isAttacking()) {
+      this.animateAttack(Math.atan2(frame.targetY - this.y, frame.targetX - this.x));
+    }
+
     this._lastFrameSent = now;
-    if(this.vx || this.vy) {
+    if(this.vx || this.vy || this._isAttacking()) {
       this._frames.push(frame);
       this.floor.sock.emit("player-frame", frame);
+
+      if(this._isAttacking()) {
+        this._lastAttack = now;
+      }
     }
+
+    this._attacking = false;
+  }
+  /* eslint-enable complexity */
+
+  _isAttacking() {
+    // eslint-disable-next-line
+    return this._attacking &amp;&amp; ((this._targetX &amp;&amp; this._targetY) || !this._mouseAttack) &amp;&amp;
+      Date.now() - this._lastAttack > PlayerCommon.ATTACK_TIME;
   }
 
   /**
@@ -190,16 +256,219 @@ export default class PlayerCommon {
       let prev = this.getPosition();
       this.x += frame.vx * duration;
       this.y += frame.vy * duration;
-
-      if(!this.spriteIsOnMap()) {
+      
+      if(!this.spriteIsOnMap() || this.collisionEntities(this.floor.monsters, Monster.SPRITE_SIZE) !== -1) {
         this.x = prev.x;
         this.y = prev.y;
       }
 
       ml.logger.debug(`Player ${this.name} moving from (${this._confirmedX}, ${this._confirmedY}) to (${this.x}, ${this.y})`, ml.tags.player);
+
+      if(typeof window === "undefined") {
+        this.processAttack(frame);
+      }
     });
     /* eslint-enable complexity */
   }
+
+  /* eslint-disable complexity, no-mixed-operators */
+  /**
+   * Checks to see if there's a monster colliding with this monster.
+   * Compares corners of each sprite to do so.
+   * @returns {boolean}
+   */
+  collisionEntities(entities, spriteSize) {
+    let x = -1;
+    let y = -1;
+    for(let entity of entities) {
+      if(this.id !== entity.id) {
+        for(let j = 0; j &lt; 4; j++) { // four corners to check for each sprite
+          if(j === 0) { // upper left corner
+            x = entity.x;
+            y = entity.y;
+          } else if(j === 1) { // upper right corner
+            x = entity.x + spriteSize * entity.size;
+            y = entity.y;
+          } else if(j === 2) { // lower right corner
+            x = entity.x + spriteSize * entity.size;
+            y = entity.y + spriteSize * entity.size;
+          } else if(j === 3) { // lower left corner
+            x = entity.x;
+            y = entity.y + spriteSize * entity.size;
+          }
+          if(x >= this.x &amp;&amp; x &lt;= this.x + spriteSize * entity.size) { // within x bounds
+            if(y >= this.y &amp;&amp; y &lt;= this.y + spriteSize * entity.size) { // and within y bounds
+              let index = entities.indexOf(entity);
+              ml.logger.debug(`Player ${this.id} at (${this.x}, ${this.y}) collided with entity ${index} at (${entity.x}, ${entity.y})`, ml.tags.monster);
+              return index;
+            }
+          }
+        }
+      }
+    }
+    return -1; // indicate no collision
+  }
+  /* eslint-disable complexity, no-mixed-operators */
+
+  /**
+   * Process an attack frame
+   */
+  /* eslint-disable complexity */
+  processAttack(frame) {
+    if(!frame.attacking) {
+      return;
+    }
+
+    if(frame.start - this._lastAttack &lt; PlayerCommon.ATTACK_TIME || frame.start &lt; this._lastAttack) {
+      ml.logger.debug(`Reject attack request ${frame.start} ${this._lastAttack}`, ml.tags.player);
+      return;
+    }
+
+    this._lastAttack = frame.start;
+
+    let attackAngle = Math.atan2(frame.targetY - this.y, frame.targetX - this.x);
+    ml.logger.debug(`Player ${this.name} attacking at angle ${attackAngle}`, ml.tags.player);
+
+    for(let monster of this.floor.monsters) {
+      if(this.attackType === "rectangle") {
+        if(this._isHittingRect(attackAngle, monster)) {
+          this.attack(monster);
+        }
+      } else {
+        // eslint-disable-next-line
+        let monsterDist = Math.sqrt((monster.x - this.x) ** 2 + (monster.y - this.y) ** 2);
+        let monsterAngle = Math.atan2(monster.y - this.y, monster.x - this.x);
+
+        // check if the monster is in range
+        if(monsterDist &lt;= this.range &amp;&amp; Math.abs(attackAngle - monsterAngle) &lt;= this.attackAngle / 2) {
+          this.attack(monster);
+        }
+      }
+    }
+  }
+
+  /**
+   * Check if the attack line is hitting a monster
+   */
+  _isHittingRect(attackAngle, monster) {
+    let targetStart = {
+      x: this.x + (PlayerCommon.SPRITE_SIZE / 2),
+      y: this.y + (PlayerCommon.SPRITE_SIZE / 2)
+    };
+
+    let targetEnd = {
+      x: targetStart.x + (this.range * Math.cos(attackAngle)),
+      y: targetStart.y + (this.range * Math.sin(attackAngle))
+    };
+
+    // corrners of the monster hit box
+    let monsterPoints = [
+      { x: monster.x, y: monster.y },
+      { x: monster.x + Monster.SPRITE_SIZE, y: monster.y },
+      { x: monster.x, y: monster.y + Monster.SPRITE_SIZE },
+      { x: monster.x + Monster.SPRITE_SIZE, y: monster.y + Monster.SPRITE_SIZE }
+    ];
+
+    // check if the attack line intersects with the monster's hit box
+    if(this.instersects(targetStart, targetEnd, monsterPoints[0], monsterPoints[1])) {
+      return true;
+    }
+
+    if(this.instersects(targetStart, targetEnd, monsterPoints[0], monsterPoints[2])) {
+      return true;
+    }
+
+    if(this.instersects(targetStart, targetEnd, monsterPoints[3], monsterPoints[1])) {
+      return true;
+    }
+
+    if(this.instersects(targetStart, targetEnd, monsterPoints[3], monsterPoints[2])) {
+      return true;
+    }
+
+    return false;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  // The following code is from Geeks for Geeks                                //
+  // https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/ //
+  ///////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Check if iPoint is on the line formed by point1 and point2
+   * @param point1 
+   * @param point2 
+   * @param iPoint 
+   */
+  _isOnLine(point1, point2, iPoint) { 
+    return Math.min(point1.x, point2.x) &lt;= iPoint.x &amp;&amp; iPoint.x &lt;= Math.max(point1.x, point2.x) &amp;&amp; 
+      Math.min(point1.y, point2.y) &lt;= iPoint.y &amp;&amp; iPoint.y &lt;= Math.max(point1.y, point2.y);
+  } 
+
+  /**
+   * Determine the orientation of three points
+   * @param p 
+   * @param q 
+   * @param r 
+   */
+  _getOrientation(p, q, r) { 
+    // Algorithm from https://www.geeksforgeeks.org/orientation-3-ordered-points/
+    // eslint-disable-next-line
+    let val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y); 
+
+    if(val === 0) {
+      return "colinear";
+    }
+
+    return val > 0 ? "clockwise" : "counterclockwise";
+  }
+
+  /**
+   * Check if two points intersect
+   * @param line1p1 
+   * @param line1p2 
+   * @param line2p1 
+   * @param line2p2 
+   */
+  instersects(line1p1, line1p2, line2p1, line2p2) { 
+    let o1 = this._getOrientation(line1p1, line1p2, line2p1); 
+    let o2 = this._getOrientation(line1p1, line1p2, line2p2); 
+    let o3 = this._getOrientation(line2p1, line2p2, line1p1); 
+    let o4 = this._getOrientation(line2p1, line2p2, line1p2); 
+
+    // General case (intersecting non-parallel)
+    if(o1 !== o2 &amp;&amp; o3 !== o4) {
+      return true;
+    }
+
+    // Special Cases (colinear aka all parallel)
+    // line1p1, line1p2q1 and line2p1 are colinear and line2p1 lies on segment line1p1 line1p2 
+    if(o1 === "colinear" &amp;&amp; this._isOnLine(line1p1, line1p2, line2p1)) {
+      return true;
+    }
+
+    // line1p1, line1p2 and line2p2 are colinear and line2p2 lies on segment line1p1 line1p2 
+    if(o2 === "colinear" &amp;&amp; this._isOnLine(line1p1, line1p2, line2p2)) {
+      return true;
+    }
+
+    // line2p1, line2p2 and line1p1 are colinear and line1p1 lies on segment line1p line2p2 
+    if(o3 === "colinear" &amp;&amp; this._isOnLine(line2p1, line2p2, line1p1)) {
+      return true;
+    }
+
+    // linep2, line2p2 and line1p2 are colinear and line1p2 lies on segment linep2 line2p2 
+    if(o4 === "colinear" &amp;&amp; this._isOnLine(line2p1, line1p2, line1p2)) {
+      return true;
+    }
+
+    return false; // Doesn't fall in any of the above cases 
+  }
+
+  /* eslint-enable complexity */
+  ///////////////////////////////////////////////////////////////////////////////
+  // End of code from Geeks for Geeks                                          //
+  ///////////////////////////////////////////////////////////////////////////////
 
   /**
    * Drop all confirmed frames
@@ -245,14 +514,16 @@ export default class PlayerCommon {
 
   /** 
    * Player attacks monster
-   * @param {*} monsterID id for player that monster is attacking
+   * @param {*} monster The monster to attack
    */
-  attack(monsterID) {
-    this.floor.monsters[monsterID].beAttacked(this.damage);
+  attack(monster) {
+    monster.beAttacked(this.damage);
   }
 }
 PlayerCommon.SPRITE_SIZE = 48;
-</code></pre>
+
+// the minimum time between attacks
+PlayerCommon.ATTACK_TIME = 187;</code></pre>
         </article>
     </section>
 
@@ -262,13 +533,13 @@ PlayerCommon.SPRITE_SIZE = 48;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#disconnectPlayer">disconnectPlayer</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#removePlayer">removePlayer</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 26 2018 19:12:15 GMT+0000 (UTC)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Nov 30 2018 15:09:46 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

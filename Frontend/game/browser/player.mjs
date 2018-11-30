@@ -70,7 +70,8 @@ export default class Player extends PlayerCommon {
     if(this.tinted !== -1) {
       if(this.sprite.tint === this.regularTint) {
         this.tint();
-        this.hpNotificationSprite.setText("-" + this.hpDamageTaken);
+        this.hpDamageTaken = Math.abs(this.hpDamageTaken) * -1;
+        this.hpNotificationSprite.setText(this.hpDamageTaken);
         this.hpNotificationSpriteOffset = (this.sprite.width / 2) - (this.hpNotificationSprite.width / 2);
         this.usernameSprite.position.set(this.x - viewX + this.usernameSpriteOffset, this.y - viewY - 15);
       }
