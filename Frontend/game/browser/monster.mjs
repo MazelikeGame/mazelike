@@ -20,6 +20,18 @@ export default class Monster extends MonsterCommon {
     this.sprite.height = MonsterCommon.SPRITE_SIZE * this.size;
     this.floor.monsterSprites.addChild(this.sprite);
     this.regularTint = this.sprite.tint;
+  
+    this._textStyle2 = new PIXI.TextStyle({
+      fill: "#ff0000",
+      fontSize: 24,
+      fontFamily: "Tahoma",
+      fontWeight: "bold"
+    });
+
+    this.hpNotificationSprite = new PIXI.Text("", this._textStyle2);
+    this.hpNotificationSpriteOffset = (this.sprite.width / 2) - (this.hpNotificationSprite.width / 2);
+    this.hpNotificationSprite.position.set(this.sprite.position.x + this.hpNotificationSpriteOffset, this.sprite.position.y - 40);
+    this.floor.playerSprites.addChild(this.hpNotificationSprite);
   }
 
   /**
@@ -32,13 +44,17 @@ export default class Monster extends MonsterCommon {
     this.move(this._lastMove - now);
     this._lastMove = now;
     this.sprite.position.set(this.x - viewX, this.y - viewY);
+    this.hpNotificationSprite.position.set(this.x - viewX + this.hpNotificationSpriteOffset, this.y - viewY - 25);
     if(this.tinted !== -1) {
       if(this.sprite.tint === this.regularTint) {
         this.tint();
+        this.hpNotificationSprite.setText("-" + this.hpDamageTaken);
+        this.hpNotificationSpriteOffset = (this.sprite.width / 2) - (this.hpNotificationSprite.width / 2);
       }
-      if(new Date().getTime() - this.tinted > 100) {
+      if(new Date().getTime() - this.tinted > 200) {
         this.tinted = -1;
         this.untint();
+        this.hpNotificationSprite.setText();
       }
     }
   }
@@ -58,6 +74,7 @@ export default class Monster extends MonsterCommon {
     }
     if(oldHP !== this.hp) {
       this.tinted = new Date().getTime();
+      this.hpDamageTaken = oldHP - this.hp;
     }
   }
 
@@ -67,6 +84,7 @@ export default class Monster extends MonsterCommon {
    */
   remove() {
     this.floor.monsterSprites.removeChild(this.sprite);
+    this.floor.playerSprites.removeChild(this.hpNotificationSprite);
   }
   
   /**
