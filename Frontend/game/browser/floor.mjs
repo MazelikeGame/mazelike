@@ -117,8 +117,7 @@ export default class Floor extends FloorCommon {
       this.players[i].createSprite();
     }
 
-    this.ladder.x = this.map.ladder.x;
-    this.ladder.y = this.map.ladder.y;
+    this.ladder.setPosition(this.map.ladder.x, this.map.ladder.y);
  
     this.sprite.addChild(this.playerSprites);
     this.sprite.addChild(this.monsterSprites);

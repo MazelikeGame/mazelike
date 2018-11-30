@@ -17,13 +17,8 @@ export default class Floor extends FloorCommon {
     floor.map = GameMap.generate(map);
     floor.generateMonsters();
     
-    let randomRoom = floor.map.rooms[Math.floor(Math.random() * floor.map.rooms.length)];
-    let ladderX = randomRoom.x + Math.floor(randomRoom.width / 2);
-    let ladderY = randomRoom.y + Math.floor(randomRoom.height / 2);
-    floor.map.ladder.x = ladderX;
-    floor.map.ladder.y = ladderY;
+    floor.map.ladder.placeInRandomRoom(floor.map);
 
-    console.log(randomRoom);
     return floor;
   }
 
