@@ -38,9 +38,8 @@ export default class PlayerCommon {
    * @param {floor} floor - The floor this player is on.
    */
   constructor(name, hp, spriteName, floor) {
-    this.name = name;
-    this.hp = 1000; //todo hp
-    // this.hp = 100;
+    this.name = name; 
+    this.hp = 100;
     this.hpMax = 100;
     this.alive = true;
     this.x = 0;

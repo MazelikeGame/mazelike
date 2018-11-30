@@ -37,7 +37,7 @@ export default class MonsterCommon {
     }
   }
 
-  /** 
+  /**
    * Returns true if monster can see given pixel coordinate.
    * @param x 
    * @param y 
@@ -142,12 +142,6 @@ export default class MonsterCommon {
       dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
     } while(!this.spriteIsOnMap() && dist > 0 && --count > 0);
 
-    // Directly moves stubborn monsters back onto the map.
-    while(!this.spriteIsOnMap() && --count > 0) {
-      this.x -= Math.cos(theta);
-      this.y -= Math.sin(theta);
-    }
-
     this.targetx = Math.floor(this.x);
     this.targety = Math.floor(this.y);
     Object.assign(this, prev);
@@ -186,6 +180,12 @@ export default class MonsterCommon {
         }
       } else {
         this.collision = false;
+      }
+      if(!this.spriteIsOnMap()) {
+        this.x = prevx;
+        this.y = prevy;
+        this.targetx = prevx;
+        this.targety = prevy;
       }
     }
   }

@@ -60,13 +60,11 @@ export default class Monster extends MonsterCommon {
         this.hpNotificationSprite.setText();
       }
     }
-    // todo
-    if(this.collisionEntities(this.floor.monsters, this.SPRITE_SIZE) >= -1 || this.collisionEntities(this.floor.players, this.floor.players[0].SPRITE_SIZE) >= -1
-      || !this.spriteIsOnMap()) {
+    if(this.collisionEntities(this.floor.monsters, this.SPRITE_SIZE) >= -1 || this.collisionEntities(this.floor.players, this.floor.players[0].SPRITE_SIZE) >= -1) {
       this.x = prevx;
       this.y = prevy;
       this.sprite.position.set(this.x - viewX, this.y - viewY);
-      console.log("collision");
+      this.hpNotificationSprite.position.set(this.x - viewX + this.hpNotificationSpriteOffset, this.y - viewY - 25);
     }
   }
 
