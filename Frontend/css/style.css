@@ -1443,3 +1443,17 @@ header {
             transform:scale(0);
   }
 }
+
+.small-logo {
+    display: none;
+}
+
+@media all and (max-width: 900px) {
+    .small-logo {
+        display: inline;
+    }
+
+    .big-logo {
+        display: none;
+    }
+}

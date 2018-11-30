@@ -3,7 +3,7 @@
 import "./logger.js"; // THIS MUST BE THE FIRST IMPORT
 import sequelize from "./sequelize";
 import express from "express";
-import http from "http";
+import {createServer, appPort} from "./server";
 import socketio from "socket.io";
 import {gameRouter, joinRoute} from "./routes/game.mjs";
 import accountRouter from "./routes/accounts.mjs";
@@ -19,7 +19,7 @@ import morgan from "morgan";
 const PACKAGE_VERSION = fs.readFileSync("VERSION", "utf8").trim();
 
 let app = express();
-let server = http.Server(app);
+let server = createServer(app);
 global.io = socketio(server);
 setHttpd(server);
 
@@ -97,8 +97,8 @@ io.on("connection", (client) => {
 const start = async() => {
   await sequelize.sync();
 
-  server.listen(3000, () => {
-    ml.logger.info("Server started on port 3000");
+  server.listen(appPort, () => {
+    ml.logger.info(`Server started on port ${appPort}`);
   });
 };
 

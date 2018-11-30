@@ -5,6 +5,8 @@
     <base href="/game/"/>
     <link rel="icon" href="/img/m main.png"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <link rel="manifest" href="/manifest.json"/>
+    <script src="/scripts/common.js"></script>
     <style>
       * {
         margin: 0px;
@@ -29,9 +31,12 @@
         height: 100%;
         position: fixed;
         z-index: 99;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      h2 {
+      h1 {
         text-align: center;
         margin-bottom: 15px;
       }
@@ -40,16 +45,59 @@
         background: #fff;
         width: 500px;
         padding: 10px;
-        margin: 20px auto;
         border-radius: 7px;
       }
 
       @media all and (max-width: 500px) {
-        .popup {
-          margin: 0px;
-          border-radius: 0px;
-          width: 100%;
+        .lightbox {
+          display: block;
         }
+
+        .popup {
+          border-radius: 0px;
+          width: calc(100% - 20px);
+        }
+      }
+
+      .crosshair {
+        cursor: crosshair;
+      }
+
+      .tip {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #000;
+      }
+
+      .ready-align {
+        display: flex;
+      }
+
+      button {
+        background: #4484FF;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 10px;
+        color: #fff;
+      }
+
+      button:hover {
+        opacity: 0.8;
+      }
+
+      .dead .popup {
+        background-color: #d00;
+        color: #fff;
+      }
+
+      .dead a {
+        color: #fff;
+      }
+
+      .fullscreen-box {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
       }
     </style>
   </head>
@@ -58,8 +106,22 @@
       <div class="backdrop"></div>
       <div class="lightbox">
         <div class="popup">
-          <h2 class="msg-header">Waiting for game to start</h2>
-          <p class="msg">Loading assets</p>
+          <div class="ingame" style="display: none;">
+            <h1 class="msg-header">Waiting for game to start</h1>
+            <p class="msg">Loading assets</p>
+          </div>
+          <div class="pregame">
+            <h1>Backstory</h1>
+            <p>--- Backstory HERE ---</p>
+            <p class="tip">TIP: You can use ijkl to attack (i is up, k is down, j is left, l is right) or you can use the mouse</p>
+            <div class="ready-align">
+              <div class="fullscreen-box">
+                  <input type="checkbox" class="fullscreen" id="fullscreen"/>
+                  <label for="fullscreen">Fullscreen</label>
+              </div>
+              <button class="ready">Play</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
