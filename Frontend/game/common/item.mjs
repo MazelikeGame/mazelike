@@ -20,8 +20,8 @@ export default class Item {
     spriteName,
     spriteSize,
     movementSpeed,
+    damage,
     attackSpeed,
-    attack,
     defence,
     range,
     id,
@@ -32,11 +32,11 @@ export default class Item {
     this.floor = floor;
     this.spriteName = spriteName;
     this.spriteSize = spriteSize;
-    this.movementSpeed = movementSpeed;
-    this.attackSpeed = attackSpeed;
-    this.attack = attack;
-    this.defence = defence;
-    this.range = range;
+    this.movementSpeed = movementSpeed || 0;
+    this.attackSpeed = attackSpeed || 0;
+    this.damage = damage || 0;
+    this.defence = defence || 0;
+    this.range = range || 0;
     this.id = id;
     this.category = category;
     this.accruacy = accuracy;
@@ -66,6 +66,15 @@ export default class Item {
     this.x = x;
     this.y = y;
     this.isOnFloor = true;
+  }
+
+  /**
+   * Puts item in a state that signifies that it has been
+   * placed in an inventory
+   */
+  pickup() {
+    this.setCoordinates(null, null);
+    this.isOnFloor = false;
   }
 
   /**

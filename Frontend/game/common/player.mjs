@@ -15,7 +15,8 @@ const KEYS = {
   i: 73,
   j: 74,
   k: 75,
-  l: 76
+  l: 76,
+  e: 69
 };
 
 // map w to up, d to right, etc
@@ -23,7 +24,18 @@ const MAPPINGS = {
   [KEYS.w]: KEYS.upArrow,
   [KEYS.d]: KEYS.rightArrow,
   [KEYS.s]: KEYS.downArrow,
-  [KEYS.a]: KEYS.leftArrow
+  [KEYS.a]: KEYS.leftArrow,
+  [KEYS.e]: KEYS.e
+};
+
+const MAX_INVENTORY_SIZE = 8;
+const BASE_STATS = {
+  hp: 100,
+  hpMax: 100,
+  damage: 10,
+  speed: 400,
+  range: 100,
+  defence: 0,
 };
 
 /**
@@ -39,8 +51,6 @@ export default class PlayerCommon {
    */
   constructor(name, hp, spriteName, floor) {
     this.name = name;
-    this.hp = 100;
-    this.hpMax = 100;
     this.alive = true;
     this.x = 0;
     this.y = 0;
@@ -48,17 +58,21 @@ export default class PlayerCommon {
     this.vy = 0;
     this.spriteName = spriteName;
     this.floor = floor;
-    this.damage = 10;
-    this.speed = 15;
     this.input = new Set();
     this._nextId = 0;
     this._lastFrame = Date.now();
     this._lastAttack = Date.now();
     this._frames = [];
     this.size = 1; // used with monster collision checking, acts as a size multiplier
-    this.speed = 400;
     this.attackAngle = Math.PI / 4;
-    this.range = 100;
+
+    /* Stats */
+    this.hp = BASE_STATS.hp;
+    this.hpMax = BASE_STATS.hpMax;
+    this._setStatsToBase();
+
+    this.inventory = [];
+    this.wearing = [];
   }
 
   /**
@@ -139,6 +153,9 @@ export default class PlayerCommon {
     }
     if(this.input.has(KEYS.j)) {
       this.vxAttack -= 1;
+    }
+    if(this.input.has(KEYS.e)) {
+      this.wieldItem();
     }
 
     if(this.vxAttack || this.vyAttack) {
@@ -238,9 +255,73 @@ export default class PlayerCommon {
 
       if(typeof window === "undefined") {
         this.processAttack(frame);
+
+        if(this.inventory.length < MAX_INVENTORY_SIZE) {
+          this._pickupNearbyItems();
+        }
       }
     });
     /* eslint-enable complexity */
+  }
+
+  /**
+   * Player picks up nearby items if inventory is not full
+   */
+  _pickupNearbyItems() {
+    for(let item of this.floor.items) {
+      if(
+        item.getPosition() &&
+        this.inventory.length < MAX_INVENTORY_SIZE &&
+        this._withinRadius(this.getPosition(), item.getPosition(), 12)
+      ) {
+        item.pickup(this);
+        this.inventory.push(item);
+        ml.logger.verbose(`Player ${this.name} picked up a(n) ${item.spriteName}`, ml.tags.player);
+      }
+    }
+  }
+
+  /**
+   * Updates the player's stats based on what is being worn.
+   */
+  updateStats() {
+    this._setStatsToBase();
+    for(let item of this.wearing) {
+      this.speed += item.movementSpeed;
+      this.damage += item.damage;
+      this.defence += item.defence;
+      this.range += item.range;
+    }
+  }
+
+  wieldItem(/* item to wear */) {
+    let index = this.inventory.indexOf();
+    if(index > -1) {
+      let toWear = this.inventory[index];
+      this.inventory.splice(index, 1);
+      this.wearing.push(toWear); // need to implement logic for different types of items
+    }
+  }
+
+  _setStatsToBase() {
+    this.speed = BASE_STATS.speed;
+    this.damage = BASE_STATS.damage;
+    this.defence = BASE_STATS.defence;
+    this.range = BASE_STATS.range;
+  }
+
+  /**
+   * Returns true if obj is within the desired radius of the center circle.
+   *
+   * @param {object} center - Coords to use that acts as the center of the circle
+   * @param {object} obj - Object to compare to center's coord
+   * @param {int} radius - the desired radius of the circle to check
+   */
+  _withinRadius(center, obj, radius) {
+    let centerCoords = { x: Math.round(center.x), y: Math.round(center.y) };
+    let objCoords = { x: Math.round(obj.x), y: Math.round(obj.y) };
+    let hyp = Math.pow(objCoords.x - centerCoords.x, 2) + Math.pow(objCoords.y - centerCoords.y, 2);
+    return hyp <= Math.pow(radius, 2);
   }
 
   /**
@@ -303,19 +384,19 @@ export default class PlayerCommon {
     ];
 
     // check if the attack line intersects with the monster's hit box
-    if(this.instersects(targetStart, targetEnd, monsterPoints[0], monsterPoints[1])) {
+    if(this._intersects(targetStart, targetEnd, monsterPoints[0], monsterPoints[1])) {
       return true;
     }
 
-    if(this.instersects(targetStart, targetEnd, monsterPoints[0], monsterPoints[2])) {
+    if(this._intersects(targetStart, targetEnd, monsterPoints[0], monsterPoints[2])) {
       return true;
     }
 
-    if(this.instersects(targetStart, targetEnd, monsterPoints[3], monsterPoints[1])) {
+    if(this._intersects(targetStart, targetEnd, monsterPoints[3], monsterPoints[1])) {
       return true;
     }
 
-    if(this.instersects(targetStart, targetEnd, monsterPoints[3], monsterPoints[2])) {
+    if(this._intersects(targetStart, targetEnd, monsterPoints[3], monsterPoints[2])) {
       return true;
     }
 
@@ -329,25 +410,25 @@ export default class PlayerCommon {
 
   /**
    * Check if iPoint is on the line formed by point1 and point2
-   * @param point1 
-   * @param point2 
-   * @param iPoint 
+   * @param point1
+   * @param point2
+   * @param iPoint
    */
-  _isOnLine(point1, point2, iPoint) { 
-    return Math.min(point1.x, point2.x) <= iPoint.x && iPoint.x <= Math.max(point1.x, point2.x) && 
+  _isOnLine(point1, point2, iPoint) {
+    return Math.min(point1.x, point2.x) <= iPoint.x && iPoint.x <= Math.max(point1.x, point2.x) &&
       Math.min(point1.y, point2.y) <= iPoint.y && iPoint.y <= Math.max(point1.y, point2.y);
-  } 
+  }
 
   /**
    * Determine the orientation of three points
-   * @param p 
-   * @param q 
-   * @param r 
+   * @param p
+   * @param q
+   * @param r
    */
-  _getOrientation(p, q, r) { 
+  _getOrientation(p, q, r) {
     // Algorithm from https://www.geeksforgeeks.org/orientation-3-ordered-points/
     // eslint-disable-next-line
-    let val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y); 
+    let val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
 
     if(val === 0) {
       return "colinear";
@@ -358,16 +439,16 @@ export default class PlayerCommon {
 
   /**
    * Check if two points intersect
-   * @param line1p1 
-   * @param line1p2 
-   * @param line2p1 
-   * @param line2p2 
+   * @param line1p1
+   * @param line1p2
+   * @param line2p1
+   * @param line2p2
    */
-  instersects(line1p1, line1p2, line2p1, line2p2) { 
-    let o1 = this._getOrientation(line1p1, line1p2, line2p1); 
-    let o2 = this._getOrientation(line1p1, line1p2, line2p2); 
-    let o3 = this._getOrientation(line2p1, line2p2, line1p1); 
-    let o4 = this._getOrientation(line2p1, line2p2, line1p2); 
+  _intersects(line1p1, line1p2, line2p1, line2p2) {
+    let o1 = this._getOrientation(line1p1, line1p2, line2p1);
+    let o2 = this._getOrientation(line1p1, line1p2, line2p2);
+    let o3 = this._getOrientation(line2p1, line2p2, line1p1);
+    let o4 = this._getOrientation(line2p1, line2p2, line1p2);
 
     // General case (intersecting non-parallel)
     if(o1 !== o2 && o3 !== o4) {
@@ -375,27 +456,27 @@ export default class PlayerCommon {
     }
 
     // Special Cases (colinear aka all parallel)
-    // line1p1, line1p2q1 and line2p1 are colinear and line2p1 lies on segment line1p1 line1p2 
+    // line1p1, line1p2q1 and line2p1 are colinear and line2p1 lies on segment line1p1 line1p2
     if(o1 === "colinear" && this._isOnLine(line1p1, line1p2, line2p1)) {
       return true;
     }
 
-    // line1p1, line1p2 and line2p2 are colinear and line2p2 lies on segment line1p1 line1p2 
+    // line1p1, line1p2 and line2p2 are colinear and line2p2 lies on segment line1p1 line1p2
     if(o2 === "colinear" && this._isOnLine(line1p1, line1p2, line2p2)) {
       return true;
     }
 
-    // line2p1, line2p2 and line1p1 are colinear and line1p1 lies on segment line1p line2p2 
+    // line2p1, line2p2 and line1p1 are colinear and line1p1 lies on segment line1p line2p2
     if(o3 === "colinear" && this._isOnLine(line2p1, line2p2, line1p1)) {
       return true;
     }
 
-    // linep2, line2p2 and line1p2 are colinear and line1p2 lies on segment linep2 line2p2 
+    // linep2, line2p2 and line1p2 are colinear and line1p2 lies on segment linep2 line2p2
     if(o4 === "colinear" && this._isOnLine(line2p1, line1p2, line1p2)) {
       return true;
     }
 
-    return false; // Doesn't fall in any of the above cases 
+    return false; // Doesn't fall in any of the above cases
   }
 
   /* eslint-enable complexity */
@@ -433,7 +514,7 @@ export default class PlayerCommon {
     this.y = y;
   }
 
-  /** 
+  /**
    * Monster attacks player
    * @param {*} hp health points that the player's health decrements by
    */
@@ -445,7 +526,7 @@ export default class PlayerCommon {
     ml.logger.verbose(`Player ${this.name} was attacked with ${hp} damage (hp: ${this.hp})`, ml.tags.player);
   }
 
-  /** 
+  /**
    * Player attacks monster
    * @param {*} monster The monster to attack
    */

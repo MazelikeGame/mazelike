@@ -225,6 +225,7 @@ export default class MonsterCommon {
    * @param {*} playerID id for player that monster is attacking
    */
   attack(playerID) {
+    this.die();
     this.floor.players[playerID].beAttacked(this.damage);
   }
 

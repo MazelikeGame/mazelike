@@ -39,6 +39,8 @@ export default class Item extends ItemCommon {
   update(viewX, viewY) {
     if(this.isOnFloor) {
       this.sprite.position.set(this.x - viewX, this.y - viewY);
+    } else {
+      this.remove();
     }
   }
 
