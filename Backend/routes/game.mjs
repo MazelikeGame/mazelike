@@ -9,7 +9,7 @@ import User from '../models/user';
 import sql from "../sequelize";
 import path from "path";
 import fs from "fs";
-import {spawnGame, getGameAddr} from "../managers/manager";
+import startGame from "../game.mjs";
 import Floor from "../game/floor";
 import MonsterModel from "../models/monster.mjs";
 import Sequelize from "sequelize";
@@ -385,9 +385,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
 
     try {
       ml.logger.verbose(`Spawning ${req.params.id}`, ml.tags.lobby);
-      await spawnGame({
-        gameId: req.params.id
-      });
+      await startGame(req.params.id);
       await Lobby.update({ inProgress: true },
         {
           where: {
@@ -412,11 +410,6 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
 
   ml.logger.verbose(`${req.user.username} failed to start ${req.params.id}`, ml.tags.lobby);
   res.end("No such lobby or you are not the host");
-});
-
-// Get the game server address
-gameRouter.get("/addr/:id", (req, res) => {
-  res.end(getGameAddr(req.params.id));
 });
 
 // Serve /game/:id as /game/

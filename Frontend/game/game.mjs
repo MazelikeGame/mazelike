@@ -143,19 +143,8 @@ fullscreenEl.checked = localStorage.fullscreen !== "false";
 async function setup() {
   await readyToPlay;
   msgEl.innerText = "Connecting to the game server";
-  let addr = await (await fetch(`/game/addr/${gameId}`)).text();
 
-  if(addr === "__current__") {
-    addr = location.host;
-  }
-
-  if(addr[0] === ":") {
-    addr = location.hostname + addr;
-  }
-
-  let sock = io(`${location.protocol}//${addr}`, {
-    path: `/socket/${gameId}`
-  });
+  let sock = io(`${location.origin}/game/${gameId}`);
 
   let username = await getUsername(sock);
   msgEl.innerText = "Loading game";
