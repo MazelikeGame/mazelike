@@ -1,4 +1,4 @@
-/* global ml */
+/* global ml io */
 // jshint esversion: 6
 import "./logger.js"; // THIS MUST BE THE FIRST IMPORT
 import sequelize from "./sequelize";
@@ -19,6 +19,8 @@ const PACKAGE_VERSION = fs.readFileSync("VERSION", "utf8").trim();
 let app = express();
 let server = createServer(app);
 global.io = socketio(server);
+
+io.of(`/lobby`).on("connection", () => {});
 
 // Log http requests
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms", {
