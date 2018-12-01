@@ -7,7 +7,6 @@ import ItemCommon from '../../Frontend/game/common/item.mjs';
 import ItemModel from '../models/item.mjs';
 
 const readFile = util.promisify(fs.readFile);
-var numItems = 0;
 
 export default class Item extends ItemCommon {
   static async load(floor) {
@@ -48,7 +47,7 @@ export default class Item extends ItemCommon {
   static async saveAll(floor) {
     for(let item of floor.items) {
       let uniqueId = item.id;
-      if(typeof(item.id) === typeof('string')) {
+      if(typeof (item.id) === typeof ('string')) {
         uniqueId = item.id.slice(item.id.lastIndexOf('-') + 1);
       }
       let dataToSave = {
@@ -57,7 +56,7 @@ export default class Item extends ItemCommon {
         x: item.x,
         y: item.y,
         spriteName: item.spriteName
-      }
+      };
       let itemFound = await ItemModel.findOne({
         where: {
           id: dataToSave.id
