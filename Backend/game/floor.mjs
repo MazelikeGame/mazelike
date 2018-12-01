@@ -87,9 +87,13 @@ export default class Floor extends FloorCommon {
     }
     for(let player of this.players) {
       player.move();
-      
-      if(LadderCommon.collision(player, this.map.ladder)) {
-        console.log("LADDER");
+
+      if(typeof this.regenerate === 'undefined') {
+        if(LadderCommon.collision(player, this.map.ladder)) {
+          console.log("LADDER");
+          this.regenerate = true; //Allows this to only regenerate once.
+          //Signal to regenerate
+        }
       }
 
       if(player._frames.length) {
