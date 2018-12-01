@@ -7,7 +7,7 @@ module.exports = {
       'spriteName',
       {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       }
     );
   },

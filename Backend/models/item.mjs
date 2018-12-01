@@ -16,7 +16,7 @@ let Item = sql.define('items', {
   },
   spriteName: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: true
   }
 });
 
