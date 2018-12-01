@@ -88,7 +88,9 @@ export default class Floor extends FloorCommon {
     for(let player of this.players) {
       player.move();
       
-      LadderCommon.collision(player, this.map.ladder);
+      if(LadderCommon.collision(player, this.map.ladder)) {
+        console.log("LADDER");
+      }
 
       if(player._frames.length) {
         player._confirmedId = player._frames[player._frames.length - 1].id;

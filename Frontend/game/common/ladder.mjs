@@ -46,8 +46,11 @@ export default class LadderCommon {
       if(x >= ladder.x && x <= ladder.x + 48 * player.size) { // within x bounds
         if(y >= ladder.y && y <= ladder.y + 48 * player.size) { // and within y bounds
           ml.logger.debug(`Player at (${player.x}, ${player.y}) collided with ladder at (${ladder.x}, ${ladder.y})`, ml.tags.ladder);
+          return true;
         }
       }
     }
+
+    return false;
   }
 }
