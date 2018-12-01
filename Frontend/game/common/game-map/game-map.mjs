@@ -46,7 +46,7 @@ export default class GameMap {
    * @private
    * @param params
    */
-  _initParams(params = {}) {
+  _initParams(params = {}, numItems = 0) {
     this._params = {
       nodes: params.nodes || 100,
       minRoom: (params.minRoom || 16) * MIN_SIZE,
@@ -59,6 +59,8 @@ export default class GameMap {
       theme: params.theme || THEMES[Math.floor(Math.random() * THEMES.length)],
       spawn: params.spawn
     };
+
+    this.numItems = numItems;
 
     if(!this._params.spawn) {
       this._params.spawn = Math.floor(Math.random() * this._params.nodes);
@@ -81,7 +83,7 @@ export default class GameMap {
    * @returns {GameMap}
    */
   static generate(map, params) {
-    map._initParams(params);
+    map._initParams(params, map.numItems);
 
     map.generateMap(map.generateMaze());
 
@@ -144,6 +146,7 @@ export default class GameMap {
   serialize() {
     return JSON.stringify({
       rooms: this.rooms,
+      numItems: this.numItems,
       params: {
         nodes: this._params.nodes,
         minRoom: this._params.minRoom / MIN_SIZE,
@@ -154,7 +157,7 @@ export default class GameMap {
         xPadding: this._params.xPadding / MIN_SIZE,
         yPadding: this._params.xPadding / MIN_SIZE,
         theme: this._params.theme || "0-0",
-        spawn: this._params.spawn
+        spawn: this._params.spawn,
       }
     });
   }
@@ -168,7 +171,7 @@ export default class GameMap {
   static parse(json, map) {
     let raw = typeof json === "string" ? JSON.parse(json) : json;
 
-    map._initParams(raw.params);
+    map._initParams(raw.params, raw.numItems);
 
     for(let i = 0; i < raw.rooms.length; ++i) {
       map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i], map._params));

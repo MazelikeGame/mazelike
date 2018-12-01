@@ -2,6 +2,7 @@
 /* eslint-disable max-len,curly,complexity,prefer-template, no-warning-comments */
 /** @module Monster */
 
+import ItemBackend from './item.mjs';
 import MonsterCommon from "../../Frontend/game/common/monster.mjs";
 import MonsterModel from "../models/monster";
 import sql from "../sequelize";
@@ -17,14 +18,14 @@ export default class Monster extends MonsterCommon {
     this.targetx = -1;
     this.targety = -1;
   }
-  
+
   /**
-   * Puts 
+   * Puts
    *  monster in half of all "rooms".
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters(floor) {
-    for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) { 
+    for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) {
       floor.monsters[i] = new Monster('sir spoopy', 100, 10, this, i, 1);
     }
   }
@@ -38,7 +39,7 @@ export default class Monster extends MonsterCommon {
     });
 
     floor.monsters = [];
-    
+
     rawMonsters.forEach((raw, i) => {
       let monster = new Monster(raw.name, raw.hp, 10, floor, i, raw.type);
       monster.setCoodinates(raw.x, raw.y);
@@ -96,11 +97,11 @@ export default class Monster extends MonsterCommon {
 
   /**
    * Given a min and a max integer, returns a random number between the two (*inclusive)
-   * @param min 
-   * @param max 
+   * @param min
+   * @param max
    */
   getRandomNumber(min, max) {
-    return Math.floor(Math.random() * max) + min; 
+    return Math.floor(Math.random() * max) + min;
   }
 
   /**
@@ -118,14 +119,15 @@ export default class Monster extends MonsterCommon {
       name: this.name
     };
   }
-  
+
   /**
    * ~WIP drop items down the road
-   * 
+   *
    * Monster dies.
    */
   die() {
     ml.logger.verbose(`Monster ${this.id} died`, ml.tags.monster);
+    ItemBackend.spawnRandomItem(this.floor, Math.round(this.x), Math.round(this.y));
     this.x = -1; // (-1, -1) coordinate tells us that the monster is dead
     this.y = -1;
     this.alive = false;

@@ -4,6 +4,7 @@ import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
 import Monster from "./monster.mjs";
 import Player from './player';
+import Item from './item';
 
 export default class Floor extends FloorCommon {
   /**
@@ -16,6 +17,7 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
     floor.map = GameMap.generate(map);
     floor.generateMonsters();
+    floor.items = [];
 
     return floor;
   }
@@ -55,7 +57,8 @@ export default class Floor extends FloorCommon {
 
     await Promise.all([
       Monster.load(floor),
-      Player.load(floor)
+      Player.load(floor),
+      Item.load(floor)
     ]);
 
     return floor;
@@ -69,7 +72,8 @@ export default class Floor extends FloorCommon {
     return Promise.all([
       this.map.save(this.id),
       Monster.saveAll(this, create),
-      Player.saveAll(this)
+      Player.saveAll(this),
+      Item.saveAll(this)
     ]);
   }
 
@@ -101,6 +105,7 @@ export default class Floor extends FloorCommon {
     io.emit("state", {
       monsters: this.monsters,
       players: this.players,
+      items: this.items,
       isGameRunning
     });
   }

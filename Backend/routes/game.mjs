@@ -12,6 +12,7 @@ import fs from "fs";
 import {spawnGame, getGameAddr} from "../managers/manager";
 import Floor from "../game/floor";
 import MonsterModel from "../models/monster.mjs";
+import ItemModel from '../models/item.mjs';
 import Sequelize from "sequelize";
 
 let monsterModel = new MonsterModel(sql);
@@ -431,7 +432,13 @@ gameRouter.get('/test', (req, res) => {
 function deleteGame(id) {
   return Promise.all([
     unlink(`${DATA_DIR}/maps/${id}.json`),
-
+    ItemModel.destroy({
+      where: {
+        floorId: {
+          [Sequelize.Op.like]: `${id}-%`
+        }
+      }
+    }),
     monsterModel.destroy({
       where: {
         floorId: {
