@@ -1,5 +1,5 @@
 /* global ml */
-/* eslint-disable max-len,curly,complexity,prefer-template, no-warning-comments, no-mixed-operators */
+/* eslint-disable max-len,curly,complexity,prefer-template, no-mixed-operators */
 /** @module Monster */
 
 // The maximum amount of ms we want a monster to walk for
@@ -98,8 +98,8 @@ export default class MonsterCommon {
     this.targetAquired = false;
     let minDist = -1;
     for(let player of this.floor.players) {
-      if(this.canSee(player.x, player.y) && this.canSee(player.x + player.SPRITE_SIZE * this.size, player.y + player.SPRITE_SIZE * this.size) &&
-         this.canSee(player.x + player.SPRITE_SIZE * this.size, player.y) && this.canSee(player.x, player.y + player.SPRITE_SIZE * this.size)) {
+      if(this.canSee(player.x, player.y) && this.canSee(player.x + player.SPRITE_SIZE * player.size, player.y + player.SPRITE_SIZE * player.size) &&
+         this.canSee(player.x + player.SPRITE_SIZE * player.size, player.y) && this.canSee(player.x, player.y + player.SPRITE_SIZE * player.size)) {
         this.targetAquired = true;
         if(this.findDistance(player.x, player.y) < minDist || minDist === -1) {
           this.targetx = player.x;
@@ -181,6 +181,12 @@ export default class MonsterCommon {
       } else {
         this.collision = false;
       }
+      if(!this.spriteIsOnMap()) {
+        this.x = prevx;
+        this.y = prevy;
+        this.targetx = prevx;
+        this.targety = prevy;
+      }
     }
   }
 
@@ -246,6 +252,8 @@ export default class MonsterCommon {
     this.y = this.floor.map.rooms[this.initialRoom].y + randomDiffY;
     if(!this.spriteIsOnMap())
       this.placeInRandomRoom();
+    if(this.type === "boss" && this.floor.map.rooms[this.initialRoom].height === this.floor.map.rooms[this.initialRoom].width)
+      this.placeInRandomRoom();
   }
 
   /**
@@ -274,10 +282,10 @@ export default class MonsterCommon {
           } else if(j === 1) { // upper right corner
             x = entity.x + spriteSize * entity.size;
             y = entity.y;
-          } else if(j === 1) { // lower right corner
+          } else if(j === 2) { // lower right corner
             x = entity.x + spriteSize * entity.size;
             y = entity.y + spriteSize * entity.size;
-          } else if(j === 1) { // lower left corner
+          } else if(j === 3) { // lower left corner
             x = entity.x;
             y = entity.y + spriteSize * entity.size;
           }

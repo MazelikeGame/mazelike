@@ -72,7 +72,13 @@ export default class PlayerCommon {
     this._setStatsToBase();
 
     this.inventory = [];
-    this.wearing = [];
+    this.wearing = {
+      'hat': null,
+      'chest': null,
+      'glove': null,
+      'shortWep': null, // will need to change to weapon, or offhand?
+      'shield': null
+    };
   }
 
   /**
@@ -246,7 +252,7 @@ export default class PlayerCommon {
       this.x += frame.vx * duration;
       this.y += frame.vy * duration;
 
-      if(!this.spriteIsOnMap()) {
+      if(!this.spriteIsOnMap() || this.collisionEntities(this.floor.monsters, Monster.SPRITE_SIZE) !== -1) {
         this.x = prev.x;
         this.y = prev.y;
       }
@@ -264,6 +270,45 @@ export default class PlayerCommon {
     /* eslint-enable complexity */
   }
 
+  /* eslint-disable complexity, no-mixed-operators */
+  /**
+   * Checks to see if there's a monster colliding with this monster.
+   * Compares corners of each sprite to do so.
+   * @returns {boolean}
+   */
+  collisionEntities(entities, spriteSize) {
+    let x = -1;
+    let y = -1;
+    for(let entity of entities) {
+      if(this.id !== entity.id) {
+        for(let j = 0; j < 4; j++) { // four corners to check for each sprite
+          if(j === 0) { // upper left corner
+            x = entity.x;
+            y = entity.y;
+          } else if(j === 1) { // upper right corner
+            x = entity.x + spriteSize * entity.size;
+            y = entity.y;
+          } else if(j === 2) { // lower right corner
+            x = entity.x + spriteSize * entity.size;
+            y = entity.y + spriteSize * entity.size;
+          } else if(j === 3) { // lower left corner
+            x = entity.x;
+            y = entity.y + spriteSize * entity.size;
+          }
+          if(x >= this.x && x <= this.x + spriteSize * entity.size) { // within x bounds
+            if(y >= this.y && y <= this.y + spriteSize * entity.size) { // and within y bounds
+              let index = entities.indexOf(entity);
+              ml.logger.debug(`Player ${this.id} at (${this.x}, ${this.y}) collided with entity ${index} at (${entity.x}, ${entity.y})`, ml.tags.monster);
+              return index;
+            }
+          }
+        }
+      }
+    }
+    return -1; // indicate no collision
+  }
+  /* eslint-disable complexity, no-mixed-operators */
+
   /**
    * Player picks up nearby items if inventory is not full
    */
@@ -277,6 +322,7 @@ export default class PlayerCommon {
         item.pickup(this);
         this.inventory.push(item);
         ml.logger.verbose(`Player ${this.name} picked up a(n) ${item.spriteName}`, ml.tags.player);
+        this.wieldItem(item);
       }
     }
   }
@@ -286,20 +332,26 @@ export default class PlayerCommon {
    */
   updateStats() {
     this._setStatsToBase();
-    for(let item of this.wearing) {
-      this.speed += item.movementSpeed;
-      this.damage += item.damage;
-      this.defence += item.defence;
-      this.range += item.range;
+    for(let item of Object.values(this.wearing)) {
+      if(item) {
+        this.speed += item.movementSpeed;
+        this.damage += item.damage;
+        this.defence += item.defence;
+        this.range += item.range;
+      }
     }
+    ml.logger.verbose(`${this.name}'s stats are now ${this.speed}, ${this.damage}, ${this.defence}, ${this.range}`, ml.tags.player);
   }
 
-  wieldItem(/* item to wear */) {
-    let index = this.inventory.indexOf();
+  wieldItem(item) {
+    let index = this.inventory.indexOf(item);
     if(index > -1) {
-      let toWear = this.inventory[index];
-      this.inventory.splice(index, 1);
-      this.wearing.push(toWear); // need to implement logic for different types of items
+      if(!this.wearing[item.category]) {
+        this.inventory.splice(index, 1);
+        this.wearing[item.category] = item;
+        this.updateStats();
+        ml.logger.verbose(`Player ${this.name} wielded a(n) ${item.spriteName}`, ml.tags.player);
+      }
     }
   }
 
