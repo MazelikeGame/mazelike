@@ -1,4 +1,4 @@
-/* eslint-disable no-extra-parens, max-len, complexity, prefer-template */
+/* eslint-disable max-len, complexity, prefer-template */
 /* global PIXI */
 import PlayerCommon from "../common/player.mjs";
 import interpolate from "../common/interpolator.mjs";
@@ -16,6 +16,7 @@ export default class Player extends PlayerCommon {
     
     this.tinted = -1;
     this.hpDamageTaken = -1;
+    this._attackSprite = new PIXI.Graphics();
   }
 
   /**
@@ -69,7 +70,8 @@ export default class Player extends PlayerCommon {
     if(this.tinted !== -1) {
       if(this.sprite.tint === this.regularTint) {
         this.tint();
-        this.hpNotificationSprite.setText("-" + this.hpDamageTaken);
+        this.hpDamageTaken = Math.abs(this.hpDamageTaken) * -1;
+        this.hpNotificationSprite.setText(this.hpDamageTaken);
         this.hpNotificationSpriteOffset = (this.sprite.width / 2) - (this.hpNotificationSprite.width / 2);
         this.usernameSprite.position.set(this.x - viewX + this.usernameSpriteOffset, this.y - viewY - 15);
       }
@@ -79,6 +81,7 @@ export default class Player extends PlayerCommon {
         this.hpNotificationSprite.setText();
       }
     }
+    this._attackFrame(this.x - viewX, this.y - viewY);
   }
 
   /**
@@ -135,5 +138,71 @@ export default class Player extends PlayerCommon {
       this.tinted = new Date().getTime();
       this.hpDamageTaken = oldHP - this.hp;
     }
+  }
+
+  /**
+   * Start the attack animation
+   */
+  animateAttack(attackingAt) {
+    this._attackingAt = attackingAt;
+    this._attackStart = Date.now();
+  }
+
+  /**
+   * Render a single frame in the attack animation
+   */
+  _attackFrame(x, y) {
+    if(this._attackingAt !== undefined) {
+      this.floor.attackSprites.removeChild(this._attackSprite);
+
+      let percComplete = (Date.now() - this._attackStart) / PlayerCommon.ATTACK_TIME;
+
+      if(percComplete > 1) {
+        this._attackingAt = undefined;
+        return;
+      }
+
+      this._attackSprite = new PIXI.Graphics();
+      this.floor.attackSprites.addChild(this._attackSprite);
+
+      if(this.attackType === "rectangle") {
+        this._attackFrameRect(x, y, percComplete);
+      } else {
+        this._attackFrameArc(x, y, percComplete);
+      }
+    }
+  }
+
+  /**
+   * Render a single frame in the attack arc animation
+   */
+  _attackFrameArc(x, y, percComplete) {
+    let start = this._attackingAt - (this.attackAngle / 2) + (this.attackAngle * percComplete) - (Math.PI / 32);
+    let end = start + (Math.PI / 16);
+
+    this._attackSprite.moveTo(0, 0);
+    this._attackSprite.beginFill(this._attackColor || 0xcccccc);
+    this._attackSprite.lineStyle(0, 0x0);
+    this._attackSprite.arc(0, 0, this.range, start, end);
+    this._attackSprite.lineTo(0, 0);
+    this._attackSprite.alpha = 0.8;
+    this._attackSprite.position.set(x + (PlayerCommon.SPRITE_SIZE / 2), y + (PlayerCommon.SPRITE_SIZE / 2));
+  }
+
+  /**
+   * Render a single frame in the attack rect animation
+   */
+  _attackFrameRect(x, y, percComplete) {
+    let offset = PlayerCommon.SPRITE_SIZE / 2;
+    this._attackSprite.position.set(x + offset, y + offset);
+    this._attackSprite.lineStyle(7, this._attackColor || 0xcccccc);
+    this._attackSprite.alpha = 0.7;
+
+    let length = this.range * percComplete;
+    this._attackSprite.moveTo(0, 0);
+    this._attackSprite.lineTo(
+      length * Math.cos(this._attackingAt),
+      length * Math.sin(this._attackingAt)
+    );
   }
 }

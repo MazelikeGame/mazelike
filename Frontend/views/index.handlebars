@@ -5,7 +5,9 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="manifest" href="/manifest.json"/>
 	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<script src="/scripts/common.js"></script>
 
 	<title>MazeLike</title>
 
@@ -67,7 +69,6 @@
 				<ul class="main-nav nav navbar-nav navbar-right">
 					<li><a href="#home">Home</a></li>
 					<li><a href="#about">About</a></li>
-					<li><a href="#leaderboard">Leaderboard</a></li>
 					<li><a href="#team">Team</a></li>
 					<li><a href="#contact">Contact</a></li>
 				</ul>
@@ -85,7 +86,8 @@
 					<!-- home content -->
 					<div class="col-md-10 col-md-offset-1">
 						<div class="home-content">
-							<img class="logo" src="img/mazelike logo.png" alt="logo" width="800" height="220">
+							<img class="logo big-logo" src="img/mazelike logo.png" alt="logo" width="800" height="220">
+							<img class="logo small-logo" src="/img/m main.png" alt="logo" width="220" height="220">
               <p class="white-text">Version: {{version}}</p>
 							<a href="/account/create"><button class="white-btn">Create Account</button></a>
 							<a href="/account/login"><button class="blue-btn">Log in</button></a>
@@ -157,62 +159,7 @@
 	<!-- /About -->
 
 
-	<!-- Leaderboard -->
-	<div id="leaderboard" class="section md-padding">
-
-		<!-- Container -->
-		<div class="container">
-
-			<!-- Row -->
-			<div class="row">
-
-				<!-- Section header -->
-				<div class="section-header text-center">
-					<h2 class="title">Leaderboard</h2>
-				</div>
-				<!-- /Section header -->
-
-				<!-- about -->
-				<div class="col-md-4">
-					<div class="leaderboard">
-						<h3>1st</h3>
-						<h3>Team X</h3>
-						<p>Score: x</p>
-						<p>Players:</p>
-					</div>
-				</div>
-				<!-- /about -->
-
-				<!-- about -->
-				<div class="col-md-4">
-						<div class="leaderboard">
-						<h3>2nd</h3>
-						<h3>Team Y</h3>
-						<p>Score: y</p>
-						<p>Players:</p>
-					</div>
-				</div>
-				<!-- /about -->
-
-				<!-- about -->
-				<div class="col-md-4">
-						<div class="leaderboard">
-						<h3>3rd</h3>
-						<h3>Team Z</h3>
-						<p>Score: z</p>
-						<p>Players:</p>
-					</div>
-				</div>
-				<!-- /about -->
-
-			</div>
-			<!-- /Row -->
-
-		</div>
-		<!-- /Container -->
-
-	</div>
-	<!-- /Leaderboard -->
+	
 
 	<!-- Team -->
 	<div id="team" class="section md-padding">

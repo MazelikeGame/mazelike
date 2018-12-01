@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign,complexity */
 import "./logger.js"; // THIS MUST BE THE FIRST IMPORT
 import socketIO from "socket.io";
-import http from "http";
+import {createServer} from "./server";
 import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
 import movementHandler from "./handlers/player-movement";
@@ -33,7 +33,7 @@ export default async function main(env, httpd) {
 
   // Create the socket.io server
   if(!isNaN(PORT)) {
-    httpd = http.createServer((req, res) => {
+    httpd = createServer((req, res) => {
       res.end("Game server");
     }).listen(PORT, () => {
       ml.logger.info(`Game server listening on ${PORT}`);

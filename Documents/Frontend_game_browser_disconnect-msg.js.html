@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Backend/handlers/player-movement.mjs</title>
+    <title>JSDoc: Source: Frontend/game/browser/disconnect-msg.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: Backend/handlers/player-movement.mjs</h1>
+    <h1 class="page-title">Source: Frontend/game/browser/disconnect-msg.js</h1>
 
     
 
@@ -26,52 +26,57 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>const GRACE_PERIOD = 100;
-const MAX_FRAME_LENGTH = 50; /* # of ms between frames at 20 fps */
-
-/**
- * Handle player movement
- * @param sock 
- * @param floor 
- */
-export default function movementHandler(sock, floor) { 
-  sock.on("player-frame", async(frame) => {
-    let player = floor.players.find((_player) => {
-      return _player.name === sock.user.username;
-    });
-
-    if(player &amp;&amp; player.alive) {
-      verifyTimes(frame, player);
-      let frames = breakUpFrame(frame);
-      player._frames = player._frames.concat(frames);
-    }
-  });
-}
-
-// Ensure frame times make sense
-function verifyTimes(frame, player) {
-  let duration = (Date.now() - player._lastFrame) + GRACE_PERIOD;
-  let userDuration = Math.abs(frame.end - frame.start);
-  player._lastFrame = Date.now();
-
-  frame.end = frame.start + Math.min(userDuration, duration);
-}
-
-// Break up a long frame so collision detection can work
-function breakUpFrame(frame) {
-  let frames = [];
-
-  while(frame.end - frame.start > MAX_FRAME_LENGTH) {
-    let first = Object.assign({}, frame);
-    first.end = first.start + MAX_FRAME_LENGTH;
-    frame.start = first.end;
-    first.attacking = false;
-    frames.push(first);
+            <pre class="prettyprint source linenums"><code>/*global PIXI*/
+export default class DiconnectMessage {
+  constructor(msg) {
+    this.msg = msg;
+    this.graphics = new PIXI.Graphics();
+    this.disconnectBox = new PIXI.Graphics();
   }
 
-  frames.push(frame);
-  return frames;
-}</code></pre>
+  /**
+   * Renders the disconnect message.
+   */
+  render() {
+    this.draw();
+    return this.graphics;
+  }
+
+  /**
+   * Resizes the disconnect box when the window is resized.
+   */
+  resize() {
+    this.disconnectBox.position.set(window.innerWidth - 310, 10); //eslint-disable-line
+  }
+
+  /**
+   * Creates the elements of the disconnect message in PIXI.
+   */
+  draw() {  
+    //Black background with white border
+    let outline = new PIXI.Graphics();
+    outline.beginFill(0x000000);
+    outline.fillAlpha = 0.75;
+    outline.lineStyle(2, 0xFFFFFFF, 1);
+    outline.drawRect(0, 0, 300, 30);
+    outline.position.set(0, 0); //eslint-disable-line
+    outline.endFill();
+    this.disconnectBox.addChild(outline);
+
+    this._disconnectMessageStyle = new PIXI.TextStyle({
+      fill: "#fff",
+      fontSize: 16
+    });
+    
+    //Disconnect Message
+    let msg = new PIXI.Text(this.msg, this._disconnectMessageStyle);
+    msg.position.set(15, 5); //eslint-disable-line
+    this.disconnectBox.addChild(msg);
+    this.graphics.addChild(this.disconnectBox);
+  }
+
+}
+</code></pre>
         </article>
     </section>
 

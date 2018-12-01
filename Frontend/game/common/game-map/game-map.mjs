@@ -1,4 +1,4 @@
-/* eslint-disable complexity,no-extra-parens,no-mixed-operators,consistent-return */
+/* eslint-disable complexity,no-mixed-operators,consistent-return */
 /** @module common/game-map/GameMap */
 import {MIN_SIZE, THEMES} from "./game-map-const.mjs";
 import Room from "./room.mjs";

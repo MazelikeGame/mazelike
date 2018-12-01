@@ -53,8 +53,9 @@ export default class Floor extends FloorCommon {
   static async load(gameId, floorIdx) {
     let floor = new Floor(gameId, floorIdx);
 
+    await GameMap.load(floor);
+
     await Promise.all([
-      GameMap.load(floor),
       Monster.load(floor),
       Player.load(floor)
     ]);
