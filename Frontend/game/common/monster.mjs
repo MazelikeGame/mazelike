@@ -9,7 +9,7 @@ import PlayerCommon from "./player.mjs";
 import interpolate from "./interpolator.mjs";
 
 export default class MonsterCommon {
-  
+
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
     this.name = name_in;
     this.hp = hp_in;
@@ -39,8 +39,8 @@ export default class MonsterCommon {
 
   /**
    * Returns true if monster can see given pixel coordinate.
-   * @param x 
-   * @param y 
+   * @param x
+   * @param y
    */
   canSee(x, y) {
     let x1 = -1, x2 = -1, y1 = -1, y2 = -1;
@@ -71,7 +71,7 @@ export default class MonsterCommon {
         for(let k = y1; k <= y2; k += 20) {
           if(!this.floor.map.isOnMap(j, k)) {
             return false;
-          }  
+          }
         }
       }
     }
@@ -80,8 +80,8 @@ export default class MonsterCommon {
 
   /**
    * Finds distance between monster and coodinate.
-   * @param x 
-   * @param y 
+   * @param x
+   * @param y
    * @return {double}
    */
   findDistance(x, y) {
@@ -111,7 +111,7 @@ export default class MonsterCommon {
     return minDist !== -1;
   }
 
-  /**  
+  /**
    * Monster moves to an adjacent, unoccupied location.
    */
   wander() {
@@ -133,7 +133,7 @@ export default class MonsterCommon {
       // eslint-disable-next-line
       dist = Math.sqrt(Math.abs(prev.x - this.x) ** 2 + Math.abs(prev.y - this.y) ** 2);
     } while(this.spriteIsOnMap() && dist < targetDist && --count > 0);
-    
+
     // Back up until we are back on the map
     do {
       this.x -= Math.cos(theta);
@@ -190,7 +190,7 @@ export default class MonsterCommon {
     }
   }
 
-  /** 
+  /**
    * Moves monster.
    * If PC has been seen, move strategically towards last seen location.
    * Else (if PC not seen yet or last seen PC location has been explored) the monster wanders.
@@ -214,7 +214,7 @@ export default class MonsterCommon {
     }
   }
 
-  /** 
+  /**
    * Player attacks Monster
    * @param {*} hp health points that the monster's health decrements by
    */
@@ -223,18 +223,19 @@ export default class MonsterCommon {
     if(this.hp <= 0) {
       this.die();
     }
-    ml.logger.verbose(`Monster ${this.id} was attached with ${hp} damage (hp: ${this.hp})`, ml.tags.monster);
+    ml.logger.verbose(`Monster ${this.id} was attacked with ${hp} damage (hp: ${this.hp})`, ml.tags.monster);
   }
 
-  /** 
+  /**
    * Monster attacks PC
    * @param {*} playerID id for player that monster is attacking
    */
   attack(playerID) {
+    this.die();
     this.floor.players[playerID].beAttacked(this.damage);
   }
 
-  /** 
+  /**
    * Places monster in a random "room" with no other monsters.
    */
   placeInRandomRoom() {
@@ -245,9 +246,9 @@ export default class MonsterCommon {
         this.placeInRandomRoom();
       }
     }
-    let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].width); 
+    let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].width);
     this.x = this.floor.map.rooms[this.initialRoom].x + randomDiffX;
-    let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].height); 
+    let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].height);
     this.y = this.floor.map.rooms[this.initialRoom].y + randomDiffY;
     if(!this.spriteIsOnMap())
       this.placeInRandomRoom();
@@ -260,7 +261,7 @@ export default class MonsterCommon {
    * @returns {boolean}
    */
   spriteIsOnMap() {
-    return this.floor.map.isOnMap(this.x, this.y) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y) 
+    return this.floor.map.isOnMap(this.x, this.y) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y)
     && this.floor.map.isOnMap(this.x, this.y + MonsterCommon.SPRITE_SIZE * this.size) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y + MonsterCommon.SPRITE_SIZE * this.size);
   }
 

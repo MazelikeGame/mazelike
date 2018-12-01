@@ -3,10 +3,10 @@
   "short_name": "Mazelike",
   "display": "standalone",
   "background_color": "#000",
-  "description": "Multiplayer video game played in a browser.",
+  "description": "A dungeon crawling game",
   "start_url": "/",
   "icons": [{
-    "src": "/img/m-alt.png",
+    "src": "/img/m main.png",
     "sizes": "754x754",
     "type": "image/png"
   }]

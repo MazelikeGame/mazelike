@@ -5,6 +5,7 @@ import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
 import Player from "./player.mjs";
 import Monster from "./monster.mjs";
+import Item from './item.mjs';
 
 export default class Floor extends FloorCommon {
   constructor(gameId, floorIdx, sock, username) {
@@ -20,7 +21,10 @@ export default class Floor extends FloorCommon {
 
     this.players = [];
     this.playerSprites = new PIXI.Container();
-    
+
+    this.items = [];
+    this.itemSprites = new PIXI.Container();
+
     this.attackSprites = new PIXI.Container();
   }
 
@@ -108,12 +112,16 @@ export default class Floor extends FloorCommon {
 
     this.sprite.addChild(this.attackSprites);
 
-    for(let i = 0; i < this.monsters.length; i++) {
-      this.monsters[i].createSprite();
+    for(let monster of this.monsters) {
+      monster.createSprite();
     }
-    for(let i = 0; i < this.players.length; ++i) {
-      this.players[i].createSprite();
+    for(let player of this.players) {
+      player.createSprite();
     }
+    for(let item of this.items) {
+      item.createSprite();
+    }
+    this.sprite.addChild(this.itemSprites);
     this.sprite.addChild(this.playerSprites);
     this.sprite.addChild(this.monsterSprites);
   }
@@ -127,6 +135,9 @@ export default class Floor extends FloorCommon {
     }
     for(let i = 0; i < this.players.length; ++i) {
       this.players[i].update(this._viewportX, this._viewportY);
+    }
+    for(let i = 0; i < this.items.length; ++i) {
+      this.items[i].update(this._viewportX, this._viewportY);
     }
     this._mapRenderer.update(
       this._viewportX,
@@ -180,12 +191,32 @@ export default class Floor extends FloorCommon {
       player._lastFrameSent = raw._lastFrame;
       player.x = raw._confirmedX;
       player.y = raw._confirmedY;
-      
+
       if(raw.username === username) {
         this.setViewport(player.x, player.y);
       }
 
       return player;
+    });
+    this._diffState('id', 'id', this.items, state.items, (raw) => {
+      let item = new Item(
+        this,
+        raw.spriteName,
+        raw.spriteSize,
+        raw.movementSpeed,
+        raw.attackSpeed,
+        raw.attack,
+        raw.defence,
+        raw.range,
+        raw.id,
+        raw.category
+      );
+      item.handleState(raw);
+      if(raw.isOnFloor) {
+        item.setCoordinates(raw.x, raw.y);
+        item.createSprite();
+      }
+      return item;
     });
   }
 
@@ -207,7 +238,7 @@ export default class Floor extends FloorCommon {
 
     for(let i = 0; i < current.length; ++i) {
       let obj = current[i];
-      
+
       // already have an instance update it
       if(wantedIds.has(obj[idKey])) {
         obj.handleState(wantedIds.get(obj[idKey]));
