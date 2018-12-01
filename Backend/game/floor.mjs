@@ -4,6 +4,7 @@ import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
 import Monster from "./monster.mjs";
 import Player from './player';
+import LadderCommon from "../../Frontend/game/common/ladder.mjs";
 
 export default class Floor extends FloorCommon {
   /**
@@ -59,7 +60,7 @@ export default class Floor extends FloorCommon {
       Monster.load(floor),
       Player.load(floor)
     ]);
-
+    
     return floor;
   }
 
@@ -86,6 +87,9 @@ export default class Floor extends FloorCommon {
     }
     for(let player of this.players) {
       player.move();
+      
+      LadderCommon.collision(player, this.map.ladder);
+
       if(player._frames.length) {
         player._confirmedId = player._frames[player._frames.length - 1].id;
       }
