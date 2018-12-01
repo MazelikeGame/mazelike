@@ -571,11 +571,18 @@ export default class PlayerCommon {
    * @param {*} hp health points that the player's health decrements by
    */
   beAttacked(hp) {
-    this.hp -= hp;
+    let damageTaken = 0;
+    if(this.defence !== BASE_STATS.hp) {
+      damageTaken = hp * 0.3;
+      this.hp -= damageTaken; // use dice here instead
+    } else {
+      damageTaken = hp;
+      this.hp -= damageTaken;
+    }
     if(this.hp <= 0) {
       this.die();
     }
-    ml.logger.verbose(`Player ${this.name} was attacked with ${hp} damage (hp: ${this.hp})`, ml.tags.player);
+    ml.logger.verbose(`Player ${this.name} was attacked with ${damageTaken} damage (hp: ${this.hp})`, ml.tags.player);
   }
 
   /**
