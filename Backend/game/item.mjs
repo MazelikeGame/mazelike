@@ -44,24 +44,30 @@ export default class Item extends ItemCommon {
   /**
    * Saves items to the database.
    * @param {Floor} floor - The floor the items are on
-   * @param {boolean} create - Create new item rows
    */
   static async saveAll(floor) {
-    let items = [];
     for(let item of floor.items) {
-      items.push({
+      let uniqueId = item.id;
+      if(typeof(item.id) === typeof('string')) {
+        uniqueId = item.id.slice(item.id.lastIndexOf('-') + 1);
+      }
+      let dataToSave = {
+        id: `${item.floor.id}-${uniqueId}`,
         floorId: item.floor.id,
         x: item.x,
         y: item.y,
         spriteName: item.spriteName
-      });
-    }
-    if(items.length) {
-      await ItemModel.bulkCreate(items,
-        {
-          updateOnDuplicate: ['x', 'y']
+      }
+      let itemFound = await ItemModel.findOne({
+        where: {
+          id: dataToSave.id
         }
-      );
+      });
+      if(itemFound) {
+        itemFound.update(dataToSave);
+      } else {
+        ItemModel.create(dataToSave);
+      }
     }
   }
 
@@ -96,11 +102,12 @@ export default class Item extends ItemCommon {
       randomItem.attack,
       randomItem.defence,
       randomItem.range,
-      ++numItems,
+      floor.map.numItems,
       randomItem.category,
       randomItem.accuracy,
       randomItem.attackStyle
     );
+    ++floor.map.numItems;
     newItem.setCoordinates(x, y);
     newItem.isOnFloor = true;
     floor.items.push(newItem);

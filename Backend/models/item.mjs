@@ -17,6 +17,10 @@ let Item = sql.define('items', {
   spriteName: {
     type: Sequelize.STRING,
     allowNull: true
+  },
+  id: {
+    primaryKey: true,
+    type: Sequelize.STRING
   }
 });
 
