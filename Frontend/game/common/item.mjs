@@ -15,6 +15,7 @@ export default class Item {
    * @param {int} accuracy - Angle or width of the semi-circle or rectangle for attacking
    * @param {string} attackStyle - Could be ranged or melee, or null if not a weapon
    */
+  /* eslint-disable-next-line complexity */
   constructor(
     floor,
     spriteName,
