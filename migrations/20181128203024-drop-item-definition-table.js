@@ -4,7 +4,6 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return [
       queryInterface.dropTable('itemDefinitions'),
-      queryInterface.removeColumn('items', 'fkDefinition')
     ];
   },
 
