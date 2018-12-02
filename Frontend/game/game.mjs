@@ -192,10 +192,6 @@ async function setup() {
   let gameRunning = new Promise((resolve) => {
     resolveGameRunning = resolve;
   });
-
-  sock.on("regenerate", (floor) => {
-
-  });
   
   sock.on("state", (state) => {
     floor.handleState(state, username);
