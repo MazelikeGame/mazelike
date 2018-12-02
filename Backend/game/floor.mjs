@@ -61,7 +61,7 @@ export default class Floor extends FloorCommon {
       Monster.load(floor),
       Player.load(floor)
     ]);
-    
+
     return floor;
   }
 
@@ -88,6 +88,7 @@ export default class Floor extends FloorCommon {
     }
     for(let player of this.players) {
       player.move();
+
       if(typeof this.regenerate === 'undefined') {
         if(LadderCommon.collision(player, this.map.ladder)) {
           this.regenerate = true; //Allows this to only regenerate once.
@@ -110,7 +111,6 @@ export default class Floor extends FloorCommon {
    */
   sendState(io, isGameRunning) {
     io.emit("state", {
-      floor: this,
       monsters: this.monsters,
       players: this.players,
       isGameRunning
