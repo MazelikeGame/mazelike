@@ -132,7 +132,10 @@ async function triggerTick(floor, io, lastUpdate) {
   try {
     await floor.tick(now - lastUpdate);
     if(typeof floor.regenerate !== 'undefined') {
-      console.log("Floor needs regenerated");
+      let gameId = floor.id;
+      let newFloor = Floor.generate({gameId});
+      newFloor.players = floor.players;
+      floor = newFloor;
     }
     await floor.sendState(io, isGameRunning);
   } catch(err) {

@@ -193,6 +193,10 @@ async function setup() {
     resolveGameRunning = resolve;
   });
 
+  sock.on("regenerate", (floor) => {
+
+  });
+  
   sock.on("state", (state) => {
     floor.handleState(state, username);
 
