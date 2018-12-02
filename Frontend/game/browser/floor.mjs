@@ -26,6 +26,8 @@ export default class Floor extends FloorCommon {
     this.itemSprites = new PIXI.Container();
 
     this.attackSprites = new PIXI.Container();
+
+    this.wearingSprites = new PIXI.Container();
   }
 
   /**
@@ -209,7 +211,8 @@ export default class Floor extends FloorCommon {
         raw.defence,
         raw.range,
         raw.id,
-        raw.category
+        raw.category,
+        raw.holder
       );
       item.handleState(raw);
       if(raw.isOnFloor) {

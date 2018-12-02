@@ -37,10 +37,14 @@ export default class Item extends ItemCommon {
    * @param viewY
    */
   update(viewX, viewY) {
-    if(this.isOnFloor) {
-      this.sprite.position.set(this.x - viewX, this.y - viewY);
-    } else {
+    this.sprite.position.set(this.x - viewX, this.y - viewY);
+    if(!this.isOnFloor) {
       this.remove();
+    }
+    if(this.holder) {
+      console.log(`${this.spriteName} sprite in holder. Holder's coords ${this.holder.x}, ${this.holder.y}`);
+      console.log(`${this.sprite.x}, ${this.sprite.y}`);
+      this.floor.wearingSprites.addChild(this.sprite);
     }
   }
 

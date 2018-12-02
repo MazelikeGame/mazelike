@@ -7,6 +7,8 @@ import UserModel from '../models/user';
 
 /** @module backend/game/player */
 
+const MAX_INVENTORY_SIZE = 8;
+
 /**
  * The player class.
  */
@@ -110,6 +112,9 @@ export default class Player extends PlayerCommon {
    * Serialize player model for client
    */
   toJSON() {
+    if(this.inventory.length < MAX_INVENTORY_SIZE) {
+      this._pickupNearbyItems();
+    }
     return {
       username: this.name,
       hp: this.hp,
@@ -133,5 +138,73 @@ export default class Player extends PlayerCommon {
     /* Remove the player from the player array */
     let player = this.floor.players.indexOf(this);
     this.floor.players.splice(player, 1);
+  }
+
+  /**
+   * Player picks up nearby items if inventory is not full
+   */
+  _pickupNearbyItems() {
+    for(let item of this.floor.items) {
+      if(
+        item.getPosition() &&
+        this.inventory.length < MAX_INVENTORY_SIZE &&
+        this._withinRadius(this.getPosition(), item.getPosition(), 12)
+      ) {
+        item.pickup(this);
+        this.inventory.push(item);
+        ml.logger.verbose(`Player ${this.name} picked up a(n) ${item.spriteName}`, ml.tags.player);
+        this.wieldItem(item);
+      }
+    }
+  }
+
+  /**
+   * Updates the player's stats based on what is being worn.
+   */
+  updateStats() {
+    this._setStatsToBase();
+    for(let item of Object.values(this.wearing)) {
+      if(item) {
+        this.speed += item.movementSpeed;
+        this.damage += item.damage;
+        this.defence += item.defence;
+        this.range += item.range;
+      }
+    }
+    ml.logger.verbose(`${this.name}'s stats are now ${this.speed}, ${this.damage}, ${this.defence}, ${this.range}`, ml.tags.player);
+  }
+
+  wieldItem(item) {
+    let index = this.inventory.indexOf(item);
+    if(index > -1) {
+      if(!this.wearing[item.category]) {
+        this.inventory.splice(index, 1);
+        this.wearing[item.category] = item;
+        item.wear(this);
+        this.updateStats();
+        ml.logger.verbose(`Player ${this.name} wielded a(n) ${item.spriteName}`, ml.tags.player);
+      }
+    }
+  }
+
+  // _setStatsToBase() {
+  //   this.speed = BASE_STATS.speed;
+  //   this.damage = BASE_STATS.damage;
+  //   this.defence = BASE_STATS.defence;
+  //   this.range = BASE_STATS.range;
+  // }
+
+  /**
+   * Returns true if obj is within the desired radius of the center circle.
+   *
+   * @param {object} center - Coords to use that acts as the center of the circle
+   * @param {object} obj - Object to compare to center's coord
+   * @param {int} radius - the desired radius of the circle to check
+   */
+  _withinRadius(center, obj, radius) {
+    let centerCoords = { x: Math.round(center.x), y: Math.round(center.y) };
+    let objCoords = { x: Math.round(obj.x), y: Math.round(obj.y) };
+    let hyp = Math.pow(objCoords.x - centerCoords.x, 2) + Math.pow(objCoords.y - centerCoords.y, 2);
+    return hyp <= Math.pow(radius, 2);
   }
 }

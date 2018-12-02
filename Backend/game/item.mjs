@@ -77,7 +77,7 @@ export default class Item extends ItemCommon {
       spriteSize: this.spriteSize,
       movementSpeed: this.movementSpeed,
       attackSpeed: this.attackSpeed,
-      attack: this.attack,
+      damage: this.damage,
       defence: this.defence,
       range: this.range,
       x: this.x,
@@ -85,9 +85,24 @@ export default class Item extends ItemCommon {
       isOnFloor: this.isOnFloor,
       category: this.category,
       accuracy: this.accuracy,
-      attackStyle: this.attackStyle
+      attackStyle: this.attackStyle,
+      holder: this.holder
     };
   }
+
+  /**
+   * Puts item in a state that signifies that it has been
+   * worn
+   * @param {Player} wearer - Person wearing the item
+   */
+  wear(wearer) {
+    this.setCoordinates(Math.round(wearer.x), Math.round(wearer.y));
+    this.isOnFloor = true;
+    console.log(`Setting wearer for object ${this.spriteName}`);
+    this.holder = wearer;
+    console.log(this.holder);
+  }
+
 
   static async spawnRandomItem(floor, x, y) {
     let itemDefs = await Item.getItemDefinitions();

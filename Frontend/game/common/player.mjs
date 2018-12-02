@@ -28,7 +28,6 @@ const MAPPINGS = {
   [KEYS.e]: KEYS.e
 };
 
-const MAX_INVENTORY_SIZE = 8;
 const BASE_STATS = {
   hp: 100,
   hpMax: 100,
@@ -161,7 +160,7 @@ export default class PlayerCommon {
       this.vxAttack -= 1;
     }
     if(this.input.has(KEYS.e)) {
-      this.wieldItem();
+      // this.wieldItem();
     }
 
     if(this.vxAttack || this.vyAttack) {
@@ -262,9 +261,6 @@ export default class PlayerCommon {
       if(typeof window === "undefined") {
         this.processAttack(frame);
 
-        if(this.inventory.length < MAX_INVENTORY_SIZE) {
-          this._pickupNearbyItems();
-        }
       }
     });
     /* eslint-enable complexity */
@@ -309,72 +305,6 @@ export default class PlayerCommon {
   }
   /* eslint-disable complexity, no-mixed-operators */
 
-  /**
-   * Player picks up nearby items if inventory is not full
-   */
-  _pickupNearbyItems() {
-    for(let item of this.floor.items) {
-      if(
-        item.getPosition() &&
-        this.inventory.length < MAX_INVENTORY_SIZE &&
-        this._withinRadius(this.getPosition(), item.getPosition(), 12)
-      ) {
-        item.pickup(this);
-        this.inventory.push(item);
-        ml.logger.verbose(`Player ${this.name} picked up a(n) ${item.spriteName}`, ml.tags.player);
-        this.wieldItem(item);
-      }
-    }
-  }
-
-  /**
-   * Updates the player's stats based on what is being worn.
-   */
-  updateStats() {
-    this._setStatsToBase();
-    for(let item of Object.values(this.wearing)) {
-      if(item) {
-        this.speed += item.movementSpeed;
-        this.damage += item.damage;
-        this.defence += item.defence;
-        this.range += item.range;
-      }
-    }
-    ml.logger.verbose(`${this.name}'s stats are now ${this.speed}, ${this.damage}, ${this.defence}, ${this.range}`, ml.tags.player);
-  }
-
-  wieldItem(item) {
-    let index = this.inventory.indexOf(item);
-    if(index > -1) {
-      if(!this.wearing[item.category]) {
-        this.inventory.splice(index, 1);
-        this.wearing[item.category] = item;
-        this.updateStats();
-        ml.logger.verbose(`Player ${this.name} wielded a(n) ${item.spriteName}`, ml.tags.player);
-      }
-    }
-  }
-
-  _setStatsToBase() {
-    this.speed = BASE_STATS.speed;
-    this.damage = BASE_STATS.damage;
-    this.defence = BASE_STATS.defence;
-    this.range = BASE_STATS.range;
-  }
-
-  /**
-   * Returns true if obj is within the desired radius of the center circle.
-   *
-   * @param {object} center - Coords to use that acts as the center of the circle
-   * @param {object} obj - Object to compare to center's coord
-   * @param {int} radius - the desired radius of the circle to check
-   */
-  _withinRadius(center, obj, radius) {
-    let centerCoords = { x: Math.round(center.x), y: Math.round(center.y) };
-    let objCoords = { x: Math.round(obj.x), y: Math.round(obj.y) };
-    let hyp = Math.pow(objCoords.x - centerCoords.x, 2) + Math.pow(objCoords.y - centerCoords.y, 2);
-    return hyp <= Math.pow(radius, 2);
-  }
 
   /**
    * Process an attack frame
@@ -591,6 +521,13 @@ export default class PlayerCommon {
    */
   attack(monster) {
     monster.beAttacked(this.damage);
+  }
+
+  _setStatsToBase() {
+    this.speed = BASE_STATS.speed;
+    this.damage = BASE_STATS.damage;
+    this.defence = BASE_STATS.defence;
+    this.range = BASE_STATS.range;
   }
 }
 PlayerCommon.SPRITE_SIZE = 48;

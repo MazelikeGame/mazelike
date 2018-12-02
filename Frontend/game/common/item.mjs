@@ -28,7 +28,8 @@ export default class Item {
     id,
     category,
     accuracy,
-    attackStyle
+    attackStyle,
+    holder
   ) {
     this.floor = floor;
     this.spriteName = spriteName;
@@ -44,6 +45,7 @@ export default class Item {
     this.attackStyle = attackStyle;
     this.x = null;
     this.y = null;
+    this.holder = holder || null;
     this.isOnFloor = false;
   }
 
