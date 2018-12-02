@@ -4,7 +4,7 @@
   "scripts": {
     "test": "echo Tests should be run from the tests directory (don't forget to npm install when you get there) && exit 1",
     "start": "sequelize db:migrate && node --experimental-modules Backend/index.mjs",
-    "doc": "jsdoc -r Frontend/game Backend -c jsdoc.json -d Documents",
+    "doc": "jsdoc -r Frontend/game Backend doc.md -c jsdoc.json -d Documents",
     "eslint": "eslint Frontend Backend --ext .js,.mjs",
     "debug": "node --experimental-modules --inspect Backend/index.mjs",
     "db:migrate": "sequelize db:migrate",

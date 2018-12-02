@@ -5,15 +5,12 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-COPY .babelrc .
-COPY Frontend .
+COPY . .
 
-WORKDIR /app/game
-RUN ../node_modules/.bin/rollup game.mjs --format iife --name mazelike --file game.mjs && \
-  ../node_modules/.bin/babel game.mjs -o game.js
-
-WORKDIR /app/scripts
-RUN ../node_modules/.bin/babel lobby.js -o lobby.js
+RUN npm run doc && \
+  ./node_modules/.bin/rollup Frontend/game/game.mjs --format iife --name mazelike --file Frontend/game/game.mjs && \
+  ./node_modules/.bin/babel Frontend/game/game.mjs -o Frontend/game/game.js && \
+  ./node_modules/.bin/babel Frontend/scripts/lobby.js -o Frontend/scripts/lobby.js
 
 FROM node:8.11-alpine
 
@@ -23,8 +20,8 @@ COPY package*.json ./
 RUN npm install --production
 
 COPY . .
-COPY --from=build /app/game/game.*js Frontend/game/
-COPY --from=build /app/scripts/lobby.js Frontend/scripts/
+COPY --from=build /app/Frontend Frontend
+COPY --from=build /app/Documents /app/Documents
 RUN sed -i "s/VERSION-HERE/$(cat VERSION)/" Frontend/sw.js
 
 VOLUME /data

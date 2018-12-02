@@ -35,6 +35,7 @@ if(process.env.PUBLIC_DIR) {
   app.use("/public", express.static(process.env.PUBLIC_DIR));
 }
 
+app.use("/docs", express.static("Documents"));
 app.use(express.static("Frontend"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
