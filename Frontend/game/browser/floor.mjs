@@ -85,7 +85,6 @@ export default class Floor extends FloorCommon {
 
     floor._initRendering();
     
-    console.log("----FLOOR----");
     console.log(floor);
 
     return floor;
