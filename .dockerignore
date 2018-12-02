@@ -16,6 +16,5 @@ tests
 .gitignore
 .gitlab-ci.yml
 .vscode
-.babelrc
 scripts/build
 Frontend/game/Tests

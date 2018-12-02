@@ -8,14 +8,14 @@
     <meta name="theme-color" content="#203255"/>
     <link rel="manifest" href="/manifest.json"/>
     <script async src="/scripts/common.js"></script>
-    <link rel="preload" href="DawnLike/Objects/Floor.json" as="fetch"/>
-    <link rel="preload" href="DawnLike/Characters/dog.json" as="fetch"/>
-    <link rel="preload" href="DawnLike/Characters/demon.json" as="fetch"/>
-    <link rel="preload" href="DawnLike/Characters/player.json" as="fetch"/>
-    <link rel="preload" href="DawnLike/Items/Boot.json" as="fetch"/>
-    <link rel="preload" href="DawnLike/Items/Hat.json" as="fetch"/>
-    <link rel="preload" href="DawnLike/Items/Shield.json" as="fetch"/>
-    <link rel="preload" href="DawnLike/Items/ShortWep.json" as="fetch"/>
+    <link rel="preload" href="DawnLike/Objects/Floor.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Characters/dog.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Characters/demon.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Characters/player.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Items/boot.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Items/hat.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Items/shield.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Items/shortWep.json" as="fetch" crossorigin="anonymous"/>
     <link rel="preload" href="DawnLike/Objects/Floor.png" as="image"/>
     <link rel="preload" href="DawnLike/Characters/Dog0.png" as="image"/>
     <link rel="preload" href="DawnLike/Characters/Demon0.png" as="image"/>
@@ -145,5 +145,6 @@
     <script src="/js/socket.io.js"></script>
     <script src="/js/pixi.min.js"></script>
     <script type="module" src="game.mjs"></script>
+    <script nomodule src="game.js"></script>
   </body>
 </html>
