@@ -22,7 +22,6 @@ try {
 let auth;
 switch(dbUrl.protocol) {
 // install tedious@^1.7.0 and add case "mssql:": to a mysql support
-case "postgres":
 case "mysql:":
   conf.dialect = dbUrl.protocol.substr(0, dbUrl.protocol.length - 1);
 

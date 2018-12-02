@@ -99,14 +99,14 @@ export default class Floor extends FloorCommon {
 
   /**
    * Send the current state of the floor to the client
-   * @param {} io The socket io instance (not a sock)
+   * @param {} io The socket io boradcast instance for this game
    */
-  sendState(io, isGameRunning) {
+  sendState(io) {
     io.emit("state", {
       monsters: this.monsters,
       players: this.players,
-      items: this.items,
-      isGameRunning
+      isGameRunning: this.isGameRunning,
+      items: this.items
     });
   }
 }

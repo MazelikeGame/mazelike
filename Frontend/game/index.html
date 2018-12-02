@@ -5,8 +5,25 @@
     <base href="/game/"/>
     <link rel="icon" href="/img/m main.png"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <meta name="theme-color" content="#203255"/>
     <link rel="manifest" href="/manifest.json"/>
-    <script src="/scripts/common.js"></script>
+    <script async src="/scripts/common.js"></script>
+    <link rel="preload" href="DawnLike/Objects/Floor.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Characters/dog.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Characters/demon.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Characters/player.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Items/boot.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Items/hat.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Items/shield.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Items/shortWep.json" as="fetch" crossorigin="anonymous"/>
+    <link rel="preload" href="DawnLike/Objects/Floor.png" as="image"/>
+    <link rel="preload" href="DawnLike/Characters/Dog0.png" as="image"/>
+    <link rel="preload" href="DawnLike/Characters/Demon0.png" as="image"/>
+    <link rel="preload" href="DawnLike/Characters/Player0.png" as="image"/>
+    <link rel="preload" href="DawnLike/Items/Boot.png" as="image"/>
+    <link rel="preload" href="DawnLike/Items/Hat.png" as="image"/>
+    <link rel="preload" href="DawnLike/Items/Shield.png" as="image"/>
+    <link rel="preload" href="DawnLike/Items/ShortWep.png" as="image"/>
     <style>
       * {
         margin: 0px;
@@ -125,8 +142,9 @@
         </div>
       </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.dev.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.7.1/pixi.min.js"></script>
+    <script src="/js/socket.io.js"></script>
+    <script src="/js/pixi.min.js"></script>
     <script type="module" src="game.mjs"></script>
+    <script nomodule src="game.js"></script>
   </body>
 </html>

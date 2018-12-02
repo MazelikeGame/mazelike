@@ -4,22 +4,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="Dashboard">
-    <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+    <meta name="keyword" content="Dashboard, Bootstrap, Template">
     <link rel="icon" href="/img/m main.png"/>
     <link rel="manifest" href="/manifest.json"/>
     <script src="/scripts/common.js"></script>
+    <meta name="theme-color" content="#203255"/>
 
     <title>MazeLike - Account</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
     <!--external css-->
-    <link href="../font-awesome/css/font-awesome.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="../js/bootstrap-datepicker/css/datepicker.css" />
-    <link rel="stylesheet" type="text/css" href="../js/bootstrap-daterangepicker/daterangepicker.css" />
-
+    <link href="../css/font-awesome.min.css" rel="stylesheet" />
     <!-- Custom styles for this template -->
     <link href="../css/loggedinstyle.css" rel="stylesheet">
     <link href="../css/style-responsive.css" rel="stylesheet">
@@ -43,13 +39,8 @@
                 <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
             </div>
             <!--logo start-->
-            <a href="/account/dashboard" class="logo"><b>M A Z E L I K E</b></a>
+            <a href="/account/dashboard" class="logo"><img class="logo" src="../img/mazelike logo white.png" alt="logo" height=40 width=175></a>
             <!--logo end-->
-            <div class="top-menu">
-                <ul class="nav pull-right top-menu">
-                    <a href="/account/logout"><button class="blue-btn">Log Out</button></a>
-                </ul>
-            </div>
         </header>
         <!--header end-->
 
@@ -75,6 +66,11 @@
                         <a class="active" href="/account/view">
                             <i class="fa fa-tasks"></i>
                             <span>View Account</span>
+                        </a>
+                    </li>
+                    <li class="mt">
+                        <a href="/account/logout">
+                            <span>Logout</span>
                         </a>
                     </li>
                 </ul>
@@ -120,45 +116,11 @@
 
         <!-- js placed at the end of the document so the pages load faster -->
         <script src="../js/jquery.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
         <script class="include" type="text/javascript" src="../js/jquery.dcjqaccordion.2.7.js"></script>
-        <script src="../js/jquery.scrollTo.min.js"></script>
-        <script src="../js/jquery.nicescroll.js" type="text/javascript"></script>
 
 
         <!--common script for all pages-->
         <script src="../js/common-scripts.js"></script>
 
-        <!--script for this page-->
-        <script src="../js/jquery-ui-1.9.2.custom.min.js"></script>
-
-        <!--custom switch-->
-        <script src="../js/bootstrap-switch.js"></script>
-
-        <!--custom tagsinput-->
-        <script src="../js/jquery.tagsinput.js"></script>
-
-        <!--custom checkbox & radio-->
-
-        <script type="text/javascript" src="../js/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
-        <script type="text/javascript" src="../js/bootstrap-daterangepicker/date.js"></script>
-        <script type="text/javascript" src="../js/bootstrap-daterangepicker/daterangepicker.js"></script>
-
-        <script type="text/javascript" src="../js/bootstrap-inputmask/bootstrap-inputmask.min.js"></script>
-
-
-        <script src="../js/form-component.js"></script>
-
-
-        <script>
-            //custom select box
-
-            $(function () {
-                $('select.styled').customSelect();
-            });
-
-        </script>
-
 </body>
-
 </html>

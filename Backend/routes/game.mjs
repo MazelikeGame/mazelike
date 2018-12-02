@@ -9,7 +9,7 @@ import User from '../models/user';
 import sql from "../sequelize";
 import path from "path";
 import fs from "fs";
-import {spawnGame, getGameAddr} from "../managers/manager";
+import startGame from "../game.mjs";
 import Floor from "../game/floor";
 import MonsterModel from "../models/monster.mjs";
 import ItemModel from '../models/item.mjs';
@@ -202,7 +202,7 @@ export const joinRoute = async(req, res) => {
 
   ml.logger.info(`${req.user.username} joined ${lobby.lobbyId}`, ml.tags.lobby);
 
-  io.emit("lobby-add", {
+  io.of(`/lobby`).emit("lobby-add", {
     id: lobby.lobbyId,
     playerId: req.user.username,
     image_name: req.user.image_name
@@ -288,7 +288,7 @@ gameRouter.get("/lobby/:id/delete", async(req, res) => {
           }
         });
       });
-      io.emit("lobby-delete", req.params.id);
+      io.of(`/lobby`).emit("lobby-delete", req.params.id);
       await deleteGame(req.params.id);
       ml.logger.info(`Deleted ${req.params.id}`, ml.tags.lobby);
       res.redirect("/account/dashboard");
@@ -341,7 +341,7 @@ gameRouter.get("/lobby/:id/drop/:player", async(req, res) => {
     await player.update({
       inGame: false
     });
-    io.emit("lobby-drop", {
+    io.of(`/lobby`).emit("lobby-drop", {
       id: req.params.id,
       player: req.params.player
     });
@@ -386,16 +386,14 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
 
     try {
       ml.logger.verbose(`Spawning ${req.params.id}`, ml.tags.lobby);
-      await spawnGame({
-        gameId: req.params.id
-      });
+      startGame(req.params.id);
       await Lobby.update({ inProgress: true },
         {
           where: {
             lobbyId: req.params.id,
           }
         });
-      io.emit("lobby-start", req.params.id);
+      io.of(`/lobby`).emit("lobby-start", req.params.id);
       res.end("Game started");
     } catch(err) {
       await Lobby.update({ inProgress: false },
@@ -413,11 +411,6 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
 
   ml.logger.verbose(`${req.user.username} failed to start ${req.params.id}`, ml.tags.lobby);
   res.end("No such lobby or you are not the host");
-});
-
-// Get the game server address
-gameRouter.get("/addr/:id", (req, res) => {
-  res.end(getGameAddr(req.params.id));
 });
 
 // Serve /game/:id as /game/
