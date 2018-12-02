@@ -29,7 +29,7 @@ img{max-width:100%;}
 /*end reset*/
 /****-----start-body----****/
 body{
-	background-color:#86B4CC;
+	background-color:#f2f2f2;
 }
 .main{
 	margin:7em auto 0;
@@ -40,9 +40,6 @@ body{
 	vertical-align: middle;
 	margin-right: 5.2em;
 }
-.login{
-	padding:2em 0;
-}
 .inset {
 	position:relative;
 	background: #fff;
@@ -51,18 +48,6 @@ body{
 	-webkit-border-radius: 0.3em;
 	-o-border-radius: 0.3em;
 	-moz-border-radius: 0.3em;
-}
-.inset:before{
-	content: '';
-	width: 0;
-	height: 0;
-	border: 20px solid #FFF;
-	border-top: 0 solid rgba(0, 0, 0, 0)!important;
-	border-right: 13px solid rgba(0, 0, 0, 0)!important;
-	border-left: 13px solid rgba(0, 0, 0, 0);
-	left: 77.1%;
-	top: -5.3%;
-	position: absolute;
 }
 form span {
 	display: block;
@@ -107,7 +92,7 @@ input[type="text"]:hover,input[type="Password"]:hover, input[type="email"]:hover
 	margin-right: 11px;
 }
 .submit input[type="submit"] {
-	background: #F06B37;
+	background: #4484FF;
 	border: none;
 	outline: none;
 	padding: 0.55em 1.3em 0.6em;
@@ -126,7 +111,7 @@ input[type="text"]:hover,input[type="Password"]:hover, input[type="email"]:hover
 	font-weight: 600;
 }
 .submit input[type="submit"]:hover{
-	background:#62A0C4;
+	opacity: 0.8;
 }
 .create-account {
   float: right;
@@ -155,7 +140,6 @@ input[type="text"]:hover,input[type="Password"]:hover, input[type="email"]:hover
 	margin: 2em auto 0;
 }
 .copy-right p {
-	color: #FFF;
 	font-size: 1em;
 	font-family: 'Open Sans', sans-serif;
 }
@@ -265,9 +249,6 @@ input[type="text"]:hover,input[type="Password"]:hover, input[type="email"]:hover
 	}
 	.user {
 	margin-right: 4.2em;
-	}
-	.login {
-	padding: 1em 0;
 	}
 	.submit{
 	padding: 2px ;

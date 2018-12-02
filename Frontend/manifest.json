@@ -5,6 +5,7 @@
   "background_color": "#000",
   "description": "A dungeon crawling game",
   "start_url": "/",
+  "theme_color": "#203255",
   "icons": [{
     "src": "/img/m main.png",
     "sizes": "754x754",
