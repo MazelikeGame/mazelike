@@ -43,11 +43,6 @@
             <!--logo start-->
             <a href="/account/dashboard" class="logo"><img class="logo" src="../img/mazelike logo white.png" alt="logo" height=40 width=175></a>
             <!--logo end-->
-            <div class="top-menu">
-                <ul class="nav pull-right top-menu">
-                    <a href="/account/logout"><button class="blue-btn">Log Out</button></a>
-                </ul>
-            </div>
         </header>
         <!--header end-->
 
@@ -75,6 +70,11 @@
                             <span>View Account</span>
                         </a>
                     </li>
+                    <li class="mt">
+                        <a href="/account/logout">
+                            <span>Log Out</span>
+                        </a>
+                    </li>
                 </ul>
                 <!-- sidebar menu end-->
             </div>
@@ -88,19 +88,7 @@
         <section id="main-content">
             <section class="wrapper">
                 <div class="row mt">
-
-                    <!-- SERVER STATUS PANELS -->
-                    <div class="col-md-4 col-sm-4 mb">
-                        <div class="white-panel pn">
-                            <div class="white-header">
-                                <h5>Game Stats</h5>
-                            </div>
-                            <div class="row">
-                                <h5 id = "game stats">No Game Selected</h5>
-                            </div>
-                        </div>
-                    </div><!-- /col-md-4 -->
-                    <div class="col-md-4 col-sm-4 mb">
+                    <div class="col-md-7 col-sm-7 mb">
                         <div class="white-panel pn">
                             <div class="white-header">
                                 <h5>Games</h5>
@@ -108,14 +96,15 @@
                             <div class="row">
                                 {{#each lobbies}}
                                 <tr>
-                                    <input type="radio" name="gender" value="male" id={{lobbyId}} >     {{lobbyId}}<br>
+                                    <input type="radio" name="gender" value="male" id={{lobbyId}}>
+                                    &nbsp;<label for={{lobbyId}}>{{lobbyId}}</label><br>
                                 </tr>
                                 {{/each}}
                             </div>
                         </div>
                     </div><!-- /col-md-4-->
 
-                    <div class="col-md-3 col-sm-3 mb">
+                    <div class="col-md-4 col-sm-4 mb">
                         <div class="white-panel pn">
                             <div class="white-header">
                                 <h5>Options</h5>
@@ -160,12 +149,6 @@
             <script src="../js/zabuto_calendar.js"></script>
 
             <script>
-                // radio button listeners
-                $('input:radio').each(function () {
-                    document.getElementById(this.id).addEventListener('click', function (event) {
-                        document.getElementById("game stats").innerText = "Game <" + this.id + "> selected.";
-                    });
-                });
                 // continue button listener
                 document.getElementById("continue button").addEventListener('click', function (event) {
                     var selectedlobby = -1;
