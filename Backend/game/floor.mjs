@@ -1,3 +1,4 @@
+/*global ml*/
 /* eslint-disable complexity */
 /** @module backend/game/Floor */
 import FloorCommon from "../../Frontend/game/common/floor.mjs";
@@ -90,9 +91,8 @@ export default class Floor extends FloorCommon {
 
       if(typeof this.regenerate === 'undefined') {
         if(LadderCommon.collision(player, this.map.ladder)) {
-          console.log("LADDER");
           this.regenerate = true; //Allows this to only regenerate once.
-          //Signal to regenerate
+          ml.logger.info(`Spawning a new floor.`, ml.tags.ladder);
         }
       }
 
