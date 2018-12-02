@@ -140,170 +140,165 @@ let readyToPlay = new Promise((resolve) => {
 window.localStorage || (window.localStorage = {});
 fullscreenEl.checked = localStorage.fullscreen !== "false";
 
-async function setup() {
-  await readyToPlay;
-  msgEl.innerText = "Connecting to the game server";
+function setup() {
+  let sock, username;
 
-  let sock = io(`${location.origin}/game/${gameId}`);
+  readyToPlay.then(() => {
+    msgEl.innerText = "Connecting to the game server";
 
-  let username = await getUsername(sock);
-  msgEl.innerText = "Loading game";
-  let floor;
+    sock = io(`${location.origin}/game/${gameId}`);
 
-  if(gameId) {
-    floor = await Floor.load(gameId, 0, sock, username);
-  } else {
-    floor = Floor.generate({
-      gameId,
-      floorIdx: 0,
-      sock,
-      username
-    });
-  }
+    return getUsername(sock);
+  }).then((uname) => {
+    username = uname;
+    msgEl.innerText = "Loading game";
 
-  app.stage.addChild(floor.sprite);
-  floor.update();
-
-  // Show the fps counter on dev machines
-  let fps;
-  if(location.hostname === "localhost") {
-    fps = new FpsCounter();
-    app.stage.addChild(fps.sprite);
-  }
-
-  let controls = new MobileControls();
-  app.stage.addChild(controls.sprite);
-
-  window.ml.floor = floor;
-  addArrowKeyListener(floor, controls, username);
-
-  let resolveGameRunning;
-  let gameRunning = new Promise((resolve) => {
-    resolveGameRunning = resolve;
-  });
-
-  sock.on("state", (state) => {
-    floor.handleState(state, username);
-
-    if(state.isGameRunning) {
-      resolveGameRunning();
-    }
-  });
-
-  // display the countdown when it starts
-  sock.on("countdown", (count) => {
-    msgEl.innerText = `The game will start in ${count}`;
-  });
-
-  // wait for the game to start
-  msgEl.innerText = "Waiting for all players to join";
-
-  await Promise.race([
-    new Promise((resolve) => {
-      sock.once("start-game", resolve);
-    }),
-    gameRunning
-  ]);
-
-  document.body.classList.add("crosshair");
-  msgParentEl.style.display = "none";
-
-  // don't run monster logic multiplayer game (for now)
-  if(!gameId) {
-    window.setInterval(function() {
-      for(let i = 0; i < floor.monsters.length; i++) {
-        floor.monsters[i].figureOutWhereToGo();
-      }
-    }, 500);
-  }
-
-  sock.on("disconnect", () => {
-    app.stage.addChild(disconnected.render());
-  });
-
-  sock.on("update-playerlist", (player) => {
-    playerList.disconnectPlayer(player); //Update player list
-  });
-
-  playerList.floor = floor;
-  playerList.listOfPlayers = floor.players;
-  app.stage.addChild(playerList.render()); //Draw the player list
-
-  let isSpectator = false;
-  app.ticker.add(() => {
-    // spectator mode
-    if(!isSpectator && !getPlayer(floor, username)) {
-      document.body.classList.add("dead");
-      document.body.classList.remove("crosshair");
-      controls.becomeSpectator();
-      isSpectator = true;
-      floor.followingUser = floor.players[0] && floor.players[0].name;
-      // switch following users by pressing up and down
-      controls.bind(spectatorHandler.bind(null, floor), () => {});
-      window.addEventListener("keydown", spectatorHandler.bind(null, floor));
-      // show you died
-      msgHeader.innerText = "You died";
-      msgEl.innerHTML = "";
-      msgParentEl.style.display = "";
-
-      let a = document.createElement("a");
-      a.href = "#";
-      a.innerText = "Spectate";
-      msgEl.appendChild(a);
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        msgParentEl.style.display = "none";
-      });
-    }
-
-    // follow a specific player in spectator mode
-    if(isSpectator) {
-      let following = getPlayer(floor, floor.followingUser);
-      if(following) {
-        floor.setViewport(following.x, following.y);
-      } else if(floor.players.length) {
-        floor.followingUser = floor.players[0].name;
-      }
-    }
-
-    // show game over
-    if(floor.players.length === 0 && msgHeader.innerText !== "Game over") {
-      document.body.classList.remove("crosshair");
-      document.body.classList.add("dead");
-      msgHeader.innerText = "Game over";
-      msgEl.innerHTML = "";
-      msgParentEl.style.display = "";
-
-      let a = document.createElement("a");
-      a.href = "/account/dashboard";
-      a.innerText = "Dashboard";
-      msgEl.appendChild(a);
-
-      // Exit fullscreen
-      if(localStorage.fullscreen) {
-        if(document.documentElement.webkitExitFullScreen) {
-          document.documentElement.webkitExitFullScreen();
-        } else if(document.documentElement.exitFullScreen) {
-          document.documentElement.exitFullScreen();
-        }
-      }
-    }
-
-    let player = getPlayer(floor, username);
-    if(player) {
-      player.sendFrame();
-      player.dropConfirmed();
-      player.move();
-      floor.setViewport(player.x, player.y);
-    }
-
+    return Floor.load(gameId, 0, sock, username);
+  }).then((floor) => {
+    app.stage.addChild(floor.sprite);
     floor.update();
-    controls.update();
-    playerList.update();
 
-    if(fps) {
-      fps.update();
+    // Show the fps counter on dev machines
+    let fps;
+    if(location.hostname === "localhost") {
+      fps = new FpsCounter();
+      app.stage.addChild(fps.sprite);
     }
+
+    let controls = new MobileControls();
+    app.stage.addChild(controls.sprite);
+
+    window.ml.floor = floor;
+    addArrowKeyListener(floor, controls, username);
+
+    let resolveGameRunning;
+    let gameRunning = new Promise((resolve) => {
+      resolveGameRunning = resolve;
+    });
+
+    sock.on("state", (state) => {
+      floor.handleState(state, username);
+
+      if(state.isGameRunning) {
+        resolveGameRunning();
+      }
+    });
+
+    // display the countdown when it starts
+    sock.on("countdown", (count) => {
+      msgEl.innerText = `The game will start in ${count}`;
+    });
+
+    // wait for the game to start
+    msgEl.innerText = "Waiting for all players to join";
+
+    return Promise.race([
+      new Promise((resolve) => {
+        sock.once("start-game", resolve);
+      }),
+      gameRunning
+    ]).then(() => {
+      document.body.classList.add("crosshair");
+      msgParentEl.style.display = "none";
+
+      // don't run monster logic multiplayer game (for now)
+      if(!gameId) {
+        window.setInterval(function() {
+          for(let i = 0; i < floor.monsters.length; i++) {
+            floor.monsters[i].figureOutWhereToGo();
+          }
+        }, 500);
+      }
+
+      sock.on("disconnect", () => {
+        app.stage.addChild(disconnected.render());
+      });
+
+      sock.on("update-playerlist", (player) => {
+        playerList.disconnectPlayer(player); //Update player list
+      });
+
+      playerList.floor = floor;
+      playerList.listOfPlayers = floor.players;
+      app.stage.addChild(playerList.render()); //Draw the player list
+
+      let isSpectator = false;
+      app.ticker.add(() => {
+        // spectator mode
+        if(!isSpectator && !getPlayer(floor, username)) {
+          document.body.classList.add("dead");
+          document.body.classList.remove("crosshair");
+          controls.becomeSpectator();
+          isSpectator = true;
+          floor.followingUser = floor.players[0] && floor.players[0].name;
+          // switch following users by pressing up and down
+          controls.bind(spectatorHandler.bind(null, floor), () => {});
+          window.addEventListener("keydown", spectatorHandler.bind(null, floor));
+          // show you died
+          msgHeader.innerText = "You died";
+          msgEl.innerHTML = "";
+          msgParentEl.style.display = "";
+
+          let a = document.createElement("a");
+          a.href = "#";
+          a.innerText = "Spectate";
+          msgEl.appendChild(a);
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            msgParentEl.style.display = "none";
+          });
+        }
+
+        // follow a specific player in spectator mode
+        if(isSpectator) {
+          let following = getPlayer(floor, floor.followingUser);
+          if(following) {
+            floor.setViewport(following.x, following.y);
+          } else if(floor.players.length) {
+            floor.followingUser = floor.players[0].name;
+          }
+        }
+
+        // show game over
+        if(floor.players.length === 0 && msgHeader.innerText !== "Game over") {
+          document.body.classList.remove("crosshair");
+          document.body.classList.add("dead");
+          msgHeader.innerText = "Game over";
+          msgEl.innerHTML = "";
+          msgParentEl.style.display = "";
+
+          let a = document.createElement("a");
+          a.href = "/account/dashboard";
+          a.innerText = "Dashboard";
+          msgEl.appendChild(a);
+
+          // Exit fullscreen
+          if(localStorage.fullscreen) {
+            if(document.documentElement.webkitExitFullScreen) {
+              document.documentElement.webkitExitFullScreen();
+            } else if(document.documentElement.exitFullScreen) {
+              document.documentElement.exitFullScreen();
+            }
+          }
+        }
+
+        let player = getPlayer(floor, username);
+        if(player) {
+          player.sendFrame();
+          player.dropConfirmed();
+          player.move();
+          floor.setViewport(player.x, player.y);
+        }
+
+        floor.update();
+        controls.update();
+        playerList.update();
+
+        if(fps) {
+          fps.update();
+        }
+      });
+    });
   });
 }
 
