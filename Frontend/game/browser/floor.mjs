@@ -177,11 +177,6 @@ export default class Floor extends FloorCommon {
    * Update our state to match the server's state
    */
   handleState(state, username) {
-
-    if(state.floor.id !== this.id) {
-      console.log("NEW");
-    }
-
     this._diffState("id", "id", this.monsters, state.monsters, (raw) => {
       let monster = new Monster(raw.name, raw.hp, 10, this, raw.id, raw.type);
       monster.setCoodinates(raw.x, raw.y);

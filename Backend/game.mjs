@@ -131,12 +131,14 @@ async function triggerTick(floor, io, lastUpdate) {
   // move monsters and check for collisions
   try {
     await floor.tick(now - lastUpdate);
-    if(typeof floor.regenerate !== 'undefined') {
+
+    if(typeof floor.regenerate !== 'undefined') { //if the floor needs to be regenerated
       let gameId = floor.id;
       let newFloor = Floor.generate({gameId});
       newFloor.players = floor.players;
       floor = newFloor;
     }
+
     await floor.sendState(io, isGameRunning);
   } catch(err) {
     ml.logger.error(`${err.stack}`, ml.tags("game"));

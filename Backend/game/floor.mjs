@@ -88,7 +88,6 @@ export default class Floor extends FloorCommon {
     }
     for(let player of this.players) {
       player.move();
-
       if(typeof this.regenerate === 'undefined') {
         if(LadderCommon.collision(player, this.map.ladder)) {
           this.regenerate = true; //Allows this to only regenerate once.
