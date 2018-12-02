@@ -19,6 +19,7 @@ RUN npm install --production
 
 COPY . .
 COPY --from=build /app/game.*js Frontend/game/
+RUN sed -i "s/VERSION-HERE/$(cat VERSION)/" Frontend/sw.js
 
 VOLUME /data
 EXPOSE 3000
