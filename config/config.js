@@ -1,7 +1,7 @@
 /* global ml */
 /* eslint-disable arrow-body-style */
-require("../Backend/logger.js"); // THIS MUST BE THE FIRST IMPORT
 require('dotenv').config();
+require("../Backend/logger.js"); // THIS MUST BE THE FIRST IMPORT
 const url = require("url");
 const os = require("os");
 
