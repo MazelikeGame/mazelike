@@ -5,7 +5,15 @@ import saveHandler from "./handlers/save";
 import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth";
 
+let runningGames = new Set();
+
 export default async function startGame(gameId) {
+  if(runningGames.has(gameId)) {
+    return;
+  }
+
+  runningGames.add(gameId);
+
   // Load/generate the ground floor
   let floor = await Floor.load(gameId, 0);
 
@@ -26,9 +34,20 @@ export default async function startGame(gameId) {
 
     sock.emit("set-username", sock.user.username);
 
-    sock.on("disconnect", () => {
+    sock.on("disconnect", async() => {
       //Player has left and need to update the list of players.
       sock.broadcast.emit("update-playerlist", sock.user.username);
+
+      ml.logger.info(`${sock.user.username} left the game`, ml.tags("game"));
+
+      // Remove the player
+      let player = floor.players.find((pl) => {
+        return pl.name === sock.user.username;
+      });
+
+      if(player) {
+        floor.players.splice(floor.players.indexOf(player), 1);
+      }
     });
 
     saveHandler(sock, floor);
@@ -75,11 +94,15 @@ async function triggerTick(floor, lastUpdate, gameId) {
   let now = Date.now();
 
   // save and quit if we loose all the clients
-  if(io.engine.clientsCount === 0 || floor.players.length === 0) {
+  if(floor.players.length === 0) {
     await floor.sendState(io.of(`/game/${gameId}`));
+    io.of(`/game/${gameId}`).removeAllListeners("connection");
+
     ml.logger.verbose("All clients left or died saving game", ml.tags("game"));
 
     await floor.save();
+
+    runningGames.delete(gameId);
 
     return;
   }
