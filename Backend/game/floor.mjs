@@ -94,9 +94,9 @@ export default class Floor extends FloorCommon {
       player.move();
 
       if(typeof this.regenerate === 'undefined') {
-        if(LadderCommon.collision(player, this.map.ladder)) {
+        if(LadderCommon.collision(player, this.map.ladder) && LadderCommon.doesPlayerHaveKey(player.inventory)) {
           this.regenerate = true; //Allows this to only regenerate once.
-          ml.logger.info(`Spawning a new floor.`, ml.tags.ladder);
+          ml.logger.info(`Player ${player.name} used a key on the ladder to spawn a new floor.`, ml.tags.ladder);
         }
       }
 

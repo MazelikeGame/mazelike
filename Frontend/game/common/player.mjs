@@ -346,7 +346,7 @@ export default class PlayerCommon {
   wieldItem(item) {
     let index = this.inventory.indexOf(item);
     if(index > -1) {
-      if(!this.wearing[item.category]) {
+      if(!this.wearing[item.category] && item.category !== "key") {
         this.inventory.splice(index, 1);
         this.wearing[item.category] = item;
         this.updateStats();

@@ -18,7 +18,26 @@ export default class LadderCommon {
     ml.logger.debug(`Placed the ladder at (${this.x}, ${this.y})`, ml.tags.ladder);
   }
 
+  /**
+   * Checks to see if the player has a key in the inventory.
+   * @param inventory the inventory of the player that needs checked
+   */
+  static doesPlayerHaveKey(inventory) {
+    for(let item of inventory) {
+      if(item.category === "key" && item.spriteName === "Floor Key") {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   /* eslint-disable complexity, no-mixed-operators */
+  /**
+   * Checks for collision between a player and a ladder.
+   * @param player the player we want to check
+   * @param ladder the ladder we want to check
+   */
   static collision(player, ladder) {
     let x = -1;
     let y = -1;
