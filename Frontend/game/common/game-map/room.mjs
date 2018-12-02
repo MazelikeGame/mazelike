@@ -21,9 +21,8 @@ export default class Room {
    * @param y 
    * @param width 
    * @param height 
-   * @param mapParams 
    */
-  constructor(i, x, y, width, height, mapParams, noMonsters) {
+  constructor(i, x, y, width, height, mapParams) {
     this._i = i;
     this.x = x;
     this.y = y;
@@ -31,7 +30,6 @@ export default class Room {
     this.height = height;
     this._params = mapParams;
     this.type = "room";
-    this.noMonsters = noMonsters;
   
     this._corridors = new Map();
   }
@@ -86,6 +84,13 @@ export default class Room {
   }
 
   /**
+   * Is this room allowed to have monsters
+   */
+  get noMonsters() {
+    return this._corridors.size < 2 || this._i === this._params.spawn;
+  }
+
+  /**
    * Convert the room to json
    * @private
    */
@@ -95,8 +100,7 @@ export default class Room {
       y: this.y / MIN_SIZE,
       w: this.width / MIN_SIZE,
       h: this.height / MIN_SIZE,
-      r: this._rendererName,
-      b: this.noMonsters
+      r: this._rendererName
     };
 
     if(this.left) {
@@ -121,8 +125,7 @@ export default class Room {
       json.y * MIN_SIZE,
       json.w * MIN_SIZE,
       json.h * MIN_SIZE,
-      mapParams,
-      json.b
+      mapParams
     );
 
     if(json.l) {

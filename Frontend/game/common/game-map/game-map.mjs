@@ -292,8 +292,7 @@ export default class GameMap {
       x += Math.max(this._params.maxRoom - width, 0);
 
       // save for corridor rendering
-      let isSafeZone = Math.floor(Math.random() * 20) === 0 || i === this._params.spawn;
-      let newRoom = new Room(i, x, y, width, height, this._params, isSafeZone);
+      let newRoom = new Room(i, x, y, width, height, this._params);
       map.rooms.push(newRoom);
 
       // pick a renderer
