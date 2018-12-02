@@ -110,10 +110,16 @@ export default class GameMap {
    * Check if a point is on the map/floor
    * @param {number} x
    * @param {number} y
+   * @param {boolean} isMonster
    * @returns {boolean}
    */
-  isOnMap(x, y) {
-    return !!this.getRect(x, y);
+  isOnMap(x, y, isMonster) {
+    let rect = this.getRect(x, y);
+    if(!rect) {
+      return;
+    }
+
+    return !isMonster || !rect.noMonsters;
   }
 
   /**
@@ -267,7 +273,7 @@ export default class GameMap {
 
     // Place rooms onto the map
     for(let i = 0; i < this._params.nodes; ++i) {
-      // We are at the end of this row tart a new row
+      // We are at the end of this row start a new row
       if(i % this._params.size === 0 && i > 0) {
         x = this._params.xPadding;
         y += maxHeight + Math.floor(Math.random() * this._params.maxYDist) + this._params.yPadding;
@@ -286,7 +292,8 @@ export default class GameMap {
       x += Math.max(this._params.maxRoom - width, 0);
 
       // save for corridor rendering
-      let newRoom = new Room(i, x, y, width, height, this._params);
+      let isSafeZone = Math.floor(Math.random() * 20) === 0 || i === this._params.spawn;
+      let newRoom = new Room(i, x, y, width, height, this._params, isSafeZone);
       map.rooms.push(newRoom);
 
       // pick a renderer

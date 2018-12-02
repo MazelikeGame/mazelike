@@ -69,7 +69,7 @@ export default class MonsterCommon {
       }
       for(let j = x1; j <= x2; j += 20) { // checking every 20th pixel to improve runtime
         for(let k = y1; k <= y2; k += 20) {
-          if(!this.floor.map.isOnMap(j, k)) {
+          if(!this.floor.map.isOnMap(j, k, true)) {
             return false;
           }
         }
@@ -260,8 +260,8 @@ export default class MonsterCommon {
    * @returns {boolean}
    */
   spriteIsOnMap() {
-    return this.floor.map.isOnMap(this.x, this.y) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y)
-    && this.floor.map.isOnMap(this.x, this.y + MonsterCommon.SPRITE_SIZE * this.size) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y + MonsterCommon.SPRITE_SIZE * this.size);
+    return this.floor.map.isOnMap(this.x, this.y, true) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y, true)
+    && this.floor.map.isOnMap(this.x, this.y + MonsterCommon.SPRITE_SIZE * this.size, true) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y + MonsterCommon.SPRITE_SIZE * this.size, true);
   }
 
   /**

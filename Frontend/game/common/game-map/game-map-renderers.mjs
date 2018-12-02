@@ -9,8 +9,9 @@ GameMap.register({
     return true;
   },
 
-  render({x, y, width, height, map}) {
-    let texture = PIXI.loader.resources.floor.textures[`${map.theme}-box-big`].clone();
+  render({x, y, width, height, map, rect}) {
+    let theme = rect.noMonsters ? "0-0" : map.theme;
+    let texture = PIXI.loader.resources.floor.textures[`${theme}-box-big`].clone();
     let defaultFrame = texture.frame;
     
     let tWidth = defaultFrame.width - 12;

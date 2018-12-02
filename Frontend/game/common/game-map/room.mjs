@@ -9,6 +9,7 @@ import Corridor from "./corridor.mjs";
  * @prop {number} width Width coordinate of the room
  * @prop {number} height Height coordinate of the room
  * @prop {string} type Always room
+ * @prop {boolean} noMonsters No monsters allowed in this room
  */
 export default class Room {
   /**
@@ -22,7 +23,7 @@ export default class Room {
    * @param height 
    * @param mapParams 
    */
-  constructor(i, x, y, width, height, mapParams) {
+  constructor(i, x, y, width, height, mapParams, noMonsters) {
     this._i = i;
     this.x = x;
     this.y = y;
@@ -30,6 +31,7 @@ export default class Room {
     this.height = height;
     this._params = mapParams;
     this.type = "room";
+    this.noMonsters = noMonsters;
   
     this._corridors = new Map();
   }
@@ -93,7 +95,8 @@ export default class Room {
       y: this.y / MIN_SIZE,
       w: this.width / MIN_SIZE,
       h: this.height / MIN_SIZE,
-      r: this._rendererName
+      r: this._rendererName,
+      b: this.noMonsters
     };
 
     if(this.left) {
@@ -118,7 +121,8 @@ export default class Room {
       json.y * MIN_SIZE,
       json.w * MIN_SIZE,
       json.h * MIN_SIZE,
-      mapParams
+      mapParams,
+      json.b
     );
 
     if(json.l) {
