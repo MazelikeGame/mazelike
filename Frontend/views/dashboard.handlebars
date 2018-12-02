@@ -187,8 +187,17 @@
                     if (selectedlobby == -1)
                         alert("Please select a game.");
                     else{
-                        alert("Game deleted.")
-                        window.location.href = "/game/lobby/" + selectedlobby + "/delete";
+                        fetch("/game/lobby/" + selectedlobby + "/delete")
+                        .then((res) => {
+                            return res.text()
+                        })
+                        .then((msg) => {
+                            if(msg.length > 100) {
+                                msg = "Deleted";
+                            }
+                            alert(msg);
+                            location.reload();
+                        });
                     }
                 });
             </script>
