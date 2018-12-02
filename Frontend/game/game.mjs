@@ -100,7 +100,7 @@ function spectatorHandler(floor, e) {
   if(index >= floor.players.length) {
     index = 0;
   }
-  
+
   floor.followingUser = floor.players[index].name;
 }
 
@@ -303,7 +303,7 @@ async function setup() {
         }
       }
     }
-    
+
     let player = getPlayer(floor, username);
     if(player) {
       player.sendFrame();
@@ -323,9 +323,16 @@ async function setup() {
 }
 
 // load the textures
+let itemsDir = 'DawnLike/Items';
+let charactersDir = 'DawnLike/Characters';
 PIXI.loader
   .add("floor", "DawnLike/Objects/Floor.json")
-  .add("dog", "DawnLike/Characters/dog.json")
-  .add("demon", "DawnLike/Characters/demon.json")
-  .add("player", "DawnLike/Characters/player.json")
+  .add("dog", `${charactersDir}/dog.json`)
+  .add("demon", `${charactersDir}/demon.json`)
+  .add("player", `${charactersDir}/player.json`)
+  .add('boot', `${itemsDir}/boot.json`)
+  .add('hat', `${itemsDir}/hat.json`)
+  .add('shield', `${itemsDir}/shield.json`)
+  .add('shortWep', `${itemsDir}/shortWep.json`)
+  .add('key', `${itemsDir}/key.json`)
   .load(setup);

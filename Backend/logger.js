@@ -93,6 +93,7 @@ if(!ml.noCreateLogger) {
   // Commonly used logger tags
   tags.monster = tags("game", "monster");
   tags.player = tags("game", "player");
+  tags.item = tags("game", "item");
   tags.pregame = tags("game", "pregame");
   tags.manager = tags("manager");
   tags.lobby = tags("lobby");
@@ -119,7 +120,7 @@ if(!ml.noCreateLogger) {
     if(!ml.logger) {
       return;
     }
-    
+
     ml.logger.error(`Unhandled exception: ${err.message}`);
     ml.logger.verbose(err.stack);
     ml.logger.close();
