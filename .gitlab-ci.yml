@@ -29,18 +29,6 @@ Backend_Tests:
     - docker-compose up -d tests_backend
     - node scripts/test-stopper.js tests_backend
 
-Browser_Tests:
-  stage: test
-  script:
-    - BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -c 1-15)
-    # Version parser from https://gist.github.com/DarrenN/8c6a5b969481725a4413
-    - sed s/branch/$BRANCH/ -i docker-compose.yml
-    - sed s/latest/branch-$BRANCH/ -i docker-compose.yml
-    - touch runner-result
-    - chmod 666 runner-result
-    - docker-compose up -d tests_browser
-    - node scripts/test-stopper.js tests_browser
-
 Version_Change:
   stage: test
   allow_failure: true
