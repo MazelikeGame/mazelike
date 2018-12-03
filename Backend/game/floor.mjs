@@ -118,7 +118,8 @@ export default class Floor extends FloorCommon {
       monsters: this.monsters,
       players: this.players,
       isGameRunning: this.isGameRunning,
-      items: this.items
+      items: this.items,
+      id: this.id
     });
   }
 }

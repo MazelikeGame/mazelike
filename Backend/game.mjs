@@ -1,13 +1,13 @@
 /* global ml io */
 /* eslint-disable no-param-reassign,complexity */
 import Floor from "./game/floor";
-import saveHandler from "./handlers/save";
 import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth";
 
 let runningGames = new Set();
 
 export default async function startGame(gameId) {
+  let floorRef = {};
   if(runningGames.has(gameId)) {
     return;
   }
@@ -15,7 +15,7 @@ export default async function startGame(gameId) {
   runningGames.add(gameId);
 
   // Load/generate the ground floor
-  let floor = await Floor.load(gameId, 0);
+  let floor = floorRef.floor = await Floor.load(gameId, 0);
 
   // eslint-disable-next-line arrow-parens,arrow-body-style
   let awaitedPlayers = new Set(floor.players.map(player => player.name));
@@ -50,8 +50,7 @@ export default async function startGame(gameId) {
       }
     });
 
-    saveHandler(sock, floor);
-    movementHandler(sock, floor, sock.broadcast);
+    movementHandler(sock, floorRef, sock.broadcast);
 
     // Mark this player as ready
     awaitedPlayers.delete(sock.user.username);
@@ -87,10 +86,10 @@ export default async function startGame(gameId) {
   io.of(`/game/${gameId}`).emit("start-game");
   floor.isGameRunning = true;
 
-  triggerTick(floor, Date.now(), gameId);
+  triggerTick(floor, Date.now(), gameId, floorRef);
 }
 
-async function triggerTick(floor, lastUpdate, gameId) {
+async function triggerTick(floor, lastUpdate, gameId, floorRef) {
   let now = Date.now();
 
   // save and quit if we loose all the clients
@@ -111,7 +110,7 @@ async function triggerTick(floor, lastUpdate, gameId) {
   try {
     await floor.tick(now - lastUpdate);
 
-    /* REGENERATE NEW FLOOR
+    // REGENERATE NEW FLOOR
     if(typeof floor.regenerate !== 'undefined') { //if the floor needs to be regenerated
       let oldId = floor.id.split("-");
       let newIndex = Number(oldId[1]) + 1;
@@ -119,16 +118,20 @@ async function triggerTick(floor, lastUpdate, gameId) {
         gameId: oldId[0],
         floorIdx: newIndex
       });
+      for(let player of floor.players) {
+        player.floor = newFloor;
+        player.respawn();
+      }
       newFloor.players = floor.players;
-      newFloor.save(); //Saves the new floor (true)
-      let newId = newFloor.id.split("-");
-      floor = await Floor.load(newId[0], newId[1]);
-    }*/
+      await newFloor.save(true); //Saves the new floor (true)
+      floor = floorRef.floor = newFloor;
+      io.of(`/game/${gameId}`).emit("new-floor", floor.id);
+    }
 
     await floor.sendState(io.of(`/game/${gameId}`));
   } catch(err) {
     ml.logger.error(`${err.stack}`, ml.tags("game"));
   }
 
-  setTimeout(triggerTick.bind(undefined, floor, now, gameId), Floor.UPDATE_INTERVAL);
+  setTimeout(triggerTick.bind(undefined, floor, now, gameId, floorRef), Floor.UPDATE_INTERVAL);
 }

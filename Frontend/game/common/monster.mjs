@@ -176,6 +176,7 @@ export default class MonsterCommon {
         let currentTime = new Date().getTime();
         if(collisionPlayer !== -1 && currentTime - this.lastAttackTime >= 187) { // attacks max evey 0.75 seconds
           this.lastAttackTime = currentTime;
+          this.die(); // TODO: Remove this
           this.attack(collisionPlayer);
         }
       } else {
@@ -251,8 +252,8 @@ export default class MonsterCommon {
     this.y = this.floor.map.rooms[this.initialRoom].y + randomDiffY;
     if(!this.spriteIsOnMap())
       this.placeInRandomRoom();
-    if(this.type === "boss" && this.floor.map.rooms[this.initialRoom].height === this.floor.map.rooms[this.initialRoom].width)
-      this.placeInRandomRoom();
+    // if(this.type === "boss" && this.floor.map.rooms[this.initialRoom].height === this.floor.map.rooms[this.initialRoom].width)
+      // this.placeInRandomRoom();
   }
 
   /**
