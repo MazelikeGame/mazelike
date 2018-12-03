@@ -118,7 +118,7 @@ export default class Player extends PlayerCommon {
    */
   tint() {
     this.tinted = new Date().getTime();
-    this.sprite.tint = 0xFF0000;
+    this.sprite.tint = this.hpDamageTaken > 0 ? 0x00FF00 : 0xFF0000;
   }
 
   /**
