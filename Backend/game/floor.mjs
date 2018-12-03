@@ -92,9 +92,9 @@ export default class Floor extends FloorCommon {
     }
     for(let player of this.players) {
       player.move();
-
+      console.log(`${player.x} - ${player.y}`);
       if(typeof this.regenerate === 'undefined') {
-        if(LadderCommon.collision(player, this.map.ladder) && LadderCommon.doesPlayerHaveKey(player.inventory)) {
+        if(LadderCommon.collision(player, this.map.ladder) && LadderCommon.doesPlayerHaveKey(player)) {
           this.regenerate = true; //Allows this to only regenerate once.
           ml.logger.info(`Player ${player.name} used a key on the ladder to spawn a new floor.`, ml.tags.ladder);
         }
@@ -106,6 +106,7 @@ export default class Floor extends FloorCommon {
       player._confirmedX = player.x;
       player._confirmedY = player.y;
       player.dropConfirmed();
+      player.removeOldItems();
     }
   }
 

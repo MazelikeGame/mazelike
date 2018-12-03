@@ -22,13 +22,12 @@ export default class LadderCommon {
    * Checks to see if the player has a key in the inventory.
    * @param inventory the inventory of the player that needs checked
    */
-  static doesPlayerHaveKey(inventory) {
-    for(let item of inventory) {
-      if(item.category === "key" && item.spriteName === "Floor Key") {
+  static doesPlayerHaveKey(player) {
+    if(typeof player.hasKey !== "undefined") {
+      if(player.hasKey) {
         return true;
       }
     }
-
     return false;
   }
 

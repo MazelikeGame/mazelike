@@ -10,7 +10,8 @@
       "range":1,
       "accuracy": 30,
       "attackStyle": "melee",
-      "category": "shortWep"
+      "category": "shortWep",
+      "maxWearTime": 10000
     },
     {
       "spriteName":"Wooden Shield",
@@ -22,7 +23,8 @@
       "range":1,
       "accuracy": 0,
       "attackStyle": null,
-      "category": "shield"
+      "category": "shield",
+      "maxWearTime": 15000
     },
     {
       "spriteName":"Iron Full Helm",
@@ -34,7 +36,8 @@
       "range":0,
       "accuracy": 0,
       "attackStyle": null,
-      "category": "hat"
+      "category": "hat",
+      "maxWearTime": 15000
     },
     {
       "spriteName":"Iron Boots",
@@ -46,7 +49,8 @@
       "range":0,
       "accuracy": 0,
       "attackStyle": null,
-      "category": "boot"
+      "category": "boot",
+      "maxWearTime": 15000
     },
     {
       "spriteName":"Floor Key",
@@ -58,7 +62,8 @@
       "range":0,
       "accuracy": 0,
       "attackStyle": null,
-      "category": "key"
+      "category": "key",
+      "maxWearTime": null
     }
   ]
 }
