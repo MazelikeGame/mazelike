@@ -5,6 +5,7 @@ import FloorCommon from "../common/floor.mjs";
 import GameMap from "./game-map.mjs";
 import Player from "./player.mjs";
 import Monster from "./monster.mjs";
+import Ladder from "./ladder.mjs";
 import Item from './item.mjs';
 
 export default class Floor extends FloorCommon {
@@ -22,6 +23,8 @@ export default class Floor extends FloorCommon {
     this.players = [];
     this.playerSprites = new PIXI.Container();
 
+    this.ladder = new Ladder();
+    
     this.items = [];
     this.itemSprites = new PIXI.Container();
 
@@ -39,7 +42,7 @@ export default class Floor extends FloorCommon {
     floor.map = GameMap.generate(map);
 
     floor._initRendering();
-
+ 
     return floor;
   }
 
@@ -118,12 +121,17 @@ export default class Floor extends FloorCommon {
     for(let player of this.players) {
       player.createSprite();
     }
+
+    this.ladder.setPosition(this.map.ladder.x, this.map.ladder.y);
+ 
     for(let item of this.items) {
       item.createSprite();
     }
     this.sprite.addChild(this.itemSprites);
     this.sprite.addChild(this.playerSprites);
     this.sprite.addChild(this.monsterSprites);
+    this.sprite.addChild(this.ladder.sprite);
+
   }
 
   /**
@@ -145,6 +153,8 @@ export default class Floor extends FloorCommon {
       this._viewportX + innerWidth,
       this._viewportY + innerHeight
     );
+
+    this.ladder.update(this._viewportX, this._viewportY);
   }
 
   /**

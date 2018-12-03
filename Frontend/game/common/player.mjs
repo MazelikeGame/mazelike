@@ -342,6 +342,9 @@ export default class PlayerCommon {
   }
 
   wieldItem(item) {
+    if(item.category === "key") {
+      this.hasKey = true;
+    }
     this.wearing[item.category] = item;
     ml.logger.verbose(`Player ${this.name} wielded a(n) ${item.spriteName}`, ml.tags.player);
     this.updateStats();

@@ -1,9 +1,11 @@
+/*global ml*/
 /* eslint-disable complexity */
 /** @module backend/game/Floor */
 import FloorCommon from "../../Frontend/game/common/floor.mjs";
 import GameMap from "./game-map";
 import Monster from "./monster.mjs";
 import Player from './player';
+import LadderCommon from "../../Frontend/game/common/ladder.mjs";
 import Item from './item';
 
 export default class Floor extends FloorCommon {
@@ -17,6 +19,8 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
     floor.map = GameMap.generate(map);
     floor.generateMonsters();
+    
+    floor.map.ladder.placeInRandomRoom(floor.map);
     floor.items = [];
 
     return floor;
@@ -88,6 +92,13 @@ export default class Floor extends FloorCommon {
     }
     for(let player of this.players) {
       player.move();
+      if(typeof this.regenerate === 'undefined') {
+        if(LadderCommon.collision(player, this.map.ladder) && LadderCommon.doesPlayerHaveKey(player)) {
+          this.regenerate = true; //Allows this to only regenerate once.
+          ml.logger.info(`Player ${player.name} used a key on the ladder to spawn a new floor.`, ml.tags.ladder);
+        }
+      }
+
       if(player._frames.length) {
         player._confirmedId = player._frames[player._frames.length - 1].id;
       }
@@ -107,7 +118,8 @@ export default class Floor extends FloorCommon {
       monsters: this.monsters,
       players: this.players,
       isGameRunning: this.isGameRunning,
-      items: this.items
+      items: this.items,
+      id: this.id
     });
   }
 }

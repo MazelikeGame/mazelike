@@ -17,3 +17,14 @@
   background: #33ff33;
   border: solid 1px #00cc00;
 }
+
+.create-account, .create-account a {
+	font-family: 'Open Sans', sans-serif;
+	color: #898888;
+	font-size: 0.95em;
+	font-weight: 600;
+}
+
+.create-account a:hover {
+	text-decoration: underline;
+}

@@ -51,6 +51,19 @@
       "attackStyle": null,
       "category": "boot",
       "maxWearTime": 15000
+    },
+    {
+      "spriteName":"Floor Key",
+      "spriteSize":32,
+      "movementSpeed":0,
+      "attackSpeed":0,
+      "damage":0,
+      "defence":0,
+      "range":0,
+      "accuracy": 0,
+      "attackStyle": null,
+      "category": "key",
+      "maxWearTime": null
     }
   ]
 }
