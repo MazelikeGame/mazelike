@@ -66,11 +66,10 @@ gameRouter.get("/lobby/:id", async(req, res) => {
     })
   );
 
-  lobbyResults = lobbyResults.filter(async(lobby) => {
+  lobbyResults = lobbyResults.filter((lobby) => {
     let _player = playerRows.find((row) => {
       return row.id === lobby.player;
     });
-
     return _player && _player.inGame;
   });
 
