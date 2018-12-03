@@ -28,7 +28,8 @@ export default class Item {
     id,
     category,
     accuracy,
-    attackStyle
+    attackStyle,
+    maxWearTime
   ) {
     this.floor = floor;
     this.spriteName = spriteName;
@@ -45,6 +46,7 @@ export default class Item {
     this.x = null;
     this.y = null;
     this.isOnFloor = false;
+    this.maxWearTime = maxWearTime;
   }
 
   /**
@@ -76,6 +78,7 @@ export default class Item {
   pickup() {
     this.setCoordinates(null, null);
     this.isOnFloor = false;
+    this.timeWorn = Date.now();
   }
 
   /**
