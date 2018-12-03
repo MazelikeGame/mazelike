@@ -7,8 +7,8 @@ import "./game-map/game-map-renderers.mjs";
 class Floor {
   /**
    * @private
-   * @param gameId The game id for the current game
-   * @param floorIdx The index of this floor
+   * @param {String} gameId The game id for the current game
+   * @param {int} floorIdx The index of this floor
    */
   constructor(gameId, floorIdx) {
     this.id = `${gameId}-${floorIdx}`;
@@ -16,7 +16,7 @@ class Floor {
     this.monsterRatio = 0.4;
     // Initialize players, monsters and the game map in loadBrowser, loadNode,  and generate methods
   }
- 
+
   /**
    * The interval at which we update the game state (if this is too short the server will break)
    */

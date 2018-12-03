@@ -24,7 +24,7 @@ export default class Floor extends FloorCommon {
     this.playerSprites = new PIXI.Container();
 
     this.ladder = new Ladder();
-    
+
     this.items = [];
     this.itemSprites = new PIXI.Container();
 
@@ -42,7 +42,7 @@ export default class Floor extends FloorCommon {
     floor.map = GameMap.generate(map);
 
     floor._initRendering();
- 
+
     return floor;
   }
 
@@ -72,10 +72,10 @@ export default class Floor extends FloorCommon {
 
   /**
    * Load everything in the browser
-   * @param gameId The game id for the game we want to load
-   * @param floorIdx The index of floor we want to load
-   * @param sock The connection to the game server
-   * @param username The username of the current player
+   * @param {String} gameId The game id for the game we want to load
+   * @param {int} floorIdx The index of floor we want to load
+   * @param {object} sock The connection to the game server
+   * @param {String} username The username of the current player
    */
   static load(gameId, floorIdx, sock, username) {
     let floor = new Floor(gameId, floorIdx, sock, username);
@@ -123,7 +123,7 @@ export default class Floor extends FloorCommon {
     }
 
     this.ladder.setPosition(this.map.ladder.x, this.map.ladder.y);
- 
+
     for(let item of this.items) {
       item.createSprite();
     }
@@ -186,6 +186,8 @@ export default class Floor extends FloorCommon {
 
   /**
    * Update our state to match the server's state
+   * @param {object} state - The state returned by the server
+   * @param {String} username - The username of the player
    */
   handleState(state, username) {
     this._diffState("id", "id", this.monsters, state.monsters, (raw) => {
@@ -231,6 +233,7 @@ export default class Floor extends FloorCommon {
   }
 
   /**
+   * @private
    * Take an array of objects and update it to match another array (keeps objects with matching ids)
    * @param {string} idRawKey The property to use as a key
    * @param {string} idKey The property to use as a key

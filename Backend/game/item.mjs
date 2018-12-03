@@ -9,6 +9,10 @@ import ItemModel from '../models/item.mjs';
 const readFile = util.promisify(fs.readFile);
 
 export default class Item extends ItemCommon {
+  /**
+   * Loads items for the passed in floor
+   * @param {object} Floor - The floor to load items for
+   */
   static async load(floor) {
     let rawItems = await ItemModel.findAll({
       where: {
@@ -70,6 +74,9 @@ export default class Item extends ItemCommon {
     }
   }
 
+  /**
+   * Serializes item fields to send to the client
+   */
   toJSON() {
     return {
       id: this.id,
@@ -90,6 +97,12 @@ export default class Item extends ItemCommon {
     };
   }
 
+  /**
+   * Spawns a key on the floor
+   * @param {object} Floor - The floor to spawn the key on
+   * @param {int} x - The x-coordinate of the key
+   * @param {int} y - The y-coordinate of the key
+   */
   static async spawnKey(floor, x, y) {
     let itemDefs = await Item.getItemDefinitions();
     let key = itemDefs[4];
@@ -114,6 +127,12 @@ export default class Item extends ItemCommon {
     ml.logger.verbose(`Spawning key ${newItem.spriteName} at (${newItem.x}, ${newItem.y})`, ml.tags.item);
   }
 
+  /**
+   * Spawn a random item on a floor at a given coordinate
+   * @param {object} Floor - The floor to spawn the random item on
+   * @param {int} x - The x-coordinate of the random item
+   * @param {int} y - The y-coordinate of the random item
+   */
   static async spawnRandomItem(floor, x, y) {
     let itemDefs = await Item.getItemDefinitions();
     let randomItem = itemDefs[Math.floor(Math.random() * itemDefs.length)];
@@ -121,7 +140,7 @@ export default class Item extends ItemCommon {
     while(randomItem === itemDefs[4]) { //Don't want regular monsters to spawn keys.
       randomItem = itemDefs[Math.floor(Math.random() * itemDefs.length)];
     }
-    
+
     let newItem = new Item(
       floor,
       randomItem.spriteName,
@@ -144,6 +163,12 @@ export default class Item extends ItemCommon {
     ml.logger.verbose(`Spawning item ${newItem.spriteName} at (${newItem.x}, ${newItem.y})`, ml.tags.item);
   }
 
+  /**
+   * Returns a either a map/JSON of all the item defintions.
+   * @param {boolean} Map - Default value is false. If true, will return
+   * a json.
+   * @return {Map/JSON} defMap/jsonDefs - A map/JSON of all item definitions
+   */
   static async getItemDefinitions(map = false) {
     let rawDefs = await readFile('Backend/game/item-definitions/item-definitions.json', 'utf-8');
     let jsonDefs = JSON.parse(rawDefs).itemDefinitions;

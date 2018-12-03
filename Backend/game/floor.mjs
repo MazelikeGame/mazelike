@@ -11,15 +11,15 @@ import Item from './item';
 export default class Floor extends FloorCommon {
   /**
    * Generate a new floor (runs on the server and the browser)
-   * @param gameId The game id for the game we want to generate
-   * @param floorIdx The index of floor we want to generate
+   * @param {String} gameId The game id for the game we want to generate
+   * @param {int} floorIdx The index of floor we want to generate
    * @param {object} opts The options of the specific generators
    */
   static generate({gameId, floorIdx, map}) {
     let floor = new Floor(gameId, floorIdx);
     floor.map = GameMap.generate(map);
     floor.generateMonsters();
-    
+
     floor.map.ladder.placeInRandomRoom(floor.map);
     floor.items = [];
 
@@ -51,8 +51,8 @@ export default class Floor extends FloorCommon {
 
   /**
    * Load everything on the server
-   * @param gameId The game id for the game we want to load
-   * @param floorIdx The index of floor we want to load
+   * @param {String} gameId The game id for the game we want to load
+   * @param {int} floorIdx The index of floor we want to load
    */
   static async load(gameId, floorIdx) {
     let floor = new Floor(gameId, floorIdx);
@@ -111,7 +111,7 @@ export default class Floor extends FloorCommon {
 
   /**
    * Send the current state of the floor to the client
-   * @param {} io The socket io boradcast instance for this game
+   * @param {object} io The socket io broadcast instance for this game
    */
   sendState(io) {
     io.emit("state", {
