@@ -21,7 +21,7 @@ try {
 
 let auth;
 switch(dbUrl.protocol) {
-// install tedious@^1.7.0 and add case "mssql:": to a mysql support
+case "postgres":
 case "mysql:":
   conf.dialect = dbUrl.protocol.substr(0, dbUrl.protocol.length - 1);
 
@@ -30,7 +30,7 @@ case "mysql:":
   conf.password = auth && auth[1];
 
   conf.host = dbUrl.hostname;
-  conf.port = +dbUrl.port || 3306;
+  conf.port = +dbUrl.port || (conf.dialect === "mysql" ? 3306 : 5432);
   conf.database = dbUrl.pathname && dbUrl.pathname.substr(1);
 
   // validate what we got
