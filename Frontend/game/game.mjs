@@ -185,6 +185,11 @@ function setup() {
         resolveGameRunning();
       }
 
+      if(isNewFloor) {
+        playerList.floor = floor;
+        playerList.listOfPlayers = floor.players;
+        app.stage.addChild(playerList.render());
+      }
       isNewFloor = false;
     });
 
@@ -260,7 +265,6 @@ function setup() {
 
             app.stage.addChild(floor.sprite);
             app.stage.addChild(controls.sprite);
-            app.stage.addChild(playerList.graphics);
           });
       });
 
