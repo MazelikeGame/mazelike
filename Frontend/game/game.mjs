@@ -258,7 +258,7 @@ function setup() {
 
             app.stage.addChild(floor.sprite);
             app.stage.addChild(controls.sprite);
-            app.stage.addChild(playerList.render());
+            app.stage.addChild(playerList.graphics);
           });
       });
 
@@ -304,7 +304,7 @@ function setup() {
         }
 
         // show game over
-        if(floor.players.length === 0 && msgHeader.innerText !== "Game over" && !isNewFloor) {
+        if(floor.players.length === 0 && msgHeader.innerText !== "Game over" && !isNewFloor && msgHeader.innerText !== "You win") {
           document.body.classList.remove("crosshair");
           document.body.classList.add("dead");
           msgHeader.innerText = "Game over";
