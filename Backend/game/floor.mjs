@@ -94,6 +94,7 @@ export default class Floor extends FloorCommon {
       player._confirmedX = player.x;
       player._confirmedY = player.y;
       player.dropConfirmed();
+      player.removeOldItems();
     }
   }
 

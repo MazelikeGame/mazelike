@@ -125,7 +125,7 @@ export default class Player extends PlayerCommon {
       _confirmedX: this._confirmedX,
       _confirmedY: this._confirmedY,
       attackAngle: this.attackAngle,
-      range: this.range
+      range: this.range,
     };
   }
 
@@ -158,6 +158,22 @@ export default class Player extends PlayerCommon {
     // Don't boost their health the second they enter a room
     if(!rect.noMonsters) {
       this._lastHpBoost = Date.now();
+    }
+  }
+  
+  /**
+   * Removes items that have been worn past their due date
+   */
+  removeOldItems() {
+    for(let wornItem of Object.values(this.wearing)) {
+      try {
+        if(Date.now() - wornItem.timeWorn > wornItem.maxWearTime) {
+          this.wearing[wornItem.category] = null;
+          ml.logger.verbose(`Player ${this.name} removed ${wornItem.spriteName}`, ml.tags.player);
+        }
+      } catch(error) {
+        // Passing in case an item doesn't have a maxWearTime
+      }
     }
   }
 }

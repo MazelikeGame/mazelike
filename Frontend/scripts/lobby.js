@@ -5,6 +5,13 @@ let hydrate = document.currentScript.dataset;
 // Create an auto copy non-modifyable text input
 let input = document.querySelector("#join-link-copy");
 
+let playersInLobby = [];
+
+var playerGroup = document.getElementsByClassName("list-group-item d-flex justify-content-between align-items-center");
+for(let item of playerGroup) {
+  playersInLobby.push(item.getAttribute("data-player-id"));
+}
+
 if(input) {
   let link = input.value;
 
@@ -32,6 +39,11 @@ sock.on("lobby-drop", ({id, player}) => {
   if(item) {
     item.remove();
   }
+
+  let index = playersInLobby.indexOf(player);
+  if(index > -1) {
+    playersInLobby.splice(index, 1);
+  }
 });
 
 let group = document.querySelector(".list-group");
@@ -41,6 +53,12 @@ sock.on("lobby-add", ({id, playerId, image_name}) => {
   if(id !== hydrate.id) {
     return;
   }
+
+  if(playersInLobby.indexOf(playerId) > -1) {
+    return;
+  }
+
+  playersInLobby.push(playerId);
 
   // Create the div for the player item
   let playerItem = document.createElement("div");
