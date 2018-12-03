@@ -143,7 +143,7 @@ export default class Player extends PlayerCommon {
       try {
         if(Date.now() - wornItem.timeWorn > wornItem.maxWearTime) {
           this.wearing[wornItem.category] = null;
-          ml.logger.info(`Player ${this.name} removed ${wornItem.spriteName}`, ml.tags.player);
+          ml.logger.verbose(`Player ${this.name} removed ${wornItem.spriteName}`, ml.tags.player);
         }
       } catch(error) {
         // Passing in case an item doesn't have a maxWearTime
