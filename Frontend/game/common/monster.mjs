@@ -282,7 +282,7 @@ export default class MonsterCommon {
     let x = -1;
     let y = -1;
     for(let entity of entities) {
-      if(this.id !== entity.id) {
+      if(this !== entity) {
         for(let j = 0; j < 4; j++) { // four corners to check for each sprite
           if(j === 0) { // upper left corner
             x = entity.x;

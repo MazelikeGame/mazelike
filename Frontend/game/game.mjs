@@ -143,6 +143,7 @@ fullscreenEl.checked = localStorage.fullscreen !== "false";
 function setup() {
   let sock, username;
   let isNewFloor = false;
+  let playerWon = false;
 
   readyToPlay.then(() => {
     msgEl.innerText = "Connecting to the game server";
@@ -222,6 +223,7 @@ function setup() {
       });
 
       sock.on("win", () => {
+        playerWon = true;
         document.body.classList.remove("crosshair");
         document.body.classList.add("win");
         msgHeader.innerText = "You win";
@@ -269,7 +271,7 @@ function setup() {
       let isSpectator = false;
       app.ticker.add(() => {
         // spectator mode
-        if(!isSpectator && !getPlayer(floor, username) && !isNewFloor) {
+        if(!isSpectator && !getPlayer(floor, username) && !isNewFloor && !playerWon) {
           document.body.classList.add("dead");
           document.body.classList.remove("crosshair");
           controls.becomeSpectator();
@@ -304,7 +306,7 @@ function setup() {
         }
 
         // show game over
-        if(floor.players.length === 0 && msgHeader.innerText !== "Game over" && !isNewFloor && msgHeader.innerText !== "You win") {
+        if(floor.players.length === 0 && msgHeader.innerText !== "Game over" && !isNewFloor && !playerWon) {
           document.body.classList.remove("crosshair");
           document.body.classList.add("dead");
           msgHeader.innerText = "Game over";
