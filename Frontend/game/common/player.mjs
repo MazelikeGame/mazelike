@@ -29,8 +29,8 @@ const MAPPINGS = {
 };
 
 const BASE_STATS = {
-  hp: 100,
-  hpMax: 100,
+  hp: 150,
+  hpMax: 150,
   damage: 10,
   speed: 400,
   range: 100,
@@ -279,7 +279,7 @@ export default class PlayerCommon {
     let x = -1;
     let y = -1;
     for(let entity of entities) {
-      if(this.id !== entity.id) {
+      if(this !== entity) {
         for(let j = 0; j < 4; j++) { // four corners to check for each sprite
           if(j === 0) { // upper left corner
             x = entity.x;

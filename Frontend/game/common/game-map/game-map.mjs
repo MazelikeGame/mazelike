@@ -50,11 +50,11 @@ export default class GameMap {
    */
   _initParams(params = {}, numItems = 0) {
     this._params = {
-      nodes: params.nodes || 100,
-      minRoom: (params.minRoom || 16) * MIN_SIZE,
-      maxRoom: (params.maxRoom || 40) * MIN_SIZE,
+      nodes: params.nodes || 9,
+      minRoom: (params.minRoom || 20) * MIN_SIZE,
+      maxRoom: (params.maxRoom || 60) * MIN_SIZE,
       maxYDist: (params.maxYDist || 12) * MIN_SIZE,
-      roomChance: params.roomChange || 0.2,
+      roomChance: params.roomChange || 0.5,
       corridorSize: (params.corridorSize || 8) * MIN_SIZE,
       xPadding: (params.xPadding || 4) * MIN_SIZE,
       yPadding: (params.xPadding || 4) * MIN_SIZE,
@@ -111,10 +111,16 @@ export default class GameMap {
    * Check if a point is on the map/floor
    * @param {number} x
    * @param {number} y
+   * @param {boolean} isMonster
    * @returns {boolean}
    */
-  isOnMap(x, y) {
-    return !!this.getRect(x, y);
+  isOnMap(x, y, isMonster) {
+    let rect = this.getRect(x, y);
+    if(!rect) {
+      return;
+    }
+
+    return !isMonster || !rect.noMonsters;
   }
 
   /**
@@ -271,7 +277,7 @@ export default class GameMap {
 
     // Place rooms onto the map
     for(let i = 0; i < this._params.nodes; ++i) {
-      // We are at the end of this row tart a new row
+      // We are at the end of this row start a new row
       if(i % this._params.size === 0 && i > 0) {
         x = this._params.xPadding;
         y += maxHeight + Math.floor(Math.random() * this._params.maxYDist) + this._params.yPadding;

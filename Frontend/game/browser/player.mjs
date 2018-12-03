@@ -40,6 +40,12 @@ export default class Player extends PlayerCommon {
       fontFamily: "Tahoma",
       fontWeight: "bold"
     });
+    this._textStyle3 = new PIXI.TextStyle({
+      fill: "#00ff00",
+      fontSize: 24,
+      fontFamily: "Tahoma",
+      fontWeight: "bold"
+    });
 
     this.usernameSprite = new PIXI.Text(this.username, this._textStyle);
     this.usernameSpriteOffset = (this.sprite.width / 2) - (this.usernameSprite.width / 2);
@@ -70,8 +76,8 @@ export default class Player extends PlayerCommon {
     if(this.tinted !== -1) {
       if(this.sprite.tint === this.regularTint) {
         this.tint();
-        this.hpDamageTaken = Math.abs(this.hpDamageTaken) * -1;
-        this.hpNotificationSprite.setText(this.hpDamageTaken);
+        this.hpNotificationSprite.style = this.hpDamageTaken > 0 ? this._textStyle3 : this._textStyle2;
+        this.hpNotificationSprite.setText((this.hpDamageTaken > 0 ? "+" : "") + this.hpDamageTaken);
         this.hpNotificationSpriteOffset = (this.sprite.width / 2) - (this.hpNotificationSprite.width / 2);
         this.usernameSprite.position.set(this.x - viewX + this.usernameSpriteOffset, this.y - viewY - 15);
       }
@@ -112,7 +118,7 @@ export default class Player extends PlayerCommon {
    */
   tint() {
     this.tinted = new Date().getTime();
-    this.sprite.tint = 0xFF0000;
+    this.sprite.tint = this.hpDamageTaken > 0 ? 0x00FF00 : 0xFF0000;
   }
 
   /**
@@ -136,7 +142,7 @@ export default class Player extends PlayerCommon {
     }
     if(oldHP !== this.hp) {
       this.tinted = new Date().getTime();
-      this.hpDamageTaken = oldHP - this.hp;
+      this.hpDamageTaken = this.hp - oldHP;
     }
   }
 

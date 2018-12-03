@@ -7,6 +7,9 @@ import UserModel from '../models/user';
 
 /** @module backend/game/player */
 
+const HP_BOOST_RATE = 1500;
+const HP_BOOST_PERC = 0.05; // out of 1
+
 /**
  * The player class.
  */
@@ -27,6 +30,8 @@ export default class Player extends PlayerCommon {
       this.x = this._confirmedX = spawn.x;
       this.y = this._confirmedY = spawn.y;
     } while(!this.spriteIsOnMap());
+
+    this._lastHpBoost = Date.now();
   }
 
   /**
@@ -140,6 +145,25 @@ export default class Player extends PlayerCommon {
     /* Remove the player from the player array */
     let player = this.floor.players.indexOf(this);
     this.floor.players.splice(player, 1);
+  }
+
+  /**
+   * Boost hp after you stop moving
+   */
+  move(...args) {
+    super.move(...args);
+
+    // Restore a player's in safe rooms
+    let rect = this.floor.map.getRect(this.x, this.y);
+    if(Date.now() - this._lastHpBoost >= HP_BOOST_RATE && rect.noMonsters) {
+      this._lastHpBoost = Date.now();
+      this.hp = Math.min(this.hp + (this.hpMax * HP_BOOST_PERC), this.hpMax);
+    }
+
+    // Don't boost their health the second they enter a room
+    if(!rect.noMonsters) {
+      this._lastHpBoost = Date.now();
+    }
   }
 
   /**

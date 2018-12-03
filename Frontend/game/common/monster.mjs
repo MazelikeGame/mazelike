@@ -8,6 +8,13 @@ const MAX_WALK_TIME = 1500;
 import PlayerCommon from "./player.mjs";
 import interpolate from "./interpolator.mjs";
 
+const HP_PER_TYPE = {
+  boss: 200,
+  blue: 150,
+  red: 100,
+  green: 50
+};
+
 export default class MonsterCommon {
 
   constructor(name_in, hp_in, damage_in, floor_in, id_in, type_in) {
@@ -17,6 +24,7 @@ export default class MonsterCommon {
     this.floor = floor_in;
     this.id = id_in;
     this.type = type_in;
+    this.hpMax = HP_PER_TYPE[type_in];
 
     this.targetAquired = false; // "in pursuit" boolean
     this.x = 0; // (x,y) = upper left pixel coordinate
@@ -34,6 +42,7 @@ export default class MonsterCommon {
     } else if(this.type === "boss") { // very slow
       this.speed = 75;
       this.size = 2;
+      this.name = "boss";
     }
   }
 
@@ -69,7 +78,7 @@ export default class MonsterCommon {
       }
       for(let j = x1; j <= x2; j += 20) { // checking every 20th pixel to improve runtime
         for(let k = y1; k <= y2; k += 20) {
-          if(!this.floor.map.isOnMap(j, k)) {
+          if(!this.floor.map.isOnMap(j, k, true)) {
             return false;
           }
         }
@@ -260,8 +269,8 @@ export default class MonsterCommon {
    * @returns {boolean}
    */
   spriteIsOnMap() {
-    return this.floor.map.isOnMap(this.x, this.y) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y)
-    && this.floor.map.isOnMap(this.x, this.y + MonsterCommon.SPRITE_SIZE * this.size) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y + MonsterCommon.SPRITE_SIZE * this.size);
+    return this.floor.map.isOnMap(this.x, this.y, true) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y, true)
+    && this.floor.map.isOnMap(this.x, this.y + MonsterCommon.SPRITE_SIZE * this.size, true) && this.floor.map.isOnMap(this.x + MonsterCommon.SPRITE_SIZE * this.size, this.y + MonsterCommon.SPRITE_SIZE * this.size, true);
   }
 
   /**
@@ -273,7 +282,7 @@ export default class MonsterCommon {
     let x = -1;
     let y = -1;
     for(let entity of entities) {
-      if(this.id !== entity.id) {
+      if(this !== entity) {
         for(let j = 0; j < 4; j++) { // four corners to check for each sprite
           if(j === 0) { // upper left corner
             x = entity.x;
