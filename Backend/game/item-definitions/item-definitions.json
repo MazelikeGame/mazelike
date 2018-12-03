@@ -24,7 +24,7 @@
       "accuracy": 0,
       "attackStyle": null,
       "category": "shield",
-      "maxWearTime": 10000
+      "maxWearTime": 15000
     },
     {
       "spriteName":"Iron Full Helm",
@@ -37,7 +37,7 @@
       "accuracy": 0,
       "attackStyle": null,
       "category": "hat",
-      "maxWearTime": 30
+      "maxWearTime": 15000
     },
     {
       "spriteName":"Iron Boots",
@@ -50,7 +50,7 @@
       "accuracy": 0,
       "attackStyle": null,
       "category": "boot",
-      "maxWearTime": 10000
+      "maxWearTime": 15000
     }
   ]
 }
