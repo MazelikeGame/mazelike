@@ -49,9 +49,8 @@ export default class GameMap {
    * @param params
    */
   _initParams(params = {}, numItems = 0) {
-    // TODO: Revert
     this._params = {
-      nodes: params.nodes || 4,
+      nodes: params.nodes || 100,
       minRoom: (params.minRoom || 16) * MIN_SIZE,
       maxRoom: (params.maxRoom || 40) * MIN_SIZE,
       maxYDist: (params.maxYDist || 12) * MIN_SIZE,
