@@ -114,18 +114,25 @@ async function triggerTick(floor, lastUpdate, gameId, floorRef) {
     if(typeof floor.regenerate !== 'undefined') { //if the floor needs to be regenerated
       let oldId = floor.id.split("-");
       let newIndex = Number(oldId[1]) + 1;
-      let newFloor = Floor.generate({
-        gameId: oldId[0],
-        floorIdx: newIndex
-      });
-      for(let player of floor.players) {
-        player.floor = newFloor;
-        player.respawn();
+      if(newIndex === 3) {
+        floor.players = [];
+        io.of(`/game/${gameId}`).emit("win");
+      } else {
+        let newFloor = Floor.generate({
+          gameId: oldId[0],
+          floorIdx: newIndex
+        });
+        for(let player of floor.players) {
+          player.floor = newFloor;
+          player.hasKey = undefined;
+          delete player.wearing.key;
+          player.respawn();
+        }
+        newFloor.players = floor.players;
+        await newFloor.save(true); //Saves the new floor (true)
+        floor = floorRef.floor = newFloor;
+        io.of(`/game/${gameId}`).emit("new-floor", floor.id);
       }
-      newFloor.players = floor.players;
-      await newFloor.save(true); //Saves the new floor (true)
-      floor = floorRef.floor = newFloor;
-      io.of(`/game/${gameId}`).emit("new-floor", floor.id);
     }
 
     await floor.sendState(io.of(`/game/${gameId}`));

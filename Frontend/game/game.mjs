@@ -221,6 +221,28 @@ function setup() {
         playerList.disconnectPlayer(player); //Update player list
       });
 
+      sock.on("win", () => {
+        document.body.classList.remove("crosshair");
+        document.body.classList.add("win");
+        msgHeader.innerText = "You win";
+        msgEl.innerHTML = "";
+        msgParentEl.style.display = "";
+
+        let a = document.createElement("a");
+        a.href = "/account/dashboard";
+        a.innerText = "Dashboard";
+        msgEl.appendChild(a);
+
+        // Exit fullscreen
+        if(localStorage.fullscreen) {
+          if(document.documentElement.webkitExitFullScreen) {
+            document.documentElement.webkitExitFullScreen();
+          } else if(document.documentElement.exitFullScreen) {
+            document.documentElement.exitFullScreen();
+          }
+        }
+      });
+
       // switch floors
       sock.on("new-floor", (id) => {
         let floorId = id.split("-")[1];
