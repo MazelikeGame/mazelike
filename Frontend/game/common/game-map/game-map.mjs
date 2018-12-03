@@ -50,11 +50,11 @@ export default class GameMap {
    */
   _initParams(params = {}, numItems = 0) {
     this._params = {
-      nodes: params.nodes || 100,
-      minRoom: (params.minRoom || 16) * MIN_SIZE,
-      maxRoom: (params.maxRoom || 40) * MIN_SIZE,
+      nodes: params.nodes || 9,
+      minRoom: (params.minRoom || 20) * MIN_SIZE,
+      maxRoom: (params.maxRoom || 60) * MIN_SIZE,
       maxYDist: (params.maxYDist || 12) * MIN_SIZE,
-      roomChance: params.roomChange || 0.2,
+      roomChance: params.roomChange || 0.5,
       corridorSize: (params.corridorSize || 8) * MIN_SIZE,
       xPadding: (params.xPadding || 4) * MIN_SIZE,
       yPadding: (params.xPadding || 4) * MIN_SIZE,

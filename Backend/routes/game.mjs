@@ -349,7 +349,10 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
       ml.logger.verbose(`Generating floor ${req.params.id}-0`, ml.tags.lobby);
       await Floor.generate({
         gameId: req.params.id,
-        floorIdx: 0
+        floorIdx: 0,
+        map: {
+          nodes: req.params.mini ? 9 : undefined
+        }
       }).save(true);
     }
 

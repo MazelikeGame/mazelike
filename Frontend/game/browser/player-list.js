@@ -1,4 +1,4 @@
-/*global PIXI*/
+/*global PIXI ml*/
 
 /**
  * A list of players that displays information about each player.
@@ -6,7 +6,6 @@
 export default class PlayerList {
 
   constructor() {
-    this.floor = null;
     this.listOfPlayers = [];
 
     this.graphics = new PIXI.Graphics();
@@ -22,7 +21,7 @@ export default class PlayerList {
       this.drawPlayerInfo(index, player); //change this to match player.getHp() in the future
     });
 
-    let boss = this.floor.monsters.find((monster) => {
+    let boss = ml.floor.monsters.find((monster) => {
       return monster.type === "boss";
     });
 
@@ -43,7 +42,7 @@ export default class PlayerList {
     //Black background
     let outline = new PIXI.Graphics();
     outline.beginFill(player.type ? 0x000088 : 0x000000);
-    outline.fillAlpha = this.floor.followingUser === player.name ? 0.85 : 0.7;
+    outline.fillAlpha = ml.floor.followingUser === player.name ? 0.85 : 0.7;
     outline.lineStyle(2, player.type ? 0x0000bb : 0x000000, 1);
     outline.drawRect(0, 0, 300, 30);
     outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
@@ -110,6 +109,14 @@ export default class PlayerList {
       match = this.floor.monsters.find((monster) => {
         return monster.type === "boss";
       });
+    }
+
+    if(!match) {
+      return {
+        name: "boss",
+        hp: 0,
+        hpMax: 200
+      }
     }
 
     return {

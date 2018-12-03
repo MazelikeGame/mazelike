@@ -157,9 +157,7 @@ export default class Player extends PlayerCommon {
     let rect = this.floor.map.getRect(this.x, this.y);
     if(Date.now() - this._lastHpBoost >= HP_BOOST_RATE && rect.noMonsters) {
       this._lastHpBoost = Date.now();
-      if(this.hp < this.hpMax / 2) {
-        this.hp = Math.min(this.hp + (this.hpMax * HP_BOOST_PERC), this.hpMax / 2);
-      }
+      this.hp = Math.min(this.hp + (this.hpMax * HP_BOOST_PERC), this.hpMax);
     }
 
     // Don't boost their health the second they enter a room
@@ -167,7 +165,7 @@ export default class Player extends PlayerCommon {
       this._lastHpBoost = Date.now();
     }
   }
-  
+
   /**
    * Removes items that have been worn past their due date
    */
