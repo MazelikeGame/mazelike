@@ -343,8 +343,8 @@ export default class PlayerCommon {
 
   wieldItem(item) {
     this.wearing[item.category] = item;
-    this.updateStats();
     ml.logger.verbose(`Player ${this.name} wielded a(n) ${item.spriteName}`, ml.tags.player);
+    this.updateStats();
   }
 
   _setStatsToBase() {

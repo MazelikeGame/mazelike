@@ -121,7 +121,6 @@ export default class Player extends PlayerCommon {
       _confirmedY: this._confirmedY,
       attackAngle: this.attackAngle,
       range: this.range,
-      // wearing: this.wearing
     };
   }
 
@@ -137,20 +136,17 @@ export default class Player extends PlayerCommon {
   }
 
   /**
-   * Checks that items have not been worn past their due date
+   * Removes items that have been worn past their due date
    */
   removeOldItems() {
     for(let wornItem of Object.values(this.wearing)) {
       try {
-        let m = Math.floor(wornItem.maxWearTime / 1000);
-        console.log(`going into removeOldItems with ${wornItem.spriteName}, with time ${m}`);
         if(Date.now() - wornItem.timeWorn > wornItem.maxWearTime) {
-          console.log('removing the following item');
-          console.log(`${wornItem.spriteName}`);
           this.wearing[wornItem.category] = null;
+          ml.logger.info(`Player ${this.name} removed ${wornItem.spriteName}`, ml.tags.player);
         }
       } catch(error) {
-        // pass
+        // Passing in case an item doesn't have a maxWearTime
       }
     }
   }
