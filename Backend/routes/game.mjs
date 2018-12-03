@@ -29,54 +29,6 @@ gameRouter.use((req, res, next) => {
   next();
 });
 
-// List all lobbies
-gameRouter.get("/all", async(req, res) => {
-  if(res.loginRedirect()) {
-    return;
-  }
-
-  let lobbies = await Lobby.findAll({
-    where: {
-      playerId: req.user.username
-    }
-  });
-
-  let counts = await sql.query(`
-    SELECT lobbyId, COUNT(playerId) AS count FROM lobbies l1
-      WHERE l1.lobbyId IN (SELECT l2.lobbyId FROM lobbies l2 WHERE l2.playerId = :userId)
-      GROUP BY l1.lobbyId
-      ORDER BY l1.lobbyId`, {
-    replacements: {
-      userId: req.user.username
-    },
-    type: sql.QueryTypes.SELECT
-  });
-
-  if(counts.length !== lobbies.length) {
-    ml.logger.error("Lobbies and counts results were different from /game/all", ml.tags("assertion"));
-    res.writeHead(500);
-    res.end("Internal server error (see server logs)");
-    return;
-  }
-
-  // Merge counts and lobbies
-  for(let i = 0; i < lobbies.length; ++i) {
-    if(lobbies[i].lobbyId !== counts[i].lobbyId) {
-      ml.logger.error("Lobbies and counts lobbyIds were different from /game/all", ml.tags("assertion"));
-      res.writeHead(500);
-      res.end("Internal server error (see server logs)");
-      return;
-    }
-
-    lobbies[i].count = counts[i].count;
-  }
-
-  res.render("game-list", {
-    user: req.user.username,
-    lobbies
-  });
-});
-
 // View a lobby
 gameRouter.get("/lobby/:id", async(req, res) => {
   // make sure req.user is an object
@@ -102,6 +54,24 @@ gameRouter.get("/lobby/:id", async(req, res) => {
   // Convert the mysql rows into useful a useful format
   let host = await lobbyResults.find((row) => {
     return row.isHost;
+  });
+
+  let playerRows = await Promise.all(
+    lobbyResults.map((lobby) => {
+      return Player.findOne({
+        where: {
+          id: lobby.player
+        }
+      });
+    })
+  );
+
+  lobbyResults = lobbyResults.filter(async(lobby) => {
+    let _player = playerRows.find((row) => {
+      return row.id === lobby.player;
+    });
+
+    return _player && _player.inGame;
   });
 
   let players = lobbyResults.map((row) => {
