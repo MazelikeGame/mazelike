@@ -6,9 +6,9 @@ const MAX_FRAME_LENGTH = 50; /* # of ms between frames at 20 fps */
  * @param sock 
  * @param floor 
  */
-export default function movementHandler(sock, floor) { 
+export default function movementHandler(sock, floorRef) { 
   sock.on("player-frame", async(frame) => {
-    let player = floor.players.find((_player) => {
+    let player = floorRef.floor.players.find((_player) => {
       return _player.name === sock.user.username;
     });
 

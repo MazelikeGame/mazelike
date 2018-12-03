@@ -43,9 +43,9 @@ addEventListener("contextmenu", (e) => {
 });
 
 // This should be removed once player controls the viewport
-const addArrowKeyListener = (floor, controls, username) => {
+const addArrowKeyListener = (controls, username) => {
   let handleKey = (type, e) => {
-    let player = getPlayer(floor, username);
+    let player = getPlayer(window.ml.floor, username);
     if(player) {
       player.handleKeyPress(type, e);
     }
@@ -56,14 +56,14 @@ const addArrowKeyListener = (floor, controls, username) => {
   window.addEventListener('keyup', handleKey.bind(null, "up"));
 
   window.addEventListener("mousemove", (e) => {
-    let player = getPlayer(floor, username);
+    let player = getPlayer(window.ml.floor, username);
     if(player) {
       player.handleMouse(false, e.clientX + player.floor._viewportX, e.clientY + player.floor._viewportY);
     }
   });
 
   window.addEventListener("pointerdown", (e) => {
-    let player = getPlayer(floor, username);
+    let player = getPlayer(window.ml.floor, username);
     if(player) {
       player.handleMouse(true, e.clientX + player.floor._viewportX, e.clientY + player.floor._viewportY);
     }
@@ -142,6 +142,7 @@ fullscreenEl.checked = localStorage.fullscreen !== "false";
 
 function setup() {
   let sock, username;
+  let isNewFloor = false;
 
   readyToPlay.then(() => {
     msgEl.innerText = "Connecting to the game server";
@@ -169,7 +170,7 @@ function setup() {
     app.stage.addChild(controls.sprite);
 
     window.ml.floor = floor;
-    addArrowKeyListener(floor, controls, username);
+    addArrowKeyListener(controls, username);
 
     let resolveGameRunning;
     let gameRunning = new Promise((resolve) => {
@@ -182,6 +183,8 @@ function setup() {
       if(state.isGameRunning) {
         resolveGameRunning();
       }
+
+      isNewFloor = false;
     });
 
     // display the countdown when it starts
@@ -218,6 +221,47 @@ function setup() {
         playerList.disconnectPlayer(player); //Update player list
       });
 
+      sock.on("win", () => {
+        document.body.classList.remove("crosshair");
+        document.body.classList.add("win");
+        msgHeader.innerText = "You win";
+        msgEl.innerHTML = "";
+        msgParentEl.style.display = "";
+
+        let a = document.createElement("a");
+        a.href = "/account/dashboard";
+        a.innerText = "Dashboard";
+        msgEl.appendChild(a);
+
+        // Exit fullscreen
+        if(localStorage.fullscreen) {
+          if(document.documentElement.webkitExitFullScreen) {
+            document.documentElement.webkitExitFullScreen();
+          } else if(document.documentElement.exitFullScreen) {
+            document.documentElement.exitFullScreen();
+          }
+        }
+      });
+
+      // switch floors
+      sock.on("new-floor", (id) => {
+        let floorId = id.split("-")[1];
+        app.stage.removeChild(floor.sprite);
+        app.stage.removeChild(controls.sprite);
+        app.stage.addChild(playerList.graphics);
+
+        // load the new map
+        Floor.load(gameId, floorId, sock, username)
+          .then((_floor) => {
+            isNewFloor = true;
+            window.ml.floor = floor = _floor; // eslint-disable-line
+
+            app.stage.addChild(floor.sprite);
+            app.stage.addChild(controls.sprite);
+            app.stage.addChild(playerList.render());
+          });
+      });
+
       playerList.floor = floor;
       playerList.listOfPlayers = floor.players;
       app.stage.addChild(playerList.render()); //Draw the player list
@@ -225,7 +269,7 @@ function setup() {
       let isSpectator = false;
       app.ticker.add(() => {
         // spectator mode
-        if(!isSpectator && !getPlayer(floor, username)) {
+        if(!isSpectator && !getPlayer(floor, username) && !isNewFloor) {
           document.body.classList.add("dead");
           document.body.classList.remove("crosshair");
           controls.becomeSpectator();
@@ -260,7 +304,7 @@ function setup() {
         }
 
         // show game over
-        if(floor.players.length === 0 && msgHeader.innerText !== "Game over") {
+        if(floor.players.length === 0 && msgHeader.innerText !== "Game over" && !isNewFloor) {
           document.body.classList.remove("crosshair");
           document.body.classList.add("dead");
           msgHeader.innerText = "Game over";
@@ -314,4 +358,5 @@ PIXI.loader
   .add('hat', `${itemsDir}/hat.json`)
   .add('shield', `${itemsDir}/shield.json`)
   .add('shortWep', `${itemsDir}/shortWep.json`)
+  .add('key', `${itemsDir}/key.json`)
   .load(setup);

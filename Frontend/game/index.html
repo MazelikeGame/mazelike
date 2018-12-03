@@ -102,12 +102,12 @@
         opacity: 0.8;
       }
 
-      .dead .popup {
+      .dead:not(.win) .popup {
         background-color: #d00;
         color: #fff;
       }
 
-      .dead a {
+      .dead:not(.win) a {
         color: #fff;
       }
 
@@ -115,6 +115,10 @@
         display: flex;
         align-items: center;
         flex-grow: 1;
+      }
+
+      .win .popup {
+        background-color: #ee0;
       }
     </style>
   </head>

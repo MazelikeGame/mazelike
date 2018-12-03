@@ -90,9 +90,38 @@ export default class Item extends ItemCommon {
     };
   }
 
+  static async spawnKey(floor, x, y) {
+    let itemDefs = await Item.getItemDefinitions();
+    let key = itemDefs[4];
+    let newItem = new Item(
+      floor,
+      key.spriteName,
+      key.spriteSize,
+      key.movementSpeed,
+      key.attackSpeed,
+      key.attack,
+      key.defence,
+      key.range,
+      floor.map.numItems,
+      key.category,
+      key.accuracy,
+      key.attackStyle
+    );
+    ++floor.map.numItems;
+    newItem.setCoordinates(x, y);
+    newItem.isOnFloor = true;
+    floor.items.push(newItem);
+    ml.logger.verbose(`Spawning key ${newItem.spriteName} at (${newItem.x}, ${newItem.y})`, ml.tags.item);
+  }
+
   static async spawnRandomItem(floor, x, y) {
     let itemDefs = await Item.getItemDefinitions();
     let randomItem = itemDefs[Math.floor(Math.random() * itemDefs.length)];
+
+    while(randomItem === itemDefs[4]) { //Don't want regular monsters to spawn keys.
+      randomItem = itemDefs[Math.floor(Math.random() * itemDefs.length)];
+    }
+    
     let newItem = new Item(
       floor,
       randomItem.spriteName,

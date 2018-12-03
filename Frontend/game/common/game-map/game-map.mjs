@@ -3,6 +3,7 @@
 import {MIN_SIZE, THEMES} from "./game-map-const.mjs";
 import Room from "./room.mjs";
 import Corridor from "./corridor.mjs";
+import Ladder from "./../ladder.mjs";
 
 /**
  * Map a 2d coordinate to a 1d coordinate
@@ -39,6 +40,7 @@ export default class GameMap {
    */
   constructor() {
     this.rooms = [];
+    this.ladder = new Ladder();
   }
 
   /**
@@ -86,7 +88,6 @@ export default class GameMap {
     map._initParams(params, map.numItems);
 
     map.generateMap(map.generateMaze());
-
     return map;
   }
 
@@ -152,6 +153,7 @@ export default class GameMap {
   serialize() {
     return JSON.stringify({
       rooms: this.rooms,
+      ladder: this.ladder,
       numItems: this.numItems,
       params: {
         nodes: this._params.nodes,
@@ -182,6 +184,8 @@ export default class GameMap {
     for(let i = 0; i < raw.rooms.length; ++i) {
       map.rooms.push(Room._parse(i, map.rooms, raw.rooms[i], map._params));
     }
+
+    map.ladder = raw.ladder;
 
     return map;
   }

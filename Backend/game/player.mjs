@@ -18,6 +18,13 @@ export default class Player extends PlayerCommon {
   constructor(...args) {
     super(...args);
 
+    this.respawn();
+  }
+
+  /**
+   * Move the player to the spawn point
+   */
+  respawn() {
     do {
       let spawn = this.floor.map.getSpawnPoint();
       this.x = this._confirmedX = spawn.x;
