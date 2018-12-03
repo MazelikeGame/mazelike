@@ -28,7 +28,6 @@ const MAPPINGS = {
   [KEYS.e]: KEYS.e
 };
 
-const MAX_INVENTORY_SIZE = 8;
 const BASE_STATS = {
   hp: 100,
   hpMax: 100,
@@ -72,7 +71,6 @@ export default class PlayerCommon {
     this.hpMax = BASE_STATS.hpMax;
     this._setStatsToBase();
 
-    this.inventory = [];
     this.wearing = {
       'hat': null,
       'chest': null,
@@ -263,7 +261,7 @@ export default class PlayerCommon {
       if(typeof window === "undefined") {
         this.processAttack(frame);
 
-        if(this.inventory.length < MAX_INVENTORY_SIZE) {
+        if(Object.values(this.wearing).includes(null)) {
           this._pickupNearbyItems();
         }
       }
@@ -311,17 +309,16 @@ export default class PlayerCommon {
   /* eslint-disable complexity, no-mixed-operators */
 
   /**
-   * Player picks up nearby items if inventory is not full
+   * Player picks up nearby items that are not currently being worn
    */
   _pickupNearbyItems() {
     for(let item of this.floor.items) {
       if(
         item.getPosition() &&
-        this.inventory.length < MAX_INVENTORY_SIZE &&
-        this._withinRadius(this.getPosition(), item.getPosition(), 12)
+        this._withinRadius(this.getPosition(), item.getPosition(), 12) &&
+        !this.wearing[item.category]
       ) {
         item.pickup(this);
-        this.inventory.push(item);
         ml.logger.verbose(`Player ${this.name} picked up a(n) ${item.spriteName}`, ml.tags.player);
         this.wieldItem(item);
       }
@@ -345,15 +342,9 @@ export default class PlayerCommon {
   }
 
   wieldItem(item) {
-    let index = this.inventory.indexOf(item);
-    if(index > -1) {
-      if(!this.wearing[item.category]) {
-        this.inventory.splice(index, 1);
-        this.wearing[item.category] = item;
-        this.updateStats();
-        ml.logger.verbose(`Player ${this.name} wielded a(n) ${item.spriteName}`, ml.tags.player);
-      }
-    }
+    this.wearing[item.category] = item;
+    this.updateStats();
+    ml.logger.verbose(`Player ${this.name} wielded a(n) ${item.spriteName}`, ml.tags.player);
   }
 
   _setStatsToBase() {
