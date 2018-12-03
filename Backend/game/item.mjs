@@ -85,7 +85,8 @@ export default class Item extends ItemCommon {
       isOnFloor: this.isOnFloor,
       category: this.category,
       accuracy: this.accuracy,
-      attackStyle: this.attackStyle
+      attackStyle: this.attackStyle,
+      maxWearTime: this.maxWearTime
     };
   }
 
@@ -104,7 +105,8 @@ export default class Item extends ItemCommon {
       floor.map.numItems,
       randomItem.category,
       randomItem.accuracy,
-      randomItem.attackStyle
+      randomItem.attackStyle,
+      randomItem.maxWearTime
     );
     ++floor.map.numItems;
     newItem.setCoordinates(x, y);
