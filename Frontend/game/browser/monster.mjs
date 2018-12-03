@@ -123,4 +123,11 @@ export default class Monster extends MonsterCommon {
     this.sprite.tint = this.regularTint;
     this.tinted = -1;
   }
+
+  /**
+   * Get the hp of the monster
+   */
+  getHp() {
+    return this.hp;
+  }
 }

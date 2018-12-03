@@ -22,6 +22,12 @@ export default class PlayerList {
       this.drawPlayerInfo(index, player); //change this to match player.getHp() in the future
     });
 
+    let boss = this.floor.monsters.find((monster) => {
+      return monster.type === "boss";
+    });
+
+    this.drawPlayerInfo(this.listOfPlayers.length, boss);
+
     return this.graphics;
   }
 
@@ -36,9 +42,9 @@ export default class PlayerList {
 
     //Black background
     let outline = new PIXI.Graphics();
-    outline.beginFill(0x000000);
+    outline.beginFill(player.type ? 0x000088 : 0x000000);
     outline.fillAlpha = this.floor.followingUser === player.name ? 0.85 : 0.7;
-    outline.lineStyle(2, 0xFFFFFFF, 1);
+    outline.lineStyle(2, player.type ? 0x0000bb : 0x000000, 1);
     outline.drawRect(0, 0, 300, 30);
     outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
     outline.endFill();
@@ -92,23 +98,34 @@ export default class PlayerList {
   }
 
   /**
+   * Get the stats for a player
+   * @param {string} key 
+   */
+  _getStats(key) {
+    let match = this.listOfPlayers.find((player) => {
+      return key === player.name;
+    });
+
+    if(!match) {
+      match = this.floor.monsters.find((monster) => {
+        return monster.type === "boss";
+      });
+    }
+
+    return {
+      name: match.name,
+      hp: match.getHp(),
+      hpMax: match.hpMax
+    };
+  }
+
+  /**
    * Updates the player list for each player.
    */
   update() { 
     let index = 0;
     this.playerBoxes.forEach((value, key) => {
-      let name = key;
-      let hp = 0;
-      let hpMax = 0;
-
-      for(let player of this.listOfPlayers) {
-        if(key === player.name) {
-          name = player.name;
-          hp = player.getHp();
-          hpMax = player.hpMax;
-          break;
-        }
-      }
+      let {name, hp, hpMax} = this._getStats(key);
 
       let offset = 40; //Space between each player information box.
       let hpBox = this.hpBoxes.get(name);
