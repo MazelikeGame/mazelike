@@ -29,8 +29,8 @@ const MAPPINGS = {
 };
 
 const BASE_STATS = {
-  hp: 15000,
-  hpMax: 15000,
+  hp: 150,
+  hpMax: 150,
   damage: 10,
   speed: 400,
   range: 100,
