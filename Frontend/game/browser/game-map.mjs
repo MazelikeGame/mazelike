@@ -126,14 +126,17 @@ export default class GameMap extends GameMapCommon {
    * Load the game map in the browser
    * @param {Floor} floor The floor to load the map for
    */
-  static async load(floor) {
+  static load(floor) {
     // for backwards compatability the map for floorIdx == 0 is just the gameId
     let mapId = floor.id.replace("-0", "");
 
-    let res = await fetch(`/public/maps/${mapId}.json`);
-    let json = await res.json();
-      
-    floor.map = GameMap.parse(json, new GameMap());
+    return fetch(`/public/maps/${mapId}.json`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        floor.map = GameMap.parse(json, new GameMap());
+      });
   }
 
   /**

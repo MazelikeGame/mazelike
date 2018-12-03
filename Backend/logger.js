@@ -1,5 +1,6 @@
 /* eslint-disable arrow-body-style */
 /* global ml */
+require('dotenv').config();
 const winston = require("winston");
 const chalk = require("chalk");
 const moment = require("moment");

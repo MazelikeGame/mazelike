@@ -77,19 +77,19 @@ export default class Floor extends FloorCommon {
    * @param sock The connection to the game server
    * @param username The username of the current player
    */
-  static async load(gameId, floorIdx, sock, username) {
+  static load(gameId, floorIdx, sock, username) {
     let floor = new Floor(gameId, floorIdx, sock, username);
 
-    await Promise.all([
+    return Promise.all([
       // NOTE: You should define your functions here and they should
       // return a promise for when they compl2ete.  All modifications to
       // floor should be done to the floor variable you pass in like so.
       GameMap.load(floor),
-    ]);
+    ]).then(() => {
+      floor._initRendering();
 
-    floor._initRendering();
-
-    return floor;
+      return floor;
+    });
   }
 
   save() {

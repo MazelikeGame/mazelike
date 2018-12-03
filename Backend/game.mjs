@@ -1,64 +1,30 @@
-/* global ml */
+/* global ml io */
 /* eslint-disable no-param-reassign,complexity */
-import "./logger.js"; // THIS MUST BE THE FIRST IMPORT
-import socketIO from "socket.io";
-import {createServer} from "./server";
 import Floor from "./game/floor";
 import saveHandler from "./handlers/save";
 import movementHandler from "./handlers/player-movement";
-import initAuth from "./game-auth.mjs";
-import path from "path";
+import initAuth from "./game-auth";
 
-let isGameRunning = false;
+let runningGames = new Set();
 
-export default async function main(env, httpd) {
-  // Parse the env vars
-  const PORT = +process.env.MAZELIKE_port;
-  const MAZELIKE_ENV = /^MAZELIKE_(.+)/;
-  let gameEnv = env;
-
-  if(env === process.env) {
-    gameEnv = {};
-
-    for(let key of Object.keys(env)) {
-      let match = key.match(MAZELIKE_ENV);
-      if(match) {
-        gameEnv[match[1]] = env[key];
-      }
-    }
+export default async function startGame(gameId) {
+  if(runningGames.has(gameId)) {
+    return;
   }
+
+  runningGames.add(gameId);
 
   // Load/generate the ground floor
-  let floor = await Floor.load(gameEnv.gameId, 0);
-
-  // Create the socket.io server
-  if(!isNaN(PORT)) {
-    httpd = createServer((req, res) => {
-      res.end("Game server");
-    }).listen(PORT, () => {
-      ml.logger.info(`Game server listening on ${PORT}`);
-    });
-
-    // tell the manager this port is in use
-    httpd.on("error", (err) => {
-      if(err.errno === "EADDRINUSE") {
-        process.exit(198);
-      }
-    });
-  }
-
-  let io = socketIO(httpd, {
-    path: `/socket/${gameEnv.gameId}`
-  });
-
-  initAuth(io);
+  let floor = await Floor.load(gameId, 0);
 
   // eslint-disable-next-line arrow-parens,arrow-body-style
   let awaitedPlayers = new Set(floor.players.map(player => player.name));
   ml.logger.verbose(`Waiting for players to join (${Array.from(awaitedPlayers).join(", ")})`, ml.tags.pregame);
 
+  initAuth(io.of(`/game/${gameId}`));
+
   let readyResolver;
-  io.on("connection", async(sock) => {
+  let connectionHandler = async(sock) => {
     ml.logger.info(`Game client connected (username: ${sock.user ? sock.user.username : "No auth"})`);
     // Not logged in enter spectator mode
     if(!sock.user) {
@@ -68,13 +34,24 @@ export default async function main(env, httpd) {
 
     sock.emit("set-username", sock.user.username);
 
-    sock.on("disconnect", () => {
+    sock.on("disconnect", async() => {
       //Player has left and need to update the list of players.
       sock.broadcast.emit("update-playerlist", sock.user.username);
+
+      ml.logger.info(`${sock.user.username} left the game`, ml.tags("game"));
+
+      // Remove the player
+      let player = floor.players.find((pl) => {
+        return pl.name === sock.user.username;
+      });
+
+      if(player) {
+        floor.players.splice(floor.players.indexOf(player), 1);
+      }
     });
 
     saveHandler(sock, floor);
-    movementHandler(sock, floor, io);
+    movementHandler(sock, floor, sock.broadcast);
 
     // Mark this player as ready
     awaitedPlayers.delete(sock.user.username);
@@ -84,7 +61,9 @@ export default async function main(env, httpd) {
     if(awaitedPlayers.size === 0) {
       readyResolver();
     }
-  });
+  };
+
+  io.of(`/game/${gameId}`).on("connection", connectionHandler);
 
   await new Promise((resolve) => {
     readyResolver = resolve;
@@ -93,39 +72,39 @@ export default async function main(env, httpd) {
   ml.logger.verbose(`Starting countdown`, ml.tags.pregame);
 
   // start the count down
-  for(let i = 5; i > 0; --i) {
+  for(let i = 3; i > 0; --i) {
     await new Promise((resolve) => {
       setTimeout(resolve, 1000);
     });
 
-    io.emit("countdown", i);
+    io.of(`/game/${gameId}`).emit("countdown", i);
   }
 
   ml.logger.info("Starting game", ml.tags("game"));
 
   // start the game
-  await floor.sendState(io, isGameRunning);
-  io.emit("start-game");
-  isGameRunning = true;
+  await floor.sendState(io.of(`/game/${gameId}`));
+  io.of(`/game/${gameId}`).emit("start-game");
+  floor.isGameRunning = true;
 
-  triggerTick(floor, io, Date.now());
+  triggerTick(floor, Date.now(), gameId);
 }
 
-async function triggerTick(floor, io, lastUpdate) {
+async function triggerTick(floor, lastUpdate, gameId) {
   let now = Date.now();
 
   // save and quit if we loose all the clients
-  if(io.engine.clientsCount === 0 || floor.players.length === 0) {
-    await floor.sendState(io, isGameRunning);
+  if(floor.players.length === 0) {
+    await floor.sendState(io.of(`/game/${gameId}`));
+    io.of(`/game/${gameId}`).removeAllListeners("connection");
+
     ml.logger.verbose("All clients left or died saving game", ml.tags("game"));
 
     await floor.save();
 
-    if(process.env.CLUSTER_MANAGER === "single") {
-      return;
-    }
+    runningGames.delete(gameId);
 
-    process.exit(0);
+    return;
   }
 
   // move monsters and check for collisions
@@ -146,16 +125,10 @@ async function triggerTick(floor, io, lastUpdate) {
       floor = await Floor.load(newId[0], newId[1]);
     }*/
 
-    await floor.sendState(io, isGameRunning);
+    await floor.sendState(io.of(`/game/${gameId}`));
   } catch(err) {
     ml.logger.error(`${err.stack}`, ml.tags("game"));
   }
 
-  setTimeout(triggerTick.bind(undefined, floor, io, now), Floor.UPDATE_INTERVAL);
-}
-
-if(path.relative(process.cwd(), process.argv[1]) === "Backend/game.mjs") {
-  ml.logger.debug("Running as game server process", ml.tags.manager);
-
-  main(process.env);
+  setTimeout(triggerTick.bind(undefined, floor, now, gameId), Floor.UPDATE_INTERVAL);
 }

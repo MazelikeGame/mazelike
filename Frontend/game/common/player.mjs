@@ -65,6 +65,7 @@ export default class PlayerCommon {
     this._frames = [];
     this.size = 1; // used with monster collision checking, acts as a size multiplier
     this.attackAngle = Math.PI / 4;
+    this.attackType = "rectangle";
 
     /* Stats */
     this.hp = BASE_STATS.hp;
@@ -430,9 +431,9 @@ export default class PlayerCommon {
     // corrners of the monster hit box
     let monsterPoints = [
       { x: monster.x, y: monster.y },
-      { x: monster.x + Monster.SPRITE_SIZE, y: monster.y },
-      { x: monster.x, y: monster.y + Monster.SPRITE_SIZE },
-      { x: monster.x + Monster.SPRITE_SIZE, y: monster.y + Monster.SPRITE_SIZE }
+      { x: monster.x + Monster.SPRITE_SIZE * monster.size, y: monster.y },
+      { x: monster.x, y: monster.y + Monster.SPRITE_SIZE * monster.size },
+      { x: monster.x + Monster.SPRITE_SIZE * monster.size, y: monster.y + Monster.SPRITE_SIZE * monster.size }
     ];
 
     // check if the attack line intersects with the monster's hit box

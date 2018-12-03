@@ -19,7 +19,7 @@ if(input) {
   };
 }
 
-let sock = io(location.origin);
+let sock = io(`${location.origin}/lobby`);
 
 // Handle a player being dropped
 sock.on("lobby-drop", ({id, player}) => {
@@ -98,7 +98,6 @@ sock.on("lobby-delete", (id) => {
 
 // Go to the game page
 sock.on("lobby-start", (id) => {
-
   if(id === hydrate.id) {
     location.href = `/game/${id}`;
   }
