@@ -14,11 +14,11 @@ import Floor from "../game/floor";
 import MonsterModel from "../models/monster.mjs";
 import ItemModel from '../models/item.mjs';
 import Sequelize from "sequelize";
+import Maps from "../models/maps";
 
 let monsterModel = new MonsterModel(sql);
 
 const mkdir = util.promisify(fs.mkdir);
-const exists = util.promisify(fs.exists);
 const unlink = util.promisify(fs.unlink);
 const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
@@ -345,7 +345,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
     ml.logger.info(`Starting game ${req.params.id}`, ml.tags.lobby);
 
     // Generate the game
-    if(!await exists(`${DATA_DIR}/maps/${req.params.id}.json`)) {
+    if(!await Maps.findOne({ where: { floorId: `${req.params.id}-0` } })) {
       ml.logger.verbose(`Generating floor ${req.params.id}-0`, ml.tags.lobby);
       await Floor.generate({
         gameId: req.params.id,
@@ -385,6 +385,18 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
   res.end("No such lobby or you are not the host");
 });
 
+// Serve the maps
+gameRouter.get("/map/:id", async(req, res) => {
+  let rawMap = await Maps.findOne({
+    where: {
+      floorId: req.params.id
+    }
+  });
+
+  res.end(rawMap.map);
+});
+
+
 // Serve /game/:id as /game/
 gameRouter.get(/[A-Za-z0-9]{12}/, (req, res) => {
   res.sendFile(path.resolve("Frontend/game/index.html"));
@@ -396,7 +408,13 @@ gameRouter.get('/test', (req, res) => {
 
 function deleteGame(id) {
   return Promise.all([
-    unlink(`${DATA_DIR}/maps/${id}.json`),
+    Maps.destroy({
+      where: {
+        floorId: {
+          [Sequelize.Op.like]: `${id}-%`
+        }
+      }
+    }),
     ItemModel.destroy({
       where: {
         floorId: {
