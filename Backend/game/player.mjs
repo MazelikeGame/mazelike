@@ -1,6 +1,6 @@
 /* global ml */
 /* jshint node: true */
-import PlayerCommon from '../../Frontend/game/common/player';
+import PlayerCommon, {BASE_STATS} from '../../Frontend/game/common/player';
 import PlayerModel from '../models/player';
 import LobbyModel from '../models/lobby';
 import UserModel from '../models/user';
@@ -133,6 +133,11 @@ export default class Player extends PlayerCommon {
       _confirmedY: this._confirmedY,
       attackAngle: this.attackAngle,
       range: this.range,
+      wearing: this.wearing,
+      hpMax: this.hpMax,
+      damage: this.damage,
+      speed: this.speed,
+      defence: this.defence
     };
   }
 
@@ -180,5 +185,68 @@ export default class Player extends PlayerCommon {
         // Passing in case an item doesn't have a maxWearTime
       }
     }
+  }
+
+  /**
+   * Player picks up nearby items that are not currently being worn
+   */
+  _pickupNearbyItems() {
+    for(let item of this.floor.items) {
+      if(
+        item.getPosition() &&
+        this._withinRadius(this.getPosition(), item.getPosition(), 12) &&
+        !this.wearing[item.category]
+      ) {
+        item.pickup(this);
+        ml.logger.verbose(`Player ${this.name} picked up a(n) ${item.spriteName}`, ml.tags.player);
+        this.wieldItem(item);
+      }
+    }
+  }
+
+  /**
+   * Updates the player's stats based on what is being worn.
+   */
+  updateStats() {
+    this._setStatsToBase();
+    for(let item of Object.values(this.wearing)) {
+      if(item) {
+        this.speed += item.movementSpeed;
+        this.damage += item.damage;
+        this.defence += item.defence;
+        this.range += item.range;
+      }
+    }
+    ml.logger.verbose(`${this.name}'s stats are now ${this.speed}, ${this.damage}, ${this.defence}, ${this.range}`, ml.tags.player);
+  }
+
+  wieldItem(item) {
+    if(item.category === "key") {
+      this.hasKey = true;
+    }
+    this.wearing[item.category] = item;
+    ml.logger.verbose(`Player ${this.name} wielded a(n) ${item.spriteName}`, ml.tags.player);
+    this.updateStats();
+  }
+
+  _setStatsToBase() {
+    this.speed = BASE_STATS.speed;
+    this.damage = BASE_STATS.damage;
+    this.defence = BASE_STATS.defence;
+    this.range = BASE_STATS.range;
+  }
+
+  /**
+   * Returns true if obj is within the desired radius of the center circle.
+   *
+   * @param {object} center - Coords to use that acts as the center of the circle
+   * @param {object} obj - Object to compare to center's coord
+   * @param {int} radius - the desired radius of the circle to check
+   */
+  _withinRadius(center, obj, radius) {
+    let centerCoords = { x: Math.round(center.x), y: Math.round(center.y) };
+    let objCoords = { x: Math.round(obj.x), y: Math.round(obj.y) };
+    let hyp = Math.pow(objCoords.x - centerCoords.x, 2) + Math.pow(objCoords.y - centerCoords.y, 2);
+    return hyp <= Math.pow(radius, 2);
   }
 }
