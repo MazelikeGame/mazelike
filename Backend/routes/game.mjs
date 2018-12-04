@@ -9,13 +9,12 @@ import User from '../models/user';
 import sql from "../sequelize";
 import path from "path";
 import fs from "fs";
-import startGame from "../game.mjs";
 import Floor from "../game/floor";
 import MonsterModel from "../models/monster.mjs";
 import ItemModel from '../models/item.mjs';
 import Sequelize from "sequelize";
 import Maps from "../models/maps";
-import {getAddr} from "../multi/host";
+import startGame, {getAddr} from "../multi/host";
 
 let monsterModel = new MonsterModel(sql);
 

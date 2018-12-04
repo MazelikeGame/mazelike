@@ -7,6 +7,7 @@ import {createServer} from "../server";
 import socketio from "socket.io";
 
 const RECONNECT_TIME = 3;
+let reconnectTimer;
 
 export default function start() {
   // Start the game server
@@ -33,7 +34,8 @@ function connect() {
     connection.on("close", () => {
       ml.logger.info(`Attempting to reconnect to ${process.env.MAZELIKE_MASTER} in ${RECONNECT_TIME} seconds`, ml.tags("intercom"));
 
-      setTimeout(connect, RECONNECT_TIME);
+      clearTimeout(reconnectTimer);
+      reconnectTimer = setTimeout(connect, RECONNECT_TIME);
     });
 
     connection.request({

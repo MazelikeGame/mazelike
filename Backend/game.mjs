@@ -3,20 +3,10 @@
 import Floor from "./game/floor";
 import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth";
-import {hasGameServers, dispatchGame} from "./multi/host";
 
 let runningGames = new Set();
 
-export default function startGameWrapper(gameId) {
-  if(hasGameServers()) {
-    return dispatchGame(gameId);
-  }
-  
-  startGame(gameId); // don't return a promise because we don't want to wait for the entire game
-  return Promise.resolve();
-}
-
-async function startGame(gameId) {
+export default async function startGame(gameId) {
   let floorRef = {};
   if(runningGames.has(gameId)) {
     return;
