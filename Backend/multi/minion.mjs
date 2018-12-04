@@ -3,7 +3,7 @@ import http2 from "http2";
 import urlLib from "url";
 import os from "os";
 import startGame from "../game";
-import {createServer} from "../server";
+import {createServer, appPort} from "../server";
 import socketio from "socket.io";
 
 const RECONNECT_TIME = 3;
@@ -14,8 +14,8 @@ export default function start() {
   let server = createServer();
   global.io = socketio(server);
 
-  server.listen(3000, () => {
-    ml.logger.info("Server started on port 3000");
+  server.listen(appPort, () => {
+    ml.logger.info(`Server started on port ${appPort}`);
   });
 
   connect();

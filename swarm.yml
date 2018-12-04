@@ -6,6 +6,8 @@ services:
       DB: postgres://root@postgres/mazelike
       DB_PASSWORD_FILE: /run/secrets/db_password
       DISABLE_MIGRATIONS: ok
+      CERT_FILE: /run/secrets/ssl_cert
+      KEY_FILE: /run/secrets/ssl_key
     depends_on:
       - postgres
     ports:
@@ -17,6 +19,8 @@ services:
         target: /data
     secrets:
       - db_password
+      - ssl_cert
+      - ssl_key
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -60,11 +64,14 @@ services:
       DB_PASSWORD_FILE: /run/secrets/db_password
       MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5901
       MAZELIKE_MASTER: http://master
-      LOG_LEVEL: verbose
+      CERT_FILE: /run/secrets/ssl_cert
+      KEY_FILE: /run/secrets/ssl_key
     ports:
-      - 5901:3000
+      - 5901:3001
     secrets:
       - db_password
+      - ssl_cert
+      - ssl_key
   
   minion2:
     hostname: minion2
@@ -78,11 +85,14 @@ services:
       DB_PASSWORD_FILE: /run/secrets/db_password
       MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5902
       MAZELIKE_MASTER: http://master
-      LOG_LEVEL: verbose
+      CERT_FILE: /run/secrets/ssl_cert
+      KEY_FILE: /run/secrets/ssl_key
     ports:
-      - 5902:3000
+      - 5902:3001
     secrets:
       - db_password
+      - ssl_cert
+      - ssl_key
 
   minion3:
     hostname: minion3
@@ -96,11 +106,14 @@ services:
       DB_PASSWORD_FILE: /run/secrets/db_password
       MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5903
       MAZELIKE_MASTER: http://master
-      LOG_LEVEL: verbose
+      CERT_FILE: /run/secrets/ssl_cert
+      KEY_FILE: /run/secrets/ssl_key
     ports:
-      - 5903:3000
+      - 5903:3001
     secrets:
       - db_password
+      - ssl_cert
+      - ssl_key
 
   minion4:
     hostname: minion4
@@ -112,17 +125,24 @@ services:
       DISABLE_MIGRATIONS: ok
       DB: postgres://root@postgres/mazelike
       DB_PASSWORD_FILE: /run/secrets/db_password
+      CERT_FILE: /run/secrets/ssl_cert
+      KEY_FILE: /run/secrets/ssl_key
       MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5904
       MAZELIKE_MASTER: http://master
-      LOG_LEVEL: verbose
     ports:
-      - 5904:3000
+      - 5904:3001
     secrets:
       - db_password
+      - ssl_cert
+      - ssl_key
 
 secrets:
   db_password:
     file: .db_password.txt
+  ssl_cert:
+    file: data/cert.pem
+  ssl_key:
+    file: data/privkey.pem
 
 volumes:
   db:
