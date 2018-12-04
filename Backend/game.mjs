@@ -3,6 +3,7 @@
 import Floor from "./game/floor";
 import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth";
+import os from "os";
 
 let runningGames = new Set();
 
@@ -33,6 +34,7 @@ export default async function startGame(gameId) {
         return;
       }
 
+      sock.emit("game-server-name", os.hostname());
       sock.emit("set-username", sock.user.username);
 
       sock.on("disconnect", async() => {

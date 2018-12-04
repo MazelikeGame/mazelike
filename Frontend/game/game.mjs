@@ -158,6 +158,11 @@ function setup() {
 
     sock = io(`${location.protocol}//${gameServerAddr}/game/${gameId}`);
 
+    // Show the user which game server is serving them
+    sock.on("game-server-name", (name) => {
+      document.title = `Mazelike - ${name}`;
+    });
+
     return getUsername(sock);
   }).then((uname) => {
     username = uname;
