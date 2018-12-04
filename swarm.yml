@@ -1,28 +1,41 @@
 version: "3.2"
 services:
   master:
-    image: mazelike
+    image: ryan3r/mazelike:edge
     environment:
-      DB: postgres://root:ghasdbjks@postgres/mazelike
+      DB: postgres://root@postgres/mazelike
+      DB_PASSWORD_FILE: /run/secrets/db_password
       DISABLE_MIGRATIONS: ok
-    build:
-      context: .
     depends_on:
       - postgres
     ports:
-      - 3000:3000
+      - 80:3000
+      - 443:3001
     volumes:
-      - type: bind
-        source: ./data
+      - type: volume
+        source: profiles
         target: /data
     secrets:
       - db_password
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+  
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - "5900:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
     
   postgres:
     image: postgres
     environment:
       POSTGRES_USER: root
-      POSTGRES_PASSWORD: ghasdbjks
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       POSTGRES_DB: mazelike
       DISABLE_MIGRATIONS: ok
     volumes:
@@ -31,46 +44,79 @@ services:
         target: /var/lib/postgresql/data
     secrets:
       - db_password
+    deploy:
+      placement:
+        constraints: [node.role == manager]
 
   minion1:
     hostname: minion1
-    image: mazelike
+    image: ryan3r/mazelike:edge
     depends_on:
       - postgres
+      - master
     environment:
       DISABLE_MIGRATIONS: ok
-      DB: postgres://root:ghasdbjks@postgres/mazelike
+      DB: postgres://root@postgres/mazelike
       DB_PASSWORD_FILE: /run/secrets/db_password
-      MAZELIKE_EXTERN_ADDR: localhost:5900
+      MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5901
       MAZELIKE_MASTER: http://master
       LOG_LEVEL: verbose
     ports:
-      - 5900:3000
-    volumes:
-      - type: bind
-        source: ./data
-        target: /data
+      - 5901:3000
     secrets:
       - db_password
   
   minion2:
     hostname: minion2
-    image: mazelike
+    image: ryan3r/mazelike:edge
     depends_on:
       - postgres
+      - master
     environment:
       DISABLE_MIGRATIONS: ok
-      DB: postgres://root:ghasdbjks@postgres/mazelike
+      DB: postgres://root@postgres/mazelike
       DB_PASSWORD_FILE: /run/secrets/db_password
-      MAZELIKE_EXTERN_ADDR: localhost:5901
+      MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5902
       MAZELIKE_MASTER: http://master
       LOG_LEVEL: verbose
     ports:
-      - 5901:3000
-    volumes:
-      - type: bind
-        source: ./data
-        target: /data
+      - 5902:3000
+    secrets:
+      - db_password
+
+  minion3:
+    hostname: minion3
+    image: ryan3r/mazelike:edge
+    depends_on:
+      - postgres
+      - master
+    environment:
+      DISABLE_MIGRATIONS: ok
+      DB: postgres://root@postgres/mazelike
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5903
+      MAZELIKE_MASTER: http://master
+      LOG_LEVEL: verbose
+    ports:
+      - 5903:3000
+    secrets:
+      - db_password
+
+  minion4:
+    hostname: minion4
+    image: ryan3r/mazelike:edge
+    depends_on:
+      - postgres
+      - master
+    environment:
+      DISABLE_MIGRATIONS: ok
+      DB: postgres://root@postgres/mazelike
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5904
+      MAZELIKE_MASTER: http://master
+      LOG_LEVEL: verbose
+    ports:
+      - 5904:3000
     secrets:
       - db_password
 
@@ -80,3 +126,4 @@ secrets:
 
 volumes:
   db:
+  profiles:

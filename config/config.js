@@ -34,7 +34,7 @@ case "mysql:":
 
   auth = dbUrl.auth && dbUrl.auth.split(":");
   conf.username = auth && auth[0];
-  conf.password = auth ? auth[1] : dbPassword;
+  conf.password = dbPassword ? dbPassword : auth && auth[1];
 
   conf.host = dbUrl.hostname;
   conf.port = +dbUrl.port || (conf.dialect === "mysql" ? 3306 : 5432);
