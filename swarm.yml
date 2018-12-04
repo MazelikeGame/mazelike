@@ -2,19 +2,45 @@ version: "3.2"
 services:
   master:
     image: mazelike
+    environment:
+      DB: postgres://root:ghasdbjks@postgres/mazelike
+      DISABLE_MIGRATIONS: ok
     build:
       context: .
+    depends_on:
+      - postgres
     ports:
       - 3000:3000
     volumes:
       - type: bind
         source: ./data
         target: /data
+    secrets:
+      - db_password
+    
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: ghasdbjks
+      POSTGRES_DB: mazelike
+      DISABLE_MIGRATIONS: ok
+    volumes:
+      - type: volume
+        source: db
+        target: /var/lib/postgresql/data
+    secrets:
+      - db_password
 
   minion1:
     hostname: minion1
     image: mazelike
+    depends_on:
+      - postgres
     environment:
+      DISABLE_MIGRATIONS: ok
+      DB: postgres://root:ghasdbjks@postgres/mazelike
+      DB_PASSWORD_FILE: /run/secrets/db_password
       MAZELIKE_EXTERN_ADDR: localhost:5900
       MAZELIKE_MASTER: http://master
       LOG_LEVEL: verbose
@@ -24,11 +50,18 @@ services:
       - type: bind
         source: ./data
         target: /data
+    secrets:
+      - db_password
   
   minion2:
     hostname: minion2
     image: mazelike
+    depends_on:
+      - postgres
     environment:
+      DISABLE_MIGRATIONS: ok
+      DB: postgres://root:ghasdbjks@postgres/mazelike
+      DB_PASSWORD_FILE: /run/secrets/db_password
       MAZELIKE_EXTERN_ADDR: localhost:5901
       MAZELIKE_MASTER: http://master
       LOG_LEVEL: verbose
@@ -38,3 +71,12 @@ services:
       - type: bind
         source: ./data
         target: /data
+    secrets:
+      - db_password
+
+secrets:
+  db_password:
+    file: .db_password.txt
+
+volumes:
+  db:

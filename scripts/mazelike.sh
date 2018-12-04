@@ -68,10 +68,12 @@ ___  ___                  _  _  _
 
 EOF
 
-./node_modules/.bin/sequelize db:migrate
+if [ -z "$DISABLE_MIGRATIONS" ]; then
+  ./node_modules/.bin/sequelize db:migrate
 
-if [ $? -ne 0 ]; then
-  exit $?
+  if [ $? -ne 0 ]; then
+    exit $?
+  fi
 fi
 
 exec node --experimental-modules Backend/index.mjs
