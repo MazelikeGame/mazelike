@@ -5,6 +5,7 @@ import startGame from "../game";
 
 let streams = [];
 let gameAddrs = new Map();
+let serverLoad = new Map();
 
 /**
  * Start the intercom server on the host
@@ -18,6 +19,8 @@ export function initHost() {
       stream.respond({ ":status": 200 });
       stream.end("v1");
     } else if(headers[":path"] === "/v1/poll-games") {
+      serverLoad.set(stream, 0);
+
       // Remove any other streams from this game server
       for(let dup of streams) {
         if(dup.$extrnAddr === headers["x-extrn-addr"]) {
@@ -34,13 +37,16 @@ export function initHost() {
       ml.logger.info(`Game server ${headers["x-hostname"]} connected (1/${streams.length})`);
 
       stream.on("finish", () => {
-        ml.logger.info(`Game server ${headers["x-hostname"]} disconnected (${streams.length} remain)`, ml.tags("intercom"));
+        serverLoad.delete(stream);
+
         // The game server disconnected
         let idx = streams.indexOf(stream);
-
+        
         if(idx !== -1) {
           streams.splice(idx, 1);
         }
+
+        ml.logger.info(`Game server ${headers["x-hostname"]} disconnected (${streams.length} remain)`, ml.tags("intercom"));
       });
     } else {
       stream.respond({ ":status": 404 });
@@ -91,8 +97,11 @@ export default async function startGameWrapper(gameId) {
  * @param gameId The id of the game to start
  */
 function dispatchGame(gameId) {
-  let idx = Math.floor(Math.random() * streams.length);
-  let stream = streams[idx];
+  streams.sort((a, b) => {
+    return serverLoad.get(a) - serverLoad.get(b);
+  });
+
+  let stream = streams[0];
 
   return new Promise((resolve, reject) => {
     stream.pushStream({ ":path": `/v1/start?gameId=${gameId}` }, (err, push) => {
@@ -100,6 +109,8 @@ function dispatchGame(gameId) {
         reject(err);
         return;
       }
+
+      serverLoad.set(stream, serverLoad.get(stream) + 1);
       
       ml.logger.verbose(`Dispatching game ${gameId} to ${stream.$hostname}`, ml.tags("intercom"));
       gameAddrs.set(gameId, stream.$extrnAddr);
@@ -111,8 +122,11 @@ function dispatchGame(gameId) {
     });
   }).catch((err) => {
     // Close and remove this server
-    streams[idx].end();
-    streams.splice(idx, 1);
+    let idx = streams.indexOf(stream);
+
+    if(idx !== -1) {
+      streams[idx].end();
+    }
 
     throw err;
   });

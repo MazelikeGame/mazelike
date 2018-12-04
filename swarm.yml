@@ -11,14 +11,29 @@ services:
         source: ./data
         target: /data
 
-  minion:
+  minion1:
+    hostname: minion1
     image: mazelike
     environment:
       MAZELIKE_EXTERN_ADDR: localhost:5900
       MAZELIKE_MASTER: http://master
-      LOG_LEVEL: debug
+      LOG_LEVEL: verbose
     ports:
       - 5900:3000
+    volumes:
+      - type: bind
+        source: ./data
+        target: /data
+  
+  minion2:
+    hostname: minion2
+    image: mazelike
+    environment:
+      MAZELIKE_EXTERN_ADDR: localhost:5901
+      MAZELIKE_MASTER: http://master
+      LOG_LEVEL: verbose
+    ports:
+      - 5901:3000
     volumes:
       - type: bind
         source: ./data

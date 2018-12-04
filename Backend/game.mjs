@@ -7,86 +7,91 @@ import initAuth from "./game-auth";
 let runningGames = new Set();
 
 export default async function startGame(gameId) {
-  let floorRef = {};
-  if(runningGames.has(gameId)) {
-    return;
-  }
-
-  runningGames.add(gameId);
-
-  // Load/generate the ground floor
-  let floor = floorRef.floor = await Floor.load(gameId, 0);
-
-  // eslint-disable-next-line arrow-parens,arrow-body-style
-  let awaitedPlayers = new Set(floor.players.map(player => player.name));
-  ml.logger.verbose(`Waiting for players to join (${Array.from(awaitedPlayers).join(", ")})`, ml.tags.pregame);
-
-  initAuth(io.of(`/game/${gameId}`));
-
-  let readyResolver;
-  let connectionHandler = async(sock) => {
-    ml.logger.info(`Game client connected (username: ${sock.user ? sock.user.username : "No auth"})`);
-    // Not logged in enter spectator mode
-    if(!sock.user) {
-      sock.emit("set-username");
+  try {
+    let floorRef = {};
+    if(runningGames.has(gameId)) {
       return;
     }
 
-    sock.emit("set-username", sock.user.username);
+    runningGames.add(gameId);
 
-    sock.on("disconnect", async() => {
-      //Player has left and need to update the list of players.
-      sock.broadcast.emit("update-playerlist", sock.user.username);
+    // Load/generate the ground floor
+    let floor = floorRef.floor = await Floor.load(gameId, 0);
 
-      ml.logger.info(`${sock.user.username} left the game`, ml.tags("game"));
-
-      // Remove the player
-      let player = floor.players.find((pl) => {
-        return pl.name === sock.user.username;
-      });
-
-      if(player) {
-        floor.players.splice(floor.players.indexOf(player), 1);
-      }
-    });
-
-    movementHandler(sock, floorRef, sock.broadcast);
-
-    // Mark this player as ready
-    awaitedPlayers.delete(sock.user.username);
-
+    // eslint-disable-next-line arrow-parens,arrow-body-style
+    let awaitedPlayers = new Set(floor.players.map(player => player.name));
     ml.logger.verbose(`Waiting for players to join (${Array.from(awaitedPlayers).join(", ")})`, ml.tags.pregame);
 
-    if(awaitedPlayers.size === 0) {
-      readyResolver();
-    }
-  };
+    initAuth(io.of(`/game/${gameId}`));
 
-  io.of(`/game/${gameId}`).on("connection", connectionHandler);
+    let readyResolver;
+    let connectionHandler = async(sock) => {
+      ml.logger.info(`Game client connected (username: ${sock.user ? sock.user.username : "No auth"})`);
+      // Not logged in enter spectator mode
+      if(!sock.user) {
+        sock.emit("set-username");
+        return;
+      }
 
-  await new Promise((resolve) => {
-    readyResolver = resolve;
-  });
+      sock.emit("set-username", sock.user.username);
 
-  ml.logger.verbose(`Starting countdown`, ml.tags.pregame);
+      sock.on("disconnect", async() => {
+        //Player has left and need to update the list of players.
+        sock.broadcast.emit("update-playerlist", sock.user.username);
 
-  // start the count down
-  for(let i = 3; i > 0; --i) {
+        ml.logger.info(`${sock.user.username} left the game`, ml.tags("game"));
+
+        // Remove the player
+        let player = floor.players.find((pl) => {
+          return pl.name === sock.user.username;
+        });
+
+        if(player) {
+          floor.players.splice(floor.players.indexOf(player), 1);
+        }
+      });
+
+      movementHandler(sock, floorRef, sock.broadcast);
+
+      // Mark this player as ready
+      awaitedPlayers.delete(sock.user.username);
+
+      ml.logger.verbose(`Waiting for players to join (${Array.from(awaitedPlayers).join(", ")})`, ml.tags.pregame);
+
+      if(awaitedPlayers.size === 0) {
+        readyResolver();
+      }
+    };
+
+    io.of(`/game/${gameId}`).on("connection", connectionHandler);
+
     await new Promise((resolve) => {
-      setTimeout(resolve, 1000);
+      readyResolver = resolve;
     });
 
-    io.of(`/game/${gameId}`).emit("countdown", i);
+    ml.logger.verbose(`Starting countdown`, ml.tags.pregame);
+
+    // start the count down
+    for(let i = 3; i > 0; --i) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+
+      io.of(`/game/${gameId}`).emit("countdown", i);
+    }
+
+    ml.logger.info("Starting game", ml.tags("game"));
+
+    // start the game
+    await floor.sendState(io.of(`/game/${gameId}`));
+    io.of(`/game/${gameId}`).emit("start-game");
+    floor.isGameRunning = true;
+
+    triggerTick(floor, Date.now(), gameId, floorRef);
+  } catch(err) {
+    ml.logger.error(`Game crashed because of ${err.message}`);
+    ml.logger.verbose(err.stack);
   }
-
-  ml.logger.info("Starting game", ml.tags("game"));
-
-  // start the game
-  await floor.sendState(io.of(`/game/${gameId}`));
-  io.of(`/game/${gameId}`).emit("start-game");
-  floor.isGameRunning = true;
-
-  triggerTick(floor, Date.now(), gameId, floorRef);
 }
 
 async function triggerTick(floor, lastUpdate, gameId, floorRef) {
