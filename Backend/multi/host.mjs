@@ -71,7 +71,7 @@ export function dispatchGame(gameId) {
         reject(err);
         return;
       }
-
+      
       ml.logger.verbose(`Dispatching game ${gameId} to ${stream.$hostname}`, ml.tags("intercom"));
       gameAddrs.set(gameId, stream.$extrnAddr);
 

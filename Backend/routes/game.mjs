@@ -358,7 +358,7 @@ gameRouter.get("/lobby/:id/start", async(req, res) => {
 
     try {
       ml.logger.verbose(`Spawning ${req.params.id}`, ml.tags.lobby);
-      startGame(req.params.id);
+      await startGame(req.params.id);
       await Lobby.update({ inProgress: true },
         {
           where: {

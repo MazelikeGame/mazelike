@@ -29,24 +29,25 @@ function connect() {
     enablePush: true
   });
 
-  connection.on("close", () => {
-    ml.logger.info(`Attempting to reconnect to ${process.env.MAZELIKE_MASTER} in ${RECONNECT_TIME} seconds`, ml.tags("intercom"));
+  connection.on("localSettings", () => {
+    connection.on("close", () => {
+      ml.logger.info(`Attempting to reconnect to ${process.env.MAZELIKE_MASTER} in ${RECONNECT_TIME} seconds`, ml.tags("intercom"));
 
-    setTimeout(connect, RECONNECT_TIME);
-  });
+      setTimeout(connect, RECONNECT_TIME);
+    });
 
-  let stream = connection.request({
-    ":path": "/v1/poll-games",
-    "x-extrn-addr": process.env.MAZELIKE_EXTERN_ADDR,
-    "x-hostname": os.hostname()
-  });
+    connection.request({
+      ":path": "/v1/poll-games",
+      "x-extrn-addr": process.env.MAZELIKE_EXTERN_ADDR,
+      "x-hostname": os.hostname()
+    });
 
-  stream.on("push", (headers) => {
-    let url = urlLib.parse(headers[":path"], true);
-    console.log(url);
+    connection.on("stream", (push, headers) => {
+      let url = urlLib.parse(headers[":path"], true);
 
-    if(url.pathname === "/v1/start") {
-      startGame(url.query.gameId);
-    }
+      if(url.pathname === "/v1/start") {
+        startGame(url.query.gameId);
+      }
+    });
   });
 }
