@@ -148,7 +148,15 @@ function setup() {
   readyToPlay.then(() => {
     msgEl.innerText = "Connecting to the game server";
 
-    sock = io(`${location.origin}/game/${gameId}`);
+    return fetch(`/game/addr/${gameId}`);
+  }).then((res) => {
+    return res.text();
+  }).then((gameServerAddr) => {
+    if(gameServerAddr === "__current__") {
+      gameServerAddr = location.host; // eslint-disable-line
+    }
+
+    sock = io(`${location.protocol}//${gameServerAddr}/game/${gameId}`);
 
     return getUsername(sock);
   }).then((uname) => {

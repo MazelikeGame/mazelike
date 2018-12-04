@@ -15,11 +15,11 @@ import MonsterModel from "../models/monster.mjs";
 import ItemModel from '../models/item.mjs';
 import Sequelize from "sequelize";
 import Maps from "../models/maps";
+import {getAddr} from "../multi/host";
 
 let monsterModel = new MonsterModel(sql);
 
 const mkdir = util.promisify(fs.mkdir);
-const unlink = util.promisify(fs.unlink);
 const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
 
 export let gameRouter = express.Router();
@@ -396,6 +396,9 @@ gameRouter.get("/map/:id", async(req, res) => {
   res.end(rawMap.map);
 });
 
+gameRouter.get("/addr/:id", (req, res) => {
+  res.end(getAddr(req.params.id));
+});
 
 // Serve /game/:id as /game/
 gameRouter.get(/[A-Za-z0-9]{12}/, (req, res) => {

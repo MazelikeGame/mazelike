@@ -1,0 +1,25 @@
+version: "3.2"
+services:
+  master:
+    image: mazelike
+    build:
+      context: .
+    ports:
+      - 3000:3000
+    volumes:
+      - type: bind
+        source: ./data
+        target: /data
+
+  minion:
+    image: mazelike
+    environment:
+      MAZELIKE_EXTERN_ADDR: localhost:5900
+      MAZELIKE_MASTER: http://master
+      LOG_LEVEL: debug
+    ports:
+      - 5900:3000
+    volumes:
+      - type: bind
+        source: ./data
+        target: /data
