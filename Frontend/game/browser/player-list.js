@@ -133,7 +133,6 @@ export default class PlayerList {
     let index = 0;
     this.playerBoxes.forEach((value, key) => {
       let {name, hp, hpMax} = this._getStats(key);
-
       let offset = 40; //Space between each player information box.
       let hpBox = this.hpBoxes.get(name);
       
