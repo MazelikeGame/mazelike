@@ -37,6 +37,9 @@ export default class Item extends ItemCommon {
    * @param viewY
    */
   update(viewX, viewY) { // eslint-disable-line complexity
+    if(!this.sprite) {
+      return;
+    }
     if(this.isOnFloor && !this.holder) {
       this.sprite.position.set(this.x - viewX, this.y - viewY);
     } else if ((this.holder && this.holderName === this.floor.username) ||
