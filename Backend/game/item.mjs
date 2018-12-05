@@ -86,7 +86,9 @@ export default class Item extends ItemCommon {
       category: this.category,
       accuracy: this.accuracy,
       attackStyle: this.attackStyle,
-      maxWearTime: this.maxWearTime
+      maxWearTime: this.maxWearTime,
+      holder: this.holder,
+      holderName: this.holderName
     };
   }
 
@@ -121,7 +123,7 @@ export default class Item extends ItemCommon {
     while(randomItem === itemDefs[4]) { //Don't want regular monsters to spawn keys.
       randomItem = itemDefs[Math.floor(Math.random() * itemDefs.length)];
     }
-    
+
     let newItem = new Item(
       floor,
       randomItem.spriteName,
@@ -155,5 +157,17 @@ export default class Item extends ItemCommon {
       return defMap;
     }
     return jsonDefs;
+  }
+
+  /**
+   * Puts item in a state that signifies that it has been
+   * placed in an inventory
+   */
+  pickup(holderName) {
+    this.setCoordinates(null, null);
+    this.isOnFloor = false;
+    this.holder = true;
+    this.holderName = holderName;
+    this.timeWorn = Date.now();
   }
 }

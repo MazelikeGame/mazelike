@@ -127,10 +127,7 @@ export default class GameMap extends GameMapCommon {
    * @param {Floor} floor The floor to load the map for
    */
   static load(floor) {
-    // for backwards compatability the map for floorIdx == 0 is just the gameId
-    let mapId = floor.id.replace("-0", "");
-
-    return fetch(`/public/maps/${mapId}.json`)
+    return fetch(`/game/map/${floor.id}`)
       .then((res) => {
         return res.json();
       })

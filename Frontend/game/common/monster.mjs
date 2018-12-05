@@ -9,10 +9,10 @@ import PlayerCommon from "./player.mjs";
 import interpolate from "./interpolator.mjs";
 
 const HP_PER_TYPE = {
-  boss: 200,
-  blue: 150,
+  boss: 500,
+  blue: 200,
   red: 100,
-  green: 50
+  green: 30
 };
 
 export default class MonsterCommon {
@@ -246,22 +246,18 @@ export default class MonsterCommon {
   /**
    * Places monster in a random "room" with no other monsters.
    */
-  placeInRandomRoom() {
+  placeInRandomRoom(calls = 0) {
     let numRooms = this.floor.map.rooms.length;
     this.initialRoom = Math.floor(Math.random() * numRooms);
-    for(let monster of this.floor.monsters) {
-      if(this.id !== monster.id && monster.initialRoom === this.initialRoom) {
-        this.placeInRandomRoom();
-      }
-    }
     let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].width);
     this.x = this.floor.map.rooms[this.initialRoom].x + randomDiffX;
     let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].height);
     this.y = this.floor.map.rooms[this.initialRoom].y + randomDiffY;
-    if(!this.spriteIsOnMap())
-      this.placeInRandomRoom();
-    // if(this.type === "boss" && this.floor.map.rooms[this.initialRoom].height === this.floor.map.rooms[this.initialRoom].width)
-      // this.placeInRandomRoom();
+    if(!this.spriteIsOnMap() || this.collisionEntities(this.floor.monsters, MonsterCommon.SPRITE_SIZE) !== -1 ||
+        this.collisionEntities(this.floor.players || [], MonsterCommon.SPRITE_SIZE) !== -1)
+      this.placeInRandomRoom(calls + 1);
+    if(this.type === "boss" && this.floor.map.rooms[this.initialRoom].height === this.floor.map.rooms[this.initialRoom].width)
+      this.placeInRandomRoom(calls + 1);
   }
 
   /**

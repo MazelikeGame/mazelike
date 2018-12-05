@@ -47,6 +47,8 @@ export default class Item {
     this.y = null;
     this.isOnFloor = false;
     this.maxWearTime = maxWearTime;
+    this.holder = false;
+    this.holderName = '';
   }
 
   /**
@@ -69,16 +71,6 @@ export default class Item {
     this.x = x;
     this.y = y;
     this.isOnFloor = true;
-  }
-
-  /**
-   * Puts item in a state that signifies that it has been
-   * placed in an inventory
-   */
-  pickup() {
-    this.setCoordinates(null, null);
-    this.isOnFloor = false;
-    this.timeWorn = Date.now();
   }
 
   /**

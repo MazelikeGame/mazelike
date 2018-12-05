@@ -8,7 +8,15 @@ import Player from './player';
 import LadderCommon from "../../Frontend/game/common/ladder.mjs";
 import Item from './item';
 
+let nextId = 0;
+const NEW_MONSTER_INTERVAL = 15000;
+
 export default class Floor extends FloorCommon {
+  constructor(...args) {
+    super(...args);
+    this._lastMonster = Date.now();
+  }
+
   /**
    * Generate a new floor (runs on the server and the browser)
    * @param gameId The game id for the game we want to generate
@@ -19,7 +27,7 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
     floor.map = GameMap.generate(map);
     floor.generateMonsters();
-    
+
     floor.map.ladder.placeInRandomRoom(floor.map);
     floor.items = [];
 
@@ -32,20 +40,27 @@ export default class Floor extends FloorCommon {
    */
   generateMonsters() {
     this.monsters = [];
-    let random = 0;
     for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) {
       if(i === 0) {
-        this.monsters[i] = new Monster('boss', 200, 15, this, i, 'boss', 200);
+        this.monsters[i] = new Monster('boss', 500, 20, this, i, 'boss');
       } else {
-        random = Math.floor(Math.random() * 100);
-        if(random < 15) { // 15% chance for blue demon
-          this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue', 150);
-        } else if(random < 50) { // 35% chance for red demon, where 15+35 = 50
-          this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red', 100);
-        } else if(random < 100) { // 50% chance for green demon, where 15+35+50 = 100
-          this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green', 50);
-        }
+        this.generateMonster();
       }
+    }
+  }
+
+  /**
+   * Geneate a new monster and place it in the floor
+   */
+  generateMonster() {
+    this._lastMonster = Date.now();
+    let random = Math.floor(Math.random() * 100);
+    if(random < 15) { // 15% chance for blue demon
+      this.monsters.push(new Monster('blue demon', 100, 10, this, ++nextId, 'blue'));
+    } else if(random < 50) { // 35% chance for red demon, where 15+35 = 50
+      this.monsters.push(new Monster('red demon', 50, 5, this, ++nextId, 'red'));
+    } else if(random < 100) { // 50% chance for green demon, where 15+35+50 = 100
+      this.monsters.push(new Monster('green demon', 30, 5, this, ++nextId, 'green'));
     }
   }
 
@@ -74,7 +89,7 @@ export default class Floor extends FloorCommon {
    */
   save(create) {
     return Promise.all([
-      this.map.save(this.id),
+      this.map.save(this.id, create),
       Monster.saveAll(this, create),
       Player.saveAll(this),
       Item.saveAll(this)
@@ -106,6 +121,10 @@ export default class Floor extends FloorCommon {
       player._confirmedY = player.y;
       player.dropConfirmed();
       player.removeOldItems();
+      player.updateStats();
+    }
+    if(Date.now() - this._lastMonster >= NEW_MONSTER_INTERVAL) {
+      this.generateMonster();
     }
   }
 

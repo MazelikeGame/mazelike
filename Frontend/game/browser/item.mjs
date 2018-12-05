@@ -36,9 +36,33 @@ export default class Item extends ItemCommon {
    * @param viewX
    * @param viewY
    */
-  update(viewX, viewY) {
-    if(this.isOnFloor) {
+  update(viewX, viewY) { // eslint-disable-line complexity
+    if(!this.sprite) {
+      return;
+    }
+    if(this.isOnFloor && !this.holder) {
       this.sprite.position.set(this.x - viewX, this.y - viewY);
+    } else if ((this.holder && this.holderName === this.floor.username) ||
+      (this.holder && this.category === 'key')) {
+      let x = window.innerWidth - 50;
+      let y = 30;
+      switch(this.category) {
+      case 'shield':
+        y = 60;
+        break;
+      case 'hat':
+        y = 90;
+        break;
+      case 'boot':
+        y = 120;
+        break;
+      case 'key':
+        y = 150;
+        break;
+      default:
+        break;
+      }
+      this.sprite.position.set(x, y);
     } else {
       this.remove();
     }

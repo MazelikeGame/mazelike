@@ -129,7 +129,7 @@ export default class Monster extends MonsterCommon {
     ml.logger.verbose(`Monster ${this.id} died`, ml.tags.monster);
     if(this.type === "boss") {
       ItemBackend.spawnKey(this.floor, Math.round(this.x), Math.round(this.y));
-    } else {
+    } else if(Math.floor(Math.random() * 5) === 0) {
       ItemBackend.spawnRandomItem(this.floor, Math.round(this.x), Math.round(this.y));
     }
     this.x = -1; // (-1, -1) coordinate tells us that the monster is dead

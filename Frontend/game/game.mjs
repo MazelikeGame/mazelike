@@ -148,7 +148,20 @@ function setup() {
   readyToPlay.then(() => {
     msgEl.innerText = "Connecting to the game server";
 
-    sock = io(`${location.origin}/game/${gameId}`);
+    return fetch(`/game/addr/${gameId}`);
+  }).then((res) => {
+    return res.text();
+  }).then((gameServerAddr) => {
+    if(gameServerAddr === "__current__") {
+      gameServerAddr = location.host; // eslint-disable-line
+    }
+
+    sock = io(`${location.protocol}//${gameServerAddr}/game/${gameId}`);
+
+    // Show the user which game server is serving them
+    sock.on("game-server-name", (name) => {
+      document.title = `Mazelike - ${name}`;
+    });
 
     return getUsername(sock);
   }).then((uname) => {
@@ -188,7 +201,6 @@ function setup() {
       if(isNewFloor) {
         playerList.floor = floor;
         playerList.listOfPlayers = floor.players;
-        app.stage.addChild(playerList.render());
       }
       isNewFloor = false;
     });
@@ -255,7 +267,7 @@ function setup() {
         let floorId = id.split("-")[1];
         app.stage.removeChild(floor.sprite);
         app.stage.removeChild(controls.sprite);
-        app.stage.addChild(playerList.graphics);
+        app.stage.removeChild(playerList.graphics);
 
         // load the new map
         Floor.load(gameId, floorId, sock, username)
@@ -265,6 +277,7 @@ function setup() {
 
             app.stage.addChild(floor.sprite);
             app.stage.addChild(controls.sprite);
+            app.stage.addChild(playerList.graphics); //Draw the player list
           });
       });
 
