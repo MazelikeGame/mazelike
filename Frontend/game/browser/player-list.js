@@ -35,7 +35,7 @@ export default class PlayerList {
    * @param {int} id the index of the player
    * @param {string} player the player being drawn
    */
-  drawPlayerInfo(id, player) {  
+  drawPlayerInfo(id, player) {
     let playerBox = new PIXI.Graphics();
     let offset = 40; //Space between each player information box.
 
@@ -44,26 +44,36 @@ export default class PlayerList {
     outline.beginFill(player.type ? 0x000088 : 0x000000);
     outline.fillAlpha = this.floor.followingUser === player.name ? 0.85 : 0.7;
     outline.lineStyle(2, player.type ? 0x0000bb : 0x000000, 1);
-    outline.drawRect(0, 0, 300, 30);
+    outline.drawRect(0, 0, 400, 30);
     outline.position.set(10, 10 + (id * offset)); //eslint-disable-line
     outline.endFill();
     playerBox.addChild(outline);
 
     this._playerNameStyle = new PIXI.TextStyle({
       fill: "#fff",
-      fontSize: 16
+      fontSize: 14
     });
-    
+
     //Player name
     let playerName = new PIXI.Text(this.checkNameLength(player.name), this._playerNameStyle);
-    playerName.position.set(35, 15 + (id * offset)); //eslint-disable-line
+    playerName.position.set(25, 15 + (id * offset)); //eslint-disable-line
     playerBox.addChild(playerName);
+
+    //Player stats
+    this._playerStatsStyle = new PIXI.TextStyle({
+      fill: '#ffff00',
+      fontSize: 10
+    });
+    this._playerStatsStr = ``;
+    let playerStats = new PIXI.Text(`Def: ${player.defence} SPD: ${player.speed}\nDMG: ${player.damage}, RNG: ${player.range}`, this._playerStatsStyle);
+    playerStats.position.set(190, 15 + (id * offset));
+    playerBox.addChild(playerStats);
 
     //Health bar red
     let healthRedBar = new PIXI.Graphics();
     healthRedBar.beginFill(0xFF0000);
     healthRedBar.drawRect(0, 0, 100, 10);
-    healthRedBar.position.set(200, 15 + (id * offset)); //eslint-disable-line
+    healthRedBar.position.set(300, 15 + (id * offset)); //eslint-disable-line
     healthRedBar.endFill();
 
     playerBox.addChild(healthRedBar);
@@ -72,7 +82,7 @@ export default class PlayerList {
     let healthGreenBar = new PIXI.Graphics();
     healthGreenBar.beginFill(0x7CFC00);
     healthGreenBar.drawRect(0, 0, player.getHp(), 10);
-    healthGreenBar.position.set(200, 15 + (id * offset));//eslint-disable-line
+    healthGreenBar.position.set(300, 15 + (id * offset));//eslint-disable-line
     healthGreenBar.endFill();
 
     playerBox.addChild(healthGreenBar);
@@ -84,7 +94,7 @@ export default class PlayerList {
     });
 
     let healthText = new PIXI.Text(`Health: ${player.getHp()}`, this._hpTextStyle);
-    healthText.position.set(200, 25 + (id * offset)); //eslint-disable-line
+    healthText.position.set(300, 25 + (id * offset)); //eslint-disable-line
     playerBox.addChild(healthText);
 
     this.graphics.addChild(playerBox);
@@ -92,13 +102,14 @@ export default class PlayerList {
     this.hpBoxes.set(player.name, {
       text: healthText,
       greenBar: healthGreenBar,
-      redBar: healthRedBar
+      redBar: healthRedBar,
+      playerStats: playerStats
     });
   }
 
   /**
    * Get the stats for a player
-   * @param {string} key 
+   * @param {string} key
    */
   _getStats(key) {
     let match = this.listOfPlayers.find((player) => {
@@ -122,48 +133,57 @@ export default class PlayerList {
     return {
       name: match.name,
       hp: match.getHp(),
-      hpMax: match.hpMax
+      hpMax: match.hpMax,
+      speed: match.speed,
+      damage: match.damage,
+      range: match.range,
+      defence: match.defence
     };
   }
 
   /**
    * Updates the player list for each player.
    */
-  update() { 
+  update() {
     let index = 0;
     this.playerBoxes.forEach((value, key) => {
-      let {name, hp, hpMax} = this._getStats(key);
+      let {name, hp, hpMax, defence, speed, range, damage} = this._getStats(key);
 
       let offset = 40; //Space between each player information box.
       let hpBox = this.hpBoxes.get(name);
-      
+
       if(hp <= 0) {
         hpBox.text.text = `DEAD`;
+      } else if(name !== 'boss') {
+        hpBox.text.text = `Health: ${hp}`;
+        hpBox.playerStats.text = this._playerStatsStr;
+        hpBox.playerStats.text = `Def: ${defence} SPD: ${speed}\nDMG: ${damage}, RNG: ${range}`;
       } else {
         hpBox.text.text = `Health: ${hp}`;
+        hpBox.playerStats.text = '';
       }
 
       //Health bar red
       hpBox.redBar.clear();
       hpBox.redBar.beginFill(0xFF0000);
       hpBox.redBar.drawRect(0, 0, 100, 10);
-      hpBox.redBar.position.set(200, 15 + (index * offset)); //eslint-disable-line
+      hpBox.redBar.position.set(300, 15 + (index * offset)); //eslint-disable-line
       hpBox.redBar.endFill();
 
       //Health bar green
       hpBox.greenBar.clear();
       hpBox.greenBar.beginFill(0x7CFC00);
       hpBox.greenBar.drawRect(0, 0, hp >= 0 ? hp / hpMax * 100 : 0, 10);
-      hpBox.greenBar.position.set(200, 15 + (index * offset));//eslint-disable-line
+      hpBox.greenBar.position.set(300, 15 + (index * offset));//eslint-disable-line
       hpBox.greenBar.endFill();
 
       index++;
     });
   }
-  
+
   /**
    * Removes the player from the list
-   * @param {string} username 
+   * @param {string} username
    */
   removePlayer(username) {
     this.listOfPlayers.splice(this.listOfPlayers.indexOf(username), 1);
@@ -171,7 +191,7 @@ export default class PlayerList {
 
   /**
    * Updates the player list to show a player disconnected.
-   * @param {string} username 
+   * @param {string} username
    */
   disconnectPlayer(username) {
     let tempPlayerBox = this.playerBoxes.get(username);
