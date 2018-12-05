@@ -2,7 +2,7 @@
 
 ## Testing
 
-Run `npm test` in the tests directory.  You will also have to run npm install in the tests directory.  
+Run `npm test` in the tests directory.  You will also have to run npm install in the tests directory.
 If you don't want to download chrome for the browser tests define `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1` (powershell `$env:PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1`)
 
 The server will need to be running in order to run the tests.
@@ -35,7 +35,4 @@ For sqlite it takes the form of sqlite://path/to/db.  For a relative path just u
 ## Default .env
 ```
 DB=mysql://root:password@mysql/mazelike
-MAILER_EMAIL_ID=noreplymazelike@gmail.com
-MAILER_PASSWORD=sneakybeakylike
-MAILER_SERVICE_PROVIDER=Gmail
 ```
