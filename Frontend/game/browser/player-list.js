@@ -18,7 +18,7 @@ export default class PlayerList {
    */
   render() {
     this.listOfPlayers.forEach((player, index) => {
-      this.drawPlayerInfo(index, player); //change this to match player.getHp() in the future
+      this.drawPlayerInfo(index, player);
     });
 
     let boss = this.floor.monsters.find((monster) => {
@@ -112,21 +112,35 @@ export default class PlayerList {
    * @param {string} key
    */
   _getStats(key) {
+    if(key === "boss") {
+      let match = this.floor.monsters.find((monster) => {
+        return monster.type === "boss";
+      });
+
+      if(!match) {
+        return {
+          name: "boss",
+          hp: 0,
+          hpMax: 200
+        };
+      }
+
+      return {
+        name: match.name,
+        hp: match.getHp(),
+        hpMax: match.hpMax
+      };
+    }
+
     let match = this.listOfPlayers.find((player) => {
       return key === player.name;
     });
 
     if(!match) {
-      match = this.floor.monsters.find((monster) => {
-        return monster.type === "boss";
-      });
-    }
-
-    if(!match) {
       return {
-        name: "boss",
+        name: key,
         hp: 0,
-        hpMax: 200
+        hpMax: 150
       };
     }
 
@@ -146,19 +160,22 @@ export default class PlayerList {
    */
   update() {
     let index = 0;
-    this.playerBoxes.forEach((value, key) => {
+    this.playerBoxes.forEach((value, key) => { // eslint-disable-line complexity
       let {name, hp, hpMax, defence, speed, range, damage} = this._getStats(key);
 
       let offset = 40; //Space between each player information box.
       let hpBox = this.hpBoxes.get(name);
 
-      if(hp <= 0) {
+      if(hp <= 0 && name !== 'boss') { // dead player
         hpBox.text.text = `DEAD`;
-      } else if(name !== 'boss') {
+        hpBox.playerStats.text = 'Spectating';
+      } else if(hp <= 0 && name === 'boss') { // dead boss
+        hpBox.text.text = `DEAD`;
+        hpBox.playerStats.text = 'Dropped key';
+      } else if(name !== 'boss') { // alive player
         hpBox.text.text = `Health: ${hp}`;
-        hpBox.playerStats.text = this._playerStatsStr;
-        hpBox.playerStats.text = `Def: ${defence} SPD: ${speed}\nDMG: ${damage}, RNG: ${range}`;
-      } else {
+        hpBox.playerStats.text = `DEF: ${defence} SPD: ${speed}\nDMG: ${damage}, RNG: ${range}`;
+      } else { // alive boss
         hpBox.text.text = `Health: ${hp}`;
         hpBox.playerStats.text = '';
       }
