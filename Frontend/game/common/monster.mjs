@@ -248,7 +248,7 @@ export default class MonsterCommon {
    */
   placeInRandomRoom(calls = 0) {
     let numRooms = this.floor.map.rooms.length;
-    this.initialRoom = calls < 100 ? Math.floor(Math.random() * numRooms) : calls - 100;
+    this.initialRoom = calls < 1000 ? Math.floor(Math.random() * numRooms) : calls - 1000;
     for(let monster of this.floor.monsters) {
       if(this.id !== monster.id && monster.initialRoom === this.initialRoom) {
         this.placeInRandomRoom(calls + 1);
