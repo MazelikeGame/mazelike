@@ -8,10 +8,10 @@ export default class MobileControls {
     this._timers = new Map();
     this._arrowName = {};
     
-    this._createArrow("up", [-20, 30, 20, 30, 0, 0], [-24, -4, 46, 36], 38);
-    this._createArrow("down", [-20, 80, 20, 80, 0, 110], [-24, 76, 46, 36], 40);
-    this._createArrow("left", [-25, 35, -25, 75, -55, 55], [-59, 31, 36, 46], 37);
-    this._createArrow("right", [25, 35, 25, 75, 55, 55], [21, 31, 36, 46], 39);
+    this._createArrow("up", [-20, 20, 20, 20, 0, -20], [-34, -24, 66, 46], 38);
+    this._createArrow("down", [-20, 100, 20, 100, 0, 130], [-34, 96, 66, 46], 40);
+    this._createArrow("left", [-45, 35, -45, 75, -75, 55], [-89, 26, 46, 56], 37);
+    this._createArrow("right", [45, 35, 45, 75, 75, 55], [41, 26, 46, 56], 39);
     
     this._players = new Set();
 
@@ -51,7 +51,7 @@ export default class MobileControls {
    * Update the position of the controls
    */
   update() {
-    this.sprite.x = 10 + (this.sprite.width / 2);
+    this.sprite.x = innerWidth - (this.sprite.width / 2);
     this.sprite.y = innerHeight - this.sprite.height - 10;
   }
 
