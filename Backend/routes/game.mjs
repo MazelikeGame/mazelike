@@ -147,15 +147,6 @@ export const joinRoute = async(req, res) => {
   /* If there is a lobby for this user, update the `inGame` attribute to true for the player
    * record associated for this lobby */
   if(lobbyExists) {
-    let continuePlayer = await Player.findOne({
-      where: {
-        id: lobbyExists.player
-      }
-    });
-    await continuePlayer.update({
-      inGame: true
-    });
-  } else {
     /* Create a new player and lobby for this user */
     let newPlayer = await Player.create({
       spriteName: Player.getRandomSprite()
@@ -167,15 +158,14 @@ export const joinRoute = async(req, res) => {
       playerId: req.user.username
     });
     await newPlayer.setLobby(newLobby);
+    io.of(`/lobby`).emit("lobby-add", {
+      id: lobby.lobbyId,
+      playerId: req.user.username,
+      image_name: req.user.image_name
+    });
   }
 
   ml.logger.info(`${req.user.username} joined ${lobby.lobbyId}`, ml.tags.lobby);
-
-  io.of(`/lobby`).emit("lobby-add", {
-    id: lobby.lobbyId,
-    playerId: req.user.username,
-    image_name: req.user.image_name
-  });
 
   res.redirect(`/game/lobby/${lobby.lobbyId}`);
 };
