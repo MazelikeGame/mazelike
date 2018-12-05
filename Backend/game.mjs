@@ -4,6 +4,8 @@ import Floor from "./game/floor";
 import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth";
 import os from "os";
+import Maps from "../models/maps";
+import Sequelize from "sequelize";
 
 let runningGames = new Set();
 
@@ -17,7 +19,23 @@ export default async function startGame(gameId) {
     runningGames.add(gameId);
 
     // Load/generate the ground floor
-    let floor = floorRef.floor = await Floor.load(gameId, 0);
+    let maps = await Maps.findAll({
+      where: {
+        floorId: {
+          [Sequelize.Op.like]: `${gameId}-%`
+        }
+      }
+    });
+
+    maps = maps.map((map) => {
+      return +map.floorId.split("-")[1];
+    });
+
+    let floorIdx = maps.reduce((a, b) => {
+      return Math.max(a, b);
+    }, 0);
+    console.log(floorIdx);
+    let floor = floorRef.floor = await Floor.load(gameId, floorIdx);
 
     // eslint-disable-next-line arrow-parens,arrow-body-style
     let awaitedPlayers = new Set(floor.players.map(player => player.name));
