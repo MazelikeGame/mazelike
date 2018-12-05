@@ -4,6 +4,8 @@ import Floor from "./game/floor";
 import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth";
 import os from "os";
+import Maps from "./models/maps";
+import Sequelize from "sequelize";
 
 let runningGames = new Set();
 
@@ -17,7 +19,22 @@ export default async function startGame(gameId) {
     runningGames.add(gameId);
 
     // Load/generate the ground floor
-    let floor = floorRef.floor = await Floor.load(gameId, 0);
+    let maps = await Maps.findAll({
+      where: {
+        floorId: {
+          [Sequelize.Op.like]: `${gameId}-%`
+        }
+      }
+    });
+
+    maps = maps.map((map) => {
+      return +map.floorId.split("-")[1];
+    });
+
+    let floorIdx = maps.reduce((a, b) => {
+      return Math.max(a, b);
+    }, 0);
+    let floor = floorRef.floor = await Floor.load(gameId, floorIdx);
 
     // eslint-disable-next-line arrow-parens,arrow-body-style
     let awaitedPlayers = new Set(floor.players.map(player => player.name));
@@ -30,12 +47,12 @@ export default async function startGame(gameId) {
       ml.logger.info(`Game client connected (username: ${sock.user ? sock.user.username : "No auth"})`);
       // Not logged in enter spectator mode
       if(!sock.user) {
-        sock.emit("set-username");
+        sock.emit("set-username", { floorIdx });
         return;
       }
 
       sock.emit("game-server-name", os.hostname());
-      sock.emit("set-username", sock.user.username);
+      sock.emit("set-username", { floorIdx, name: sock.user.username });
 
       sock.on("disconnect", async() => {
         //Player has left and need to update the list of players.
@@ -51,6 +68,10 @@ export default async function startGame(gameId) {
         if(player) {
           floor.players.splice(floor.players.indexOf(player), 1);
         }
+      });
+
+      sock.on("save", () => {
+        floorRef.save = sock.user.username;
       });
 
       movementHandler(sock, floorRef, sock.broadcast);
@@ -76,7 +97,7 @@ export default async function startGame(gameId) {
     // start the count down
     for(let i = 3; i > 0; --i) {
       await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
+        setTimeout(resolve, 700);
       });
 
       io.of(`/game/${gameId}`).emit("countdown", i);
@@ -100,13 +121,21 @@ async function triggerTick(floor, lastUpdate, gameId, floorRef) {
   let now = Date.now();
 
   // save and quit if we loose all the clients
-  if(floor.players.length === 0) {
+  if(floor.players.length === 0 || floorRef.save) {
     await floor.sendState(io.of(`/game/${gameId}`));
     io.of(`/game/${gameId}`).removeAllListeners("connection");
 
     ml.logger.verbose("All clients left or died saving game", ml.tags("game"));
 
-    await floor.save();
+    if(floor.players.length === 0) {
+      await floor.deleteGame();
+    } else {
+      await floor.save();
+    }
+
+    if(floorRef.save) {
+      io.of(`/game/${gameId}`).emit("game-saved", floorRef.save);
+    }
 
     runningGames.delete(gameId);
 

@@ -120,6 +120,13 @@
       .win .popup {
         background-color: #ee0;
       }
+
+      #save-game {
+        bottom: 5px;
+        left: 5px;
+        position: fixed;
+        z-index: 1;
+      }
     </style>
   </head>
   <body>
@@ -146,9 +153,15 @@
         </div>
       </div>
     </div>
+    <button id="save-game">Save</button>
     <script src="/js/socket.io.js"></script>
+    <script src="/js/pep.js"></script>
     <script src="/js/pixi.min.js"></script>
-    <script type="module" src="game.mjs"></script>
-    <script nomodule src="game.js"></script>
+    <script>
+      function devMode() {
+        document.write('<script type="module" src="game.mjs"></scr'+'ipt>');
+      }
+    </script>
+    <script onerror="devMode()" src="game.js"></script>
   </body>
 </html>

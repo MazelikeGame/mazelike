@@ -7,7 +7,15 @@ import Monster from "./monster.mjs";
 import Player from './player';
 import LadderCommon from "../../Frontend/game/common/ladder.mjs";
 import Item from './item';
+import sql from "../sequelize";
+import MonsterModel from "../models/monster.mjs";
+import ItemModel from '../models/item.mjs';
+import Sequelize from "sequelize";
+import Maps from "../models/maps";
+import Lobby from "../models/lobby";
+import PlayerModel from "../models/player";
 
+let monsterModel = new MonsterModel(sql);
 let nextId = 0;
 const NEW_MONSTER_INTERVAL = 15000;
 
@@ -140,5 +148,55 @@ export default class Floor extends FloorCommon {
       items: this.items,
       id: this.id
     });
+  }
+
+  /**
+   * Delete a game
+   */
+  async deleteGame() {
+    let id = this.id.split("-")[0];
+
+    let lobbies = await Lobby.findAll({
+      where: {
+        lobbyId: id
+      }
+    });
+    
+    for(var lobby of lobbies) {
+      await PlayerModel.destroy({
+        where: {
+          id: lobby.player
+        }
+      });
+    }
+
+    return Promise.all([
+      Maps.destroy({
+        where: {
+          floorId: {
+            [Sequelize.Op.like]: `${id}-%`
+          }
+        }
+      }),
+      ItemModel.destroy({
+        where: {
+          floorId: {
+            [Sequelize.Op.like]: `${id}-%`
+          }
+        }
+      }),
+      monsterModel.destroy({
+        where: {
+          floorId: {
+            [Sequelize.Op.like]: `${id}-%`
+          }
+        }
+      }),
+      Lobby.destroy({
+        where: {
+          lobbyId: id
+        }
+      })
+    ]);
   }
 }

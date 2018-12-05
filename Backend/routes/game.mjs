@@ -15,6 +15,7 @@ import ItemModel from '../models/item.mjs';
 import Sequelize from "sequelize";
 import Maps from "../models/maps";
 import startGame, {getAddr} from "../multi/host";
+import {BASE_STATS} from "../../Frontend/game/common/player.mjs";
 
 let monsterModel = new MonsterModel(sql);
 
@@ -130,6 +131,15 @@ export const joinRoute = async(req, res) => {
     ml.logger.verbose(`${req.user.username} failed to join a lobby becuase the join code ${req.params.id} is invalid`, ml.tags.lobby);
     return;
   }
+
+  // Don't join in progress games
+  if(lobby.inProgress) {
+    res.status(403);
+    res.end("Game is already in progress");
+    ml.logger.verbose(`${req.user.username} failed to join a lobby becuase the game was in progress`);
+    return;
+  }
+
   let user = await User.findOne({
     where: {
       username: req.user.username
@@ -145,19 +155,11 @@ export const joinRoute = async(req, res) => {
   });
   /* If there is a lobby for this user, update the `inGame` attribute to true for the player
    * record associated for this lobby */
-  if(lobbyExists) {
-    let continuePlayer = await Player.findOne({
-      where: {
-        id: lobbyExists.player
-      }
-    });
-    await continuePlayer.update({
-      inGame: true
-    });
-  } else {
+  if(!lobbyExists) {
     /* Create a new player and lobby for this user */
     let newPlayer = await Player.create({
-      spriteName: Player.getRandomSprite()
+      spriteName: Player.getRandomSprite(),
+      hp: BASE_STATS.hp
     });
     await user.addPlayer(newPlayer);
     let newLobby = await Lobby.create({
@@ -166,15 +168,14 @@ export const joinRoute = async(req, res) => {
       playerId: req.user.username
     });
     await newPlayer.setLobby(newLobby);
+    io.of(`/lobby`).emit("lobby-add", {
+      id: lobby.lobbyId,
+      playerId: req.user.username,
+      image_name: req.user.image_name
+    });
   }
 
   ml.logger.info(`${req.user.username} joined ${lobby.lobbyId}`, ml.tags.lobby);
-
-  io.of(`/lobby`).emit("lobby-add", {
-    id: lobby.lobbyId,
-    playerId: req.user.username,
-    image_name: req.user.image_name
-  });
 
   res.redirect(`/game/lobby/${lobby.lobbyId}`);
 };
@@ -202,7 +203,8 @@ gameRouter.get("/new", async(req, res) => {
   let secret = await genId(SECRET_LENGTH);
 
   let newPlayer = await Player.create({
-    spriteName: Player.getRandomSprite()
+    spriteName: Player.getRandomSprite(),
+    hp: BASE_STATS.hp
   });
   let user = await User.findOne({
     where: {
