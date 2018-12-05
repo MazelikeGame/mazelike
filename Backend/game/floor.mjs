@@ -19,7 +19,7 @@ export default class Floor extends FloorCommon {
     let floor = new Floor(gameId, floorIdx);
     floor.map = GameMap.generate(map);
     floor.generateMonsters();
-    
+
     floor.map.ladder.placeInRandomRoom(floor.map);
     floor.items = [];
 
@@ -106,6 +106,7 @@ export default class Floor extends FloorCommon {
       player._confirmedY = player.y;
       player.dropConfirmed();
       player.removeOldItems();
+      player.updateStats();
     }
   }
 
