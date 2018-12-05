@@ -80,7 +80,7 @@ export default async function startGame(gameId) {
     // start the count down
     for(let i = 3; i > 0; --i) {
       await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
+        setTimeout(resolve, 700);
       });
 
       io.of(`/game/${gameId}`).emit("countdown", i);
@@ -110,7 +110,11 @@ async function triggerTick(floor, lastUpdate, gameId, floorRef) {
 
     ml.logger.verbose("All clients left or died saving game", ml.tags("game"));
 
-    await floor.save();
+    if(floor.players.length === 0) {
+      await floor.deleteGame();
+    } else {
+      await floor.save();
+    }
 
     if(floorRef.save) {
       io.of(`/game/${gameId}`).emit("game-saved", floorRef.save);
