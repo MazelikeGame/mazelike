@@ -7,3 +7,4 @@ Frontend/public/*
 *.sqlite
 data
 *.log
+.*.txt

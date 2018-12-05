@@ -1,0 +1,149 @@
+version: "3.2"
+services:
+  master:
+    image: ryan3r/mazelike
+    environment:
+      DB: postgres://root@postgres/mazelike
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      DISABLE_MIGRATIONS: ok
+      CERT_FILE: /run/secrets/ssl_cert
+      KEY_FILE: /run/secrets/ssl_key
+    depends_on:
+      - postgres
+    ports:
+      - 80:3000
+      - 443:3001
+    volumes:
+      - type: volume
+        source: profiles
+        target: /data
+    secrets:
+      - db_password
+      - ssl_cert
+      - ssl_key
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+  
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - "5900:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: mazelike
+      DISABLE_MIGRATIONS: ok
+    volumes:
+      - type: volume
+        source: db
+        target: /var/lib/postgresql/data
+    secrets:
+      - db_password
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  minion1:
+    hostname: minion1
+    image: ryan3r/mazelike
+    depends_on:
+      - postgres
+      - master
+    environment:
+      DISABLE_MIGRATIONS: ok
+      DB: postgres://root@postgres/mazelike
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5901
+      MAZELIKE_MASTER: http://master
+      CERT_FILE: /run/secrets/ssl_cert
+      KEY_FILE: /run/secrets/ssl_key
+    ports:
+      - 5901:3001
+    secrets:
+      - db_password
+      - ssl_cert
+      - ssl_key
+  
+  minion2:
+    hostname: minion2
+    image: ryan3r/mazelike
+    depends_on:
+      - postgres
+      - master
+    environment:
+      DISABLE_MIGRATIONS: ok
+      DB: postgres://root@postgres/mazelike
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5902
+      MAZELIKE_MASTER: http://master
+      CERT_FILE: /run/secrets/ssl_cert
+      KEY_FILE: /run/secrets/ssl_key
+    ports:
+      - 5902:3001
+    secrets:
+      - db_password
+      - ssl_cert
+      - ssl_key
+
+  minion3:
+    hostname: minion3
+    image: ryan3r/mazelike
+    depends_on:
+      - postgres
+      - master
+    environment:
+      DISABLE_MIGRATIONS: ok
+      DB: postgres://root@postgres/mazelike
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5903
+      MAZELIKE_MASTER: http://master
+      CERT_FILE: /run/secrets/ssl_cert
+      KEY_FILE: /run/secrets/ssl_key
+    ports:
+      - 5903:3001
+    secrets:
+      - db_password
+      - ssl_cert
+      - ssl_key
+
+  minion4:
+    hostname: minion4
+    image: ryan3r/mazelike
+    depends_on:
+      - postgres
+      - master
+    environment:
+      DISABLE_MIGRATIONS: ok
+      DB: postgres://root@postgres/mazelike
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      CERT_FILE: /run/secrets/ssl_cert
+      KEY_FILE: /run/secrets/ssl_key
+      MAZELIKE_EXTERN_ADDR: mazelike.ryan3r.com:5904
+      MAZELIKE_MASTER: http://master
+    ports:
+      - 5904:3001
+    secrets:
+      - db_password
+      - ssl_cert
+      - ssl_key
+
+secrets:
+  db_password:
+    file: .db_password.txt
+  ssl_cert:
+    file: data/cert.pem
+  ssl_key:
+    file: data/privkey.pem
+
+volumes:
+  db:
+  profiles:
