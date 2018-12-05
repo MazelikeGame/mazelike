@@ -136,6 +136,12 @@ let readyToPlay = new Promise((resolve) => {
   });
 });
 
+document.querySelector("#save-game").addEventListener("click", () => {
+  if(window.ml.floor) {
+    window.ml.floor.save();
+  }
+});
+
 // eslint-disable-next-line
 window.localStorage || (window.localStorage = {});
 fullscreenEl.checked = localStorage.fullscreen !== "false";
@@ -291,9 +297,15 @@ function setup() {
       app.stage.addChild(playerList.render()); //Draw the player list
 
       let isSpectator = false;
+      let isFirstTick = true;
       app.ticker.add(() => {
         // spectator mode
         if(!isSpectator && !getPlayer(floor, username) && !isNewFloor && !playerWon) {
+          let saveBtn = document.querySelector("#save-game");
+          if(saveBtn) {
+            saveBtn.remove();
+          }
+
           document.body.classList.add("dead");
           document.body.classList.remove("crosshair");
           controls.becomeSpectator();
@@ -302,19 +314,26 @@ function setup() {
           // switch following users by pressing up and down
           controls.bind(spectatorHandler.bind(null, floor), () => {});
           window.addEventListener("keydown", spectatorHandler.bind(null, floor));
-          // show you died
-          msgHeader.innerText = "You died";
-          msgEl.innerHTML = "";
-          msgParentEl.style.display = "";
 
-          let a = document.createElement("a");
-          a.href = "#";
-          a.innerText = "Spectate";
-          msgEl.appendChild(a);
-          a.addEventListener("click", (e) => {
-            e.preventDefault();
-            msgParentEl.style.display = "none";
-          });
+          if(!isFirstTick) {
+            // show you died
+            msgHeader.innerText = "You died";
+            msgEl.innerHTML = "";
+            msgParentEl.style.display = "";
+
+            let a = document.createElement("a");
+            a.href = "#";
+            a.innerText = "Spectate";
+            msgEl.appendChild(a);
+            a.addEventListener("click", (e) => {
+              e.preventDefault();
+              msgParentEl.style.display = "none";
+            });
+          }
+        }
+
+        if(floor.players.length > 0) {
+          isFirstTick = false;
         }
 
         // follow a specific player in spectator mode
@@ -329,6 +348,11 @@ function setup() {
 
         // show game over
         if(floor.players.length === 0 && msgHeader.innerText !== "Game over" && !isNewFloor && !playerWon) {
+          let saveBtn = document.querySelector("#save-game");
+          if(saveBtn) {
+            saveBtn.remove();
+          }
+
           document.body.classList.remove("crosshair");
           document.body.classList.add("dead");
           msgHeader.innerText = "Game over";
