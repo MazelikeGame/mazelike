@@ -248,17 +248,13 @@ export default class MonsterCommon {
    */
   placeInRandomRoom(calls = 0) {
     let numRooms = this.floor.map.rooms.length;
-    this.initialRoom = calls < 1000 ? Math.floor(Math.random() * numRooms) : calls - 1000;
-    for(let monster of this.floor.monsters) {
-      if(this.id !== monster.id && monster.initialRoom === this.initialRoom) {
-        this.placeInRandomRoom(calls + 1);
-      }
-    }
+    this.initialRoom = Math.floor(Math.random() * numRooms);
     let randomDiffX = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].width);
     this.x = this.floor.map.rooms[this.initialRoom].x + randomDiffX;
     let randomDiffY = Math.floor(Math.random() * this.floor.map.rooms[this.initialRoom].height);
     this.y = this.floor.map.rooms[this.initialRoom].y + randomDiffY;
-    if(!this.spriteIsOnMap())
+    if(!this.spriteIsOnMap() || this.collisionEntities(this.floor.monsters, MonsterCommon.SPRITE_SIZE) !== -1 ||
+        this.collisionEntities(this.floor.players || [], MonsterCommon.SPRITE_SIZE) !== -1)
       this.placeInRandomRoom(calls + 1);
     if(this.type === "boss" && this.floor.map.rooms[this.initialRoom].height === this.floor.map.rooms[this.initialRoom].width)
       this.placeInRandomRoom(calls + 1);
