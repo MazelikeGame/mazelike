@@ -178,8 +178,11 @@ export default class Player extends PlayerCommon {
     for(let wornItem of Object.values(this.wearing)) {
       try {
         if(Date.now() - wornItem.timeWorn > wornItem.maxWearTime) {
+          wornItem.holder = false;
           this.wearing[wornItem.category] = null;
           ml.logger.verbose(`Player ${this.name} removed ${wornItem.spriteName}`, ml.tags.player);
+          this.updateStats();
+          this._reportStats();
         }
       } catch(error) {
         // Passing in case an item doesn't have a maxWearTime
@@ -217,7 +220,6 @@ export default class Player extends PlayerCommon {
         this.range += item.range;
       }
     }
-    ml.logger.verbose(`${this.name}'s stats are now ${this.speed}, ${this.damage}, ${this.defence}, ${this.range}`, ml.tags.player);
   }
 
   wieldItem(item) {
@@ -225,8 +227,8 @@ export default class Player extends PlayerCommon {
       this.hasKey = true;
     }
     this.wearing[item.category] = item;
-    ml.logger.verbose(`Player ${this.name} wielded a(n) ${item.spriteName}`, ml.tags.player);
     this.updateStats();
+    this._reportStats();
   }
 
   _setStatsToBase() {
@@ -234,6 +236,10 @@ export default class Player extends PlayerCommon {
     this.damage = BASE_STATS.damage;
     this.defence = BASE_STATS.defence;
     this.range = BASE_STATS.range;
+  }
+
+  _reportStats() {
+    ml.logger.verbose(`${this.name}'s stats are now SP: ${this.speed}, DMG: ${this.damage}, DEF: ${this.defence}, RNG: ${this.range}`, ml.tags.player);
   }
 
   /**
