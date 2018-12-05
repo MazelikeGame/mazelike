@@ -39,7 +39,8 @@ export default class Item extends ItemCommon {
   update(viewX, viewY) { // eslint-disable-line complexity
     if(this.isOnFloor && !this.holder) {
       this.sprite.position.set(this.x - viewX, this.y - viewY);
-    } else if (this.holder) {
+    } else if ((this.holder && this.holderName === this.floor.username) ||
+      (this.holder && this.category === 'key')) {
       let x = window.innerWidth - 50;
       let y = 30;
       switch(this.category) {

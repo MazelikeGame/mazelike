@@ -200,7 +200,7 @@ export default class Player extends PlayerCommon {
         this._withinRadius(this.getPosition(), item.getPosition(), 12) &&
         !this.wearing[item.category]
       ) {
-        item.pickup(this);
+        item.pickup(this.name);
         ml.logger.verbose(`Player ${this.name} picked up a(n) ${item.spriteName}`, ml.tags.player);
         this.wieldItem(item);
       }
