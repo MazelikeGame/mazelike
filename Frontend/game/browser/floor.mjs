@@ -94,10 +94,6 @@ export default class Floor extends FloorCommon {
 
   save() {
     this.sock.emit("save");
-
-    return new Promise((resolve) => {
-      this.sock.once("save-complete", resolve);
-    });
   }
 
   /**

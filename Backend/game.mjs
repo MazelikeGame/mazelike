@@ -53,6 +53,10 @@ export default async function startGame(gameId) {
         }
       });
 
+      sock.on("save", () => {
+        floorRef.save = sock.user.username;
+      });
+
       movementHandler(sock, floorRef, sock.broadcast);
 
       // Mark this player as ready
@@ -100,13 +104,17 @@ async function triggerTick(floor, lastUpdate, gameId, floorRef) {
   let now = Date.now();
 
   // save and quit if we loose all the clients
-  if(floor.players.length === 0) {
+  if(floor.players.length === 0 || floorRef.save) {
     await floor.sendState(io.of(`/game/${gameId}`));
     io.of(`/game/${gameId}`).removeAllListeners("connection");
 
     ml.logger.verbose("All clients left or died saving game", ml.tags("game"));
 
     await floor.save();
+
+    if(floorRef.save) {
+      io.of(`/game/${gameId}`).emit("game-saved", floorRef.save);
+    }
 
     runningGames.delete(gameId);
 

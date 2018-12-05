@@ -163,6 +163,11 @@ function setup() {
       document.title = `Mazelike - ${name}`;
     });
 
+    sock.on("game-saved", (blame) => {
+      alert(`Game saved by ${blame}`);
+      location.href = `/game/lobby/${gameId}`;
+    });
+
     return getUsername(sock);
   }).then((uname) => {
     username = uname;

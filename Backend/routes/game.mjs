@@ -15,6 +15,7 @@ import ItemModel from '../models/item.mjs';
 import Sequelize from "sequelize";
 import Maps from "../models/maps";
 import startGame, {getAddr} from "../multi/host";
+import {BASE_STATS} from "../../Frontend/game/common/player.mjs";
 
 let monsterModel = new MonsterModel(sql);
 
@@ -157,7 +158,8 @@ export const joinRoute = async(req, res) => {
   if(lobbyExists) {
     /* Create a new player and lobby for this user */
     let newPlayer = await Player.create({
-      spriteName: Player.getRandomSprite()
+      spriteName: Player.getRandomSprite(),
+      hp: BASE_STATS.hp
     });
     await user.addPlayer(newPlayer);
     let newLobby = await Lobby.create({
@@ -201,7 +203,8 @@ gameRouter.get("/new", async(req, res) => {
   let secret = await genId(SECRET_LENGTH);
 
   let newPlayer = await Player.create({
-    spriteName: Player.getRandomSprite()
+    spriteName: Player.getRandomSprite(),
+    hp: BASE_STATS.hp
   });
   let user = await User.findOne({
     where: {

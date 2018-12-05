@@ -14,11 +14,9 @@ const HP_BOOST_PERC = 0.05; // out of 1
  * The player class.
  */
 export default class Player extends PlayerCommon {
-
   constructor(...args) {
     super(...args);
-
-    this.respawn();
+    this._lastHpBoost = Date.now();
   }
 
   /**
@@ -30,8 +28,6 @@ export default class Player extends PlayerCommon {
       this.x = this._confirmedX = spawn.x;
       this.y = this._confirmedY = spawn.y;
     } while(!this.spriteIsOnMap());
-
-    this._lastHpBoost = Date.now();
   }
 
   /**
@@ -77,12 +73,16 @@ export default class Player extends PlayerCommon {
     floor.players = [];
     for(var username of Object.keys(players)) {
       if(players[username].inGame) {
-        if(players[username].x && players[username].y && players[username].hp) {
+        if(players[username].hp) {
           let playerToPush = new Player(username, players[username].hp, players[username].spriteName, floor);
-          playerToPush.setCoordinates(players[username].x, players[username].y);
+          if(players[username].x && players[username].y) {
+            playerToPush.setCoordinates(players[username].x, players[username].y);
+            playerToPush._confirmedX = players[username].x;
+            playerToPush._confirmedY = players[username].y;
+          } else {
+            playerToPush.respawn();
+          }
           floor.players.push(playerToPush);
-        } else {
-          floor.players.push(new Player(username, 100, players[username].spriteName, floor));
         }
       }
     }
@@ -159,7 +159,7 @@ export default class Player extends PlayerCommon {
     super.move(...args);
 
     // Restore a player's in safe rooms
-    let rect = this.floor.map.getRect(this.x, this.y);
+    let rect = this.floor.map.getRect(this.x, this.y) || {};
     if(Date.now() - this._lastHpBoost >= HP_BOOST_RATE && rect.noMonsters) {
       this._lastHpBoost = Date.now();
       this.hp = Math.min(this.hp + (this.hpMax * HP_BOOST_PERC), this.hpMax);
