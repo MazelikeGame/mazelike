@@ -87,7 +87,8 @@ export default class Item extends ItemCommon {
       accuracy: this.accuracy,
       attackStyle: this.attackStyle,
       maxWearTime: this.maxWearTime,
-      holder: this.holder
+      holder: this.holder,
+      holderName: this.holderName
     };
   }
 
@@ -156,5 +157,17 @@ export default class Item extends ItemCommon {
       return defMap;
     }
     return jsonDefs;
+  }
+
+  /**
+   * Puts item in a state that signifies that it has been
+   * placed in an inventory
+   */
+  pickup(holderName) {
+    this.setCoordinates(null, null);
+    this.isOnFloor = false;
+    this.holder = true;
+    this.holderName = holderName;
+    this.timeWorn = Date.now();
   }
 }
