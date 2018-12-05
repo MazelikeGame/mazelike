@@ -18,7 +18,7 @@ export default class PlayerList {
    */
   render() {
     this.listOfPlayers.forEach((player, index) => {
-      this.drawPlayerInfo(index, player); //change this to match player.getHp() in the future
+      this.drawPlayerInfo(index, player);
     });
 
     let boss = this.floor.monsters.find((monster) => {
@@ -101,21 +101,35 @@ export default class PlayerList {
    * @param {string} key 
    */
   _getStats(key) {
+    if(key === "boss") {
+      let match = this.floor.monsters.find((monster) => {
+        return monster.type === "boss";
+      });
+  
+      if(!match) {
+        return {
+          name: "boss",
+          hp: 0,
+          hpMax: 200
+        };
+      }
+  
+      return {
+        name: match.name,
+        hp: match.getHp(),
+        hpMax: match.hpMax
+      };
+    }
+
     let match = this.listOfPlayers.find((player) => {
       return key === player.name;
     });
 
     if(!match) {
-      match = this.floor.monsters.find((monster) => {
-        return monster.type === "boss";
-      });
-    }
-
-    if(!match) {
       return {
-        name: "boss",
+        name: key,
         hp: 0,
-        hpMax: 200
+        hpMax: 150
       };
     }
 

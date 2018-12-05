@@ -188,7 +188,6 @@ function setup() {
       if(isNewFloor) {
         playerList.floor = floor;
         playerList.listOfPlayers = floor.players;
-        //app.stage.addChild(playerList.render());
       }
       isNewFloor = false;
     });
