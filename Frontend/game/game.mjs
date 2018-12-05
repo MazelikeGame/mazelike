@@ -175,11 +175,11 @@ function setup() {
     });
 
     return getUsername(sock);
-  }).then((uname) => {
-    username = uname;
+  }).then(({ name, floorIdx }) => {
+    username = name;
     msgEl.innerText = "Loading game";
 
-    return Floor.load(gameId, 0, sock, username);
+    return Floor.load(gameId, floorIdx, sock, username);
   }).then((floor) => {
     app.stage.addChild(floor.sprite);
     floor.update();

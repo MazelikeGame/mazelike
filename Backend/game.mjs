@@ -4,7 +4,7 @@ import Floor from "./game/floor";
 import movementHandler from "./handlers/player-movement";
 import initAuth from "./game-auth";
 import os from "os";
-import Maps from "../models/maps";
+import Maps from "./models/maps";
 import Sequelize from "sequelize";
 
 let runningGames = new Set();
@@ -34,7 +34,6 @@ export default async function startGame(gameId) {
     let floorIdx = maps.reduce((a, b) => {
       return Math.max(a, b);
     }, 0);
-    console.log(floorIdx);
     let floor = floorRef.floor = await Floor.load(gameId, floorIdx);
 
     // eslint-disable-next-line arrow-parens,arrow-body-style
@@ -48,12 +47,12 @@ export default async function startGame(gameId) {
       ml.logger.info(`Game client connected (username: ${sock.user ? sock.user.username : "No auth"})`);
       // Not logged in enter spectator mode
       if(!sock.user) {
-        sock.emit("set-username");
+        sock.emit("set-username", { floorIdx });
         return;
       }
 
       sock.emit("game-server-name", os.hostname());
-      sock.emit("set-username", sock.user.username);
+      sock.emit("set-username", { floorIdx, name: sock.user.username });
 
       sock.on("disconnect", async() => {
         //Player has left and need to update the list of players.
