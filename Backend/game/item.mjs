@@ -86,7 +86,8 @@ export default class Item extends ItemCommon {
       category: this.category,
       accuracy: this.accuracy,
       attackStyle: this.attackStyle,
-      maxWearTime: this.maxWearTime
+      maxWearTime: this.maxWearTime,
+      holder: this.holder
     };
   }
 
@@ -121,7 +122,7 @@ export default class Item extends ItemCommon {
     while(randomItem === itemDefs[4]) { //Don't want regular monsters to spawn keys.
       randomItem = itemDefs[Math.floor(Math.random() * itemDefs.length)];
     }
-    
+
     let newItem = new Item(
       floor,
       randomItem.spriteName,

@@ -47,6 +47,7 @@ export default class Item {
     this.y = null;
     this.isOnFloor = false;
     this.maxWearTime = maxWearTime;
+    this.holder = false;
   }
 
   /**
@@ -78,6 +79,7 @@ export default class Item {
   pickup() {
     this.setCoordinates(null, null);
     this.isOnFloor = false;
+    this.holder = true;
     this.timeWorn = Date.now();
   }
 
