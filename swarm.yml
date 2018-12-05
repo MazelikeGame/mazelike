@@ -1,7 +1,7 @@
 version: "3.2"
 services:
   master:
-    image: ryan3r/mazelike:edge
+    image: ryan3r/mazelike
     environment:
       DB: postgres://root@postgres/mazelike
       DB_PASSWORD_FILE: /run/secrets/db_password
@@ -54,7 +54,7 @@ services:
 
   minion1:
     hostname: minion1
-    image: ryan3r/mazelike:edge
+    image: ryan3r/mazelike
     depends_on:
       - postgres
       - master
@@ -75,7 +75,7 @@ services:
   
   minion2:
     hostname: minion2
-    image: ryan3r/mazelike:edge
+    image: ryan3r/mazelike
     depends_on:
       - postgres
       - master
@@ -96,7 +96,7 @@ services:
 
   minion3:
     hostname: minion3
-    image: ryan3r/mazelike:edge
+    image: ryan3r/mazelike
     depends_on:
       - postgres
       - master
@@ -117,7 +117,7 @@ services:
 
   minion4:
     hostname: minion4
-    image: ryan3r/mazelike:edge
+    image: ryan3r/mazelike
     depends_on:
       - postgres
       - master
