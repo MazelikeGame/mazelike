@@ -201,7 +201,6 @@ function setup() {
       if(isNewFloor) {
         playerList.floor = floor;
         playerList.listOfPlayers = floor.players;
-        app.stage.addChild(playerList.render());
       }
       isNewFloor = false;
     });
@@ -268,7 +267,7 @@ function setup() {
         let floorId = id.split("-")[1];
         app.stage.removeChild(floor.sprite);
         app.stage.removeChild(controls.sprite);
-        app.stage.addChild(playerList.graphics);
+        app.stage.removeChild(playerList.graphics);
 
         // load the new map
         Floor.load(gameId, floorId, sock, username)
@@ -278,6 +277,7 @@ function setup() {
 
             app.stage.addChild(floor.sprite);
             app.stage.addChild(controls.sprite);
+            app.stage.addChild(playerList.graphics); //Draw the player list
           });
       });
 
