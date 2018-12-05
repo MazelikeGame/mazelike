@@ -155,7 +155,7 @@ export const joinRoute = async(req, res) => {
   });
   /* If there is a lobby for this user, update the `inGame` attribute to true for the player
    * record associated for this lobby */
-  if(lobbyExists) {
+  if(!lobbyExists) {
     /* Create a new player and lobby for this user */
     let newPlayer = await Player.create({
       spriteName: Player.getRandomSprite(),
