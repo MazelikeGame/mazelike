@@ -10,9 +10,9 @@ import interpolate from "./interpolator.mjs";
 
 const HP_PER_TYPE = {
   boss: 200,
-  blue: 150,
+  blue: 200,
   red: 100,
-  green: 50
+  green: 30
 };
 
 export default class MonsterCommon {
@@ -43,6 +43,7 @@ export default class MonsterCommon {
       this.speed = 75;
       this.size = 2;
       this.name = "boss";
+      this.hpMax = 200 * (+this.floor.id.split("-")[1] + 1);
     }
   }
 

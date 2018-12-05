@@ -31,19 +31,20 @@ export default class Floor extends FloorCommon {
    * @param {Floor} floor The floor to add monsters to
    */
   generateMonsters() {
+    let floorIdx = +this.id.split("-")[1];
     this.monsters = [];
     let random = 0;
     for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) {
       if(i === 0) {
-        this.monsters[i] = new Monster('boss', 200, 15, this, i, 'boss', 200);
+        this.monsters[i] = new Monster('boss', 200 * (floorIdx + 1), 20, this, i, 'boss');
       } else {
         random = Math.floor(Math.random() * 100);
-        if(random < 15) { // 15% chance for blue demon
-          this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue', 150);
-        } else if(random < 50) { // 35% chance for red demon, where 15+35 = 50
-          this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red', 100);
+        if(random < 15 + (floorIdx * 10)) { // 15% chance for blue demon
+          this.monsters[i] = new Monster('blue demon', 200, 10, this, i, 'blue');
+        } else if(random < 50 + (floorIdx * 10)) { // 35% chance for red demon, where 15+35 = 50
+          this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
         } else if(random < 100) { // 50% chance for green demon, where 15+35+50 = 100
-          this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green', 50);
+          this.monsters[i] = new Monster('green demon', 30, 3, this, i, 'green');
         }
       }
     }
