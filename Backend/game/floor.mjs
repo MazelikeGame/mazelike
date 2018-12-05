@@ -36,7 +36,7 @@ export default class Floor extends FloorCommon {
     let random = 0;
     for(let i = 0; i < this.map.rooms.length * this.monsterRatio; i++) {
       if(i === 0) {
-        this.monsters[i] = new Monster('boss', 200 * (floorIdx + 1), 20, this, i, 'boss');
+        this.monsters[i] = new Monster('boss', 500 * (floorIdx + 1), 20, this, i, 'boss');
       } else {
         random = Math.floor(Math.random() * 100);
         if(random < 15 + (floorIdx * 10)) { // 15% chance for blue demon
