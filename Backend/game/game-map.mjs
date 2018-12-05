@@ -1,11 +1,6 @@
 /** @module backend/game/GameMap */
 import GameMapCommon from "../../Frontend/game/common/game-map/game-map.mjs";
-import fs from "fs";
-import util from "util";
-
-const readFile = util.promisify(fs.readFile);
-const writeFile = util.promisify(fs.writeFile);
-const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
+import Maps from "../models/maps";
 
 export default class GameMap extends GameMapCommon {
   /**
@@ -21,20 +16,33 @@ export default class GameMap extends GameMapCommon {
    * @param {Floor} floor The floor to load the map for
    */
   static async load(floor) {
-    // for backwards compatability the map for floorIdx == 0 is just the gameId
-    let mapId = floor.id.replace("-0", "");
+    let rawMap = await Maps.findOne({
+      where: {
+        floorId: floor.id
+      }
+    });
 
-    floor.map = GameMap.parse(await readFile(`${DATA_DIR}/maps/${mapId}.json`, "utf8"), new GameMap());
+    floor.map = GameMap.parse(rawMap.map, new GameMap());
   }
 
   /**
    * Save the game map in nodejs
    * @param {string} id The floor id to save the map for
    */
-  save(floorId) {
-    // for backwards compatability the map for floorIdx == 0 is just the gameId
-    let mapId = floorId.replace("-0", "");
-
-    return writeFile(`${DATA_DIR}/maps/${mapId}.json`, this.serialize());
+  save(floorId, create) {
+    if(create) {
+      return Maps.create({
+        floorId,
+        map: this.serialize()
+      });
+    }
+    
+    return Maps.update({
+      map: this.serialize()
+    }, {
+      where: {
+        floorId
+      }
+    });
   }
 }

@@ -4,6 +4,13 @@ require('dotenv').config();
 require("../Backend/logger.js"); // THIS MUST BE THE FIRST IMPORT
 const url = require("url");
 const os = require("os");
+const fs = require("fs");
+
+// Load the password from a file
+let dbPassword;
+if(process.env.DB_PASSWORD_FILE) {
+  dbPassword = fs.readFileSync(process.env.DB_PASSWORD_FILE, "utf8");
+}
 
 let conf = {
   operatorsAliases: false,
@@ -21,16 +28,16 @@ try {
 
 let auth;
 switch(dbUrl.protocol) {
-// install tedious@^1.7.0 and add case "mssql:": to a mysql support
+case "postgres:":
 case "mysql:":
   conf.dialect = dbUrl.protocol.substr(0, dbUrl.protocol.length - 1);
 
   auth = dbUrl.auth && dbUrl.auth.split(":");
   conf.username = auth && auth[0];
-  conf.password = auth && auth[1];
+  conf.password = dbPassword ? dbPassword : auth && auth[1];
 
   conf.host = dbUrl.hostname;
-  conf.port = +dbUrl.port || 3306;
+  conf.port = +dbUrl.port || (conf.dialect === "mysql" ? 3306 : 5432);
   conf.database = dbUrl.pathname && dbUrl.pathname.substr(1);
 
   // validate what we got
