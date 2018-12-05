@@ -130,6 +130,15 @@ export const joinRoute = async(req, res) => {
     ml.logger.verbose(`${req.user.username} failed to join a lobby becuase the join code ${req.params.id} is invalid`, ml.tags.lobby);
     return;
   }
+
+  // Don't join in progress games
+  if(lobby.inProgress) {
+    res.status(403);
+    res.end("Game is already in progress");
+    ml.logger.verbose(`${req.user.username} failed to join a lobby becuase the game was in progress`);
+    return;
+  }
+
   let user = await User.findOne({
     where: {
       username: req.user.username
