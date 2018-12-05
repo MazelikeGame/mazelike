@@ -1,5 +1,18 @@
 # MazeLike
 
+## Run the server
+
+Basic demo
+```
+docker run -p 3000:3000 ryan3r/mazelike
+```
+
+Persistant changes
+```
+docker volume create mazelike
+docker run -p 3000:3000 -v mazelike:/data ryan3r/mazelike
+```
+
 ## Testing
 
 Run `npm test` in the tests directory.  You will also have to run npm install in the tests directory.
