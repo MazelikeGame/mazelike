@@ -1,0 +1,39 @@
+language: node_js
+
+services:
+    - docker
+stages:
+  - build
+  - test
+  - cleanup
+
+jobs:
+    include:
+        - stage: "build"
+          script:
+            - BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -c 1-15)
+            - sed s/branch/$BRANCH/ -i docker-compose.yml
+            - sed s/latest/branch-$BRANCH/ -i docker-compose.yml
+            - docker-compose build
+            - docker-compose up -d backend
+        - stage: "test"
+          name: "eslint"
+          script:
+            - npm run eslint
+        - script:
+            - BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -c 1-15)
+            - sed s/branch/$BRANCH/ -i docker-compose.yml
+            - sed s/latest/branch-$BRANCH/ -i docker-compose.yml
+            - touch runner-result
+            - chmod 666 runner-result
+            - docker-compose up -d tests_backend
+            - node scripts/test-stopper.js tests_backend
+          name: "Backend Tests"
+        - script:
+            - node scripts/version-check.js
+          name: "Verision Change"
+        - stage: "cleanup"
+          script:
+            - BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -c 1-15)
+            - sed s/branch/$BRANCH/ -i docker-compose.yml
+            - docker-compose down
