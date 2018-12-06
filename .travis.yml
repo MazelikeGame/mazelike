@@ -17,6 +17,7 @@ jobs:
         - stage: "test"
           name: "eslint"
           script:
+            - npm i
             - npm run eslint
         - script:
             - BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -c 1-15)
