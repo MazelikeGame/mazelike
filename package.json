@@ -2,7 +2,8 @@
   "name": "mazelike",
   "version": "0.0.0",
   "scripts": {
-    "test": "echo Tests should be run from the tests directory (don't forget to npm install when you get there) && exit 1",
+    "test": "jasmine --config=tests/spec/support/jasmine.json",
+    "test-browser": "node tests/browser-ci",
     "start": "sequelize db:migrate && node --experimental-modules Backend/index.mjs",
     "doc": "jsdoc -r Frontend/game Backend doc.md -c jsdoc.json -d Documents",
     "eslint": "eslint Frontend Backend --ext .js,.mjs",
@@ -49,6 +50,7 @@
     "jasmine-core": "^3.2.1",
     "jsdoc": "^3.5.5",
     "request": "^2.88.0",
-    "rollup": "^0.67.3"
+    "rollup": "^0.67.3",
+    "puppeteer": "1.5.0"
   }
 }

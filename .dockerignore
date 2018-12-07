@@ -15,5 +15,3 @@ tests
 .gitignore
 .gitlab-ci.yml
 .vscode
-scripts/build
-Frontend/game/Tests

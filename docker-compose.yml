@@ -2,7 +2,6 @@
 version: "3.2"
 services:
   backend:
-    container_name: backend_branch
     image: ryan3r/mazelike:latest
     build:
       context: .
@@ -12,7 +11,6 @@ services:
       - mazelike_testing_branch
 
   tests_backend:
-    container_name: tests_branch_backend
     image: ryan3r/mazelike_tests:latest
     build:
       context: tests
