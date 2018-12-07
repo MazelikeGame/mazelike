@@ -15,11 +15,6 @@ node_js:
 stages:
     - test
 
-before_install:
-    - docker build -t ryan3r/mazelike .
-    - docker run --rm -d -p 127.0.0.1:3000:3000 ryan3r/mazelike
-    - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
-
 jobs:
     include:
         - stage: "test"
@@ -27,11 +22,12 @@ jobs:
           script:
             - npm run eslint
         - script:
-            - npm test
-          name: "Backend Tests"
-        - script:
             - node scripts/version-check.js
           name: "Verision Change"
         - script:
-            - npm run browser-test
-          name: "Browser tests"
+            - docker build -t ryan3r/mazelike .
+            - docker run --rm -d -p 127.0.0.1:3000:3000 ryan3r/mazelike
+            - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
+            - npm test
+            - npm run test-browser
+          name: "Acceptance tests"
