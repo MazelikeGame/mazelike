@@ -2,6 +2,9 @@ branches:
     only:
         master
 
+addons:
+  chrome: stable
+
 services:
     - docker
 
@@ -10,26 +13,25 @@ node_js:
     - "8"
 
 stages:
-  - build
-  - test
-  - cleanup
+    - test
+
+before_install:
+    - docker build -t ryan3r/mazelike .
+    - docker run --rm -d -p 127.0.0.1:3000:3000 ryan3r/mazelike
+    - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
 
 jobs:
     include:
-        - stage: "build"
-          script:
-            - docker --version
         - stage: "test"
           name: "eslint"
           script:
-            - npm i
             - npm run eslint
         - script:
-            - touch runner-result
-            - chmod 666 runner-result
-            - docker-compose up -d
-            - node scripts/test-stopper.js tests_backend
+            - npm test
           name: "Backend Tests"
         - script:
             - node scripts/version-check.js
           name: "Verision Change"
+        - script:
+            - npm run browser-test
+          name: "Browser tests"

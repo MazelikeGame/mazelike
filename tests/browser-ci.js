@@ -1,11 +1,10 @@
 const puppeteer = require("puppeteer");
 
-const BASE_URL = process.env.IS_RUNNING_IN_DOCKER ? `http://${process.env.BACKEND}:3000` : "http://localhost:3000";
+const BASE_URL = "http://localhost:3000";
 
 (async() => {
-  let browser = await puppeteer.launch({
-    executablePath: process.env.IS_RUNNING_IN_DOCKER ? "/usr/bin/chromium-browser" : undefined,
-    args: process.env.IS_RUNNING_IN_DOCKER ? ["--no-sandbox"] : []
+  let browser = await puppeteer.connect({
+    browserWSEndpoint: "localhost:9222"
   });
 
   const test = async() => {
