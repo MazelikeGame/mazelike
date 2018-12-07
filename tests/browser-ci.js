@@ -1,10 +1,10 @@
 const puppeteer = require("puppeteer");
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://127.0.0.1:3000";
 
 (async() => {
   let browser = await puppeteer.connect({
-    browserWSEndpoint: "localhost:9222"
+    browserWSEndpoint: "127.0.0.1:9222"
   });
 
   const test = async() => {
