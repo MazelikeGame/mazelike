@@ -2,7 +2,7 @@
   "name": "mazelike",
   "version": "0.0.0",
   "scripts": {
-    "test": "jasmine tests/spec",
+    "test": "jasmine --config=tests/spec/support/jasmine.json",
     "test-browser": "node tests/browser-ci",
     "start": "sequelize db:migrate && node --experimental-modules Backend/index.mjs",
     "doc": "jsdoc -r Frontend/game Backend doc.md -c jsdoc.json -d Documents",
