@@ -8,6 +8,6 @@ fighting mobs and defeating bosses in order to progress through randomly
 generated rooms/levels.
 
 ### Documentation
-  ** [JSDocs](https://mazelike.ryan3r.com/docs/)
+  * [JSDocs](https://mazelike.ryan3r.com/docs/)
   * [How to contribute](CONTRIBUTING.md)
 
