@@ -12,6 +12,9 @@
     "db:migrate:undo": "sequelize db:migrate:undo",
     "migration:create": "sequelize migration:create --name"
   },
+  "husky": {
+    "pre-push": "jsdoc -r Frontend/game Backend doc.md -c jsdoc.json -d docs && git add docs/* && git commit"
+  },
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -46,11 +49,12 @@
     "babel-preset-minify": "^0.5.0",
     "chai": "^4.1.2",
     "eslint": "^5.5.0",
+    "husky": "^1.2.0",
     "jasmine": "^3.2.0",
     "jasmine-core": "^3.2.1",
     "jsdoc": "^3.5.5",
+    "puppeteer": "1.5.0",
     "request": "^2.88.0",
-    "rollup": "^0.67.3",
-    "puppeteer": "1.5.0"
+    "rollup": "^0.67.3"
   }
 }
