@@ -20,7 +20,6 @@ RUN npm install --production
 
 COPY . .
 COPY --from=build /app/Frontend Frontend
-COPY --from=build /app/Documents /app/Documents
 RUN sed -i "s/VERSION-HERE/$(cat VERSION)/" Frontend/sw.js
 
 VOLUME /data
