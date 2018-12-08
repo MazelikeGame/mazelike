@@ -12,11 +12,6 @@
     "db:migrate:undo": "sequelize db:migrate:undo",
     "migration:create": "sequelize migration:create --name"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "jsdoc -r Frontend/game Backend doc.md -c jsdoc.json -d docs && git add docs/* && git commit -m 'Doc: JSDoc'"
-    }
-  },
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
