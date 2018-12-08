@@ -13,7 +13,7 @@
     "migration:create": "sequelize migration:create --name"
   },
   "husky": {
-    "pre-push": "jsdoc -r Frontend/game Backend doc.md -c jsdoc.json -d docs && git add docs/* && git commit"
+    "pre-push": "jsdoc -r Frontend/game Backend doc.md -c jsdoc.json -d docs && git add docs/* && git commit -m 'Doc: JSDoc'"
   },
   "license": "ISC",
   "dependencies": {
