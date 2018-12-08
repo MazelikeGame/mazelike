@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Backend/routes/accounts.mjs</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Backend/routes/accounts.mjs</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// jshint esversion: 6
+/* global ml */
+import express from "express";
+import Sequelize from 'sequelize';
+import User from '../models/user.mjs';
+import Lobby from '../models/lobby.mjs';
+import multer from 'multer';
+import fs from 'fs';
+import qs from "querystring";
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
+
+const DATA_DIR = process.env.PUBLIC_DIR || "Frontend/public";
+
+var storage = multer.diskStorage({
+  destination: `${DATA_DIR}/images`,
+  filename: function(req, file, cb) {
+    let date_posted = Date.now().toString().concat('-');
+    cb(null, date_posted.concat(file.originalname));
+  }
+});
+var upload = multer({ storage: storage });
+
+const accountRouter = express.Router();
+
+accountRouter.use((req, res, next) => {
+  res.set("Cache-Control", "no-cache");
+  next();
+});
+
+/**
+ * Checks to make sure the user is authenticated.
+ * @param req
+ * @param res
+ * @param next
+ */
+function isAuthenticated(req, res, next) {
+  res.loginRedirect();
+
+  return next();
+}
+
+/**
+ * DEFAULT
+ */
+accountRouter.get('/', function(req, res) {
+  res.redirect('/'); //Redirects to the homepage.
+});
+
+/**
+ * CREATE ACCOUNT GET/POST
+ */
+accountRouter.get('/create', function(req, res) {
+  if(req.session.authenticated) {
+    res.redirect('dashboard');
+  } else {
+    res.render('create_acct', {
+      returnUrl: req.query.returnUrl ?
+        `?returnUrl=${qs.escape(req.query.returnUrl || "")}` :
+        ""
+    });
+  }
+});
+
+accountRouter.post('/create', upload.fields([{ name: 'avatar', maxCount: 1}]), async(req, res) => {
+
+  let image_name = null;
+  try {
+    image_name = req.files.avatar[0].filename;
+  } catch(e) {
+    image_name = null;
+  }
+
+  let username = req.body.username;
+  let email = req.body.email;
+
+  User.sync().then(() => {
+    User.findOne({
+      where: {
+        [Sequelize.Op.or]: [{username: req.body.username}, {email: req.body.email}]
+      }
+    }).then(function(user) {
+      if(user) {
+        res.render('create_acct', {
+          isAuthenticated: true,
+          returnUrl: req.query.returnUrl ?
+            `?returnUrl=${qs.escape(req.query.returnUrl || "")}` :
+            ""
+        });
+      } else {
+        ml.logger.info(`Created user ${username}`, ml.tags.account);
+        User.encryptPassword(req.body.password, (err, hash) => {
+          User.create({
+            username: username,
+            email: email,
+            password: hash,
+            image_name: image_name
+          });
+          res.loginRedirect(req.query.returnUrl || "");
+        });
+      }
+    });
+  });
+});
+
+accountRouter.get('/edit', function(req, res) {
+  if(res.loginRedirect()) {
+    return;
+  }
+
+  res.render('edit_acct', {
+    username: req.session.username,
+    image: req.user.image_name || "../../img/profilepic.jpg"
+  });
+});
+
+// I will refactor this in the future
+accountRouter.post('/edit', upload.fields([{ name: 'avatar', maxCount: 1}]), function(req, res) { // eslint-disable-line
+  if(res.loginRedirect()) {
+    return;
+  }
+
+  var argument, file_name;
+  var changing_avatar = false;
+  try {
+    file_name = req.files.avatar[0].filename;
+    argument = req.body.email || req.body.password || req.files.avatar[0].filename;
+    changing_avatar = true;
+  } catch (e) {
+    argument = req.body.email || req.body.password;
+  }
+
+  if (argument &amp;&amp; req.session.username !== undefined) {
+    User.encryptPassword(req.body.password, (err, hash) => {
+      let values = {};
+      if(req.body.email) {
+        values.email = req.body.email;
+        ml.logger.verbose(`Updating email for ${req.session.username} to ${req.body.email}`, ml.tags.account);
+      }
+      if(req.body.password) {
+        values.password = hash;
+        ml.logger.verbose(`Updating password for ${req.session.username}`, ml.tags.account);
+      }
+      if(changing_avatar === true) {
+        values.image_name = file_name;
+        let file_to_delete = `${DATA_DIR}/images/${req.user.image_name}`;
+        fs.unlink(file_to_delete, () => {});
+        ml.logger.verbose(`Update profie pic for ${req.session.username}`, ml.tags.account);
+      }
+      let selector = {
+        where: { username: req.session.username }
+      };
+      ml.logger.info(`Updated account ${req.session.username}`, ml.tags.account);
+      User.update(values, selector).then(function(result) {
+        if(result) {
+          res.redirect('dashboard');
+        } else {
+          res.redirect('edit_acct');
+        }
+      });
+    });
+  }
+});
+
+
+/**
+ * LOGOUT
+ */
+accountRouter.get('/logout', isAuthenticated, function(req, res) {
+  ml.logger.info(`${req.session &amp;&amp; req.session.username} logged out`, ml.tags.account);
+  req.session.destroy(function(err) {
+    if(!err) {
+      res.redirect('login');
+    }
+  });
+});
+
+/**
+ * LOGIN GET/POST
+ */
+accountRouter.get('/login', function(req, res) {
+  if(req.session.authenticated) {
+    if(req.query.returnUrl) {
+      res.redirect(req.query.returnUrl);
+    } else {
+      res.redirect('dashboard');
+    }
+  } else {
+    res.render('login', {
+      returnUrl: req.query.returnUrl ?
+        `?returnUrl=${qs.escape(req.query.returnUrl || "")}` :
+        ""
+    });
+  }
+});
+
+accountRouter.post('/login', function(req, res) {
+  User.findOne({
+    where: {
+      username: req.body.username
+    }
+  }).then(function(user) {
+    if(user) {
+      User.comparePassword(req.body.password, user.password, (err, result) => {
+        if(result) {
+          ml.logger.info(`${req.body.username} logged in`, ml.tags.account);
+          req.session.authenticated = true;
+          req.session.username = user.username;
+          req.session.userId = user.id;
+          if(req.query.returnUrl) {
+            res.redirect(req.query.returnUrl);
+          } else {
+            res.redirect('dashboard');
+          }
+        } else {
+          ml.logger.verbose(`${req.body.username} failed to login because of invalid password`, ml.tags.account);
+          res.render('login', {
+            wrongPassword: true,
+            returnUrl: req.query.returnUrl ?
+              `?returnUrl=${qs.escape(req.query.returnUrl || "")}` :
+              ""
+          }); //Failed login by password.
+        }
+      });
+    } else {
+      ml.logger.verbose(`${req.body.username} failed to login because the user did not exist`, ml.tags.account);
+      res.render('login', {
+        wrongUsername: true,
+        returnUrl: req.query.returnUrl ?
+          `?returnUrl=${qs.escape(req.query.returnUrl || "")}` :
+          ""
+      }); //Failed login by username.
+    }
+  });
+});
+
+accountRouter.get('/view', function(req, res) {
+  if(res.loginRedirect()) {
+    return;
+  }
+
+  res.render('view_acct', {
+    username: req.session.username,
+    email: req.user.email,
+    image: req.user.image_name || "../../img/profilepic.jpg"
+  });
+});
+
+// Check if forgot password is enabled if not send an error message to the user
+const checkForgotPassword = (res) => {
+  if(!process.env.MAILER_EMAIL_ID || !process.env.MAILER_PASSWORD || !process.env.MAILER_SERVICE_PROVIDER) {
+    res.render('forgot-password', {
+      badError: new Error("Forgot password is not enabled")
+    });
+
+    return false;
+  }
+
+  return true;
+};
+
+accountRouter.get('/forgot-password', function(req, res) {
+  if(!checkForgotPassword(res)) {
+    return;
+  }
+
+  res.render('forgot-password');
+});
+
+/* eslint-disable complexity */
+accountRouter.post('/forgot-password', async(req, res) => {
+  if(!checkForgotPassword(res)) {
+    return undefined;
+  }
+  
+  const buf = crypto.randomBytes(20);
+  var token = buf.toString('hex');
+  let user = await User.findOne({
+    where: {
+      username: req.body.username
+    }
+  });
+  if(!user) {
+    ml.logger.verbose(`Forgot password failed because ${req.body.username} does not exist`, ml.tags.account);
+    return res.render('forgot-password', {
+      noUserExists: true
+    });
+  }
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = Date.now() + 3600000;
+  user.save();
+
+  let smtpTransport = nodemailer.createTransport({
+    service: process.env.MAILER_SERVICE_PROVIDER,
+    auth: {
+      user: process.env.MAILER_EMAIL_ID,
+      pass: process.env.MAILER_PASSWORD
+    }
+  });
+  let mailOptions = {
+    from: process.env.MAILER_EMAIL_ID,
+    to: user.email,
+    subject: 'MazeLike Password Reset',
+    // eslint-disable-next-line prefer-template
+    text: 'Greetings ' + req.body.username +
+    ',\n\nPlease click the following link, or paste this into your browser to complete the process.\n\n' +
+    ' http://' + req.headers.host + '/account/reset/' + token + ' \n\n' +
+    'If you did not request this, please ignore this email and your password will remain unchanged.' +
+    '\n\nThank you,\nMazeLike'
+  };
+  try {
+    await smtpTransport.sendMail(mailOptions);
+    ml.logger.info(`Sent forget password email to ${user.email} for ${user.username}`, ml.tags.account);
+  } catch (err) {
+    return res.render('forgot-password', {
+      badError: err
+    });
+  }
+  return res.render('forgot-password', {
+    accountFound: true
+  });
+});
+
+accountRouter.get('/reset/:token', async(req, res) => {
+  let user = await User.findOne({
+    where: {
+      resetPasswordToken: req.params.token
+    }
+  });
+  if(!user) {
+    ml.logger.verbose(`Password reset token ${req.params.token} is invalid`, ml.tags.account);
+    return res.render('forgot-password', {
+      badError: 'Password reset token is invalid or has expired. '.concat(user)
+    });
+  }
+  return res.render('reset_password', {
+    token: req.params.token,
+    username: user.username
+  });
+});
+
+accountRouter.post('/reset/:token', async(req, res) => {
+  let user = await User.findOne({
+    where: {
+      resetPasswordToken: req.params.token
+    }
+  });
+  if(!user) {
+    ml.logger.verbose(`Password reset token ${req.params.token} is invalid`, ml.tags.account);
+    res.render('reset', {
+      tokenError: 'Reset token is invalid'
+    });
+  }
+  User.encryptPassword(req.body.password, (err, hash) => {
+    let values = {
+      password: hash
+    };
+    let selector = {
+      where: {
+        username: user.username
+      }
+    };
+    ml.logger.info(`Reset password for ${user.username}`, ml.tags.account);
+    User.update(values, selector).then((result) => {
+      if(result) {
+        res.render('reset_password', {
+          successfulReset: 'Password reset was successful for user '.concat(user.username)
+        });
+      } else {
+        res.render('reset/'.concat(req.params.token), {
+          tokenError: 'Could not reset password for '.concat(user.username)
+        });
+      }
+    });
+  });
+});
+/* eslint-enable complexity */
+
+accountRouter.get('/dashboard', async(req, res) => {
+  if(res.loginRedirect()) {
+    return;
+  }
+  let lobbies = await Lobby.findAll({
+    where: {
+      playerId: req.user.username
+    }
+  });
+  res.render('dashboard', {
+    username: req.session.username,
+    image: req.user.image_name || "../../img/profilepic.jpg",
+    lobbies
+  });
+});
+
+export default accountRouter;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_Item.html">backend/game/Item</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Item.html">Item</a></li><li><a href="module-LadderCommon.html">LadderCommon</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_getStats">_getStats</a></li><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#disconnectPlayer">disconnectPlayer</a></li><li><a href="global.html#dispatchGame">dispatchGame</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAddr">getAddr</a></li><li><a href="global.html#initHost">initHost</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#removePlayer">removePlayer</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Dec 07 2018 23:47:31 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Frontend/game/browser/floor.mjs</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Frontend/game/browser/floor.mjs</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable complexity */
+/* global PIXI */
+/** @module browser/Floor */
+import FloorCommon from "../common/floor.mjs";
+import GameMap from "./game-map.mjs";
+import Player from "./player.mjs";
+import Monster from "./monster.mjs";
+import Ladder from "./ladder.mjs";
+import Item from './item.mjs';
+
+export default class Floor extends FloorCommon {
+  constructor(gameId, floorIdx, sock, username) {
+    super(gameId, floorIdx);
+    this.sock = sock;
+    this.username = username;
+    // the top left corrner of the user's screen
+    this._viewportX = 0;
+    this._viewportY = 0;
+
+    this.monsters = [];
+    this.monsterSprites = new PIXI.Container();
+
+    this.players = [];
+    this.playerSprites = new PIXI.Container();
+
+    this.ladder = new Ladder();
+    
+    this.items = [];
+    this.itemSprites = new PIXI.Container();
+
+    this.attackSprites = new PIXI.Container();
+  }
+
+  /**
+   * Generate a new floor (runs on the server and the browser)
+   * @param gameId The game id for the game we want to generate
+   * @param floorIdx The index of floor we want to generate
+   * @param {object} opts The options of the specific generators
+   */
+  static generate({gameId, floorIdx, map, sock, username}) {
+    let floor = new Floor(gameId, floorIdx, sock, username);
+    floor.map = GameMap.generate(map);
+
+    floor._initRendering();
+ 
+    return floor;
+  }
+
+  /**
+   * Puts a monster in half of all "rooms".
+   * Occurs twice upon floor generation, shouldnt cause errors though.
+   * @param {Floor} floor The floor to add monsters to
+   */
+  generateMonsters() {
+    this.monsters = [];
+    let random = 0;
+    for(let i = 0; i &lt; this.map.rooms.length * this.monsterRatio; i++) {
+      if(i === 0) {
+        this.monsters[i] = new Monster('boss', 200, 15, this, i, 'boss');
+      } else {
+        random = Math.floor(Math.random() * 100);
+        if(random &lt; 15) { // 15% chance for blue demon
+          this.monsters[i] = new Monster('blue demon', 150, 10, this, i, 'blue');
+        } else if(random &lt; 50) { // 35% chance for red demon, where 15+35 = 50
+          this.monsters[i] = new Monster('red demon', 100, 5, this, i, 'red');
+        } else if(random &lt; 100) { // 50% chance for green demon, where 15+35+50 = 100
+          this.monsters[i] = new Monster('green demon', 50, 5, this, i, 'green');
+        }
+      }
+    }
+  }
+
+  /**
+   * Load everything in the browser
+   * @param gameId The game id for the game we want to load
+   * @param floorIdx The index of floor we want to load
+   * @param sock The connection to the game server
+   * @param username The username of the current player
+   */
+  static load(gameId, floorIdx, sock, username) {
+    let floor = new Floor(gameId, floorIdx, sock, username);
+
+    return Promise.all([
+      // NOTE: You should define your functions here and they should
+      // return a promise for when they compl2ete.  All modifications to
+      // floor should be done to the floor variable you pass in like so.
+      GameMap.load(floor),
+    ]).then(() => {
+      floor._initRendering();
+
+      return floor;
+    });
+  }
+
+  save() {
+    this.sock.emit("save");
+  }
+
+  /**
+   * Do any rendering setup and add all sprites to the stage
+   */
+  _initRendering() {
+    this.sprite = new PIXI.Container();
+
+    // Move the viewport to the spawn point
+    let spawn = this.map.getSpawnPoint();
+    this.setViewport(spawn.x, spawn.y);
+
+    this._mapRenderer = this.map.createRenderer();
+    this.sprite.addChild(this._mapRenderer.sprite);
+
+    this.sprite.addChild(this.attackSprites);
+
+    for(let monster of this.monsters) {
+      monster.createSprite();
+    }
+    for(let player of this.players) {
+      player.createSprite();
+    }
+
+    this.ladder.setPosition(this.map.ladder.x, this.map.ladder.y);
+ 
+    for(let item of this.items) {
+      item.createSprite();
+    }
+    this.sprite.addChild(this.itemSprites);
+    this.sprite.addChild(this.playerSprites);
+    this.sprite.addChild(this.monsterSprites);
+    this.sprite.addChild(this.ladder.sprite);
+
+  }
+
+  /**
+   * Render/update the game
+   */
+  update() {
+    for(let i = 0; i &lt; this.monsters.length; i++) {
+      this.monsters[i].update(this._viewportX, this._viewportY);
+    }
+    for(let i = 0; i &lt; this.players.length; ++i) {
+      this.players[i].update(this._viewportX, this._viewportY);
+    }
+    for(let i = 0; i &lt; this.items.length; ++i) {
+      this.items[i].update(this._viewportX, this._viewportY);
+    }
+    this._mapRenderer.update(
+      this._viewportX,
+      this._viewportY,
+      this._viewportX + innerWidth,
+      this._viewportY + innerHeight
+    );
+
+    this.ladder.update(this._viewportX, this._viewportY);
+  }
+
+  /**
+   * Set the viewport of the cient (ie the coordiates for the center of their screen)
+   * @param {number} x
+   * @param {number} y
+   */
+  setViewport(x, y) {
+    let halfWidth = innerWidth / 2;
+    let halfHeight = innerHeight / 2;
+
+    this._viewportX = Math.max(x - halfWidth, 0);
+    this._viewportY = Math.max(y - halfHeight, 0);
+  }
+
+  /**
+   * Get the current viewport
+   * @returns {object} {x, y}
+   */
+  getViewport() {
+    let halfWidth = innerWidth / 2;
+    let halfHeight = innerHeight / 2;
+
+    return {
+      x: this._viewportX + halfWidth,
+      y: this._viewportY + halfHeight
+    };
+  }
+
+  /**
+   * Update our state to match the server's state
+   */
+  handleState(state, username) {
+    this._diffState("id", "id", this.monsters, state.monsters, (raw) => {
+      let monster = new Monster(raw.name, raw.hp, 10, this, raw.id, raw.type);
+      monster.setCoodinates(raw.x, raw.y);
+      monster.createSprite();
+      return monster;
+    });
+    this._diffState("username", 'name', this.players, state.players, (raw) => {
+      let player = new Player(raw.username, raw.hp, raw.spriteName, this);
+      player.handleState(raw);
+      player.createSprite();
+      player._lastFrameSent = raw._lastFrame;
+      player.x = raw._confirmedX;
+      player.y = raw._confirmedY;
+
+      if(raw.username === username) {
+        this.setViewport(player.x, player.y);
+      }
+
+      return player;
+    });
+    this._diffState('id', 'id', this.items, state.items, (raw) => {
+      let item = new Item(
+        this,
+        raw.spriteName,
+        raw.spriteSize,
+        raw.movementSpeed,
+        raw.attackSpeed,
+        raw.attack,
+        raw.defence,
+        raw.range,
+        raw.id,
+        raw.category
+      );
+      item.handleState(raw);
+      if(raw.isOnFloor) {
+        item.setCoordinates(raw.x, raw.y);
+        item.createSprite();
+      }
+      return item;
+    });
+  }
+
+  /**
+   * Take an array of objects and update it to match another array (keeps objects with matching ids)
+   * @param {string} idRawKey The property to use as a key
+   * @param {string} idKey The property to use as a key
+   * @param {object[]} current The current array of objects
+   * @param {object[]} wanted The array of objects we want
+   * @param {function} create A function that creates an instance of a current object
+   *                          from an instance of a wanted object
+   */
+  _diffState(idRawKey, idKey, current, wanted, create) {
+    // add ids to a map for quick lookups
+    let wantedIds = new Map();
+    for(let obj of wanted) {
+      wantedIds.set(obj[idRawKey], obj);
+    }
+
+    for(let i = 0; i &lt; current.length; ++i) {
+      let obj = current[i];
+
+      // already have an instance update it
+      if(wantedIds.has(obj[idKey])) {
+        obj.handleState(wantedIds.get(obj[idKey]));
+        wantedIds.delete(obj[idKey]);
+      } else {
+        // unwanted instance (delete)
+        current.splice(i, 1);
+        --i;
+        obj.remove();
+      }
+    }
+
+    // create missing objects
+    for(let wantedObj of wantedIds) {
+      current.push(create(wantedObj[1]));
+    }
+  }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-backend_game_Floor.html">backend/game/Floor</a></li><li><a href="module-backend_game_GameMap.html">backend/game/GameMap</a></li><li><a href="module-backend_game_Item.html">backend/game/Item</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-browser_Floor.html">browser/Floor</a></li><li><a href="module-browser_GameMap.html">browser/GameMap</a></li><li><a href="module-common_Floor.html">common/Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Item.html">Item</a></li><li><a href="module-LadderCommon.html">LadderCommon</a></li><li><a href="module-Monster.html">Monster</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li></ul><h3>Classes</h3><ul><li><a href="Clock.html">Clock</a></li><li><a href="Env.html">Env</a></li><li><a href="jsApiReporter.html">jsApiReporter</a></li><li><a href="module.html#.exports">exports</a></li><li><a href="module-backend_game_player.html">backend/game/player</a></li><li><a href="module-common_Floor-Floor.html">Floor</a></li><li><a href="module-common_game-map_Corridor.html">common/game-map/Corridor</a></li><li><a href="module-common_game-map_GameMap.html">common/game-map/GameMap</a></li><li><a href="module-common_game-map_Room.html">common/game-map/Room</a></li><li><a href="module-FpsCounter.html">FpsCounter</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerCommon.html">PlayerCommon</a></li><li><a href="Spy.html">Spy</a></li></ul><h3>Namespaces</h3><ul><li><a href="async-matchers.html">async-matchers</a></li><li><a href="jasmine.html">jasmine</a></li><li><a href="matchers.html">matchers</a></li><li><a href="Spy_calls.html">calls</a></li></ul><h3>Interfaces</h3><ul><li><a href="Reporter.html">Reporter</a></li><li><a href="SpyStrategy.html">SpyStrategy</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_getStats">_getStats</a></li><li><a href="global.html#afterAll">afterAll</a></li><li><a href="global.html#afterEach">afterEach</a></li><li><a href="global.html#becomeSpectator">becomeSpectator</a></li><li><a href="global.html#beforeAll">beforeAll</a></li><li><a href="global.html#beforeEach">beforeEach</a></li><li><a href="global.html#bind">bind</a></li><li><a href="global.html#callbackify">callbackify</a></li><li><a href="global.html#checkNameLength">checkNameLength</a></li><li><a href="global.html#describe">describe</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#disconnectPlayer">disconnectPlayer</a></li><li><a href="global.html#dispatchGame">dispatchGame</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawPlayerInfo">drawPlayerInfo</a></li><li><a href="global.html#expect">expect</a></li><li><a href="global.html#expectAsync">expectAsync</a></li><li><a href="global.html#fail">fail</a></li><li><a href="global.html#fdescribe">fdescribe</a></li><li><a href="global.html#fit">fit</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getAddr">getAddr</a></li><li><a href="global.html#initHost">initHost</a></li><li><a href="global.html#isAuthenticated">isAuthenticated</a></li><li><a href="global.html#it">it</a></li><li><a href="global.html#pending">pending</a></li><li><a href="global.html#removePlayer">removePlayer</a></li><li><a href="global.html#render">render</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#spyOn">spyOn</a></li><li><a href="global.html#spyOnProperty">spyOnProperty</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#xdescribe">xdescribe</a></li><li><a href="global.html#xit">xit</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Dec 07 2018 23:47:31 GMT-0600 (Central Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
