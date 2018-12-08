@@ -12,6 +12,11 @@
     "db:migrate:undo": "sequelize db:migrate:undo",
     "migration:create": "sequelize migration:create --name"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "eslint Frontend Backend --ext .js,.mjs"
+    }
+  },
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
