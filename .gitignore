@@ -7,5 +7,4 @@ Frontend/public/*
 *.sqlite
 data
 *.log
-.*.txt
 sqlite3.exe
