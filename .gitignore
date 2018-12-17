@@ -8,3 +8,4 @@ Frontend/public/*
 data
 *.log
 .*.txt
+sqlite3.exe
