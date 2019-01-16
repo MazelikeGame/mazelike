@@ -5,6 +5,7 @@ let hydrate = document.currentScript.dataset;
 // Create an auto copy non-modifyable text input
 let input = document.querySelector("#join-link-copy");
 
+// eslint-ignore-next-line
 input.value = location.origin + "/j/" + hydrate.secret;
 
 let playersInLobby = [];
