@@ -1,7 +1,7 @@
 /* global describe itAsync SERVER_URL requestAsync */
 const chai = require("chai");
 
-let lobbyId;
+let lobbyId, joinUrl;
 
 describe("Lobby", function() {
   itAsync("redirects non-users to login", async() => {
@@ -67,6 +67,11 @@ describe("Lobby", function() {
     });
 
     chai.should().equal(res.statusCode, 200);
+    joinUrl = body.match(/data-secret="([A-Za-z0-9]+)"/);
+	if(joinUrl) {
+		joinUrl = [`${SERVER_URL}/j/${joinUrl[1]}`, joinUrl[1]];
+	}
+    chai.assert(joinUrl, "Join url not found");
   });
 
   itAsync("can join a lobby", async() => {
@@ -91,6 +96,28 @@ describe("Lobby", function() {
         password: "bar"
       }
     });
+
+    if(!joinUrl) {
+      throw new Error("can view a lobby needs to pass the join code");
+    }
+
+    let {res} = await requestAsync({
+      url: `${SERVER_URL}${joinUrl[0]}`,
+      followRedirect: false,
+      jar: true
+    });
+
+    chai.should().equal(res.statusCode, 302);
+    chai.should().equal(res.headers.location, `/game/lobby/${lobbyId}`);
+
+    let {res: res2, body} = await requestAsync({
+      url: `${SERVER_URL}/game/lobby/${lobbyId}`,
+      followRedirect: false,
+      jar: true
+    });
+
+    chai.should().equal(res2.statusCode, 200);
+    chai.assert(body.indexOf("bar") !== -1, "bar not found in lobby");
   });
 
   itAsync("can drop a player", async() => {
