@@ -107,7 +107,6 @@ gameRouter.get("/lobby/:id", async(req, res) => {
     user: req.user.username,
     players,
     host: host.playerId,
-    origin: `http://${req.headers.host}`,
     secret: lobbyResults[0].secret
   });
 });
