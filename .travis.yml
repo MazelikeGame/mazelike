@@ -24,10 +24,10 @@ jobs:
         - script:
             - node scripts/version-check.js
           name: "Verision Change"
-        - script:
-            - docker build -t ryan3r/mazelike .
-            - docker run --rm -d -p 127.0.0.1:3000:3000 ryan3r/mazelike
-            - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
-            - npm test
-            - npm run test-browser
-          name: "Acceptance tests"
+        # - script:
+            # - docker build -t ryan3r/mazelike .
+            # - docker run --rm -d -p 127.0.0.1:3000:3000 ryan3r/mazelike
+            # - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
+            # - npm test
+            # - npm run test-browser
+          # name: "Acceptance tests"

@@ -5,6 +5,9 @@ let hydrate = document.currentScript.dataset;
 // Create an auto copy non-modifyable text input
 let input = document.querySelector("#join-link-copy");
 
+// eslint-disable-next-line
+input.value = location.origin + "/j/" + hydrate.secret;
+
 let playersInLobby = [];
 
 var playerGroup = document.getElementsByClassName("list-group-item d-flex justify-content-between align-items-center");

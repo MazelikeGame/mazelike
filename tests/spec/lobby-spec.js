@@ -67,7 +67,10 @@ describe("Lobby", function() {
     });
 
     chai.should().equal(res.statusCode, 200);
-    joinUrl = body.match(/\/j\/([A-Za-z0-9]+)/);
+    joinUrl = body.match(/data-secret="([A-Za-z0-9]+)"/);
+	if(joinUrl) {
+		joinUrl = [`${SERVER_URL}/j/${joinUrl[1]}`, joinUrl[1]];
+	}
     chai.assert(joinUrl, "Join url not found");
   });
 
