@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: Mazelike main
+    labels:
+        app: mazelike
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: mazelike
+    template:
+        metadata:
+            labels:
+                app: mazelike
+        spec:
+            containers:
+                - name: Mazelike
+                  image: mazelike/mazelike
+                  ports:
+                      - containerPorts: 3000

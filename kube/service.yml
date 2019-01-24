@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: mazelike
+spec:
+    selector:
+        app: mazelike
+    ports:
+        - protocol: TCP
+          port: 3000
