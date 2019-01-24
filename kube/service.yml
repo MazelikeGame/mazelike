@@ -3,6 +3,7 @@ kind: Service
 metadata:
     name: mazelike
 spec:
+    type: NodePort
     selector:
         app: mazelike
     ports:
