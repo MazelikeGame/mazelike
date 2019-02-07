@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: mazelike-main
+    labels:
+        app: mazelike
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: mazelike
+    template:
+        metadata:
+            labels:
+                app: mazelike
+        spec:
+            containers:
+                - name: mazelike
+                  image: mazelike/mazelike
+                  ports:
+                      - containerPort: 3000
+                  volumeMounts:
+                      - name: mazelike-storage
+                        mountPath: /data
+            volumes:
+                - name: mazelike-storage
+                  persistentVolumeClaim:
+                      claimName: mazelike-storage-claim
