@@ -19,3 +19,10 @@ spec:
                   image: mazelike/mazelike
                   ports:
                       - containerPort: 3000
+                  volumeMounts:
+                      - name: mazelike-storage
+                        mountPath: /data
+            volumes:
+                - name: mazelike-storage
+                  persistentVolumeClaim:
+                      claimName: mazelike-storage-claim
